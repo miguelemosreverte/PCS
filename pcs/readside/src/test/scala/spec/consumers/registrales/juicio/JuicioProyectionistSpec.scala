@@ -3,27 +3,29 @@ package spec.consumers.registrales.juicio
 import consumers.registral.juicio.application.entities.JuicioExternalDto
 import consumers.registral.juicio.application.entities.JuicioMessage.JuicioMessageRoots
 import consumers.registral.juicio.domain.JuicioEvents
-import infrastructure.cassandra.CassandraTestkit.TableName
-import spec.ProyectionistSpec
+import infrastructure.cassandra.CassandraTestkit.{TableName, _}
+import spec.testsuite.ProjectionTestSuite
 
-trait JuicioProyectionistSpec extends ProyectionistSpec[JuicioEvents, JuicioMessageRoots] {
+trait JuicioProyectionistSpec extends ProjectionTestSuite[JuicioEvents, JuicioMessageRoots] {
   implicit val tableName: TableName = TableName("read_side.buc_juicios")
 
   "JuicioProyectionistSpec" should
-  "add a registro" in {
+  "add a registro" in parallelActorSystemRunner { implicit s =>
+    val context = testContext()
+    val projectionTestkit = context.ProjectionTestkit
 
     val evento =
       stubs.consumers.registrales.juicio.JuicioEvents.juicioUpdatedFromDtoTriStub
 
-    ProjectionTestkit process eventEnvelope(evento)
+    projectionTestkit process projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
-    ProjectionTestkit read JuicioMessageRoots(
-      evento.sujetoId,
-      evento.objetoId,
-      evento.tipoObjeto,
-      evento.juicioId
-    )
+      projectionTestkit read JuicioMessageRoots(
+        evento.sujetoId,
+        evento.objetoId,
+        evento.tipoObjeto,
+        evento.juicioId
+      )
 
     val registro: JuicioExternalDto = evento.registro
 
@@ -47,5 +49,6 @@ trait JuicioProyectionistSpec extends ProyectionistSpec[JuicioEvents, JuicioMess
         "bju_total" -> registro.BJU_TOTAL
       )
 
+    context.close()
   }
 }

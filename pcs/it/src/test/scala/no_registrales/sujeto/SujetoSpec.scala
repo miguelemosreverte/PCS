@@ -5,6 +5,7 @@ import consumers.no_registral.sujeto.domain.SujetoEvents
 import infrastructure.cassandra.CassandraTestkit.TableName
 import no_registrales.BaseE2ESpec
 import infrastructure.cassandra.CassandraTestkit._
+import spec.testkit.ProjectionTestkit
 
 trait SujetoSpec extends consumers_spec.no_registrales.sujeto.SujetoSpec with BaseE2ESpec {
 
@@ -12,7 +13,7 @@ trait SujetoSpec extends consumers_spec.no_registrales.sujeto.SujetoSpec with Ba
 
   def ProjectionTestkit(context: TestContext)(
       implicit system: ActorSystem
-  ): spec.consumers.ProjectionTestkit[SujetoEvents, SujetoMessageRoots]
+  ): ProjectionTestkit[SujetoEvents, SujetoMessageRoots]
 
   "sending an obligacion" should "reflect on the api and the database" in parallelActorSystemRunner { implicit s =>
     val context = testContext()

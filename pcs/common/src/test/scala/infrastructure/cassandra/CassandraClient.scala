@@ -9,6 +9,7 @@ import akka.stream.alpakka.cassandra.scaladsl.{CassandraSession, CassandraSessio
 import akka.stream.scaladsl.Sink
 import com.datastax.oss.driver.api.core.cql.{Row, SimpleStatement}
 
+// @TODO session should be injected and managed (closed) from outside
 class CassandraClient(implicit system: ActorSystem) {
   import system.dispatcher
 
@@ -42,5 +43,9 @@ class CassandraClient(implicit system: ActorSystem) {
       case sequence =>
         Some(sequence.last)
     }
+  }
+
+  def close(): Unit = {
+    cassandraSession.close(system.dispatcher)
   }
 }

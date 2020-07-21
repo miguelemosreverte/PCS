@@ -23,10 +23,11 @@ object Utils {
   def uniqueActorName: String = s"MockSujeto-${deliveryId}"
 
   def isObjetoBajaFromGetObjetoResponse(response: GetObjetoResponse): Boolean = response match {
-    case response: GetObjetoResponse => response.registro match {
-      case Some(registro) if registro.SOJ_ESTADO.contains("BAJA") => true
-      case Some(registro) if !registro.SOJ_ESTADO.contains("BAJA") => false
-    }
+    case response: GetObjetoResponse =>
+      response.registro match {
+        case Some(registro) if registro.SOJ_ESTADO.contains("BAJA") => true
+        case Some(registro) if !registro.SOJ_ESTADO.contains("BAJA") => false
+      }
   }
 
 }

@@ -28,4 +28,12 @@ object ObjetoMessage {
           ObjetoMessageRoots(sujetoId, objetoId, tipoObjeto)
       }
   }
+  case class ExencionMessageRoot(
+      sujetoId: String,
+      objetoId: String,
+      tipoObjeto: String,
+      exencionId: String
+  ) extends ObjetoMessage {
+    override def aggregateRoot: String = s"${super.aggregateRoot}-Exencion-$exencionId"
+  }
 }

@@ -4,15 +4,16 @@ import java.time.LocalDateTime
 
 import akka.actor.ActorSystem
 import consumers.no_registral.objeto.application.entities.ObjetoExternalDto.Exencion
+import consumers.no_registral.objeto.application.entities.ObjetoMessage.ExencionMessageRoot
 import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoAddedExencion
 import design_principles.actor_model.{ActorSpecCassandra, ActorSpecWriteside}
 import design_principles.projection.CassandraTestkit
+import infrastructure.cassandra.CassandraTestkit._
 import no_registrales.BaseE2ESpec
 import registrales.exencion.testkit.ExencionImplicitConversions
 import registrales.exencion.testkit.query.ExencionQueryTestkit
-import spec.consumers.registrales.exencion.ExencionProyectionistSpec.ExencionMessageRoot
+import spec.testkit.ProjectionTestkit
 import stubs.consumers.no_registrales.objeto.ObjetoExternalDto.objetoExencionStub
-import infrastructure.cassandra.CassandraTestkit._
 
 trait ExencionSpec
     extends consumers_spec.no_registrales.sujeto.SujetoSpec
@@ -21,7 +22,7 @@ trait ExencionSpec
 
   def ProjectionTestkit(context: TestContext)(
       implicit system: ActorSystem
-  ): spec.consumers.ProjectionTestkit[ObjetoAddedExencion, ExencionMessageRoot]
+  ): ProjectionTestkit[ObjetoAddedExencion, ExencionMessageRoot]
 
   abstract class ExencionE2ETestContext(implicit val system: ActorSystem)
       extends ActorSpecWriteside

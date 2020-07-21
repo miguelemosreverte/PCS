@@ -5,12 +5,13 @@ import consumers.no_registral.obligacion.application.entities.ObligacionMessage.
 import consumers.no_registral.obligacion.domain.ObligacionEvents
 import infrastructure.cassandra.CassandraTestkit.{TableName, _}
 import no_registrales.BaseE2ESpec
+import spec.testkit.ProjectionTestkit
 
 trait ObligacionSpec extends consumers_spec.no_registrales.obligacion.ObligacionSpec with BaseE2ESpec {
 
   def ProjectionTestkit(context: TestContext)(
       implicit system: ActorSystem
-  ): spec.consumers.ProjectionTestkit[ObligacionEvents, ObligacionMessageRoots]
+  ): ProjectionTestkit[ObligacionEvents, ObligacionMessageRoots]
 
   implicit val tableName: TableName = TableName("read_side.buc_obligaciones")
 

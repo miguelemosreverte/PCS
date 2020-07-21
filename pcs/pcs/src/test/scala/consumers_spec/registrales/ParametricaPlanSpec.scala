@@ -61,8 +61,10 @@ class ParametricaPlanSpec extends TypedActorSpec {
              | parametrica_plan 2 - $parametrica_planResponse2
              | parametrica_plan 3 - $parametrica_planResponse3
              |""".stripMargin)
-    } yield
-      (parametrica_planResponse1, parametrica_planResponse2, parametrica_planResponse3, parametrica_planResponse4)).futureValue
+    } yield (parametrica_planResponse1,
+             parametrica_planResponse2,
+             parametrica_planResponse3,
+             parametrica_planResponse4)).futureValue
 
     parametrica_planResponse1.registro.get.BPP_FPM_DESCRIPCION should be("FIRST REGISTRO")
     parametrica_planResponse2.registro.get.BPP_FPM_DESCRIPCION should be("SECOND REGISTRO")

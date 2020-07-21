@@ -5,6 +5,7 @@ import scala.util.Try
 
 import akka.actor.ActorSystem
 import akka.pattern.ask
+import com.typesafe.config.{Config, ConfigFactory}
 import design_principles.actor_model.system_parallelizable.ActorSystemParallelizer.RunTest
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.flatspec.AnyFlatSpecLike
@@ -22,10 +23,15 @@ class ActorSystemParallelizerSpec
 
   val log: Logger = LoggerFactory.getLogger(this.getClass)
 
+  lazy val actorConfig: Config = ActorSystemParallelizerSpec.config
   def parallelActorSystemRunner(testContext: ActorSystem => Unit): Unit =
     ActorSystemParallelizerBuilder.actor
-      .ask(RunTest(testContext))(2.minutes)
+      .ask(RunTest(actorConfig, testContext))(2.minutes)
       .mapTo[Try[Unit]]
       .futureValue(timeout(2.minutes))
       .get
+}
+
+object ActorSystemParallelizerSpec {
+  lazy val config: Config = ConfigFactory.load()
 }

@@ -6,6 +6,7 @@ import scala.util.Try
 
 import akka.actor.{Actor, ActorSystem, Props, Stash}
 import akka.pattern.pipe
+import com.typesafe.config.Config
 
 class ActorSystemParallelizer(actorSystemNumbers: Seq[Int]) extends Actor with Stash {
   import ActorSystemParallelizer._
@@ -37,9 +38,9 @@ class ActorSystemParallelizer(actorSystemNumbers: Seq[Int]) extends Actor with S
         _system.scheduler.scheduleOnce(10.seconds, self, CanShutdown)
       }
 
-    case RunTest(test) =>
+    case RunTest(config, test) =>
       state
-        .orElse(Some(ActorSystemParallelizerState.fromActorSystemNumbers(actorSystemNumbers)))
+        .orElse(Some(ActorSystemParallelizerState.fromActorSystemNumbers(config, actorSystemNumbers)))
         .foreach(processTest(test))
   }
 
@@ -70,5 +71,5 @@ object ActorSystemParallelizer {
 
   case class FreeActorSystem(actorSystem: (Int, ActorSystem))
   case object CanShutdown
-  case class RunTest(test: ActorSystem => Unit)
+  case class RunTest(config: Config, test: ActorSystem => Unit)
 }

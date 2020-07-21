@@ -27,7 +27,9 @@ case class ObjetoTributarioTransaction()(implicit actorRef: ActorRef) extends Ac
       detalles <- serialization.decodeF[Seq[ObjetosTriOtrosAtributos]](sojDetalles.toString).headOption
     } yield detalles
 
-    val isResponsable = detalle map { d => d.RESPONSABLE_OTROS_ATRIBUTOS contains "S" }
+    val isResponsable = detalle map { d =>
+      d.RESPONSABLE_OTROS_ATRIBUTOS contains "S"
+    }
     val sujetoResponsable = detalle flatMap { d =>
       d.RESPONSABLE_OTROS_ATRIBUTOS.getOrElse("N") match {
         case "S" => Some(registro.SOJ_SUJ_IDENTIFICADOR)
@@ -35,25 +37,27 @@ case class ObjetoTributarioTransaction()(implicit actorRef: ActorRef) extends Ac
       }
     }
 
-    val command: ObjetoCommands = 
-      if(registro.SOJ_ESTADO.contains("BAJA")) ObjetoCommands.SetBajaObjeto(
-        sujetoId = registro.SOJ_SUJ_IDENTIFICADOR,
-        objetoId = registro.SOJ_IDENTIFICADOR,
-        tipoObjeto = registro.SOJ_TIPO_OBJETO,
-        deliveryId = registro.EV_ID,
-        registro = registro,
-        isResponsable = isResponsable,
-        sujetoResponsable = sujetoResponsable
-      )
-      else ObjetoCommands.ObjetoUpdateFromTri(
-        sujetoId = registro.SOJ_SUJ_IDENTIFICADOR,
-        objetoId = registro.SOJ_IDENTIFICADOR,
-        tipoObjeto = registro.SOJ_TIPO_OBJETO,
-        deliveryId = registro.EV_ID,
-        registro = registro,
-        isResponsable = isResponsable,
-        sujetoResponsable = sujetoResponsable
-      )
+    val command: ObjetoCommands =
+      if (registro.SOJ_ESTADO.contains("BAJA"))
+        ObjetoCommands.SetBajaObjeto(
+          sujetoId = registro.SOJ_SUJ_IDENTIFICADOR,
+          objetoId = registro.SOJ_IDENTIFICADOR,
+          tipoObjeto = registro.SOJ_TIPO_OBJETO,
+          deliveryId = registro.EV_ID,
+          registro = registro,
+          isResponsable = isResponsable,
+          sujetoResponsable = sujetoResponsable
+        )
+      else
+        ObjetoCommands.ObjetoUpdateFromTri(
+          sujetoId = registro.SOJ_SUJ_IDENTIFICADOR,
+          objetoId = registro.SOJ_IDENTIFICADOR,
+          tipoObjeto = registro.SOJ_TIPO_OBJETO,
+          deliveryId = registro.EV_ID,
+          registro = registro,
+          isResponsable = isResponsable,
+          sujetoResponsable = sujetoResponsable
+        )
 
     actorRef.ask[akka.Done](command)
 

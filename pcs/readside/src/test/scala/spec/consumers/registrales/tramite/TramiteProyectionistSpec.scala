@@ -3,25 +3,27 @@ package spec.consumers.registrales.tramite
 import consumers.registral.tramite.application.entities.TramiteExternalDto.Tramite
 import consumers.registral.tramite.application.entities.TramiteMessage.TramiteMessageRoots
 import consumers.registral.tramite.domain.TramiteEvents
-import infrastructure.cassandra.CassandraTestkit.TableName
-import spec.ProyectionistSpec
+import infrastructure.cassandra.CassandraTestkit.{TableName, _}
+import spec.testsuite.ProjectionTestSuite
 
-trait TramiteProyectionistSpec extends ProyectionistSpec[TramiteEvents, TramiteMessageRoots] {
+trait TramiteProyectionistSpec extends ProjectionTestSuite[TramiteEvents, TramiteMessageRoots] {
   implicit val tableName: TableName = TableName("read_side.buc_tramites")
 
   "TramiteProyectionistSpec" should
-  "add a registro" in {
+  "add a registro" in parallelActorSystemRunner { implicit s =>
+    val context = testContext()
+    val projectionTestkit = context.ProjectionTestkit
 
     val evento =
       stubs.consumers.registrales.tramite.TramiteEvents.tramiteUpdatedFromDtoStub
 
-    ProjectionTestkit process eventEnvelope(evento)
+    projectionTestkit process projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
-    ProjectionTestkit read TramiteMessageRoots(
-      sujetoId = evento.sujetoId,
-      tramiteId = evento.tramiteId
-    )
+      projectionTestkit read TramiteMessageRoots(
+        sujetoId = evento.sujetoId,
+        tramiteId = evento.tramiteId
+      )
 
     val registro: Tramite = evento.registro
 
@@ -36,5 +38,6 @@ trait TramiteProyectionistSpec extends ProyectionistSpec[TramiteEvents, TramiteM
         "btr_tipo" -> registro.BTR_TIPO
       )
 
+    context.close()
   }
 }

@@ -77,7 +77,7 @@ package object json {
   implicit val ObjetosTriOtrosAtributosF = Json.format[ObjetosTriOtrosAtributos]
 
   implicit val GetExencionResponseF = Json.format[GetExencionResponse]
-  
+
   implicit val ObjetoBajaSetF = Json.format[ObjetoBajaSet]
   class ObjetoBajaSetFS extends EventSerializer[ObjetoBajaSet]
 

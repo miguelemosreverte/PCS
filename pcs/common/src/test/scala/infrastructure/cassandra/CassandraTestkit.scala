@@ -108,26 +108,26 @@ object CassandraTestkit extends AnyFlatSpec {
         //val header = " " * 40 + decoration + " " + tableName + " " + decoration
         val twoColumnComparison = rowAsMapPrepared prettyPrintAlongside compareToPrepared
         val detailedOneByOneComparison: Seq[String] = compareToPrepared.toSeq map {
-          case (key, value) =>
-            val valueAsString = value
-            val valueInCassandra = rowAsMapPrepared.getOrElse(key, "--")
-            " " * 60 + s"row(${Console.CYAN + key + Console.RESET}) == value" + " | " + s"${Console.GREEN + standarize(
-              valueInCassandra
-            ) + Console.RESET} == ${standarize(valueAsString)}"
-        }
+            case (key, value) =>
+              val valueAsString = value
+              val valueInCassandra = rowAsMapPrepared.getOrElse(key, "--")
+              " " * 60 + s"row(${Console.CYAN + key + Console.RESET}) == value" + " | " + s"${Console.GREEN + standarize(
+                valueInCassandra
+              ) + Console.RESET} == ${standarize(valueAsString)}"
+          }
         val fullPresentation: String = (Seq(twoColumnComparison) ++ detailedOneByOneComparison) mkString "\n"
         val twoEmptyLines = "\n" * 2
         println(twoEmptyLines + fullPresentation + twoEmptyLines)
       }
 
       val comparisons = compareToPrepared map {
-        case (key, value) =>
-          val valueAsString = value
-          val valueInCassandra = rowAsMapPrepared.getOrElse(key, "--")
-          assert(safeCompare(valueInCassandra, valueAsString))
-          safeCompare(valueInCassandra, valueAsString)
+          case (key, value) =>
+            val valueAsString = value
+            val valueInCassandra = rowAsMapPrepared.getOrElse(key, "--")
+            assert(safeCompare(valueInCassandra, valueAsString))
+            safeCompare(valueInCassandra, valueAsString)
 
-      }
+        }
       if (comparisons.isEmpty) assert(true)
       else assert(comparisons reduce (_ && _))
     }

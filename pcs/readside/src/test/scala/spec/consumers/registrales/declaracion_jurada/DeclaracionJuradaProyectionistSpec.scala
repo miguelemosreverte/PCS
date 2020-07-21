@@ -3,26 +3,28 @@ package spec.consumers.registrales.declaracion_jurada
 import consumers.registral.declaracion_jurada.application.entities.DeclaracionJuradaExternalDto
 import consumers.registral.declaracion_jurada.application.entities.DeclaracionJuradaMessage.DeclaracionJuradaMessageRoots
 import consumers.registral.declaracion_jurada.domain.DeclaracionJuradaEvents
-import infrastructure.cassandra.CassandraTestkit.TableName
-import spec.ProyectionistSpec
+import infrastructure.cassandra.CassandraTestkit.{TableName, _}
+import spec.testsuite.ProjectionTestSuite
 
 trait DeclaracionJuradaProyectionistSpec
-    extends ProyectionistSpec[DeclaracionJuradaEvents, DeclaracionJuradaMessageRoots] {
+    extends ProjectionTestSuite[DeclaracionJuradaEvents, DeclaracionJuradaMessageRoots] {
   implicit val tableName: TableName = TableName("read_side.buc_declaraciones_juradas")
 
   "DeclaracionJuradaProyectionistSpec" should
-  "add a registro" in {
+  "add a registro" in parallelActorSystemRunner { implicit s =>
+    val context = testContext()
+    val projectionTestkit = context.ProjectionTestkit
 
     val evento =
       stubs.consumers.registrales.declaracion_jurada.DeclaracionJuradaEvents.declaracionJuradaUpdatedFromDtoStub
 
-    ProjectionTestkit process eventEnvelope(evento)
+    projectionTestkit process projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
-    ProjectionTestkit read DeclaracionJuradaMessageRoots(evento.sujetoId,
-                                                         evento.objetoId,
-                                                         evento.tipoObjeto,
-                                                         evento.declaracionJuradaId)
+      projectionTestkit read DeclaracionJuradaMessageRoots(evento.sujetoId,
+                                                           evento.objetoId,
+                                                           evento.tipoObjeto,
+                                                           evento.declaracionJuradaId)
 
     val registro: DeclaracionJuradaExternalDto = evento.registro
 
@@ -44,5 +46,6 @@ trait DeclaracionJuradaProyectionistSpec
         "bdj_vencimiento" -> registro.BDJ_VENCIMIENTO
       )
 
+    context.close()
   }
 }

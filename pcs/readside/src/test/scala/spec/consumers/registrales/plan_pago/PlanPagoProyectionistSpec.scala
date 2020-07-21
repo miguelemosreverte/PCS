@@ -3,27 +3,30 @@ package spec.consumers.registrales.plan_pago
 import consumers.registral.plan_pago.application.entities.PlanPagoExternalDto
 import consumers.registral.plan_pago.application.entities.PlanPagoMessage.PlanPagoMessageRoots
 import consumers.registral.plan_pago.domain.PlanPagoEvents
-import infrastructure.cassandra.CassandraTestkit.TableName
-import spec.ProyectionistSpec
+import infrastructure.cassandra.CassandraTestkit.{TableName, _}
+import spec.testsuite.ProjectionTestSuite
 
-trait PlanPagoProyectionistSpec extends ProyectionistSpec[PlanPagoEvents, PlanPagoMessageRoots] {
+trait PlanPagoProyectionistSpec extends ProjectionTestSuite[PlanPagoEvents, PlanPagoMessageRoots] {
   implicit val tableName: TableName = TableName("read_side.buc_planes_pago")
 
   "PlanPagoProyectionistSpec" should
-  "add a registro" in {
+  "add a registro" in parallelActorSystemRunner { implicit s =>
+    val context = testContext()
+    val projectionTestkit = context.ProjectionTestkit
+
 
     val evento =
       stubs.consumers.registrales.plan_pago.PlanPagoEvents.PlanPagoUpdatedFromDtoAntStub
 
-    ProjectionTestkit process eventEnvelope(evento)
+    projectionTestkit process projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
-    ProjectionTestkit read PlanPagoMessageRoots(
-      sujetoId = evento.sujetoId,
-      objetoId = evento.objetoId,
-      tipoObjeto = evento.tipoObjeto,
-      planPagoId = evento.planPagoId
-    )
+      projectionTestkit read PlanPagoMessageRoots(
+        sujetoId = evento.sujetoId,
+        objetoId = evento.objetoId,
+        tipoObjeto = evento.tipoObjeto,
+        planPagoId = evento.planPagoId
+      )
 
     val registro: PlanPagoExternalDto = evento.registro
 
@@ -41,5 +44,6 @@ trait PlanPagoProyectionistSpec extends ProyectionistSpec[PlanPagoEvents, PlanPa
         "bpl_otros_atributos" -> registro.BPL_OTROS_ATRIBUTOS.toString
       )
 
+    context.close()
   }
 }

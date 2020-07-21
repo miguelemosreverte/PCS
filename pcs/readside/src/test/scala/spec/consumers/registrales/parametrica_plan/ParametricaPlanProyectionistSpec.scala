@@ -3,24 +3,26 @@ package spec.consumers.registrales.parametrica_plan
 import consumers.registral.parametrica_plan.application.entities.ParametricaPlanExternalDto
 import consumers.registral.parametrica_plan.application.entities.ParametricaPlanMessage.ParametricaPlanMessageRoots
 import consumers.registral.parametrica_plan.domain.ParametricaPlanEvents
-import infrastructure.cassandra.CassandraTestkit.TableName
-import spec.ProyectionistSpec
+import infrastructure.cassandra.CassandraTestkit.{TableName, _}
+import spec.testsuite.ProjectionTestSuite
 
-trait ParametricaPlanProyectionistSpec extends ProyectionistSpec[ParametricaPlanEvents, ParametricaPlanMessageRoots] {
+trait ParametricaPlanProyectionistSpec extends ProjectionTestSuite[ParametricaPlanEvents, ParametricaPlanMessageRoots] {
   implicit val tableName: TableName = TableName("read_side.buc_obligaciones")
 
   "ParametricaPlanProyectionistSpec" should
-  "add a registro" in {
+  "add a registro" in parallelActorSystemRunner { implicit s =>
+    val context = testContext()
+    val projectionTestkit = context.ProjectionTestkit
 
     val evento =
       stubs.consumers.registrales.parametrica_plan.ParametricaPlanEvents.parametricaPlanUpdatedFromDtoAntStub
 
-    ProjectionTestkit process eventEnvelope(evento)
+    projectionTestkit process projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
-    ProjectionTestkit read ParametricaPlanMessageRoots(
-      parametricaPlanId = evento.bppFpmId
-    )
+      projectionTestkit read ParametricaPlanMessageRoots(
+        parametricaPlanId = evento.bppFpmId
+      )
 
     val registro: ParametricaPlanExternalDto = evento.registro
 
@@ -38,5 +40,6 @@ trait ParametricaPlanProyectionistSpec extends ProyectionistSpec[ParametricaPlan
         "bpp_porcentaje_anticipo" -> registro.BPP_PORCENTAJE_ANTICIPO*/
       )
 
+    context.close()
   }
 }

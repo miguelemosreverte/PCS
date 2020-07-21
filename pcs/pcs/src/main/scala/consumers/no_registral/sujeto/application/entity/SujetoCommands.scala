@@ -30,10 +30,10 @@ object SujetoCommands {
   ) extends SujetoCommands
 
   case class SujetoSetBajaFromObjeto(
-    deliveryId: BigInt,
-    sujetoId: String,
-    objetoId: String,
-    tipoObjeto: String
+      deliveryId: BigInt,
+      sujetoId: String,
+      objetoId: String,
+      tipoObjeto: String
   ) extends SujetoCommands
 
 }

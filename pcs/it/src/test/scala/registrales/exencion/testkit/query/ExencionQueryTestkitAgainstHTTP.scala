@@ -1,21 +1,15 @@
 package registrales.exencion.testkit.query
 
-import akka.actor.{ActorRef, ActorSystem}
-import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMessageRoots
-import consumers.no_registral.objeto.application.entities.ObjetoQueries.GetStateExencion
+import akka.actor.ActorSystem
+import consumers.no_registral.objeto.application.entities.ObjetoMessage.{ExencionMessageRoot, ObjetoMessageRoots}
 import consumers.no_registral.objeto.application.entities.ObjetoResponses.{GetExencionResponse, GetObjetoResponse}
-import design_principles.actor_model.testkit.QueryTestkit
-import design_principles.actor_model.testkit.QueryTestkit.AgainstHTTP
-import play.api.libs.json.Format
 import consumers.no_registral.objeto.infrastructure.json._
 import consumers.no_registral.obligacion.application.entities.ObligacionMessage.ObligacionMessageRoots
 import consumers.no_registral.obligacion.application.entities.ObligacionResponses.GetObligacionResponse
 import consumers.no_registral.sujeto.application.entity.SujetoMessage.SujetoMessageRoots
 import consumers.no_registral.sujeto.application.entity.SujetoResponses.GetSujetoResponse
-import consumers_spec.no_registrales.testkit.query.{NoRegistralesQueryWithActorRef, NoRegistralesQueryWithHTTP}
-import spec.consumers.registrales.exencion.ExencionProyectionistSpec.ExencionMessageRoot
-
-import scala.reflect.ClassTag
+import consumers_spec.no_registrales.testkit.query.NoRegistralesQueryWithHTTP
+import design_principles.actor_model.testkit.QueryTestkit.AgainstHTTP
 
 class ExencionQueryTestkitAgainstHTTP(implicit system: ActorSystem) extends ExencionQueryTestkit with AgainstHTTP {
 

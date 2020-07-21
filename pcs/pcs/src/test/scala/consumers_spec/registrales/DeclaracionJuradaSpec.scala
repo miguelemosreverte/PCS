@@ -48,11 +48,10 @@ class DeclaracionJuradaSpec extends TypedActorSpec {
              | sujeto 2 - $getDeclaracionJuradaResponse2
              | sujeto 3 - $getDeclaracionJuradaResponse3
              |""".stripMargin)
-    } yield
-      (getDeclaracionJuradaResponse1,
-       getDeclaracionJuradaResponse2,
-       getDeclaracionJuradaResponse3,
-       getDeclaracionJuradaResponse4)).futureValue
+    } yield (getDeclaracionJuradaResponse1,
+             getDeclaracionJuradaResponse2,
+             getDeclaracionJuradaResponse3,
+             getDeclaracionJuradaResponse4)).futureValue
 
     declaracionJuradaResponse1.registro.get.BDJ_ESTADO.get should be("FIRST REGISTRO")
     declaracionJuradaResponse2.registro.get.BDJ_ESTADO.get should be("SECOND REGISTRO")

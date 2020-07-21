@@ -3,22 +3,24 @@ package spec.consumers.registrales.actividad_sujeto
 import consumers.registral.actividad_sujeto.application.entities.ActividadSujetoExternalDto
 import consumers.registral.actividad_sujeto.application.entities.ActividadSujetoMessage.ActividadSujetoMessageRoots
 import consumers.registral.actividad_sujeto.domain.ActividadSujetoEvents
-import infrastructure.cassandra.CassandraTestkit.TableName
-import spec.ProyectionistSpec
+import infrastructure.cassandra.CassandraTestkit.{TableName, _}
+import spec.testsuite.ProjectionTestSuite
 
-trait ActividadSujetoProyectionistSpec extends ProyectionistSpec[ActividadSujetoEvents, ActividadSujetoMessageRoots] {
+trait ActividadSujetoProyectionistSpec extends ProjectionTestSuite[ActividadSujetoEvents, ActividadSujetoMessageRoots] {
   implicit val tableName: TableName = TableName("read_side.buc_actividades_sujeto")
 
   "ActividadSujetoProyectionistSpec" should
-  "add a registro" in {
+  "add a registro" in parallelActorSystemRunner { implicit s =>
+    val context = testContext()
+    val projectionTestkit = context.ProjectionTestkit
 
     val evento =
       stubs.consumers.registrales.actividad_sujeto.ActividadSujetoEvents.actividadSujetoUpdatedFromDtoStub
 
-    ProjectionTestkit process eventEnvelope(evento)
+    projectionTestkit process projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
-    ProjectionTestkit read ActividadSujetoMessageRoots(evento.sujetoId, evento.actividadSujetoId)
+      projectionTestkit read ActividadSujetoMessageRoots(evento.sujetoId, evento.actividadSujetoId)
 
     val registro: ActividadSujetoExternalDto = evento.registro
 
@@ -32,5 +34,6 @@ trait ActividadSujetoProyectionistSpec extends ProyectionistSpec[ActividadSujeto
         "bat_tipo" -> registro.BAT_TIPO
       )
 
+    context.close()
   }
 }

@@ -5,12 +5,13 @@ import consumers.no_registral.sujeto.application.entity.SujetoMessage.SujetoMess
 import consumers.no_registral.sujeto.domain.SujetoEvents
 import no_registrales.sujeto.SujetoSpec
 import no_registrales.{BaseE2ESpec, NoRegistralesTestSuiteMock}
-import spec.consumers.no_registrales.sujeto.SujetoProyectionistUnitTest
+import spec.consumers.no_registrales.sujeto.unit_test.SujetoProjectionUnitTestKit
+import spec.testkit.ProjectionTestkit
 
 class SujetoSpecUT extends SujetoSpec with BaseE2ESpec with NoRegistralesTestSuiteMock {
 
   def ProjectionTestkit(context: TestContext)(
       implicit system: ActorSystem
-  ): spec.consumers.ProjectionTestkit[SujetoEvents, SujetoMessageRoots] =
-    new SujetoProyectionistUnitTest.SujetoProjectionTestkit(context.asInstanceOf[MockE2ETestContext].cassandraTestkit)
+  ): ProjectionTestkit[SujetoEvents, SujetoMessageRoots] =
+    new SujetoProjectionUnitTestKit(context.asInstanceOf[MockE2ETestContext].cassandraTestkit)
 }

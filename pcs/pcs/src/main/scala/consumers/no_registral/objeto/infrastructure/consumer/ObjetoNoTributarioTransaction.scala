@@ -18,8 +18,9 @@ case class ObjetoNoTributarioTransaction()(implicit actorRef: ActorRef) extends 
 
     val registro = decodeF[ObjetosAnt](input)
 
-    val command: ObjetoCommands = 
-      if(registro.SOJ_ESTADO.contains("BAJA")) ObjetoCommands.SetBajaObjeto(
+    val command: ObjetoCommands =
+      if (registro.SOJ_ESTADO.contains("BAJA"))
+        ObjetoCommands.SetBajaObjeto(
           sujetoId = registro.SOJ_SUJ_IDENTIFICADOR,
           objetoId = registro.SOJ_IDENTIFICADOR,
           tipoObjeto = registro.SOJ_TIPO_OBJETO,
@@ -28,7 +29,8 @@ case class ObjetoNoTributarioTransaction()(implicit actorRef: ActorRef) extends 
           isResponsable = None,
           sujetoResponsable = None
         )
-      else ObjetoCommands.ObjetoUpdateFromAnt(
+      else
+        ObjetoCommands.ObjetoUpdateFromAnt(
           sujetoId = registro.SOJ_SUJ_IDENTIFICADOR,
           objetoId = registro.SOJ_IDENTIFICADOR,
           tipoObjeto = registro.SOJ_TIPO_OBJETO,

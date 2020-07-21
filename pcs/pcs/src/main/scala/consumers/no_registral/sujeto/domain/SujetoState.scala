@@ -6,14 +6,14 @@ import consumers.no_registral.sujeto.application.entity.SujetoExternalDto
 import ddd.AbstractState
 
 final case class SujetoState(
-                              saldo: BigDecimal = 0,
-                              saldoObjetos: Map[String, BigDecimal] = Map.empty,
-                              saldoObjetosVencidos: Map[String, BigDecimal] = Map.empty,
-                              objetos: Set[(String, String)] = Set.empty,
-                              fechaUltMod: LocalDateTime = LocalDateTime.MIN,
-                              registro: Option[SujetoExternalDto] = None,
-                              lastDeliveryIdByEvents: Map[String, BigInt] = Map.empty
-                            ) extends AbstractState[SujetoEvents] {
+    saldo: BigDecimal = 0,
+    saldoObjetos: Map[String, BigDecimal] = Map.empty,
+    saldoObjetosVencidos: Map[String, BigDecimal] = Map.empty,
+    objetos: Set[(String, String)] = Set.empty,
+    fechaUltMod: LocalDateTime = LocalDateTime.MIN,
+    registro: Option[SujetoExternalDto] = None,
+    lastDeliveryIdByEvents: Map[String, BigInt] = Map.empty
+) extends AbstractState[SujetoEvents] {
   def +(event: SujetoEvents): SujetoState =
     changeState(event).copy(
       fechaUltMod = LocalDateTime.now,
@@ -30,24 +30,16 @@ final case class SujetoState(
         copy(
           registro = Some(registro)
         )
-      case SujetoEvents.SujetoUpdatedFromObjeto(_,
-                                                _,
-                                                objetoId,
-                                                tipoObjeto,
-                                                saldoObjeto,
-                                                saldoObligacionesVencidas) =>
+      case SujetoEvents.SujetoUpdatedFromObjeto(_, _, objetoId, tipoObjeto, saldoObjeto, saldoObligacionesVencidas) =>
         val objetoKey = s"$objetoId|$tipoObjeto"
-        val _saldoObjetos = saldoObjetos + ( objetoKey -> saldoObjeto)
+        val _saldoObjetos = saldoObjetos + (objetoKey -> saldoObjeto)
         copy(
           objetos = objetos + ((objetoId, tipoObjeto)),
           saldoObjetos = _saldoObjetos,
           saldo = _saldoObjetos.values.sum,
           saldoObjetosVencidos = saldoObjetosVencidos + (objetoKey -> saldoObligacionesVencidas)
         )
-      case SujetoEvents.SujetoBajaFromObjetoSet(_,
-                                                _,
-                                                objetoId,
-                                                tipoObjeto) =>
+      case SujetoEvents.SujetoBajaFromObjetoSet(_, _, objetoId, tipoObjeto) =>
         val objetoKey = s"$objetoId|$tipoObjeto"
         val _saldoObjetos = saldoObjetos - objetoKey
         copy(

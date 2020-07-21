@@ -64,8 +64,10 @@ class DomicilioSujetoSpec extends TypedActorSpec {
              | domicilio_sujeto 2 - $domicilio_sujetoResponse2
              | domicilio_sujeto 3 - $domicilio_sujetoResponse3
              |""".stripMargin)
-    } yield
-      (domicilio_sujetoResponse1, domicilio_sujetoResponse2, domicilio_sujetoResponse3, domicilio_sujetoResponse4)).futureValue
+    } yield (domicilio_sujetoResponse1,
+             domicilio_sujetoResponse2,
+             domicilio_sujetoResponse3,
+             domicilio_sujetoResponse4)).futureValue
 
     domicilio_sujetoResponse1.registro.get.BDS_OBSERVACIONES.get should be("FIRST REGISTRO")
     domicilio_sujetoResponse2.registro.get.BDS_OBSERVACIONES.get should be("SECOND REGISTRO")

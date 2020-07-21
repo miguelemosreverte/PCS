@@ -3,6 +3,7 @@ package registrales.exencion
 import akka.actor.{ActorRef, ActorSystem}
 import cassandra.read.CassandraRead
 import cassandra.write.CassandraWrite
+import consumers.no_registral.objeto.application.entities.ObjetoMessage.ExencionMessageRoot
 import consumers.no_registral.objeto.domain.ObjetoEvents
 import consumers.no_registral.objeto.infrastructure.json._
 import consumers_spec.no_registrales.testkit.MessageTestkitUtils
@@ -12,7 +13,6 @@ import design_principles.projection.mock.{CassandraTestkitMock, CassandraWriteMo
 import kafka.{MessageProcessor, MessageProducer}
 import readside.proyectionists.registrales.exencion.ExencionProjectionHandler
 import registrales.exencion.testkit.query.ExencionQueryTestkitAgainstActors
-import spec.consumers.registrales.exencion.ExencionProyectionistSpec.ExencionMessageRoot
 
 trait ExencionTestSuiteMock extends ExencionSpec {
 

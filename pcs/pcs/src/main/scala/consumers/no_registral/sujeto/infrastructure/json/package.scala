@@ -2,20 +2,20 @@ package consumers.no_registral.sujeto.infrastructure
 
 import ai.x.play.json.Jsonx
 import consumers.no_registral.sujeto.application.entity.SujetoCommands.{
+  SujetoSetBajaFromObjeto,
   SujetoUpdateFromAnt,
   SujetoUpdateFromObjeto,
-  SujetoUpdateFromTri,
-  SujetoSetBajaFromObjeto
+  SujetoUpdateFromTri
 }
 import consumers.no_registral.sujeto.application.entity.SujetoExternalDto
 import consumers.no_registral.sujeto.application.entity.SujetoExternalDto.{SujetoAnt, SujetoTri}
 import consumers.no_registral.sujeto.application.entity.SujetoResponses.GetSujetoResponse
 import consumers.no_registral.sujeto.domain.SujetoEvents.{
+  SujetoBajaFromObjetoSet,
   SujetoSnapshotPersisted,
   SujetoUpdatedFromAnt,
   SujetoUpdatedFromObjeto,
-  SujetoUpdatedFromTri,
-  SujetoBajaFromObjetoSet
+  SujetoUpdatedFromTri
 }
 import io.leonard.TraitFormat
 import io.leonard.TraitFormat.traitFormat

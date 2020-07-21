@@ -8,10 +8,10 @@ import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMe
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
 import consumers.no_registral.obligacion.application.entities.ObligacionMessage
 import consumers.no_registral.sujeto.application.cqrs.commands.{
+  SujetoSetBajaFromObjetoHandler,
   SujetoUpdateFromAntHandler,
   SujetoUpdateFromObjetoHandler,
-  SujetoUpdateFromTriHandler,
-  SujetoSetBajaFromObjetoHandler
+  SujetoUpdateFromTriHandler
 }
 import consumers.no_registral.sujeto.application.cqrs.queries.GetStateSujetoHandler
 import consumers.no_registral.sujeto.application.entity.SujetoMessage.SujetoMessageRoots

@@ -3,27 +3,29 @@ package spec.consumers.registrales.domicilio_objeto
 import consumers.registral.domicilio_objeto.application.entities.DomicilioObjetoExternalDto
 import consumers.registral.domicilio_objeto.application.entities.DomicilioObjetoMessage.DomicilioObjetoMessageRoots
 import consumers.registral.domicilio_objeto.domain.DomicilioObjetoEvents
-import infrastructure.cassandra.CassandraTestkit.TableName
-import spec.ProyectionistSpec
+import infrastructure.cassandra.CassandraTestkit.{TableName, _}
+import spec.testsuite.ProjectionTestSuite
 
-trait DomicilioObjetoProyectionistSpec extends ProyectionistSpec[DomicilioObjetoEvents, DomicilioObjetoMessageRoots] {
+trait DomicilioObjetoProyectionistSpec extends ProjectionTestSuite[DomicilioObjetoEvents, DomicilioObjetoMessageRoots] {
   implicit val tableName: TableName = TableName("read_side.buc_domicilios_objeto")
 
   "DomicilioObjetoProyectionistSpec" should
-  "add a registro" in {
+  "add a registro" in parallelActorSystemRunner { implicit s =>
+    val context = testContext()
+    val projectionTestkit = context.ProjectionTestkit
 
     val evento =
       stubs.consumers.registrales.domicilio_objeto.DomicilioObjetoEvents.domicilioObjetoUpdatedFromDtoAntStub
 
-    ProjectionTestkit process eventEnvelope(evento)
+    projectionTestkit process projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
-    ProjectionTestkit read DomicilioObjetoMessageRoots(
-      evento.sujetoId,
-      evento.objetoId,
-      evento.tipoObjeto,
-      evento.domicilioObjetoId
-    )
+      projectionTestkit read DomicilioObjetoMessageRoots(
+        evento.sujetoId,
+        evento.objetoId,
+        evento.tipoObjeto,
+        evento.domicilioObjetoId
+      )
 
     val registro: DomicilioObjetoExternalDto = evento.registro
 
@@ -45,6 +47,6 @@ trait DomicilioObjetoProyectionistSpec extends ProyectionistSpec[DomicilioObjeto
         "bdo_torre" -> registro.BDO_TORRE,
         "bdo_observaciones" -> registro.BDO_OBSERVACIONES
       )
-
+    context.close()
   }
 }

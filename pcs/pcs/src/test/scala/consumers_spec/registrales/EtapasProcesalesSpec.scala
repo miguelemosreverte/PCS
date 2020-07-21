@@ -62,8 +62,10 @@ class EtapasProcesalesSpec extends TypedActorSpec {
              | etapas_procesales 2 - $etapas_procesalesResponse2
              | etapas_procesales 3 - $etapas_procesalesResponse3
              |""".stripMargin)
-    } yield
-      (etapas_procesalesResponse1, etapas_procesalesResponse2, etapas_procesalesResponse3, etapas_procesalesResponse4)).futureValue
+    } yield (etapas_procesalesResponse1,
+             etapas_procesalesResponse2,
+             etapas_procesalesResponse3,
+             etapas_procesalesResponse4)).futureValue
 
     etapas_procesalesResponse1.registro.get.BEP_DESCRIPCION.get should be("FIRST REGISTRO")
     etapas_procesalesResponse2.registro.get.BEP_DESCRIPCION.get should be("SECOND REGISTRO")

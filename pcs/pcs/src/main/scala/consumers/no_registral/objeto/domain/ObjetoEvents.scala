@@ -100,6 +100,6 @@ object ObjetoEvents {
       registro: ObjetoExternalDto,
       isResponsable: Option[Boolean],
       sujetoResponsable: Option[String]
-  )  extends ObjetoEvents
+  ) extends ObjetoEvents
 
 }

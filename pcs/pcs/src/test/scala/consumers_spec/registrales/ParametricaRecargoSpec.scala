@@ -57,11 +57,10 @@ class ParametricaRecargoSpec extends TypedActorSpec {
              | parametrica_recargo 2 - $parametrica_recargoResponse2
              | parametrica_recargo 3 - $parametrica_recargoResponse3
              |""".stripMargin)
-    } yield
-      (parametrica_recargoResponse1,
-       parametrica_recargoResponse2,
-       parametrica_recargoResponse3,
-       parametrica_recargoResponse4)).futureValue
+    } yield (parametrica_recargoResponse1,
+             parametrica_recargoResponse2,
+             parametrica_recargoResponse3,
+             parametrica_recargoResponse4)).futureValue
 
     parametrica_recargoResponse1.registro.get.BPR_CONCEPTO should be("FIRST REGISTRO")
     parametrica_recargoResponse2.registro.get.BPR_CONCEPTO should be("SECOND REGISTRO")

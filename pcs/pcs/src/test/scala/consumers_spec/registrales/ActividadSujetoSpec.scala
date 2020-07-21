@@ -48,8 +48,7 @@ class ActividadSujetoSpec extends TypedActorSpec {
           | sujeto 2 - $actividadSujetoResponse2
           | sujeto 3 - $actividadSujetoResponse3
           |""".stripMargin)
-    } yield
-      (actividadSujetoResponse1, actividadSujetoResponse2, actividadSujetoResponse3, actividadSujetoResponse4)).futureValue
+    } yield (actividadSujetoResponse1, actividadSujetoResponse2, actividadSujetoResponse3, actividadSujetoResponse4)).futureValue
 
     actividadSujetoResponse1.registro.get.BAT_DESCRIPCION.get should be("FIRST REGISTRO")
     actividadSujetoResponse2.registro.get.BAT_DESCRIPCION.get should be("SECOND REGISTRO")

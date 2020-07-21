@@ -6,13 +6,13 @@ import consumers.no_registral.objeto.domain.ObjetoEvents
 import no_registrales.objeto.ObjetoSpec
 import no_registrales.{BaseE2ESpec, NoRegistralesTestSuiteE2E}
 import org.scalatest.Ignore
-import spec.consumers.ProjectionTestkit
-import spec.consumers.no_registrales.objeto.ObjetoProyectionistAcceptance
+import spec.consumers.no_registrales.objeto.acceptance.ObjetoProjectionAcceptanceTestKit
+import spec.testkit.ProjectionTestkit
 
 @Ignore
 class ObjetoSpecE2E extends ObjetoSpec with BaseE2ESpec with NoRegistralesTestSuiteE2E {
   override def ProjectionTestkit(context: TestContext)(
       implicit system: ActorSystem
   ): ProjectionTestkit[ObjetoEvents, ObjetoMessage.ObjetoMessageRoots] =
-    new ObjetoProyectionistAcceptance.ObjetoProjectionTestkit(context.asInstanceOf[E2ETestContext].cassandraTestkit)
+    new ObjetoProjectionAcceptanceTestKit(context.asInstanceOf[E2ETestContext].cassandraTestkit)
 }

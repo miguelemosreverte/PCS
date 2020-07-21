@@ -5,12 +5,13 @@ import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMe
 import consumers.no_registral.objeto.domain.ObjetoEvents
 import infrastructure.cassandra.CassandraTestkit.{TableName, _}
 import no_registrales.BaseE2ESpec
+import spec.testkit.ProjectionTestkit
 
 trait ObjetoSpec extends consumers_spec.no_registrales.objeto.ObjetoSpec with BaseE2ESpec {
 
   def ProjectionTestkit(context: TestContext)(
       implicit system: ActorSystem
-  ): spec.consumers.ProjectionTestkit[ObjetoEvents, ObjetoMessageRoots]
+  ): ProjectionTestkit[ObjetoEvents, ObjetoMessageRoots]
 
   implicit val tableName: TableName = TableName("read_side.buc_sujeto_objeto")
 

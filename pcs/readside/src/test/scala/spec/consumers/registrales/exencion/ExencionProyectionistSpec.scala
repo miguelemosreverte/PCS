@@ -1,29 +1,31 @@
 package spec.consumers.registrales.exencion
 
-import consumers.no_registral.objeto.application.entities.{ObjetoExternalDto, ObjetoMessage}
+import consumers.no_registral.objeto.application.entities.ObjetoExternalDto
+import consumers.no_registral.objeto.application.entities.ObjetoMessage.ExencionMessageRoot
 import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoAddedExencion
-import infrastructure.cassandra.CassandraTestkit.TableName
-import spec.ProyectionistSpec
-import spec.consumers.registrales.exencion.ExencionProyectionistSpec.ExencionMessageRoot
+import infrastructure.cassandra.CassandraTestkit.{TableName, _}
+import spec.testsuite.ProjectionTestSuite
 
-trait ExencionProyectionistSpec extends ProyectionistSpec[ObjetoAddedExencion, ExencionMessageRoot] {
+trait ExencionProyectionistSpec extends ProjectionTestSuite[ObjetoAddedExencion, ExencionMessageRoot] {
   implicit val tableName: TableName = TableName("read_side.buc_exenciones")
 
   "ExencionProyectionistSpec" should
-  "add a registro" in {
+  "add a registro" in parallelActorSystemRunner { implicit s =>
+    val context = testContext()
+    val projectionTestkit = context.ProjectionTestkit
 
     val evento: ObjetoAddedExencion =
       stubs.consumers.no_registrales.objeto.ObjetoEvents.objetoAddedExencionStub
 
-    ProjectionTestkit process eventEnvelope(evento)
+    projectionTestkit process projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
-    ProjectionTestkit read ExencionMessageRoot(
-      evento.sujetoId,
-      evento.objetoId,
-      evento.tipoObjeto,
-      evento.exencion.BEX_EXE_ID
-    )
+      projectionTestkit read ExencionMessageRoot(
+        evento.sujetoId,
+        evento.objetoId,
+        evento.tipoObjeto,
+        evento.exencion.BEX_EXE_ID
+      )
 
     implicit val registro: ObjetoExternalDto.Exencion = evento.exencion
 
@@ -37,16 +39,6 @@ trait ExencionProyectionistSpec extends ProyectionistSpec[ObjetoAddedExencion, E
         "bex_tipo" -> registro.BEX_TIPO
       )
 
-  }
-}
-
-object ExencionProyectionistSpec {
-  case class ExencionMessageRoot(
-      sujetoId: String,
-      objetoId: String,
-      tipoObjeto: String,
-      exencionId: String
-  ) extends ObjetoMessage {
-    override def aggregateRoot: String = s"${super.aggregateRoot}-Exencion-$exencionId"
+    context.close()
   }
 }

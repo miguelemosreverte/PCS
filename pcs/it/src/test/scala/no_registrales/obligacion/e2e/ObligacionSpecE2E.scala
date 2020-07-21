@@ -5,8 +5,8 @@ import consumers.no_registral.obligacion.application.entities.ObligacionMessage
 import consumers.no_registral.obligacion.domain.ObligacionEvents
 import no_registrales.{obligacion, NoRegistralesTestSuiteE2E}
 import org.scalatest.Ignore
-import spec.consumers.ProjectionTestkit
-import spec.consumers.no_registrales.obligacion.ObligacionProyectionistAcceptance
+import spec.consumers.no_registrales.obligacion.acceptance.ObligacionProjectionAcceptanceTestKit
+import spec.testkit.ProjectionTestkit
 
 @Ignore
 class ObligacionSpecE2E extends obligacion.ObligacionSpec with NoRegistralesTestSuiteE2E {
@@ -14,7 +14,7 @@ class ObligacionSpecE2E extends obligacion.ObligacionSpec with NoRegistralesTest
   override def ProjectionTestkit(context: TestContext)(
       implicit system: ActorSystem
   ): ProjectionTestkit[ObligacionEvents, ObligacionMessage.ObligacionMessageRoots] =
-    new ObligacionProyectionistAcceptance.ObligacionProjectionTestkit(
+    new ObligacionProjectionAcceptanceTestKit(
       context.asInstanceOf[E2ETestContext].cassandraTestkit
     )
 }

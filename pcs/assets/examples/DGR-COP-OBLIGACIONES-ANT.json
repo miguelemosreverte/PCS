@@ -1,0 +1,45 @@
+{
+  "EV_ID" : "1",
+  "BOB_SUJ_IDENTIFICADOR" : "2",
+  "BOB_SOJ_IDENTIFICADOR" : "1",
+  "BOB_SOJ_TIPO_OBJETO" : "I",
+  "CCTID" : "8",
+  "FECHAVTOSANCION" : "1900-01-01",
+  "BOB_INDICE_INT_RESAR" : null,
+  "TABLE_NAME" : "EVENTOS_OBLIGACIONES_ANT",
+  "OSSSITGESTIONESPECIAL" : "0",
+  "BOB_TIPO" : "no tributaria",
+  "BOB_OBN_ID" : "202001000000100000000006304094",
+  "FECHAVTOREBELDIA" : "1900-01-01",
+  "ITSID" : "MAAE",
+  "OSSSITGESTION" : "0",
+  "BOB_CUOTA" : "1",
+  "OSSSITPLANPAGO" : "0",
+  "BOB_ESTADO" : null,
+  "BOB_CAPITAL" : "100",
+  "BOB_SALDO" : "100",
+  "OSSSITJUDICIAL" : "0",
+  "TPBID" : null,
+  "BOB_JUI_ID" : 1,
+  "BOB_TOTAL" : null,
+  "BOB_FISCALIZADA" : null,
+  "OSSSITBLOQUEO" : "0",
+  "BOB_VENCIMIENTO" : "2020-03-10 00:00:00.0",
+  "BOB_PRORROGA" : "0001-01-01 00:00:00.0",
+  "RULE_NUMBER" : "16",
+  "BOB_PERIODO" : "2020",
+  "BOB_PLN_ID" : null,
+  "BOB_INTERES_RESAR" : null,
+  "OSSSITAJUSTE" : "0",
+  "OSSSITSE" : "0",
+  "BOB_INTERES_PUNIT" : null,
+  "BOB_INDICE_INT_PUNIT" : null,
+  "BOB_OTROS_ATRIBUTOS":{
+    "BOB_DETALLES":[
+      {
+        "BOB_MUNICIPIO":null,
+        "RULE_NUMBER":"14"
+      }
+    ]
+  }
+}

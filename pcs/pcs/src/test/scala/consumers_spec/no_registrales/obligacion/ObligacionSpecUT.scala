@@ -1,0 +1,5 @@
+package consumers_spec.no_registrales.obligacion
+
+import consumers_spec.no_registrales.testsuite.NoRegistralesTestSuiteMock
+
+class ObligacionSpecUT extends ObligacionSpec with NoRegistralesTestSuiteMock

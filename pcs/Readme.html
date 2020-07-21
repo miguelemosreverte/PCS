@@ -1,0 +1,150 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Readme</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="project-structure">Project structure</h1>
+<ul>
+<li>
+<p>/</p>
+<ul>
+<li>documentation/
+<ul>
+<li>…</li>
+</ul>
+</li>
+<li>assets/
+<ul>
+<li>CI/</li>
+<li>docker-compose/</li>
+<li>examples/</li>
+<li>k8s/</li>
+</ul>
+</li>
+<li>common/
+<ul>
+<li>src/</li>
+<li>test/</li>
+</ul>
+</li>
+<li>it/
+<ul>
+<li>src/</li>
+<li>test/</li>
+</ul>
+</li>
+<li>pcs/
+<ul>
+<li>src/</li>
+<li>test/</li>
+</ul>
+</li>
+<li>project/
+<ul>
+<li>build.properties</li>
+<li>plugins.sbt</li>
+</ul>
+</li>
+<li>readside/
+<ul>
+<li>src/</li>
+<li>test/</li>
+</ul>
+</li>
+<li>build.sbt</li>
+</ul>
+<p><strong>documentation</strong> stores any document that explains the project.<br>
+<strong>assets</strong> stores any document useful to the project.<br>
+<strong>common</strong> stores any useful abstraction shared between two projects.<br>
+<strong>it</strong> is where we make E2E tests that prove the HTTP API and DB work in collaboration<br>
+<strong>writeside or pcs</strong> is where the event database is written.<br>
+It hears kafka topics and saves to the event database anything important.<br>
+<strong>readside</strong> is where the event database is read, and then some human readable view can be created on top.<br>
+It hears raw events and transforms them into human readable presentations.</p>
+</li>
+</ul>
+<h2 id="run-test">Run test</h2>
+<p>Sometimes the best way to understand a project is to run the tests:</p>
+<h5 id="writeside">-  writeside</h5>
+<pre class=" language-bash"><code class="prism  language-bash">sbt pcs/test
+</code></pre>
+<blockquote>
+<p>This will prove that the actors process the messages successfully</p>
+</blockquote>
+<h5 id="readside">-  readside</h5>
+<pre class=" language-bash"><code class="prism  language-bash">sh assets/scripts/infrastructure.sh <span class="token operator">&amp;&amp;</span> sbt readside/test
+</code></pre>
+<blockquote>
+<p>This will prove that the events the actors save are interpreted and projected to a human readable view in CassandraDB<br>
+This test requires you to have CassandraDB up and working.</p>
+</blockquote>
+<h5 id="it">-  it</h5>
+<pre class=" language-bash"><code class="prism  language-bash">sh assets/scripts/infrastructure.sh
+</code></pre>
+<pre class=" language-bash"><code class="prism  language-bash">sh assets/scripts/readside.sh
+</code></pre>
+<pre class=" language-bash"><code class="prism  language-bash">sh assets/scripts/writeside.sh
+</code></pre>
+<pre class=" language-bash"><code class="prism  language-bash">sbt it/test
+</code></pre>
+<blockquote>
+<p>Run each command on a different console!</p>
+</blockquote>
+<blockquote>
+<p>This will prove that entire system works.<br>
+It sends kafka messages, hits the API to prove the responses are correct and also queries the human readable projections on the database to see them performing correctly.</p>
+</blockquote>
+<h1 id="how-to-run">How to run</h1>
+<h1 id="local-development-environments">Local Development Environments</h1>
+<h5 id="run-dev">-  run dev</h5>
+<pre class=" language-bash"><code class="prism  language-bash">sh assets/scripts/infrastructure.sh
+</code></pre>
+<pre class=" language-bash"><code class="prism  language-bash">sh assets/scripts/readside.sh
+</code></pre>
+<pre class=" language-bash"><code class="prism  language-bash">sh assets/scripts/writeside.sh
+</code></pre>
+<blockquote>
+<p>This will start the infrastructure (Cassandra, Zookeeper, Kafka)<br>
+It will start the writeside, which listens to Kafka and saves events to Cassandra<br>
+It will start the readside, which listens to Cassandra events and performs human-readable projections on Cassandra</p>
+</blockquote>
+<h5 id="run-docker-compose">-  run docker-compose</h5>
+<pre class=" language-bash"><code class="prism  language-bash">sh assets/docker-compose/vm/runner.sh
+</code></pre>
+<blockquote>
+<p>This will start the infrastructure (Cassandra, Zookeeper, Kafka)<br>
+It will start the writeside, which listens to Kafka and saves events to Cassandra<br>
+It will start the readside, which listens to Cassandra events and performs human-readable projections on Cassandra</p>
+</blockquote>
+<blockquote>
+<p>It will do all this but with dockerized versions of readside and writeside</p>
+</blockquote>
+<h5 id="run-k8s">-  run k8s</h5>
+<pre class=" language-bash"><code class="prism  language-bash">sh assets/k8s/start_all.sh
+</code></pre>
+<blockquote>
+<p>This will start the infrastructure (Cassandra, Zookeeper, Kafka)<br>
+It will start the writeside, which listens to Kafka and saves events to Cassandra<br>
+It will start the readside, which listens to Cassandra events and performs human-readable projections on Cassandra</p>
+</blockquote>
+<blockquote>
+<p>It will do all this but with dockerized versions of readside and writeside</p>
+</blockquote>
+<blockquote>
+<p>This dockerized versions will run inside kubernetes pods.</p>
+</blockquote>
+<h1 id="how-to-interact">How to interact</h1>
+<p>By publishing Kafka messages!</p>
+<h5 id="kafkacat">-  kafkacat</h5>
+<pre class=" language-bash"><code class="prism  language-bash">kafkacat -P -b 0.0.0.0:9092 -t DGR-COP-OBLIGACIONES-TRI assets/examples/DGR-COP-OBLIGACIONES-TRI.json
+</code></pre>
+</div>
+</body>
+
+</html>

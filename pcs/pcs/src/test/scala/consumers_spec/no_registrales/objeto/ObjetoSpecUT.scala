@@ -1,0 +1,5 @@
+package consumers_spec.no_registrales.objeto
+
+import consumers_spec.no_registrales.testsuite.NoRegistralesTestSuiteMock
+
+class ObjetoSpecUT extends ObjetoSpec with NoRegistralesTestSuiteMock

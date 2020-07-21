@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StartStopAPI</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="start-stop-api">Start Stop API</h1>
+<p>Para conseguirlo vamos a crear un actor que toma mensajes.<br>
+Estos mensajes contienen la información necesaria para crear una transacción.<br>
+El actor va a estar a cargo de detener o recomenzar la transacción en base a los mensajes de Start/Stop que reciba.</p>
+<h2 id="parametros-de-una-transacción">Parametros de una Transacción</h2>
+<p>Vamos a crear un subconjunto más concreto de transacciones, las cuales se encargan de enviar un mensaje a un actor, garantizando la transaccionalidad del envío y respuesta.</p>
+<ul>
+<li>ActorRef</li>
+<li>Command</li>
+<li>Nombre tópico</li>
+</ul>
+<p>La transacción entonces va a escuchar a un tópico, generar un comando en base a el ExternalDto recibido, y enviarselo al actor y esperar su respuesta.</p>
+<h3 id="el-problema-1">El problema 1</h3>
+<h2 id="string---externalregistro">String -&gt; ExternalDto</h2>
+<p>Necesitamos un formater que sepa decodificar un String y transformarlo en una case class.</p>
+<h3 id="solución-0----obsoleta">Solución 0 – obsoleta</h3>
+<p>Antes como no necesitábamos comunicarnos con un actor para realizar una transacción, podíamos entonces enviar una <em>implícitamente</em>  un formater. Ahora no podemos, necesitamos enviar un mensaje a un actor. Y los mensajes deben enviarse por network; necesitan serialización.</p>
+<h3 id="solución-1">Solución 1</h3>
+<p>Enviar el formater explícitamente dentro de el mensaje:</p>
+<pre class=" language-scala"><code class="prism  language-scala"><span class="token keyword">case</span> <span class="token keyword">class</span> SubscribeMe<span class="token punctuation">(</span>
+	actorRef<span class="token operator">:</span> ActorRef<span class="token punctuation">,</span> 
+	topic<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">,</span> 
+	commandExample<span class="token operator">:</span> ddd<span class="token punctuation">.</span>Command <span class="token keyword">with</span> ddd<span class="token punctuation">.</span>CommandFromDto<span class="token punctuation">,</span>
+	format<span class="token operator">:</span> Format<span class="token punctuation">[</span>_ <span class="token operator">&lt;</span><span class="token operator">:</span> ExternalDto<span class="token punctuation">]</span>
+<span class="token punctuation">)</span>
+</code></pre>
+<h3 id="solución-2">Solución 2</h3>
+<p>Enviar un mensaje de texto que sea interpretado por el actor:</p>
+<pre class=" language-scala"><code class="prism  language-scala"><span class="token keyword">case</span> <span class="token keyword">class</span> SubscribeMe<span class="token punctuation">(</span>
+	actorRef<span class="token operator">:</span> ActorRef<span class="token punctuation">,</span> 
+	topic<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">,</span> <span class="token keyword">&lt;-</span><span class="token operator">--</span><span class="token operator">-</span> inferir de aquí el formater a usar
+	commandExample<span class="token operator">:</span> ddd<span class="token punctuation">.</span>Command <span class="token keyword">with</span> ddd<span class="token punctuation">.</span>CommandFromDto<span class="token punctuation">,</span>
+<span class="token punctuation">)</span>
+</code></pre>
+<p>Donde el <code>topic</code> se usa para acceder a un mapa de <code>String</code> a <code>Format[_ &lt;: ExternalDto]</code></p>
+<h5 id="por-qué-la-solucion-2-es-mejor">Por qué la solucion 2 es mejor</h5>
+<p>Porque permite al actor tener control sobre su dominio. Que abarca la deserialización de mensajes. Entonces el actor tiene a su disposición formaters para cada tópico que espera, y infiere a partir del nombre del tópico el formater a utilizar.</p>
+<h3 id="el-problema-2">El problema 2</h3>
+<h2 id="externalregistro---command">ExternalDto -&gt; Command</h2>
+<p>La conversión de un ExternalDto a un comando consiste en estandarizar la clave aggregateRoot y el deliveryId.</p>
+<h3 id="solución-0----obsoleta-1">Solución 0 – obsoleta</h3>
+<p>Antes como no necesitábamos comunicarnos con un actor para realizar una transacción, podíamos entonces enviar una <em>lambda function</em>  llamada <code>FromDto</code>. Ahora no podemos, necesitamos enviar un mensaje a un actor. Y los mensajes deben enviarse por network; necesitan serialización. Y no es posible para nosotros serializar una <em>lamda function</em> como lo consigue Java8, porque la comunidad de Akka fuertemente recomienda:</p>
+<ul>
+<li>
+<ol>
+<li>No usar JavaSerialization porque es target de ataques de seguridad</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>No usar serialización de lambda functions porque es peligroso para la mantenibilidad de los proyectos. Se considera un anti patrón enviar funciones como valor entre actores.</li>
+</ol>
+</li>
+</ul>
+<h4 id="solución-1-1">Solución 1</h4>
+<p>Un método llamado <code>toCommand</code><br>
+La conversión de un ExternalDto a un comando podría ser trivial.<br>
+Enganchar un método a la case class del ExternalDto que apunte a el comando destino sería una solución válida.</p>
+<p>La razón por la que no vamos a avanzar por ésta solución es que queremos que nuestros Dto no conozcan (ni referencien), nada de la aplicación.</p>
+<h4 id="solución-2-1">Solución 2</h4>
+<p>Un método llamado <code>FromDto</code><br>
+Podemos entonces agregarles a los comandos éste método, que tome un ExternalDto y sepa cómo construirse a sí mismo, el comando.</p>
+<p>La razón por la que vamos a avanzar por ésta solución es que queremos que nuestros Dto no conozcan (ni referencien), nada de la aplicación.</p>
+<h5 id="solución-2.1">Solución 2.1</h5>
+<p>Podemos simplemente entonces resolver la <em>signature</em> del método de la manera siguiente:</p>
+<pre class=" language-scala"><code class="prism  language-scala"><span class="token keyword">object</span> MyCommand <span class="token punctuation">{</span>
+<span class="token keyword">def</span> fromDto<span class="token punctuation">(</span>registro<span class="token operator">:</span> ddd<span class="token punctuation">.</span>ExternalDto<span class="token punctuation">)</span><span class="token operator">:</span> MyCommand <span class="token operator">=</span> registro <span class="token keyword">match</span> <span class="token punctuation">{</span>
+  <span class="token keyword">case</span> registro<span class="token operator">:</span> MyCommandDto <span class="token keyword">=&gt;</span> MyCommand<span class="token punctuation">(</span>
+  aggregateRoot <span class="token operator">=</span> registro<span class="token punctuation">.</span>WHATEVER_AGGREGATE_ROOT_KEY<span class="token punctuation">,</span>
+  deliveryId <span class="token operator">=</span> registro<span class="token punctuation">.</span>EV_ID_OR_SOMETHING
+<span class="token punctuation">}</span> 
+<span class="token punctuation">}</span>
+</code></pre>
+<p>El problema es el pattern match.</p>
+<h5 id="solución-2.2">Solución 2.2</h5>
+<p>Podemos <em>linkear</em> cada <code>design_principles.actor_model.Command</code> a su respectivo <code>ddd.ExternalDto</code> mediante tipos paramétricos, de la siguiente manera.</p>
+<pre class=" language-scala"><code class="prism  language-scala"><span class="token keyword">case</span> <span class="token keyword">class</span> MyCommand<span class="token punctuation">(</span>aggregateRoot<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">,</span> deliveryId<span class="token operator">:</span> BigInt<span class="token punctuation">)</span> <span class="token keyword">extends</span> ddd<span class="token punctuation">.</span>Command<span class="token punctuation">[</span>MyCommandDto<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+
+	 <span class="token keyword">def</span> fromDto<span class="token punctuation">(</span>registro<span class="token operator">:</span> MyCommandDto<span class="token punctuation">)</span><span class="token operator">:</span> MyCommand <span class="token operator">=</span>MyCommand<span class="token punctuation">(</span>
+      aggregateRoot <span class="token operator">=</span> registro<span class="token punctuation">.</span>WHATEVER_AGGREGATE_ROOT_KEY<span class="token punctuation">,</span>
+      deliveryId <span class="token operator">=</span> registro<span class="token punctuation">.</span>EV_ID_OR_SOMETHING
+      <span class="token punctuation">)</span>
+          
+
+<span class="token punctuation">}</span>
+</code></pre>
+<h5 id="por-qué-la-solucion-2.1-es-la-mejor">Por qué la solucion 2.1 es la mejor</h5>
+<p>El problema consiste en que <em>necesitamos</em> que la signature sea abierta, no cerrada. Porque el actor StartStopApi recibe <code>ExternalDto</code>, y para poder reducir ésta signature deberíamos enviar como mensaje una case class parametrizada por tipo.</p>
+<pre class=" language-scala"><code class="prism  language-scala">SubscribeMe<span class="token punctuation">[</span>SpecificExternalDto <span class="token operator">&lt;</span><span class="token operator">:</span> ddd<span class="token punctuation">.</span>ExternalDto<span class="token punctuation">]</span>
+</code></pre>
+<p>El problema continúa luego, porque el actor cuando recibiese éste mensaje<br>
+no podría conseguir el tipo, tendría que hacer pattern match de todas formas.</p>
+<p>El único use case en nuestro proyecto que enfrentó con éxito la parametrización de tipos dentro de un actor es el <code>BaseActor</code>, que debió convertirse en una clase abstracta parametrizada en tiempo de construcción + uso de classtags.</p>
+<p>En la balanza está usar 8 pattern matches (1 para cada comando-documento) y mantenener el resto de la codebase <em>easy to read</em>, o enfrentar el problema con parametrizaciones difíciles de seguir que no aportan demasiado a la calidad del producto.</p>
+</div>
+</body>
+
+</html>

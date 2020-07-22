@@ -1,6 +1,8 @@
 package akka.entity
 
 import scala.io.Source
+import scala.io.Codec
+import java.nio.charset.CodingErrorAction
 
 object EntityIdOps {
 
@@ -11,9 +13,10 @@ object EntityIdOps {
     val uuid: String = "00000000-0000-0000-C000-000000000046"
   }
 
-  val mapping: Map[Char, Int] =
+  val mapping: Map[Char, Int] = {
+    val decoder = Codec.UTF8.decoder.onMalformedInput(CodingErrorAction.IGNORE)
     Source
-      .fromResource("UTF-8-character-table")
+      .fromResource("UTF-8-character-table")(decoder)
       .getLines
       .toSeq
       .map(_ trim)
@@ -21,6 +24,7 @@ object EntityIdOps {
       .zipWithIndex
       .toMap
 
+  }
   def encode(aggregateRootCandidate: String): String =
     aggregateRootCandidate
       .map { letter =>

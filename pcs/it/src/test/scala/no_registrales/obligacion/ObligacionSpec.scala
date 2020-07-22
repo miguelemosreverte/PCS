@@ -7,7 +7,7 @@ import infrastructure.cassandra.CassandraTestkit.{TableName, _}
 import no_registrales.BaseE2ESpec
 import spec.testkit.ProjectionTestkit
 
-trait ObligacionSpec extends consumers_spec.no_registrales.obligacion.ObligacionSpec with BaseE2ESpec {
+trait ObligacionSpec extends BaseE2ESpec {
 
   def ProjectionTestkit(context: TestContext)(
       implicit system: ActorSystem
@@ -18,10 +18,15 @@ trait ObligacionSpec extends consumers_spec.no_registrales.obligacion.Obligacion
   "sending an obligacion" should "reflect on the api and the database" in parallelActorSystemRunner { implicit s =>
     val context = testContext()
 
-    val obligacion = examples.obligacionWithSaldo50
+
+    val obligacion = stubs.consumers.no_registrales.obligacion.ObligacionExternalDtoStub.obligacionesTri.copy(
+        BOB_SALDO = 50
+    )
     context.messageProducer produceObligacion obligacion
+    eventually {
     val response = context.Query getStateObligacion obligacion
     response.saldo should be(obligacion.BOB_SALDO)
+    }
     (ProjectionTestkit(context) read obligacion) =========================
       Map(
         "bob_suj_identificador" -> obligacion.BOB_SUJ_IDENTIFICADOR,

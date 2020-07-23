@@ -18,6 +18,7 @@ project/plugins/project/
 # IDEA
 .idea
 # Metals
+.theia
 project/metals.sbt
 .metals
 .bloop

@@ -87,6 +87,9 @@ trait NoRegistralesTestSuiteMock extends BaseE2ESpec {
 
     lazy val MessageProducers = new MessageTestkitUtils(sujeto, cotitularidadActor, messageProducer)
 
+
+     MessageProducers.StartMessageProcessor(messageProcessor).startProcessing()
+     
     def close(): Unit = {
       MessageProducers.StartMessageProcessor(messageProcessor).startProcessing()
     }

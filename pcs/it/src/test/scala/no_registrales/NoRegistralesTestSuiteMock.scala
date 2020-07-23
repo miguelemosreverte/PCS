@@ -90,8 +90,7 @@ trait NoRegistralesTestSuiteMock extends BaseE2ESpec {
 
      MessageProducers.StartMessageProcessor(messageProcessor).startProcessing()
      
-    def close(): Unit = {
-      MessageProducers.StartMessageProcessor(messageProcessor).startProcessing()
-    }
+    def close(): Unit = {}
+    
   }
 }

@@ -28,8 +28,8 @@ trait ParametricaPlanProyectionistSpec extends ProjectionTestSuite[ParametricaPl
 
     mappedEvent =========================
       Map(
-        "bpp_decreto" -> registro.BPP_DECRETO
-        /*  "bpp_fpm_descripcion" -> registro.BPP_FPM_DESCRIPCION,
+        "bpp_decreto" -> registro.BPP_DECRETO,
+        "bpp_fpm_descripcion" -> registro.BPP_FPM_DESCRIPCION,
         "bpp_indice_int_financ" -> registro.BPP_INDICE_INT_FINANC,
         "bpp_indice_int_punit" -> registro.BPP_INDICE_INT_PUNIT,
         "bpp_indice_int_resar" -> registro.BPP_INDICE_INT_RESAR,
@@ -37,7 +37,7 @@ trait ParametricaPlanProyectionistSpec extends ProjectionTestSuite[ParametricaPl
         "bpp_monto_min_anticipo" -> registro.BPP_MONTO_MIN_ANTICIPO,
         "bpp_monto_min_cuota" -> registro.BPP_MONTO_MIN_CUOTA,
         "bpp_monto_min_deuda" -> registro.BPP_MONTO_MIN_DEUDA,
-        "bpp_porcentaje_anticipo" -> registro.BPP_PORCENTAJE_ANTICIPO*/
+        "bpp_porcentaje_anticipo" -> registro.BPP_PORCENTAJE_ANTICIPO
       )
 
     context.close()

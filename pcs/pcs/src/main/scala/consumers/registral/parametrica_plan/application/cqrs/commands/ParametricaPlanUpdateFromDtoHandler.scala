@@ -32,7 +32,7 @@ class ParametricaPlanUpdateFromDtoHandler() {
           bppMontoMinAnticipo = command.registro.BPP_MONTO_MIN_ANTICIPO,
           bppMontoMinCuota = command.registro.BPP_MONTO_MIN_CUOTA,
           bppMontoMinDeuda = command.registro.BPP_MONTO_MIN_DEUDA,
-          bppPorcentajeAnticipo = command.registro.BPP_MONTO_MIN_ANTICIPO,
+          bppPorcentajeAnticipo = command.registro.BPP_PORCENTAJE_ANTICIPO,
           registro = command.registro
         )
       )

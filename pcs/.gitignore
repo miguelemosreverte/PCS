@@ -16,10 +16,12 @@ project/plugins/project/
 .scala_dependencies
 .worksheet
 # IDEA
-.idea/
+.idea
 # Metals
-\.metals/
-\.bloop/
+.theia
+project/metals.sbt
+.metals
+.bloop
 
 target
 

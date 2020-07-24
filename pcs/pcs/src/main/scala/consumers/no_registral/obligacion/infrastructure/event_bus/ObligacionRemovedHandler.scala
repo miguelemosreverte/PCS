@@ -13,7 +13,7 @@ class ObligacionRemovedHandler(actor: ObligacionActor) extends SyncEventHandler[
   ): Try[Unit] = {
 
     actor.persistEvent(event, ObligacionTags.ObligacionReadside) { () =>
-      log.info(s"[${actor.persistenceId}] Persisted snapshot")
+      ()
     }
     Success(akka.Done)
   }

@@ -1,5 +1,7 @@
 package consumers.no_registral.objeto.infrastructure.consumer
 
+import scala.concurrent.{ExecutionContext, Future}
+
 import akka.Done
 import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
@@ -8,14 +10,21 @@ import consumers.no_registral.objeto.application.entities.ObjetoExternalDto.Exen
 import consumers.no_registral.objeto.infrastructure.json._
 import serialization.decodeF
 
-import scala.concurrent.Future
-
-case class ObjetoExencionTransaction()(implicit actorRef: ActorRef) extends ActorTransaction {
+case class ObjetoExencionTransaction()(implicit actorRef: ActorRef, ec: ExecutionContext) extends ActorTransaction {
 
   val topic = "DGR-COP-EXENCIONES"
 
-  override def transaction(input: String): Future[Done] = {
-    val exencion = decodeF[Exencion](input)
+  override def transaction(input: String): Future[Done] =
+    for {
+      cmd <- processInput(input)
+      done <- processCommand(cmd)
+    } yield done
+
+  def processInput(input: String): Future[Exencion] = Future {
+    decodeF[Exencion](input)
+  }
+
+  def processCommand(exencion: Exencion): Future[Done] = {
     val command = ObjetoCommands.ObjetoAddExencion(
       deliveryId = exencion.EV_ID,
       sujetoId = exencion.BEX_SUJ_IDENTIFICADOR,

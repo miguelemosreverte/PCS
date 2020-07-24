@@ -1,7 +1,8 @@
 package consumers_spec.no_registrales.testkit
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+
 import akka.Done
 import akka.actor.ActorRef
 import consumers.no_registral.cotitularidad.infrastructure.kafka.{
@@ -9,10 +10,8 @@ import consumers.no_registral.cotitularidad.infrastructure.kafka.{
   CotitularPublishSnapshotTransaction
 }
 import consumers.no_registral.objeto.application.entities.ObjetoExternalDto
-import consumers.no_registral.objeto.application.entities.ObjetoExternalDto.ObjetosTri
 import consumers.no_registral.objeto.infrastructure.consumer._
 import consumers.no_registral.obligacion.application.entities.ObligacionExternalDto
-import consumers.no_registral.obligacion.application.entities.ObligacionExternalDto.ObligacionesTri
 import consumers.no_registral.obligacion.infrastructure.consumer.{
   ObligacionNoTributariaTransaction,
   ObligacionTributariaTransaction
@@ -22,61 +21,60 @@ import consumers.no_registral.sujeto.infrastructure.consumer.{
   SujetoNoTributarioTransaction,
   SujetoTributarioTransaction
 }
-import consumers_spec.no_registrales.testsuite.ToJson._
 import design_principles.external_pub_sub.kafka.KafkaMock.MessageProcessorImplicits
 import kafka.{MessageProcessor, MessageProducer}
 
 class MessageTestkitUtils(sujeto: ActorRef, cotitularidadActor: ActorRef, messageProducer: MessageProducer) {
-
+  val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   implicit class StartMessageProcessor(messageProcessor: MessageProcessor) {
     def startProcessing(): Unit = {
       // COTITULARIDAD CONSUMERS
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "AddCotitularTransaction",
-        AddCotitularTransaction()(cotitularidadActor)
+        AddCotitularTransaction()(cotitularidadActor, ec)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "CotitularidadPublishSnapshot",
-        CotitularPublishSnapshotTransaction()(cotitularidadActor)
+        CotitularPublishSnapshotTransaction()(cotitularidadActor, ec)
       )
       // OBJETO CONSUMERS
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "DGR-COP-EXENCIONES",
-        ObjetoExencionTransaction()(sujeto)
+        ObjetoExencionTransaction()(sujeto, ec)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "DGR-COP-OBJETOS-ANT",
-        ObjetoNoTributarioTransaction()(sujeto)
+        ObjetoNoTributarioTransaction()(sujeto, ec)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "DGR-COP-OBJETOS-TRI",
-        ObjetoTributarioTransaction()(sujeto)
+        ObjetoTributarioTransaction()(sujeto, ec)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "ObjetoUpdateCotitularesTransaction",
-        ObjetoUpdateCotitularesTransaction()(sujeto)
+        ObjetoUpdateCotitularesTransaction()(sujeto, ec)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "ObjetoReceiveSnapshot",
-        ObjetoUpdateNovedadTransaction()(sujeto)
+        ObjetoUpdateNovedadTransaction()(sujeto, ec)
       )
       // OBLIGACION CONSUMERS
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-OBLIGACIONES-ANT",
-        ObligacionNoTributariaTransaction()(sujeto)
+        ObligacionNoTributariaTransaction()(sujeto, ec)
       )
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-OBLIGACIONES-TRI",
-        ObligacionTributariaTransaction()(sujeto)
+        ObligacionTributariaTransaction()(sujeto, ec)
       )
       // SUJETO CONSUMERS
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-SUJETO-TRI",
-        SujetoTributarioTransaction()(sujeto)
+        SujetoTributarioTransaction()(sujeto, ec)
       )
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-SUJETO-ANT",
-        SujetoNoTributarioTransaction()(sujeto)
+        SujetoNoTributarioTransaction()(sujeto, ec)
       )
       ()
     }

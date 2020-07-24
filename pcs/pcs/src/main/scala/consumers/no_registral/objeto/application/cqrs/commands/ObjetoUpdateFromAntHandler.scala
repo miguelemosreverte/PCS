@@ -21,7 +21,8 @@ class ObjetoUpdateFromAntHandler(actor: ObjetoActor) extends SyncCommandHandler[
     )
     val documentName = utils.Inference.getSimpleName(event.getClass.getName)
     val lastDeliveryId = actor.state.lastDeliveryIdByEvents.getOrElse(documentName, BigInt(0))
-    if (event.deliveryId < lastDeliveryId) {
+    if (event.deliveryId <= lastDeliveryId) {
+      log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
       replyTo ! akka.Done
     } else {
       actor.persistEvent(event) { () =>

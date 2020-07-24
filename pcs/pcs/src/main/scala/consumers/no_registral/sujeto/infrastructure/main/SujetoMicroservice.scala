@@ -13,7 +13,7 @@ import consumers.no_registral.sujeto.infrastructure.http.SujetoStateAPI
 object SujetoMicroservice {
   def routes(implicit system: ActorSystem): Route = {
     implicit val sujetoActor: ActorRef = SujetoActor.start
-
+    import system.dispatcher
     Seq(
       SujetoStateAPI().routes,
       SujetoTributarioTransaction().routesClassic,

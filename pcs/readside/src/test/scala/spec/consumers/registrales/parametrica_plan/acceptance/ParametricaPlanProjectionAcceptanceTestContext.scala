@@ -8,7 +8,7 @@ import spec.testkit.ProjectionTestkit
 import spec.testsuite.ProjectionTestContext
 
 class ParametricaPlanProjectionAcceptanceTestContext(implicit system: ActorSystem)
-  extends ProjectionTestContext[ParametricaPlanEvents, ParametricaPlanMessageRoots] {
+    extends ProjectionTestContext[ParametricaPlanEvents, ParametricaPlanMessageRoots] {
 
   import system.dispatcher
   truncateTables(

@@ -16,7 +16,7 @@ class SujetoUpdateFromAntHandler(actor: SujetoActor) extends SyncCommandHandler[
     val lastDeliveryId = actor.state.lastDeliveryIdByEvents.getOrElse(documentName, BigInt(0))
 
     if (command.deliveryId <= lastDeliveryId) {
-      log.info(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
+      log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
       replyTo ! akka.Done
     } else {
       actor.persistEvent(event) { () =>

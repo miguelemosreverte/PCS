@@ -8,7 +8,7 @@ import spec.testkit.ProjectionTestkit
 import spec.testsuite.ProjectionTestContext
 
 class ParametricaRecargoProjectionAcceptanceTestContext(implicit system: ActorSystem)
-  extends ProjectionTestContext[ParametricaRecargoEvents, ParametricaRecargoMessageRoots] {
+    extends ProjectionTestContext[ParametricaRecargoEvents, ParametricaRecargoMessageRoots] {
 
   import system.dispatcher
   truncateTables(
@@ -21,4 +21,3 @@ class ParametricaRecargoProjectionAcceptanceTestContext(implicit system: ActorSy
   override def ProjectionTestkit: ProjectionTestkit[ParametricaRecargoEvents, ParametricaRecargoMessageRoots] =
     new ParametricaRecargoProjectionAcceptanceTestKit(cassandraTestkit)
 }
-

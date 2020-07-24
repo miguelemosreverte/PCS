@@ -36,23 +36,9 @@ class ObligacionProjectionHandler(settings: ProjectionSettings, system: ActorSys
   override def process(envelope: EventEnvelope[ObligacionEvents]): Future[Done] = {
     envelope.event match {
       case evt: ObligacionEvents.ObligacionPersistedSnapshot =>
-        log.info(
-          s"ObligacionProjectionHandler consumed $evt from $tag with seqNr ${envelope.sequenceNr}",
-          settings.tag,
-          envelope.event,
-          envelope.persistenceId,
-          envelope.sequenceNr
-        )
         val projection = ObligacionSnapshotProjection(evt)
         cassandra writeState projection
       case evt: ObligacionEvents.ObligacionRemoved =>
-        log.info(
-          s"ObligacionProjectionHandler consumed $evt from $tag with seqNr ${envelope.sequenceNr}",
-          settings.tag,
-          envelope.event,
-          envelope.persistenceId,
-          envelope.sequenceNr
-        )
         session
           .executeDDL(
             s"""

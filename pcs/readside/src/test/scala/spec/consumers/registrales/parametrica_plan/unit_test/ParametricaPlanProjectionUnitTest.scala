@@ -7,6 +7,8 @@ import spec.consumers.registrales.parametrica_plan.ParametricaPlanProyectionistS
 import spec.testsuite.ProjectionTestContext
 
 class ParametricaPlanProjectionUnitTest extends ParametricaPlanProyectionistSpec {
-  override def testContext()(implicit system: ActorSystem): ProjectionTestContext[ParametricaPlanEvents, ParametricaPlanMessage.ParametricaPlanMessageRoots] =
+  override def testContext()(
+      implicit system: ActorSystem
+  ): ProjectionTestContext[ParametricaPlanEvents, ParametricaPlanMessage.ParametricaPlanMessageRoots] =
     new ParametricaPlanProjectionUnitTestContext
 }

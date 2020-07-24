@@ -12,7 +12,7 @@ import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
 
 class PlanPagoProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
-  extends ProjectionTestkit[PlanPagoEvents, PlanPagoMessageRoots]
+    extends ProjectionTestkit[PlanPagoEvents, PlanPagoMessageRoots]
     with ScalaFutures {
   override val cassandraTestkit: CassandraTestkitProduction = c
   override def process(envelope: EventEnvelope[PlanPagoEvents]): Future[Done] =

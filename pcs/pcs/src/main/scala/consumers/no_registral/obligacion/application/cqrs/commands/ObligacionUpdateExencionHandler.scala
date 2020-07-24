@@ -22,15 +22,7 @@ class ObligacionUpdateExencionHandler(actor: ObligacionActor)
         fechaInicio.compareTo(fechaVencimiento) <= 0
         && fechaFin.compareTo(fechaVencimiento) >= 0
       )
-    } yield {
-      log.info(s"""[${actor.persistenceId}] Analysing exencion under the following condition:
-                     |                        fechaInicioExencion        < fechaVencimientoObligacion        < fechaFinExencion
-                     |                        $fechaInicio   <  $fechaVencimiento           < $fechaFin
-                     |                                          $receivesExencion
-                     |
-                     |                        """.stripMargin)
-      receivesExencion
-    }).getOrElse(false)
+    } yield receivesExencion).getOrElse(false)
 
     if (receivesExencion) {
       val event = ObligacionEvents.ObligacionAddedExencion(

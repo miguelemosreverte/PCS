@@ -23,7 +23,7 @@ sealed trait ParametricaPlanEvents extends Event {
   def bppMontoMinAnticipo: BigDecimal
   def bppMontoMinCuota: BigDecimal
   def bppMontoMinDeuda: BigDecimal
-  def bppPorcentajeAnticipo: Option[BigDecimal]
+  def bppPorcentajeAnticipo: BigDecimal
 }
 object ParametricaPlanEvents {
   case class ParametricaPlanUpdatedFromDto(
@@ -44,7 +44,7 @@ object ParametricaPlanEvents {
       bppMontoMinAnticipo: BigDecimal,
       bppMontoMinCuota: BigDecimal,
       bppMontoMinDeuda: BigDecimal,
-      bppPorcentajeAnticipo: Option[BigDecimal],
+      bppPorcentajeAnticipo: BigDecimal,
       registro: ParametricaPlanExternalDto
   ) extends ParametricaPlanEvents
 }

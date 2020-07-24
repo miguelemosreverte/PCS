@@ -12,7 +12,7 @@ import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
 
 class ParametricaRecargoProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
-  extends ProjectionTestkit[ParametricaRecargoEvents, ParametricaRecargoMessageRoots]
+    extends ProjectionTestkit[ParametricaRecargoEvents, ParametricaRecargoMessageRoots]
     with ScalaFutures {
   override val cassandraTestkit: CassandraTestkitProduction = c
   override def process(envelope: EventEnvelope[ParametricaRecargoEvents]): Future[Done] =

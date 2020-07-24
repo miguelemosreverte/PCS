@@ -1,13 +1,12 @@
 package consumers.no_registral.objeto.application.cqrs.commands
 
-import akka.persistence.journal.Tagged
+import scala.util.{Success, Try}
+
 import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.objeto.domain.ObjetoEvents
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
 import consumers.no_registral.obligacion.application.entities.ObligacionCommands
 import cqrs.untyped.command.CommandHandler.SyncCommandHandler
-
-import scala.util.{Success, Try}
 
 class ObjetoAddExencionHandler(actor: ObjetoActor) extends SyncCommandHandler[ObjetoCommands.ObjetoAddExencion] {
   override def handle(
@@ -24,18 +23,14 @@ class ObjetoAddExencionHandler(actor: ObjetoActor) extends SyncCommandHandler[Ob
 
     val documentName = utils.Inference.getSimpleName(event.getClass.getName)
     val lastDeliveryId = actor.state.lastDeliveryIdByEvents.getOrElse(documentName, BigInt(0))
-    if (event.deliveryId < lastDeliveryId) {
+    if (event.deliveryId <= lastDeliveryId) {
+      log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
       replyTo ! akka.Done
     } else {
       actor.persistEvent(event, Set("Exencion")) { () =>
-        log.info(s"[${actor.persistenceId}] Persist event | ${event}")
         actor.state += event
-        log.info(
-          s"[${actor.persistenceId}] will inform about exencion to obligacion ${actor.state.obligaciones.mkString(",")}"
-        )
         actor.state.obligaciones.foreach { obligacionId =>
           val obligacion = actor.obligaciones((command.sujetoId, command.objetoId, command.tipoObjeto, obligacionId))
-          log.info(s"[${actor.persistenceId}] Informing obligacion $obligacionId of the new exencion")
           obligacion ! ObligacionCommands.ObligacionUpdateExencion(command.deliveryId,
                                                                    command.sujetoId,
                                                                    command.objetoId,

@@ -12,7 +12,7 @@ import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
 
 class SubastaProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
-  extends ProjectionTestkit[SubastaEvents, SubastaMessageRoots]
+    extends ProjectionTestkit[SubastaEvents, SubastaMessageRoots]
     with ScalaFutures {
   override val cassandraTestkit: CassandraTestkitProduction = c
   override def process(envelope: EventEnvelope[SubastaEvents]): Future[Done] =

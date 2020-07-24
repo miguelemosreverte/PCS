@@ -9,6 +9,8 @@ import spec.testsuite.ProjectionTestContext
 
 @Ignore
 class PlanPagoProjectionAcceptanceTest extends PlanPagoProyectionistSpec {
-  override def testContext()(implicit system: ActorSystem): ProjectionTestContext[PlanPagoEvents, PlanPagoMessage.PlanPagoMessageRoots] =
+  override def testContext()(
+      implicit system: ActorSystem
+  ): ProjectionTestContext[PlanPagoEvents, PlanPagoMessage.PlanPagoMessageRoots] =
     new PlanPagoProjectionAcceptanceTestContext
 }

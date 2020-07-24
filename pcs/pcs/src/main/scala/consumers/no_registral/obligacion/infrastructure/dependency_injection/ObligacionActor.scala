@@ -55,7 +55,7 @@ object ObligacionActor {
   def props: Props = Props(new ObligacionActor)
 
   object ObligacionTags {
-    val ObligacionReadside = Set("Obligacion")
+    val ObligacionReadside: Set[String] = Set("Obligacion")
   }
 
 }

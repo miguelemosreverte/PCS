@@ -23,7 +23,7 @@ sealed trait ParametricaPlanExternalDto extends ddd.ExternalDto {
   def BPP_MONTO_MIN_ANTICIPO: BigDecimal
   def BPP_MONTO_MIN_CUOTA: BigDecimal
   def BPP_MONTO_MIN_DEUDA: BigDecimal
-  def BPP_PORCENTAJE_ANTICIPO: Option[BigDecimal]
+  def BPP_PORCENTAJE_ANTICIPO: BigDecimal
 
 }
 
@@ -49,7 +49,7 @@ object ParametricaPlanExternalDto {
       BPP_MONTO_MIN_ANTICIPO: BigDecimal,
       BPP_MONTO_MIN_CUOTA: BigDecimal,
       BPP_MONTO_MIN_DEUDA: BigDecimal,
-      BPP_PORCENTAJE_ANTICIPO: Option[BigDecimal]
+      BPP_PORCENTAJE_ANTICIPO: BigDecimal
   ) extends ParametricaPlanExternalDto
 
   case class ParametricaPlanAnt(
@@ -72,7 +72,7 @@ object ParametricaPlanExternalDto {
       BPP_MONTO_MIN_ANTICIPO: BigDecimal,
       BPP_MONTO_MIN_CUOTA: BigDecimal,
       BPP_MONTO_MIN_DEUDA: BigDecimal,
-      BPP_PORCENTAJE_ANTICIPO: Option[BigDecimal]
+      BPP_PORCENTAJE_ANTICIPO: BigDecimal
   ) extends ParametricaPlanExternalDto
 
 }

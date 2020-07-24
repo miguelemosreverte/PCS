@@ -10,7 +10,7 @@ import spec.testkit.ProjectionTestkit
 import spec.testsuite.ProjectionTestContext
 
 class ParametricaRecargoProjectionUnitTestContext(implicit system: ActorSystem)
-  extends ProjectionTestContext[ParametricaRecargoEvents, ParametricaRecargoMessageRoots] {
+    extends ProjectionTestContext[ParametricaRecargoEvents, ParametricaRecargoMessageRoots] {
 
   private val cassandraTestkit: CassandraTestkitMock = new CassandraTestkitMock({
     case e: ParametricaRecargoUpdatedFromDto =>

@@ -7,6 +7,8 @@ import spec.consumers.registrales.parametrica_recargo.ParametricaRecargoProyecti
 import spec.testsuite.ProjectionTestContext
 
 class ParametricaRecargoProjectionUnitTest extends ParametricaRecargoProyectionistSpec {
-  override def testContext()(implicit system: ActorSystem): ProjectionTestContext[ParametricaRecargoEvents, ParametricaRecargoMessage.ParametricaRecargoMessageRoots] =
+  override def testContext()(
+      implicit system: ActorSystem
+  ): ProjectionTestContext[ParametricaRecargoEvents, ParametricaRecargoMessage.ParametricaRecargoMessageRoots] =
     new ParametricaRecargoProjectionUnitTestContext
 }

@@ -9,6 +9,8 @@ import spec.testsuite.ProjectionTestContext
 
 @Ignore
 class JuicioProjectionAcceptanceTest extends JuicioProyectionistSpec {
-  override def testContext()(implicit system: ActorSystem): ProjectionTestContext[JuicioEvents, JuicioMessage.JuicioMessageRoots] =
+  override def testContext()(
+      implicit system: ActorSystem
+  ): ProjectionTestContext[JuicioEvents, JuicioMessage.JuicioMessageRoots] =
     new JuicioProjectionAcceptanceTestContext
 }

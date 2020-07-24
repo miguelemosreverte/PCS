@@ -15,7 +15,7 @@ import readside.proyectionists.registrales.subasta.projections.SubastaUpdatedFro
 import spec.testkit.ProjectionTestkitMock
 
 class SubastaProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
-  extends ProjectionTestkitMock[SubastaEvents, SubastaMessageRoots] {
+    extends ProjectionTestkitMock[SubastaEvents, SubastaMessageRoots] {
 
   override val cassandraTestkit: CassandraTestkitMock = c
 

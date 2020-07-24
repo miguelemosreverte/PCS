@@ -10,7 +10,7 @@ import spec.testkit.ProjectionTestkit
 import spec.testsuite.ProjectionTestContext
 
 class SubastaProjectionUnitTestContext(implicit system: ActorSystem)
-  extends ProjectionTestContext[SubastaEvents, SubastaMessageRoots] {
+    extends ProjectionTestContext[SubastaEvents, SubastaMessageRoots] {
 
   private val cassandraTestkit: CassandraTestkitMock = new CassandraTestkitMock({
     case e: SubastaUpdatedFromDto =>

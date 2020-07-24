@@ -14,7 +14,7 @@ object ObligacionMicroservice {
 
   def routes(implicit system: ActorSystem): Route = {
     implicit val actor: ActorRef = SujetoActor.start
-
+    import system.dispatcher
     Seq(
       ObligacionStateAPI().routes,
       ObligacionTributariaTransaction().routesClassic,

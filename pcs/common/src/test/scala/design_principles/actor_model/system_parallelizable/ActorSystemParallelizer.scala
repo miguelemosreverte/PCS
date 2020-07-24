@@ -33,7 +33,7 @@ class ActorSystemParallelizer(actorSystemNumbers: Seq[Int]) extends Actor with S
 
     case CanShutdown =>
       if (actorSystemNumbers.forall(freeActorSystemSeries.contains)) {
-        _system.terminate()
+        context.stop(self)
       } else {
         _system.scheduler.scheduleOnce(10.seconds, self, CanShutdown)
       }

@@ -11,8 +11,8 @@ import design_principles.projection.infrastructure.CassandraTestkitProduction
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
 
-  class JuicioProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
-  extends ProjectionTestkit[JuicioEvents, JuicioMessageRoots]
+class JuicioProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
+    extends ProjectionTestkit[JuicioEvents, JuicioMessageRoots]
     with ScalaFutures {
   override val cassandraTestkit: CassandraTestkitProduction = c
   override def process(envelope: EventEnvelope[JuicioEvents]): Future[Done] =

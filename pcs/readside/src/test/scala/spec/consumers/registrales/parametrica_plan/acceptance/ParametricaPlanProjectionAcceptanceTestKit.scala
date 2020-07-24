@@ -12,7 +12,7 @@ import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
 
 class ParametricaPlanProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
-  extends ProjectionTestkit[ParametricaPlanEvents, ParametricaPlanMessageRoots]
+    extends ProjectionTestkit[ParametricaPlanEvents, ParametricaPlanMessageRoots]
     with ScalaFutures {
   override val cassandraTestkit: CassandraTestkitProduction = c
   override def process(envelope: EventEnvelope[ParametricaPlanEvents]): Future[Done] =

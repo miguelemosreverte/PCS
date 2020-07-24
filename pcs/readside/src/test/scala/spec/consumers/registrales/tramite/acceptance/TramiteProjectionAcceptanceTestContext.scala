@@ -8,7 +8,7 @@ import spec.testkit.ProjectionTestkit
 import spec.testsuite.ProjectionTestContext
 
 class TramiteProjectionAcceptanceTestContext(implicit system: ActorSystem)
-  extends ProjectionTestContext[TramiteEvents, TramiteMessageRoots] {
+    extends ProjectionTestContext[TramiteEvents, TramiteMessageRoots] {
 
   import system.dispatcher
   truncateTables(

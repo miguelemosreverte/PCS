@@ -16,6 +16,7 @@ object CotitularidadMicroservice {
   def routes(implicit system: ActorSystem): Route = {
     implicit val actor =
       CotitularidadActor.startWithRequirements(KafkaMessageProcessorRequirements.productionSettings())
+    import system.dispatcher
     Seq(
       CotitularidadStateAPI().routes,
       AddCotitularTransaction().routesClassic,

@@ -14,7 +14,7 @@ class ObligacionPersistedSnapshotHandler(actor: ObligacionActor) extends SyncEve
   ): Try[Unit] = {
 
     actor.persistEvent(event, ObligacionTags.ObligacionReadside) { () =>
-      log.info(s"[${actor.persistenceId}] Persisted snapshot")
+      ()
     }
     Success(akka.Done)
   }

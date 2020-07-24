@@ -10,7 +10,7 @@ import spec.testkit.ProjectionTestkit
 import spec.testsuite.ProjectionTestContext
 
 class TramiteProjectionUnitTestContext(implicit system: ActorSystem)
-  extends ProjectionTestContext[TramiteEvents, TramiteMessageRoots] {
+    extends ProjectionTestContext[TramiteEvents, TramiteMessageRoots] {
 
   private val cassandraTestkit: CassandraTestkitMock = new CassandraTestkitMock({
     case e: TramiteUpdatedFromDto =>

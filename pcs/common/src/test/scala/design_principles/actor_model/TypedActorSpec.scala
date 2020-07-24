@@ -39,6 +39,6 @@ object TypedActorSpec {
       akka.persistence.journal.plugin = "akka.persistence.journal.inmem"
       akka.persistence.journal.inmem.test-serialization = on
       akka.actor.allow-java-serialization = true
-      #akka.cluster.jmx.multi-mbeans-in-same-jvm = on
+      akka.cluster.jmx.multi-mbeans-in-same-jvm = on
     """)
 }

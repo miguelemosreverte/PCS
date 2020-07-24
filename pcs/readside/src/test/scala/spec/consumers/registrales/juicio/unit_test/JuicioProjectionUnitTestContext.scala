@@ -10,7 +10,7 @@ import spec.testkit.ProjectionTestkit
 import spec.testsuite.ProjectionTestContext
 
 class JuicioProjectionUnitTestContext(implicit system: ActorSystem)
-  extends ProjectionTestContext[JuicioEvents, JuicioMessageRoots] {
+    extends ProjectionTestContext[JuicioEvents, JuicioMessageRoots] {
 
   private val cassandraTestkit: CassandraTestkitMock = new CassandraTestkitMock({
     case e: JuicioUpdatedFromDto =>

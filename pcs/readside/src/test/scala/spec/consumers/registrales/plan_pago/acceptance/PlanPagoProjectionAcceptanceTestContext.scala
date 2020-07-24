@@ -8,7 +8,7 @@ import spec.testkit.ProjectionTestkit
 import spec.testsuite.ProjectionTestContext
 
 class PlanPagoProjectionAcceptanceTestContext(implicit system: ActorSystem)
-  extends ProjectionTestContext[PlanPagoEvents, PlanPagoMessageRoots] {
+    extends ProjectionTestContext[PlanPagoEvents, PlanPagoMessageRoots] {
 
   import system.dispatcher
   truncateTables(

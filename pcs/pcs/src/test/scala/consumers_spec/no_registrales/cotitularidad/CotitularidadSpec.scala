@@ -1,13 +1,9 @@
 package consumers_spec.no_registrales.cotitularidad
 
-import scala.concurrent.duration._
-
 import consumers.no_registral.objeto.application.entities.ObjetoExternalDto.ObjetosTri
 import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMessageRoots
-import consumers.no_registral.objeto.application.entities.ObjetoQueries.GetStateObjeto
 import consumers.no_registral.objeto.application.entities.ObjetoResponses.GetObjetoResponse
 import consumers.no_registral.sujeto.application.entity.SujetoMessage.SujetoMessageRoots
-import consumers.no_registral.sujeto.application.entity.SujetoQueries.GetStateSujeto
 import consumers.no_registral.sujeto.application.entity.SujetoResponses.GetSujetoResponse
 import consumers_spec.no_registrales.testkit.Examples
 import consumers_spec.no_registrales.testsuite.NoRegistralesTestSuite
@@ -18,12 +14,6 @@ import stubs.consumers.no_registrales.common._
 import utils.generators.Model.deliveryId
 
 trait CotitularidadSpec extends NoRegistralesTestSuite {
-  // @TODO check
-  // override def afterEach(): Unit = {
-  //   receiveWhile(1 second) { _ =>
-  //     ()
-  //   }
-  // }
 
   val examples = new Examples("CotitularidadSpec")
 

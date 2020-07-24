@@ -11,8 +11,8 @@ import scala.util.{Success, Try}
 class ObligacionUpdateFromDtoHandler(actor: ObligacionActor) extends SyncCommandHandler[ObligacionUpdateFromDto] {
   override def handle(command: ObligacionUpdateFromDto): Try[akka.Done] = {
     val replyTo = actor.context.sender()
-    if (command.deliveryId < actor.lastDeliveryId) {
-      log.info(s"[${actor.persistenceId}] Will have to answer idepotent for delivery ${command.deliveryId}")
+    if (command.deliveryId <= actor.lastDeliveryId) {
+      log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
       replyTo ! akka.Done
       Success(akka.Done)
     } else {

@@ -15,7 +15,7 @@ import readside.proyectionists.registrales.parametrica_recargo.projections.Param
 import spec.testkit.ProjectionTestkitMock
 
 class ParametricaRecargoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
-  extends ProjectionTestkitMock[ParametricaRecargoEvents, ParametricaRecargoMessageRoots] {
+    extends ProjectionTestkitMock[ParametricaRecargoEvents, ParametricaRecargoMessageRoots] {
 
   override val cassandraTestkit: CassandraTestkitMock = c
 

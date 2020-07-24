@@ -10,7 +10,7 @@ import spec.testkit.ProjectionTestkit
 import spec.testsuite.ProjectionTestContext
 
 class PlanPagoProjectionUnitTestContext(implicit system: ActorSystem)
-  extends ProjectionTestContext[PlanPagoEvents, PlanPagoMessageRoots] {
+    extends ProjectionTestContext[PlanPagoEvents, PlanPagoMessageRoots] {
 
   private val cassandraTestkit: CassandraTestkitMock = new CassandraTestkitMock({
     case e: PlanPagoUpdatedFromDto =>

@@ -12,11 +12,9 @@ trait ActorTransaction {
   private val log = LoggerFactory.getLogger(this.getClass)
 
   def routesClassic(implicit system: akka.actor.ActorSystem): Route = {
-    log.info((system == null).toString)
     kafka.AtomicKafkaController(this)(system).routes
   }
   def routes(implicit system: akka.actor.typed.ActorSystem[_]): Route = {
-    log.info((system == null).toString)
     kafka.AtomicKafkaController.fromTyped(this)(system).routes
   }
 }

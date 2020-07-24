@@ -9,6 +9,8 @@ import spec.testsuite.ProjectionTestContext
 
 @Ignore
 class ParametricaRecargoProjectionAcceptanceTest extends ParametricaRecargoProyectionistSpec {
-  override def testContext()(implicit system: ActorSystem): ProjectionTestContext[ParametricaRecargoEvents, ParametricaRecargoMessage.ParametricaRecargoMessageRoots] =
+  override def testContext()(
+      implicit system: ActorSystem
+  ): ProjectionTestContext[ParametricaRecargoEvents, ParametricaRecargoMessage.ParametricaRecargoMessageRoots] =
     new ParametricaRecargoProjectionAcceptanceTestContext
 }

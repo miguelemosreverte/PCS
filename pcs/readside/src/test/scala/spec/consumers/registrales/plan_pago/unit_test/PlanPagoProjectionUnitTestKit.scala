@@ -15,7 +15,7 @@ import readside.proyectionists.registrales.plan_pago.projections.PlanPagoUpdated
 import spec.testkit.ProjectionTestkitMock
 
 class PlanPagoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
-  extends ProjectionTestkitMock[PlanPagoEvents, PlanPagoMessageRoots] {
+    extends ProjectionTestkitMock[PlanPagoEvents, PlanPagoMessageRoots] {
 
   override val cassandraTestkit: CassandraTestkitMock = c
 

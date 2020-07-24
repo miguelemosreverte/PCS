@@ -8,7 +8,7 @@ import spec.testkit.ProjectionTestkit
 import spec.testsuite.ProjectionTestContext
 
 class JuicioProjectionAcceptanceTestContext(implicit system: ActorSystem)
-  extends ProjectionTestContext[JuicioEvents, JuicioMessageRoots] {
+    extends ProjectionTestContext[JuicioEvents, JuicioMessageRoots] {
 
   import system.dispatcher
   truncateTables(

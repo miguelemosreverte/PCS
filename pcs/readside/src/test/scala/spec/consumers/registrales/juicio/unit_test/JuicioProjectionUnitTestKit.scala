@@ -15,7 +15,7 @@ import readside.proyectionists.registrales.juicio.projections.JuicioUpdatedFromD
 import spec.testkit.ProjectionTestkitMock
 
 class JuicioProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
-  extends ProjectionTestkitMock[JuicioEvents, JuicioMessageRoots] {
+    extends ProjectionTestkitMock[JuicioEvents, JuicioMessageRoots] {
 
   override val cassandraTestkit: CassandraTestkitMock = c
 

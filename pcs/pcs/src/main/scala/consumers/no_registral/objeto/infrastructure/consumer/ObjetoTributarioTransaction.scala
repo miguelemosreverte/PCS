@@ -1,5 +1,7 @@
 package consumers.no_registral.objeto.infrastructure.consumer
 
+import scala.concurrent.{ExecutionContext, Future}
+
 import akka.Done
 import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
@@ -9,18 +11,24 @@ import consumers.no_registral.objeto.infrastructure.json._
 import play.api.libs.json.Reads
 import serialization.decodeF
 
-import scala.concurrent.Future
-
-case class ObjetoTributarioTransaction()(implicit actorRef: ActorRef) extends ActorTransaction {
+case class ObjetoTributarioTransaction()(implicit actorRef: ActorRef, ec: ExecutionContext) extends ActorTransaction {
 
   val topic = "DGR-COP-OBJETOS-TRI"
 
-  override def transaction(input: String): Future[Done] = {
+  override def transaction(input: String): Future[Done] =
+    for {
+      cmd <- processInput(input)
+      done <- processCommand(cmd)
+    } yield done
 
+  def processInput(input: String): Future[ObjetosTri] = Future {
+    decodeF[ObjetosTri](input)
+  }
+
+  def processCommand(registro: ObjetosTri): Future[Done] = {
     implicit val a: Reads[Seq[ObjetosTri]] = Reads.seq(ObjetosTriF.reads)
     implicit val b: Reads[Seq[ObjetosTriOtrosAtributos]] = Reads.seq(ObjetosTriOtrosAtributosF.reads)
 
-    val registro = decodeF[ObjetosTri](input)
     val detalle: Option[ObjetosTriOtrosAtributos] = for {
       otrosAtributos <- registro.SOJ_OTROS_ATRIBUTOS
       sojDetalles <- (otrosAtributos \ "SOJ_DETALLES").toOption
@@ -60,6 +68,5 @@ case class ObjetoTributarioTransaction()(implicit actorRef: ActorRef) extends Ac
         )
 
     actorRef.ask[akka.Done](command)
-
   }
 }

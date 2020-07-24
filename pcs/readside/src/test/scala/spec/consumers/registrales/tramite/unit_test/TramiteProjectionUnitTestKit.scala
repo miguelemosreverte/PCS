@@ -15,7 +15,7 @@ import readside.proyectionists.registrales.tramite.projections.TramiteUpdatedFro
 import spec.testkit.ProjectionTestkitMock
 
 class TramiteProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
-  extends ProjectionTestkitMock[TramiteEvents, TramiteMessageRoots] {
+    extends ProjectionTestkitMock[TramiteEvents, TramiteMessageRoots] {
 
   override val cassandraTestkit: CassandraTestkitMock = c
 

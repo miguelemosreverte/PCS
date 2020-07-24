@@ -7,6 +7,8 @@ import spec.consumers.registrales.subasta.SubastaProyectionistSpec
 import spec.testsuite.ProjectionTestContext
 
 class SubastaProjectionUnitTest extends SubastaProyectionistSpec {
-  override def testContext()(implicit system: ActorSystem): ProjectionTestContext[SubastaEvents, SubastaMessage.SubastaMessageRoots] =
+  override def testContext()(
+      implicit system: ActorSystem
+  ): ProjectionTestContext[SubastaEvents, SubastaMessage.SubastaMessageRoots] =
     new SubastaProjectionUnitTestContext
 }

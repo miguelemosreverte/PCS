@@ -72,7 +72,7 @@ object SujetoActor extends ShardedEntityNoRequirements {
   def props(noRequirements: NoRequirements = NoRequirements()): Props = Props(new SujetoActor)
 
   object SujetoTags {
-    val SujetoReadside = Set("Sujeto")
+    val SujetoReadside: Set[String] = Set("Sujeto")
   }
 
   type ObjetoAggregateRoot = (String, String, String)

@@ -12,7 +12,7 @@ import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
 
 class TramiteProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
-  extends ProjectionTestkit[TramiteEvents, TramiteMessageRoots]
+    extends ProjectionTestkit[TramiteEvents, TramiteMessageRoots]
     with ScalaFutures {
   override val cassandraTestkit: CassandraTestkitProduction = c
   override def process(envelope: EventEnvelope[TramiteEvents]): Future[Done] =

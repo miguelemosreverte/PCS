@@ -7,6 +7,8 @@ import spec.consumers.registrales.tramite.TramiteProyectionistSpec
 import spec.testsuite.ProjectionTestContext
 
 class TramiteProjectionUnitTest extends TramiteProyectionistSpec {
-  override def testContext()(implicit system: ActorSystem): ProjectionTestContext[TramiteEvents, TramiteMessage.TramiteMessageRoots] =
+  override def testContext()(
+      implicit system: ActorSystem
+  ): ProjectionTestContext[TramiteEvents, TramiteMessage.TramiteMessageRoots] =
     new TramiteProjectionUnitTestContext
 }

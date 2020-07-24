@@ -9,6 +9,8 @@ import spec.testsuite.ProjectionTestContext
 
 @Ignore
 class TramiteProjectionAcceptanceTest extends TramiteProyectionistSpec {
-  override def testContext()(implicit system: ActorSystem): ProjectionTestContext[TramiteEvents, TramiteMessage.TramiteMessageRoots] =
+  override def testContext()(
+      implicit system: ActorSystem
+  ): ProjectionTestContext[TramiteEvents, TramiteMessage.TramiteMessageRoots] =
     new TramiteProjectionAcceptanceTestContext
 }

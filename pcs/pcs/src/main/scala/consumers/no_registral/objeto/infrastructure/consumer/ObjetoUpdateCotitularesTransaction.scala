@@ -1,5 +1,7 @@
 package consumers.no_registral.objeto.infrastructure.consumer
 
+import scala.concurrent.{ExecutionContext, Future}
+
 import akka.Done
 import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
@@ -7,15 +9,22 @@ import consumers.no_registral.objeto.application.entities.ObjetoCommands.ObjetoU
 import consumers.no_registral.objeto.infrastructure.json._
 import serialization.decodeF
 
-import scala.concurrent.Future
-
-case class ObjetoUpdateCotitularesTransaction()(implicit actorRef: ActorRef) extends ActorTransaction {
+case class ObjetoUpdateCotitularesTransaction()(implicit actorRef: ActorRef, ec: ExecutionContext)
+    extends ActorTransaction {
 
   val topic = "ObjetoUpdatedCotitulares"
 
-  override def transaction(input: String): Future[Done] = {
+  override def transaction(input: String): Future[Done] =
+    for {
+      cmd <- processInput(input)
+      done <- processCommand(cmd)
+    } yield done
 
-    val cmd: ObjetoUpdateCotitulares = decodeF[ObjetoUpdateCotitulares](input)
+  def processInput(input: String): Future[ObjetoUpdateCotitulares] = Future {
+    decodeF[ObjetoUpdateCotitulares](input)
+  }
+
+  def processCommand(cmd: ObjetoUpdateCotitulares): Future[Done] = {
     actorRef.ask[akka.Done](cmd)
   }
 }

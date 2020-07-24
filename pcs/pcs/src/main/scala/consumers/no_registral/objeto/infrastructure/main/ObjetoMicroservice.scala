@@ -16,6 +16,7 @@ object ObjetoMicroservice {
 
   def routes(implicit system: ActorSystem): Route = {
     implicit val actor: ActorRef = SujetoActor.start
+    import system.dispatcher
     Seq(
       ObjetoStateAPI().routes,
       ObjetoExencionTransaction().routesClassic,

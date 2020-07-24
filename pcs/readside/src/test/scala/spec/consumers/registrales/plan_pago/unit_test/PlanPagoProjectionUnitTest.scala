@@ -7,6 +7,8 @@ import spec.consumers.registrales.plan_pago.PlanPagoProyectionistSpec
 import spec.testsuite.ProjectionTestContext
 
 class PlanPagoProjectionUnitTest extends PlanPagoProyectionistSpec {
-  override def testContext()(implicit system: ActorSystem): ProjectionTestContext[PlanPagoEvents, PlanPagoMessage.PlanPagoMessageRoots] =
+  override def testContext()(
+      implicit system: ActorSystem
+  ): ProjectionTestContext[PlanPagoEvents, PlanPagoMessage.PlanPagoMessageRoots] =
     new PlanPagoProjectionUnitTestContext
 }

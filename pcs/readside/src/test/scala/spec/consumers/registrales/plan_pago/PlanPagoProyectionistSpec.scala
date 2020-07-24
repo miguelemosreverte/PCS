@@ -14,7 +14,6 @@ trait PlanPagoProyectionistSpec extends ProjectionTestSuite[PlanPagoEvents, Plan
     val context = testContext()
     val projectionTestkit = context.ProjectionTestkit
 
-
     val evento =
       stubs.consumers.registrales.plan_pago.PlanPagoEvents.PlanPagoUpdatedFromDtoAntStub
 

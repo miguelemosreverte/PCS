@@ -90,7 +90,7 @@ class ObjetoActor(obligacionActorProps: Props = ObligacionActor.props)
                 exencion
               )
           }
-        case other => obligacion forward other
+        case other => ()
       }
   }
 

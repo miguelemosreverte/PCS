@@ -15,7 +15,7 @@ import readside.proyectionists.registrales.parametrica_plan.projections.Parametr
 import spec.testkit.ProjectionTestkitMock
 
 class ParametricaPlanProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
-  extends ProjectionTestkitMock[ParametricaPlanEvents, ParametricaPlanMessageRoots] {
+    extends ProjectionTestkitMock[ParametricaPlanEvents, ParametricaPlanMessageRoots] {
 
   override val cassandraTestkit: CassandraTestkitMock = c
 

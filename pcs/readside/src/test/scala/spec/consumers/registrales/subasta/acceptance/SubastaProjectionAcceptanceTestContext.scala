@@ -8,7 +8,7 @@ import spec.testkit.ProjectionTestkit
 import spec.testsuite.ProjectionTestContext
 
 class SubastaProjectionAcceptanceTestContext(implicit system: ActorSystem)
-  extends ProjectionTestContext[SubastaEvents, SubastaMessageRoots] {
+    extends ProjectionTestContext[SubastaEvents, SubastaMessageRoots] {
 
   import system.dispatcher
   truncateTables(

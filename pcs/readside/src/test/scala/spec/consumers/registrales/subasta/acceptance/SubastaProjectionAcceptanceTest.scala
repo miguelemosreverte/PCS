@@ -9,6 +9,8 @@ import spec.testsuite.ProjectionTestContext
 
 @Ignore
 class SubastaProjectionAcceptanceTest extends SubastaProyectionistSpec {
-  override def testContext()(implicit system: ActorSystem): ProjectionTestContext[SubastaEvents, SubastaMessage.SubastaMessageRoots] =
+  override def testContext()(
+      implicit system: ActorSystem
+  ): ProjectionTestContext[SubastaEvents, SubastaMessage.SubastaMessageRoots] =
     new SubastaProjectionAcceptanceTestContext
 }

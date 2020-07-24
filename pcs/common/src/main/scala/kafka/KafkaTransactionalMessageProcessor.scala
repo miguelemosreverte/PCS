@@ -1,9 +1,11 @@
 package kafka
 
 import scala.concurrent.Future
+import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 import akka.Done
+import akka.actor.ActorSystem
 import akka.kafka.scaladsl.Transactional
 import akka.kafka.{ConsumerMessage, ProducerMessage, Subscriptions}
 import akka.stream.KillSwitches
@@ -18,6 +20,8 @@ class KafkaTransactionalMessageProcessor()(
 
   override type KillSwitch = akka.stream.UniqueKillSwitch
 
+  private val log = LoggerFactory.getLogger(this.getClass)
+
   def run(
       SOURCE_TOPIC: String,
       SINK_TOPIC: String,
@@ -26,22 +30,17 @@ class KafkaTransactionalMessageProcessor()(
 
     type Msg = ConsumerMessage.TransactionalMessage[String, String]
 
-    implicit val system = transactionRequirements.system
+    implicit val system: ActorSystem = transactionRequirements.system
     val consumer = transactionRequirements.consumer
     val producer = transactionRequirements.producer
-    import scala.concurrent.duration._
 
     import system.dispatcher
 
-    var message: Msg = null
-
-    log.info(s"Running Transaction from SOURCE_TOPIC: ${SOURCE_TOPIC} to SINK_TOPIC: ${SINK_TOPIC}")
-
     val stream = Transactional
       .source(consumer, Subscriptions.topics(SOURCE_TOPIC))
-      .throttle(2000, 500 millis)
+      .throttle(3000, 100 millis)
       .mapAsync(1) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
-        message = msg
+        val message = msg
 
         val input: String = message.record.value
 
@@ -49,21 +48,21 @@ class KafkaTransactionalMessageProcessor()(
 
         algorithm(input)
           .map { a: Seq[String] =>
-            Right(a)
+            Right(message -> a)
           }
           .recover {
             case e: Exception =>
-              Left(s"""
+              Left(message -> s"""
                   Error in flow:
                   ${e.getMessage}
                   For input:
-                  ${input}
+                  $input
               """)
           }
       }
       .map {
 
-        case Left(cause) =>
+        case Left((message, cause)) =>
           log.error(cause)
           val output = Seq(message.record.value)
           ProducerMessage.multi(
@@ -76,7 +75,7 @@ class KafkaTransactionalMessageProcessor()(
             }.toList,
             passThrough = message.partitionOffset
           )
-        case Right(output) =>
+        case Right((message, output)) =>
           ProducerMessage.multi(
             records = output.map { o =>
               new ProducerRecord(
@@ -101,11 +100,13 @@ class KafkaTransactionalMessageProcessor()(
 
     done.onComplete {
       case Success(value) =>
-        log.info(s"Stream completed with success -- ${value}")
-      // run(SOURCE_TOPIC,SINK_TOPIC,algorithm)
+        log.info(s"Stream completed with success -- $value")
+        killSwitch.shutdown()
+        run(SOURCE_TOPIC, SINK_TOPIC, algorithm)
       case Failure(ex) =>
         log.error(s"Stream completed with failure -- ${ex.getMessage}")
-      // run(SOURCE_TOPIC,SINK_TOPIC,algorithm)
+        killSwitch.shutdown()
+        run(SOURCE_TOPIC, SINK_TOPIC, algorithm)
     }
 
     (killSwitch, done)
@@ -113,5 +114,4 @@ class KafkaTransactionalMessageProcessor()(
 
   def transactionalId: String = java.util.UUID.randomUUID().toString
 
-  val log = LoggerFactory.getLogger(this.getClass)
 }

@@ -31,7 +31,7 @@ trait NoRegistralesTestSuiteMock extends BaseE2ESpec {
 
     import system.dispatcher
 
-    lazy val cassandraTestkit = new CassandraTestkitMock({
+    val cassandraTestkit = new CassandraTestkitMock({
       case e: ObjetoSnapshotPersisted =>
         (
           ObjetoMessageRoots(e.sujetoId, e.objetoId, e.tipoObjeto).toString,
@@ -52,26 +52,26 @@ trait NoRegistralesTestSuiteMock extends BaseE2ESpec {
     override val cassandraRead: CassandraRead = cassandraTestkit.cassandraRead
     override val cassandraWrite: CassandraWrite = cassandraTestkit.cassandraWrite
 
-    lazy val kafkaMock: KafkaMock = new KafkaMock()
+    val kafkaMock: KafkaMock = new KafkaMock()
     override def messageProducer: MessageProducer = kafkaMock
     override def messageProcessor: MessageProcessor with MessageProcessorLogging = kafkaMock
 
-    lazy val obligacionProyectionist: ObligacionProjectionHandler =
+    val obligacionProyectionist: ObligacionProjectionHandler =
       new readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler() {
         override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
       }
 
-    lazy val objetoProyectionist: ObjetoProjectionHandler =
+    val objetoProyectionist: ObjetoProjectionHandler =
       new readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler() {
         override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
       }
 
-    lazy val sujetoProyectionist: SujetoProjectionHandler =
+    val sujetoProyectionist: SujetoProjectionHandler =
       new readside.proyectionists.no_registrales.sujeto.SujetoProjectionHandler() {
         override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
       }
 
-    lazy val sujeto: ActorRef =
+    val sujeto: ActorRef =
       new SujetoActorWithMockPersistence(
         obligacionProyectionist,
         objetoProyectionist,
@@ -80,17 +80,16 @@ trait NoRegistralesTestSuiteMock extends BaseE2ESpec {
         messageProducer
       ).start
 
-    lazy val cotitularidadActor: ActorRef = new CotitularidadActorWithMockPersistence(messageProducer).start
+    val cotitularidadActor: ActorRef = new CotitularidadActorWithMockPersistence(messageProducer).start
 
-    lazy val Query: NoRegistralesQueryTestKit with AgainstActors =
+    val Query: NoRegistralesQueryTestKit with AgainstActors =
       new NoRegistralesQueryWithActorRef(sujeto)
 
-    lazy val MessageProducers = new MessageTestkitUtils(sujeto, cotitularidadActor, messageProducer)
+    val MessageProducers = new MessageTestkitUtils(sujeto, cotitularidadActor, messageProducer)
 
+    MessageProducers.StartMessageProcessor(messageProcessor).startProcessing()
 
-     MessageProducers.StartMessageProcessor(messageProcessor).startProcessing()
-     
     def close(): Unit = {}
-    
+
   }
 }

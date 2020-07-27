@@ -26,6 +26,14 @@ object ObligacionCommands {
     override def deliveryId: BigInt = 0
   }
 
+  case class DownObligacion(
+      deliveryId: BigInt,
+      sujetoId: String,
+      objetoId: String,
+      tipoObjeto: String,
+      obligacionId: String
+  ) extends ObligacionCommands
+
   case class ObligacionUpdateExencion(
       deliveryId: BigInt,
       sujetoId: String,
@@ -34,4 +42,5 @@ object ObligacionCommands {
       obligacionId: String,
       exencion: Exencion
   ) extends ObligacionCommands
+
 }

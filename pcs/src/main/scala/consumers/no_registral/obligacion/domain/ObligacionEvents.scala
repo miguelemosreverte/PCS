@@ -50,4 +50,5 @@ object ObligacionEvents {
       obligacionId: String,
       exencion: Exencion
   ) extends ObligacionEvents
+
 }

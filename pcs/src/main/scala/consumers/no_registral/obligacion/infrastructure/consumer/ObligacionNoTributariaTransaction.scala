@@ -38,15 +38,27 @@ case class ObligacionNoTributariaTransaction()(implicit actorRef: ActorRef, ec: 
       detalles = serialization.decodeF[Seq[DetallesObligacion]](bobDetalles.toString)
     } yield detalles
 
-    val command = ObligacionCommands.ObligacionUpdateFromDto(
-      sujetoId = registro.BOB_SUJ_IDENTIFICADOR,
-      objetoId = registro.BOB_SOJ_IDENTIFICADOR,
-      tipoObjeto = registro.BOB_SOJ_TIPO_OBJETO,
-      obligacionId = registro.BOB_OBN_ID,
-      deliveryId = registro.EV_ID,
-      registro = registro,
-      detallesObligacion = detalles.getOrElse(Seq.empty)
-    )
+    {}
+
+    val command =
+      if (registro.BOB_ESTADO.contains("BAJA"))
+        ObligacionCommands.DownObligacion(
+          sujetoId = registro.BOB_SUJ_IDENTIFICADOR,
+          objetoId = registro.BOB_SOJ_IDENTIFICADOR,
+          tipoObjeto = registro.BOB_SOJ_TIPO_OBJETO,
+          obligacionId = registro.BOB_OBN_ID,
+          deliveryId = registro.EV_ID
+        )
+      else
+        ObligacionCommands.ObligacionUpdateFromDto(
+          sujetoId = registro.BOB_SUJ_IDENTIFICADOR,
+          objetoId = registro.BOB_SOJ_IDENTIFICADOR,
+          tipoObjeto = registro.BOB_SOJ_TIPO_OBJETO,
+          obligacionId = registro.BOB_OBN_ID,
+          deliveryId = registro.EV_ID,
+          registro = registro,
+          detallesObligacion = detalles.getOrElse(Seq.empty)
+        )
     actorRef.ask[akka.Done](command)
   }
 }

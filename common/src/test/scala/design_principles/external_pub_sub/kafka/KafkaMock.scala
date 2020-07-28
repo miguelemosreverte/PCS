@@ -1,7 +1,6 @@
 package design_principles.external_pub_sub.kafka
 
 import scala.concurrent.{ExecutionContext, Future}
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.OverflowStrategy
@@ -75,7 +74,7 @@ class KafkaMock()(implicit system: ActorSystem, ec: ExecutionContext)
 object KafkaMock {
 
   implicit class MessageProcessorImplicits(messageConsumer: MessageProcessor) {
-    def subscribeActorTransaction(SOURCE_TOPIC: String, actorTransaction: ActorTransaction)(
+    def subscribeActorTransaction(SOURCE_TOPIC: String, actorTransaction: ActorTransaction[_])(
         implicit ec: ExecutionContext
     ): (_, Future[Done]) =
       messageConsumer match {

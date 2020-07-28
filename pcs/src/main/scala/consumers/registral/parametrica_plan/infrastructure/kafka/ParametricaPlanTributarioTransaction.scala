@@ -7,19 +7,20 @@ import consumers.registral.parametrica_plan.application.entities.{ParametricaPla
 import consumers.registral.parametrica_plan.infrastructure.dependency_injection.ParametricaPlanActor
 import consumers.registral.parametrica_plan.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case class ParametricaPlanTributarioTransaction()(implicit actor: ParametricaPlanActor,
-                                                  system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction {
+                                                  system: akka.actor.typed.ActorSystem[_],
+                                                  monitoring: Monitoring,
+                                                  ec: ExecutionContext)
+    extends ActorTransaction[ParametricaPlanTri](monitoring) {
 
   val topic = "DGR-COP-PARAMPLAN-TRI"
 
-  override def transaction(input: String): Future[Done] = {
-
-    val registro: ParametricaPlanTri = decodeF[ParametricaPlanTri](input)
+  override def processCommand(registro: ParametricaPlanTri): Future[Done] = {
     val command = registro match {
       case registro: ParametricaPlanExternalDto.ParametricaPlanTri =>
         ParametricaPlanCommands.ParametricaPlanUpdateFromDto(

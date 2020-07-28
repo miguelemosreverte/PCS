@@ -10,14 +10,14 @@ import api.actor_transaction.ActorTransaction
 
 object AtomicKafkaController {
   def fromTyped(
-      actorTransaction: ActorTransaction
+      actorTransaction: ActorTransaction[_]
   )(implicit system: akka.actor.typed.ActorSystem[_]): AtomicKafkaController = {
     import akka.actor.typed.scaladsl.adapter._
     new AtomicKafkaController(actorTransaction)(system.toClassic)
   }
 }
 
-case class AtomicKafkaController(actorTransaction: ActorTransaction)(implicit system: ActorSystem)
+case class AtomicKafkaController(actorTransaction: ActorTransaction[_])(implicit system: ActorSystem)
     extends AkkaHttpServer {
 
   implicit private val ec: ExecutionContextExecutor = system.dispatcher

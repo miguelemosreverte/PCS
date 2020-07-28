@@ -12,7 +12,7 @@ final class ReadinessController(appLifecycle: AppLifecycle, monitoring: Monitori
 
   override val exceptionHandler = ExceptionHandler {
     case _ =>
-      criticals.increment()
+      errors.increment()
       complete(StatusCodes.InternalServerError)
   }
 

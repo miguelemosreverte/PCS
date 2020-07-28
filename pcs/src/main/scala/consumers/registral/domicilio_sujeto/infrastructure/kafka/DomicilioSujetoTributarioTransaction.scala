@@ -8,17 +8,20 @@ import consumers.registral.domicilio_sujeto.application.entities.DomicilioSujeto
 import consumers.registral.domicilio_sujeto.infrastructure.dependency_injection.DomicilioSujetoActor
 import consumers.registral.domicilio_sujeto.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class DomicilioSujetoTributarioTransaction()(implicit actor: DomicilioSujetoActor, system: ActorSystem[_])
-    extends ActorTransaction {
+case class DomicilioSujetoTributarioTransaction()(implicit actor: DomicilioSujetoActor,
+                                                  system: ActorSystem[_],
+                                                  monitoring: Monitoring,
+                                                  ec: ExecutionContext)
+    extends ActorTransaction[DomicilioSujetoTri](monitoring) {
 
   val topic = "DGR-COP-DOMICILIO-SUJ-TRI"
 
-  override def transaction(input: String): Future[Done] = {
-    val registro: DomicilioSujetoTri = decodeF[DomicilioSujetoTri](input)
+  override def processCommand(registro: DomicilioSujetoTri): Future[Done] = {
     val command = registro match {
       case registro: DomicilioSujetoTri =>
         DomicilioSujetoCommands.DomicilioSujetoUpdateFromDto(

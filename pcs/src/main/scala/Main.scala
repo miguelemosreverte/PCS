@@ -20,7 +20,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext}
 
 object Main extends App {
-  val monitoring = new KamonMonitoring
+  implicit val monitoring = new KamonMonitoring
 
   val pepeCounter = monitoring.counter("pepe")
   val pepeHistogram = monitoring.histogram("pepe")
@@ -42,6 +42,8 @@ object Main extends App {
   ).reduce(_ withFallback _)
 
   implicit val system: ActorSystem = ActorSystem("PersonClassificationService", config)
+
+  implicit val ec = system.dispatcher
 
   AkkaManagement(system).start()
   ClusterBootstrap(system).start()
@@ -71,7 +73,6 @@ object Main extends App {
   system.spawn[Nothing](Guardian.apply(), "ObjetoNovedadCotitularidad")
 
   private val appLifecycle = new AppLifecycle(AppLifecycleActor.startWithRequirements(NoRequirements()))
-  implicit val ec: ExecutionContext = system.dispatcher
   private val livenessController = new LivenessController
   private val readinessController = new ReadinessController(appLifecycle)
   private val shutdownController = new ShutdownController(appLifecycle)

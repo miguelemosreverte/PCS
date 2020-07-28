@@ -8,11 +8,14 @@ import consumers.registral.domicilio_sujeto.infrastructure.kafka.{
   DomicilioSujetoNoTributarioTransaction,
   DomicilioSujetoTributarioTransaction
 }
+import monitoring.Monitoring
+
+import scala.concurrent.ExecutionContext
 
 object DomicilioSujetoMicroservice {
 
   import akka.http.scaladsl.server.Directives._
-  def routes(implicit system: ActorSystem): Route = {
+  def routes(implicit system: ActorSystem, monitoring: Monitoring, ec: ExecutionContext): Route = {
     import akka.actor.typed.scaladsl.adapter._
 
     implicit val typedSystem = system.toTyped

@@ -5,11 +5,14 @@ import akka.http.scaladsl.server.Route
 import consumers.registral.juicio.infrastructure.dependency_injection.JuicioActor
 import consumers.registral.juicio.infrastructure.http.JuicioStateAPI
 import consumers.registral.juicio.infrastructure.kafka.{JuicioNoTributarioTransaction, JuicioTributarioTransaction}
+import monitoring.Monitoring
+
+import scala.concurrent.ExecutionContext
 
 object JuicioMicroservice {
 
   import akka.http.scaladsl.server.Directives._
-  def routes(implicit system: ActorSystem): Route = {
+  def routes(implicit system: ActorSystem, monitoring: Monitoring, ec: ExecutionContext): Route = {
     import akka.actor.typed.scaladsl.adapter._
 
     implicit val typedSystem = system.toTyped

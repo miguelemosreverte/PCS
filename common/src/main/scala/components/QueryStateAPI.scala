@@ -62,23 +62,19 @@ trait QueryStateAPI extends AkkaHttpServer {
       isEmpty: QueryMessage#ReturnType => Boolean
   )(implicit system: akka.actor.typed.ActorSystem[_]): Route = {
     implicit val ec: ExecutionContextExecutor = system.classicSystem.dispatcher
+    complete {
+      actor
+        .ask(query)
+        .map {
+          case result if isEmpty(result) => HttpResponse(NotFound)
 
-    requests.increment()
-    handleErrors(exceptionHandler) {
-      complete {
-        actor
-          .ask(query)
-          .map {
-            case result if isEmpty(result) => HttpResponse(NotFound)
-
-            case result =>
-              HttpResponse(
-                OK,
-                entity = QueryStateAPI.standarization(Json.prettyPrint(format.writes(result)))
-              )
-          }
-          .recover { case e: Exception => HttpResponse(InternalServerError, entity = e.getMessage) }
-      }
+          case result =>
+            HttpResponse(
+              OK,
+              entity = QueryStateAPI.standarization(Json.prettyPrint(format.writes(result)))
+            )
+        }
+        .recover { case e: Exception => HttpResponse(InternalServerError, entity = e.getMessage) }
     }
   }
 }

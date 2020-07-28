@@ -13,7 +13,7 @@ final class ShutdownController(appLifecycle: AppLifecycle, logger: Logger, monit
 
   override val exceptionHandler = ExceptionHandler {
     case _ =>
-      criticals.increment()
+      errors.increment()
       complete(StatusCodes.InternalServerError)
   }
 

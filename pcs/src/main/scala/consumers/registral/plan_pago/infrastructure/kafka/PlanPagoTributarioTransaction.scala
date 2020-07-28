@@ -7,17 +7,20 @@ import consumers.registral.plan_pago.application.entities.{PlanPagoCommands, Pla
 import consumers.registral.plan_pago.infrastructure.dependency_injection.PlanPagoActor
 import consumers.registral.plan_pago.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class PlanPagoTributarioTransaction()(implicit actor: PlanPagoActor, system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction {
+case class PlanPagoTributarioTransaction()(implicit actor: PlanPagoActor,
+                                           system: akka.actor.typed.ActorSystem[_],
+                                           monitoring: Monitoring,
+                                           ec: ExecutionContext)
+    extends ActorTransaction[PlanPagoTri](monitoring) {
 
   val topic = "DGR-COP-PLANES-TRI"
 
-  override def transaction(input: String): Future[Done] = {
-    val registro: PlanPagoTri = decodeF[PlanPagoTri](input)
+  override def processCommand(registro: PlanPagoTri): Future[Done] = {
     val command = registro match {
       case registro: PlanPagoExternalDto.PlanPagoTri =>
         PlanPagoCommands.PlanPagoUpdateFromDto(

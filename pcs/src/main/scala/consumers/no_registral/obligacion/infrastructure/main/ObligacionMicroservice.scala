@@ -9,10 +9,11 @@ import consumers.no_registral.obligacion.infrastructure.consumer.{
 }
 import consumers.no_registral.obligacion.infrastructure.http.ObligacionStateAPI
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor
+import monitoring.Monitoring
 
 object ObligacionMicroservice {
 
-  def routes(implicit system: ActorSystem): Route = {
+  def routes(implicit system: ActorSystem, monitoring: Monitoring): Route = {
     implicit val actor: ActorRef = SujetoActor.start
     import system.dispatcher
     Seq(

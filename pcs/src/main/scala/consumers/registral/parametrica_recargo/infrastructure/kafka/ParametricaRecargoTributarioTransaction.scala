@@ -10,19 +10,20 @@ import consumers.registral.parametrica_recargo.application.entities.{
 import consumers.registral.parametrica_recargo.infrastructure.dependency_injection.ParametricaRecargoActor
 import consumers.registral.parametrica_recargo.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case class ParametricaRecargoTributarioTransaction()(implicit actor: ParametricaRecargoActor,
-                                                     system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction {
+                                                     system: akka.actor.typed.ActorSystem[_],
+                                                     monitoring: Monitoring,
+                                                     ec: ExecutionContext)
+    extends ActorTransaction[ParametricaRecargoTri](monitoring) {
 
   val topic = "DGR-COP-PARAMRECARGO-TRI"
 
-  override def transaction(input: String): Future[Done] = {
-
-    val registro: ParametricaRecargoTri = decodeF[ParametricaRecargoTri](input)
+  override def processCommand(registro: ParametricaRecargoTri): Future[Done] = {
     val command = registro match {
       case registro: ParametricaRecargoExternalDto.ParametricaRecargoTri =>
         ParametricaRecargoCommands.ParametricaRecargoUpdateFromDto(

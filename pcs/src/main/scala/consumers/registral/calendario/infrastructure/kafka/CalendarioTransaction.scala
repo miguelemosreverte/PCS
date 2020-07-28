@@ -7,16 +7,20 @@ import consumers.registral.calendario.application.entities.{CalendarioCommands, 
 import consumers.registral.calendario.infrastructure.dependency_injection.CalendarioActor
 import consumers.registral.calendario.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.{Histogram, Monitoring}
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class CalendarioTransaction()(implicit actor: CalendarioActor, system: ActorSystem[_]) extends ActorTransaction {
+case class CalendarioTransaction()(implicit actor: CalendarioActor,
+                                   monitoring: Monitoring,
+                                   system: ActorSystem[_],
+                                   ex: ExecutionContext)
+    extends ActorTransaction[CalendarioExternalDto](monitoring) {
 
   val topic = "DGR-COP-CALENDARIOS"
 
-  override def transaction(input: String): Future[Done] = {
-    val registro: CalendarioExternalDto = decodeF[CalendarioExternalDto](input)
+  override def processCommand(registro: CalendarioExternalDto): Future[Done] = {
     val command = registro match {
       case registro: CalendarioExternalDto =>
         CalendarioCommands.CalendarioUpdateFromDto(

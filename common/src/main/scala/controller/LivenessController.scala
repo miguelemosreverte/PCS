@@ -12,7 +12,7 @@ final class LivenessController(monitoring: Monitoring) extends Controller(monito
 
   override val exceptionHandler = ExceptionHandler {
     case _ =>
-      criticals.increment()
+      errors.increment()
       complete(StatusCodes.InternalServerError)
   }
 

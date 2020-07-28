@@ -10,18 +10,20 @@ import consumers.registral.etapas_procesales.application.entities.{
 import consumers.registral.etapas_procesales.infrastructure.dependency_injection.EtapasProcesalesActor
 import consumers.registral.etapas_procesales.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case class EtapasProcesalesTributarioTransaction()(implicit actor: EtapasProcesalesActor,
-                                                   system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction {
+                                                   system: akka.actor.typed.ActorSystem[_],
+                                                   monitoring: Monitoring,
+                                                   ec: ExecutionContext)
+    extends ActorTransaction[EtapasProcesalesTri](monitoring) {
 
   val topic = "DGR-COP-ETAPROCESALES-TRI"
 
-  override def transaction(input: String): Future[Done] = {
-    val registro: EtapasProcesalesTri = decodeF[EtapasProcesalesTri](input)
+  override def processCommand(registro: EtapasProcesalesTri): Future[Done] = {
     val command = registro match {
       case registro: EtapasProcesalesExternalDto.EtapasProcesalesTri =>
         EtapasProcesalesCommands.EtapasProcesalesUpdateFromDto(

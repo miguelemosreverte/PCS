@@ -6,17 +6,20 @@ import consumers.registral.subasta.application.entities.{SubastaCommands, Subast
 import consumers.registral.subasta.infrastructure.dependency_injection.SubastaActor
 import consumers.registral.subasta.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class SubastaTransaction()(implicit actor: SubastaActor, system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction {
+case class SubastaTransaction()(implicit actor: SubastaActor,
+                                system: akka.actor.typed.ActorSystem[_],
+                                monitoring: Monitoring,
+                                ec: ExecutionContext)
+    extends ActorTransaction[SubastaExternalDto](monitoring) {
 
   val topic = "DGR-COP-SUBASTAS"
 
-  override def transaction(input: String): Future[Done] = {
-    val registro: SubastaExternalDto = decodeF[SubastaExternalDto](input)
+  override def processCommand(registro: SubastaExternalDto): Future[Done] = {
     val command = registro match {
       case registro: SubastaExternalDto =>
         SubastaCommands.SubastaUpdateFromDto(

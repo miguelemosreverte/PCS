@@ -12,15 +12,14 @@ abstract class Controller(monitoring: Monitoring = new KamonMonitoring) extends 
   def route: Route
   val exceptionHandler: ExceptionHandler = ExceptionHandler {
     case _ =>
-      criticals.increment()
+      errors.increment()
       complete(StatusCodes.InternalServerError)
   }
 
   private val metricPrefix = "controller"
   private val controllerId = api.Utils.Transformation.to_underscore(this.getClass.getSimpleName)
-  protected val warnings: Counter = monitoring.counter(s"$metricPrefix-$controllerId-warning")
-  protected val criticals: Counter = monitoring.counter(s"$metricPrefix-$controllerId-critical")
   protected val requests: Counter = monitoring.counter(s"$metricPrefix-$controllerId-request")
+  protected val errors: Counter = monitoring.counter(s"$metricPrefix-$controllerId-error")
   protected val latency: Histogram = monitoring.histogram(s"$metricPrefix-$controllerId-latency")
 
   def handleErrors(exceptionHandler: ExceptionHandler): Directive[Unit] =

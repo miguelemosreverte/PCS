@@ -8,16 +8,19 @@ import consumers.registral.declaracion_jurada.application.entities.DeclaracionJu
 import consumers.registral.declaracion_jurada.infrastructure.dependency_injection.DeclaracionJuradaActor
 import consumers.registral.declaracion_jurada.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class DeclaracionJuradaTransaction()(implicit actor: DeclaracionJuradaActor, system: ActorSystem[_])
-    extends ActorTransaction {
+case class DeclaracionJuradaTransaction()(implicit actor: DeclaracionJuradaActor,
+                                          system: ActorSystem[_],
+                                          monitoring: Monitoring,
+                                          ec: ExecutionContext)
+    extends ActorTransaction[DeclaracionJurada](monitoring) {
   val topic = "DGR-COP-DECJURADAS"
 
-  override def transaction(input: String): Future[Done] = {
-    val registro: DeclaracionJurada = decodeF[DeclaracionJurada](input)
+  override def processCommand(registro: DeclaracionJurada): Future[Done] = {
     val command = registro match {
       case registro: DeclaracionJurada =>
         DeclaracionJuradaCommands.DeclaracionJuradaUpdateFromDto(
@@ -31,7 +34,6 @@ case class DeclaracionJuradaTransaction()(implicit actor: DeclaracionJuradaActor
     }
 
     actor ask command
-
   }
 
 }

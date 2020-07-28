@@ -1,7 +1,6 @@
 package consumers.no_registral.obligacion.infrastructure.consumer
 
 import scala.concurrent.{ExecutionContext, Future}
-
 import akka.Done
 import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
@@ -11,26 +10,19 @@ import consumers.no_registral.obligacion.application.entities.ObligacionExternal
   ObligacionesAnt
 }
 import consumers.no_registral.obligacion.infrastructure.json._
+import monitoring.Monitoring
 import play.api.libs.json.Reads
 import serialization.decodeF
 
-case class ObligacionNoTributariaTransaction()(implicit actorRef: ActorRef, ec: ExecutionContext)
-    extends ActorTransaction {
+case class ObligacionNoTributariaTransaction()(implicit actorRef: ActorRef,
+                                               ec: ExecutionContext,
+                                               monitoring: Monitoring)
+    extends ActorTransaction[ObligacionesAnt](monitoring) {
 
   val topic = "DGR-COP-OBLIGACIONES-ANT"
 
-  override def transaction(input: String): Future[Done] =
-    for {
-      cmd <- processInput(input)
-      done <- processCommand(cmd)
-    } yield done
-
-  def processInput(input: String): Future[ObligacionesAnt] = Future {
-    decodeF[ObligacionesAnt](input)
-  }
-
-  def processCommand(registro: ObligacionesAnt): Future[Done] = {
-    implicit val b: Reads[Seq[DetallesObligacion]] = Reads.seq(DetallesObligacionF.reads)
+  override def processCommand(registro: ObligacionesAnt): Future[Done] = {
+    //implicit val b: Reads[Seq[DetallesObligacion]] = Reads.seq(DetallesObligacionF.reads)
 
     val detalles: Option[Seq[DetallesObligacion]] = for {
       otrosAtributos <- registro.BOB_OTROS_ATRIBUTOS

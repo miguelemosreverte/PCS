@@ -1,22 +1,19 @@
 package components
 
-import java.time.LocalDateTime
-
-import akka.AkkaHttpServer
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.model.StatusCodes.{InternalServerError, NotFound, OK}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{Directive, Route}
+import controller.Controller
 import cqrs.BasePersistentShardedTypedActor.CQRS.BasePersistentShardedTypedActorWithCQRS
 import design_principles.actor_model.mechanism.TypedAsk.{AkkaClassicTypedAsk, AkkaTypedTypedAsk}
 import design_principles.actor_model.{Query, Response}
 import play.api.libs.json.{Format, Json}
-
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.reflect.ClassTag
 
-trait QueryStateAPI extends AkkaHttpServer {
+trait QueryStateAPI extends AkkaHttpServer(monitoring){
   private val urlPrefix: Directive[Unit] = pathPrefix("state")
   def GET(route: Route): Route = (get & urlPrefix) { route }
   def POST(route: Route): Route = (post & urlPrefix) { route }

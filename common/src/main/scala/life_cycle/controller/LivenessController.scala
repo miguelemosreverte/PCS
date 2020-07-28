@@ -1,20 +1,24 @@
-package life_cycle.controller
+package controller
 
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import play.api.libs.json.{JsObject, JsString}
 
-final class LivenessController extends Controller {
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.server.{ExceptionHandler, Route}
+import akka.http.scaladsl.server.Directives._
+
+import monitoring.Monitoring
+
+final class LivenessController(monitoring: Monitoring) extends Controller(monitoring) {
 
   override val exceptionHandler = ExceptionHandler {
-    case error =>
-      log.error("Error in Liveness Controller", error)
+    case _ =>
+      criticals.increment()
       complete(StatusCodes.InternalServerError)
   }
 
   val route: Route = get {
     path("api" / "system" / "status") {
+      requests.increment()
       handleErrors(exceptionHandler) {
         complete(JsObject(Map("status" -> JsString("ok"))))
       }

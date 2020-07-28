@@ -1,13 +1,25 @@
-package controller
+package akka
 
-import play.api.libs.json.{JsArray, JsObject, JsString}
+import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.server.Directives.complete
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server._
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server._
 import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
 import monitoring.{Counter, Histogram, KamonMonitoring, Monitoring}
+import org.slf4j.LoggerFactory
+import play.api.libs.json.{JsArray, JsObject, JsString}
 
-abstract class Controller(monitoring: Monitoring = new KamonMonitoring) extends PlayJsonSupport {
+
+import scala.concurrent.Future
+
+
+abstract class AkkaHttpServer(monitoring: Monitoring) extends PlayJsonSupport {
+
+
+  val log = LoggerFactory.getLogger(this.getClass)
+
 
   def route: Route
   val exceptionHandler: ExceptionHandler = ExceptionHandler {
@@ -37,4 +49,21 @@ abstract class Controller(monitoring: Monitoring = new KamonMonitoring) extends 
         complete((StatusCodes.BadRequest, JsObject(Map("errors" -> JsArray(Seq(JsString(errorMsg)))))))
     }
     .result()
+}
+
+object AkkaHttpServer {
+  def start(route: Route, host: String = "0.0.0.0", port: Int = 8081)(implicit system: ActorSystem): Future[Unit] = {
+    import system.dispatcher
+    Http()
+      .bindAndHandle(route, host, port)
+      .map { binding =>
+        log.info(s"Starting ${this.getClass.getSimpleName} on $host:$port")
+      }
+      .recover {
+        case ex =>
+          log.error(s"Models observer could not bind to $host:$port/ ${ex.getMessage}")
+      }
+  }
+  val log = LoggerFactory.getLogger(this.getClass)
+
 }

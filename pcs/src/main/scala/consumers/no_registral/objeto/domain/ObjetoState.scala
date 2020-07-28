@@ -55,6 +55,13 @@ case class ObjetoState(
           registro = Some(evt.registro),
           sujetos = sujetos + evt.sujetoId
         )
+      case evt: ObjetoEvents.ObjetoUpdatedFromObligacionBajaSet =>
+        val obligacionesSaldo_ = obligacionesSaldo - (evt.obligacionId)
+        copy(
+          saldo = obligacionesSaldo_.values.sum,
+          obligaciones = obligaciones - evt.obligacionId,
+          obligacionesSaldo = obligacionesSaldo_
+        )
       case evt: ObjetoEvents.ObjetoUpdatedFromObligacion =>
         val _obligacionesVencidasSaldo =
           if (evt.obligacionVencida) {

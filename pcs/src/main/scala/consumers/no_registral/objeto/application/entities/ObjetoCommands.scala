@@ -59,6 +59,14 @@ object ObjetoCommands {
       porcentajeExencion: Option[BigDecimal]
   ) extends ObjetoCommands
 
+  case class ObjetoUpdateFromSetBajaObligacion(
+      deliveryId: BigInt,
+      sujetoId: String,
+      objetoId: String,
+      tipoObjeto: String,
+      obligacionId: String
+  ) extends ObjetoCommands
+
   case class ObjetoTagAdd(
       deliveryId: BigInt,
       sujetoId: String,

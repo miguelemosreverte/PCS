@@ -51,4 +51,24 @@ trait ObligacionSpec extends NoRegistralesTestSuite {
       }
       context.close()
   }
+
+  "una obligacion" should
+  "eliminar una obligacion si llega otra nueva que llegue desde Kafka para el mismo ID y con el atributo estado con BAJA" in parallelActorSystemRunner {
+    implicit s =>
+      val context = testContext()
+      context.messageProducer produceObligacion examples.obligacionWithSaldo200
+      eventually {
+        val response = context.Query getStateObligacion examples.obligacionWithSaldo200
+        response.saldo should be(examples.obligacionWithSaldo200.BOB_SALDO)
+      }
+
+      context.messageProducer produceObligacion examples.obligacionWithSaldo200.copy(
+        BOB_ESTADO = Some("BAJA")
+      )
+      eventually {
+        val response = context.Query getStateObligacion examples.obligacionWithSaldo200
+        response.saldo should be(0)
+      }
+  }
+
 }

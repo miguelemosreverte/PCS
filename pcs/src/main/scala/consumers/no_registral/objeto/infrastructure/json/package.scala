@@ -1,7 +1,6 @@
 package consumers.no_registral.objeto.infrastructure
 
 import ai.x.play.json.Jsonx
-import consumers.no_registral.objeto.application.entities.ObjetoCommands._
 import consumers.no_registral.objeto.application.entities.ObjetoExternalDto
 import consumers.no_registral.objeto.application.entities.ObjetoCommands.{
   ObjetoAddExencion,
@@ -11,8 +10,10 @@ import consumers.no_registral.objeto.application.entities.ObjetoCommands.{
   ObjetoUpdateCotitulares,
   ObjetoUpdateFromAnt,
   ObjetoUpdateFromObligacion,
+  ObjetoUpdateFromSetBajaObligacion,
   ObjetoUpdateFromTri,
-  SelfUpdateCotitulares
+  SelfUpdateCotitulares,
+  SetBajaObjeto
 }
 import consumers.no_registral.objeto.application.entities.ObjetoExternalDto.{
   Exencion,
@@ -53,8 +54,10 @@ package object json {
   implicit val ObjetoUpdateFromAntF = Json.format[ObjetoUpdateFromAnt]
   implicit val ObjetoUpdateFromObligacionF = Json.format[ObjetoUpdateFromObligacion]
   implicit val ObjetoTagAddF = Json.format[ObjetoTagAdd]
+  implicit val SetBajaObjetoF = Json.format[SetBajaObjeto]
   implicit val ObjetoTagRemoveF = Json.format[ObjetoTagRemove]
   implicit val SelfUpdateCotitularesF = Json.format[SelfUpdateCotitulares]
+  implicit val ObjetoUpdateFromSetBajaObligacionF = Json.format[ObjetoUpdateFromSetBajaObligacion]
 
   implicit val ObjetoSnapshotPersistedF = Json.format[ObjetoSnapshotPersisted]
   class ObjetoSnapshotPersistedFS extends EventSerializer[ObjetoSnapshotPersisted]
@@ -73,6 +76,9 @@ package object json {
 
   implicit val ObjetoUpdatedFromObligacionF = Json.format[ObjetoUpdatedFromObligacion]
   class ObjetoUpdatedFromObligacionFS extends EventSerializer[ObjetoUpdatedFromObligacion]
+
+  implicit val ObjetoUpdatedFromObligacionBajaSetF = Json.format[ObjetoUpdatedFromObligacionBajaSet]
+  class ObjetoUpdatedFromObligacionBajaSetFS extends EventSerializer[ObjetoUpdatedFromObligacionBajaSet]
 
   implicit val ObjetosTriOtrosAtributosF = Json.format[ObjetosTriOtrosAtributos]
 

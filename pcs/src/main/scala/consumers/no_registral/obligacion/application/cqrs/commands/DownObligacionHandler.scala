@@ -1,7 +1,7 @@
 package consumers.no_registral.obligacion.application.cqrs.commands
 
 import akka.Done
-import consumers.no_registral.obligacion.application.entities.ObligacionCommands.ObligacionRemove
+import consumers.no_registral.obligacion.application.entities.ObligacionCommands.DownObligacion
 import consumers.no_registral.obligacion.domain.ObligacionEvents
 import consumers.no_registral.obligacion.infrastructure.dependency_injection.ObligacionActor
 import consumers.no_registral.obligacion.infrastructure.dependency_injection.ObligacionActor.ObligacionTags
@@ -9,8 +9,8 @@ import cqrs.untyped.command.CommandHandler.SyncCommandHandler
 
 import scala.util.{Success, Try}
 
-class ObligacionRemoveHandler(actor: ObligacionActor) extends SyncCommandHandler[ObligacionRemove] {
-  override def handle(command: ObligacionRemove): Try[Done] = {
+class DownObligacionHandler(actor: ObligacionActor) extends SyncCommandHandler[DownObligacion] {
+  override def handle(command: DownObligacion): Try[Done] = {
     val event =
       ObligacionEvents.ObligacionRemoved(
         command.sujetoId,
@@ -20,7 +20,7 @@ class ObligacionRemoveHandler(actor: ObligacionActor) extends SyncCommandHandler
       )
     actor.persistEvent(event, ObligacionTags.ObligacionReadside) { () =>
       actor.state += event
-      // this.deleteMessages(Long.MaxValue)
+      actor.informBajaToParent(command)
       actor.context.stop(actor.self)
     }
     Success(akka.Done)

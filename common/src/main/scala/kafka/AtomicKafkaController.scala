@@ -1,10 +1,9 @@
 package kafka
 
 import scala.concurrent.ExecutionContextExecutor
-
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.server.Directives.{complete, path, pathPrefix, post, _}
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import akka.stream.UniqueKillSwitch
 import akka.{AkkaHttpServer, _}
 import api.actor_transaction.ActorTransaction

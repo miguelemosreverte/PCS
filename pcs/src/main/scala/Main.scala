@@ -5,8 +5,11 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.management.scaladsl.AkkaManagement
+import monitoring.KamonMonitoring
 import com.typesafe.config.ConfigFactory
 import consumers.no_registral.objeto.infrastructure.event_processor.Guardian
+import kamon.Kamon
+import kamon.prometheus.PrometheusReporter
 import life_cycle.controller.LivenessController
 import life_cycle.untyped.controller.{ReadinessController, ShutdownController}
 import life_cycle.untyped.{AppLifecycle, AppLifecycleActor}
@@ -17,6 +20,19 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext}
 
 object Main extends App {
+  val monitoring = new KamonMonitoring
+
+  val pepeCounter = monitoring.counter("pepe")
+  val pepeHistogram = monitoring.histogram("pepe")
+  val pepeGauge = monitoring.gauge("pepe")
+  // One-liner
+  (1 to 1000) foreach { i =>
+    pepeCounter.increment()
+    pepeGauge.increment()
+    pepeHistogram.record(i)
+
+  }
+
   val log = LoggerFactory.getLogger(this.getClass)
 
   lazy val config = Seq(

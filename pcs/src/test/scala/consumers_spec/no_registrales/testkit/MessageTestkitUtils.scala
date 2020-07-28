@@ -2,7 +2,6 @@ package consumers_spec.no_registrales.testkit
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
-
 import akka.Done
 import akka.actor.ActorRef
 import consumers.no_registral.cotitularidad.infrastructure.kafka.{
@@ -23,58 +22,60 @@ import consumers.no_registral.sujeto.infrastructure.consumer.{
 }
 import design_principles.external_pub_sub.kafka.KafkaMock.MessageProcessorImplicits
 import kafka.{MessageProcessor, MessageProducer}
+import monitoring.DummyMonitoring
 
 class MessageTestkitUtils(sujeto: ActorRef, cotitularidadActor: ActorRef, messageProducer: MessageProducer) {
   val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   implicit class StartMessageProcessor(messageProcessor: MessageProcessor) {
+    val monitoring = new DummyMonitoring
     def startProcessing(): Unit = {
       // COTITULARIDAD CONSUMERS
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "AddCotitularTransaction",
-        AddCotitularTransaction()(cotitularidadActor, ec)
+        AddCotitularTransaction(monitoring)(cotitularidadActor, ec)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "CotitularidadPublishSnapshot",
-        CotitularPublishSnapshotTransaction()(cotitularidadActor, ec)
+        CotitularPublishSnapshotTransaction(monitoring)(cotitularidadActor, ec)
       )
       // OBJETO CONSUMERS
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "DGR-COP-EXENCIONES",
-        ObjetoExencionTransaction()(sujeto, ec)
+        ObjetoExencionTransaction(monitoring)(sujeto, ec)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "DGR-COP-OBJETOS-ANT",
-        ObjetoNoTributarioTransaction()(sujeto, ec)
+        ObjetoNoTributarioTransaction(monitoring)(sujeto, ec)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "DGR-COP-OBJETOS-TRI",
-        ObjetoTributarioTransaction()(sujeto, ec)
+        ObjetoTributarioTransaction(monitoring)(sujeto, ec)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "ObjetoUpdateCotitularesTransaction",
-        ObjetoUpdateCotitularesTransaction()(sujeto, ec)
+        ObjetoUpdateCotitularesTransaction(monitoring)(sujeto, ec)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "ObjetoReceiveSnapshot",
-        ObjetoUpdateNovedadTransaction()(sujeto, ec)
+        ObjetoUpdateNovedadTransaction(monitoring)(sujeto, ec)
       )
       // OBLIGACION CONSUMERS
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-OBLIGACIONES-ANT",
-        ObligacionNoTributariaTransaction()(sujeto, ec)
+        ObligacionNoTributariaTransaction(monitoring)(sujeto, ec)
       )
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-OBLIGACIONES-TRI",
-        ObligacionTributariaTransaction()(sujeto, ec)
+        ObligacionTributariaTransaction(monitoring)(sujeto, ec)
       )
       // SUJETO CONSUMERS
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-SUJETO-TRI",
-        SujetoTributarioTransaction()(sujeto, ec)
+        SujetoTributarioTransaction(monitoring)(sujeto, ec)
       )
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-SUJETO-ANT",
-        SujetoNoTributarioTransaction()(sujeto, ec)
+        SujetoNoTributarioTransaction(monitoring)(sujeto, ec)
       )
       ()
     }

@@ -8,12 +8,14 @@ import consumers.registral.declaracion_jurada.application.entities.DeclaracionJu
 import consumers.registral.declaracion_jurada.infrastructure.dependency_injection.DeclaracionJuradaActor
 import consumers.registral.declaracion_jurada.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
 import scala.concurrent.Future
 
-case class DeclaracionJuradaTransaction()(implicit actor: DeclaracionJuradaActor, system: ActorSystem[_])
-    extends ActorTransaction {
+case class DeclaracionJuradaTransaction(monitoring: Monitoring)(implicit actor: DeclaracionJuradaActor,
+                                                                system: ActorSystem[_])
+    extends ActorTransaction(monitoring) {
   val topic = "DGR-COP-DECJURADAS"
 
   override def transaction(input: String): Future[Done] = {

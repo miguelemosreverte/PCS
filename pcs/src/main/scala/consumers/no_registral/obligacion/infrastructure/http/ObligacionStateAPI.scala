@@ -8,14 +8,16 @@ import akka.http.scaladsl.model.StatusCodes.{InternalServerError, NotFound, OK}
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.Route
 import api.Utils
-import components.QueryStateAPI
 import consumers.no_registral.objeto.application.entities.ObjetoQueries.GetStateObjeto
 import consumers.no_registral.objeto.application.entities.ObjetoResponses.GetObjetoResponse
 import consumers.no_registral.obligacion.application.entities.ObligacionQueries.GetStateObligacion
 import consumers.no_registral.obligacion.application.entities.ObligacionResponses.GetObligacionResponse
 import consumers.no_registral.obligacion.infrastructure.json._
+import design_principles.actor_model.mechanism.QueryStateAPI
+import monitoring.Monitoring
 
-case class ObligacionStateAPI()(implicit actor: ActorRef, system: ActorSystem) extends QueryStateAPI {
+case class ObligacionStateAPI(monitoring: Monitoring)(implicit actor: ActorRef, system: ActorSystem)
+    extends QueryStateAPI(monitoring) {
   import ObligacionStateAPI._
   implicit def ec = system.dispatcher
 
@@ -78,7 +80,7 @@ case class ObligacionStateAPI()(implicit actor: ActorRef, system: ActorSystem) e
       }
     }
 
-  def routes: Route = GET(getState) ~ POST(developerTools)
+  def route: Route = GET(getState) ~ POST(developerTools)
 
 }
 object ObligacionStateAPI {

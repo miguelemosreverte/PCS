@@ -8,19 +8,20 @@ import consumers.registral.parametrica_plan.infrastructure.kafka.{
   ParametricaPlanNoTributarioTransaction,
   ParametricaPlanTributarioTransaction
 }
+import monitoring.Monitoring
 
 object ParametricaPlanMicroservice {
 
   import akka.http.scaladsl.server.Directives._
-  def routes(implicit system: ActorSystem): Route = {
+  def route(monitoring: Monitoring)(implicit system: ActorSystem): Route = {
     import akka.actor.typed.scaladsl.adapter._
 
     implicit val typedSystem = system.toTyped
     implicit val actor = ParametricaPlanActor()
     Seq(
-      ParametricaPlanStateAPI().routes,
-      ParametricaPlanTributarioTransaction().routes,
-      ParametricaPlanNoTributarioTransaction().routes
+      ParametricaPlanStateAPI(monitoring).route,
+      ParametricaPlanTributarioTransaction(monitoring).route,
+      ParametricaPlanNoTributarioTransaction(monitoring).route
     ) reduce (_ ~ _)
   }
 }

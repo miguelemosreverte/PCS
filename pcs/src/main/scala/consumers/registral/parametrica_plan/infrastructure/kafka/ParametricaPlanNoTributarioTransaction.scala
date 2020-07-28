@@ -7,13 +7,14 @@ import consumers.registral.parametrica_plan.application.entities.{ParametricaPla
 import consumers.registral.parametrica_plan.infrastructure.dependency_injection.ParametricaPlanActor
 import consumers.registral.parametrica_plan.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
 import scala.concurrent.Future
 
-case class ParametricaPlanNoTributarioTransaction()(implicit actor: ParametricaPlanActor,
-                                                    system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction {
+case class ParametricaPlanNoTributarioTransaction(monitoring: Monitoring)(implicit actor: ParametricaPlanActor,
+                                                                          system: akka.actor.typed.ActorSystem[_])
+    extends ActorTransaction(monitoring) {
 
   val topic = "DGR-COP-PARAMPLAN-ANT"
 

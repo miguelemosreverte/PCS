@@ -7,11 +7,13 @@ import consumers.registral.calendario.application.entities.{CalendarioCommands, 
 import consumers.registral.calendario.infrastructure.dependency_injection.CalendarioActor
 import consumers.registral.calendario.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
 import scala.concurrent.Future
 
-case class CalendarioTransaction()(implicit actor: CalendarioActor, system: ActorSystem[_]) extends ActorTransaction {
+case class CalendarioTransaction(monitoring: Monitoring)(implicit actor: CalendarioActor, system: ActorSystem[_])
+    extends ActorTransaction(monitoring) {
 
   val topic = "DGR-COP-CALENDARIOS"
 

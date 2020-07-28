@@ -4,14 +4,15 @@ import java.time.LocalDateTime
 
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.{Directive, Route}
-import components.QueryStateAPI
 import consumers.registral.parametrica_recargo.application.entities.ParametricaRecargoQueries.GetStateParametricaRecargo
 import consumers.registral.parametrica_recargo.infrastructure.dependency_injection.ParametricaRecargoActor
 import consumers.registral.parametrica_recargo.infrastructure.json._
+import design_principles.actor_model.mechanism.QueryStateAPI
+import monitoring.Monitoring
 
-case class ParametricaRecargoStateAPI()(implicit actor: ParametricaRecargoActor,
-                                        system: akka.actor.typed.ActorSystem[_])
-    extends QueryStateAPI {
+case class ParametricaRecargoStateAPI(monitoring: Monitoring)(implicit actor: ParametricaRecargoActor,
+                                                              system: akka.actor.typed.ActorSystem[_])
+    extends QueryStateAPI(monitoring) {
   import ParametricaRecargoStateAPI._
 
   def getState: Route =
@@ -22,7 +23,7 @@ case class ParametricaRecargoStateAPI()(implicit actor: ParametricaRecargoActor,
       )
     }
 
-  def routes: Route = GET(getState)
+  def route: Route = GET(getState)
 }
 
 object ParametricaRecargoStateAPI {

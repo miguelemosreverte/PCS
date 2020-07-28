@@ -4,13 +4,15 @@ import java.time.LocalDateTime
 
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.Route
-import components.QueryStateAPI
 import consumers.registral.subasta.application.entities.SubastaQueries.GetStateSubasta
 import consumers.registral.subasta.infrastructure.dependency_injection.SubastaActor
 import consumers.registral.subasta.infrastructure.json._
+import design_principles.actor_model.mechanism.QueryStateAPI
+import monitoring.Monitoring
 
-case class SubastaStateAPI()(implicit actor: SubastaActor, system: akka.actor.typed.ActorSystem[_])
-    extends QueryStateAPI {
+case class SubastaStateAPI(monitoring: Monitoring)(implicit actor: SubastaActor,
+                                                   system: akka.actor.typed.ActorSystem[_])
+    extends QueryStateAPI(monitoring) {
   import SubastaStateAPI._
   def getState: Route =
     withSujeto { sujetoId =>
@@ -29,7 +31,7 @@ case class SubastaStateAPI()(implicit actor: SubastaActor, system: akka.actor.ty
       }
     }
 
-  def routes: Route = GET(getState)
+  def route: Route = GET(getState)
 }
 
 object SubastaStateAPI {

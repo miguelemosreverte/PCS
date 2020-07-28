@@ -5,13 +5,14 @@ import java.time.LocalDateTime
 import akka.actor.typed.ActorSystem
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.{Directive, Route}
-import components.QueryStateAPI
 import consumers.registral.actividad_sujeto.application.entities.ActividadSujetoQueries.GetStateActividadSujeto
 import consumers.registral.actividad_sujeto.infrastructure.dependency_injection.ActividadSujetoActor
 import consumers.registral.actividad_sujeto.infrastructure.json._
+import design_principles.actor_model.mechanism.QueryStateAPI
+import monitoring.Monitoring
 
-case class ActividadSujetoStateAPI()(implicit actor: ActividadSujetoActor, system: ActorSystem[_])
-    extends QueryStateAPI {
+case class ActividadSujetoStateAPI(monitoring: Monitoring)(implicit actor: ActividadSujetoActor, system: ActorSystem[_])
+    extends QueryStateAPI(monitoring) {
   import ActividadSujetoStateAPI._
   def getState: Route =
     withSujeto { sujetoId =>
@@ -25,7 +26,7 @@ case class ActividadSujetoStateAPI()(implicit actor: ActividadSujetoActor, syste
       }
     }
 
-  def routes: Route = GET(getState)
+  def route: Route = GET(getState)
 }
 
 object ActividadSujetoStateAPI {

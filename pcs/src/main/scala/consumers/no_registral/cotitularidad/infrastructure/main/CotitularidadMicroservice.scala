@@ -10,17 +10,18 @@ import consumers.no_registral.cotitularidad.infrastructure.kafka.{
   CotitularPublishSnapshotTransaction
 }
 import kafka.KafkaMessageProcessorRequirements
+import monitoring.Monitoring
 
 object CotitularidadMicroservice {
 
-  def routes(implicit system: ActorSystem): Route = {
+  def route(monitoring: Monitoring)(implicit system: ActorSystem): Route = {
     implicit val actor =
       CotitularidadActor.startWithRequirements(KafkaMessageProcessorRequirements.productionSettings())
     import system.dispatcher
     Seq(
-      CotitularidadStateAPI().routes,
-      AddCotitularTransaction().routesClassic,
-      CotitularPublishSnapshotTransaction().routesClassic
+      CotitularidadStateAPI(monitoring).route,
+      AddCotitularTransaction(monitoring).routeClassic,
+      CotitularPublishSnapshotTransaction(monitoring).routeClassic
     ) reduce (_ ~ _)
   }
 }

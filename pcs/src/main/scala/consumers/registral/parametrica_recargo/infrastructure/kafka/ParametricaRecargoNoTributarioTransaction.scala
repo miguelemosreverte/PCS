@@ -10,13 +10,14 @@ import consumers.registral.parametrica_recargo.application.entities.{
 import consumers.registral.parametrica_recargo.infrastructure.dependency_injection.ParametricaRecargoActor
 import consumers.registral.parametrica_recargo.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
 import scala.concurrent.Future
 
-case class ParametricaRecargoNoTributarioTransaction()(implicit actor: ParametricaRecargoActor,
-                                                       system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction {
+case class ParametricaRecargoNoTributarioTransaction(monitoring: Monitoring)(implicit actor: ParametricaRecargoActor,
+                                                                             system: akka.actor.typed.ActorSystem[_])
+    extends ActorTransaction(monitoring) {
 
   val topic = "DGR-COP-PARAMRECARGO-ANT"
 

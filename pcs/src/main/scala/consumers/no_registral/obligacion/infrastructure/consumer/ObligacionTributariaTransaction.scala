@@ -1,7 +1,6 @@
 package consumers.no_registral.obligacion.infrastructure.consumer
 
 import scala.concurrent.{ExecutionContext, Future}
-
 import akka.Done
 import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
@@ -11,11 +10,12 @@ import consumers.no_registral.obligacion.application.entities.ObligacionExternal
   ObligacionesTri
 }
 import consumers.no_registral.obligacion.infrastructure.json._
+import monitoring.Monitoring
 import play.api.libs.json.Reads
 import serialization.decodeF
 
-case class ObligacionTributariaTransaction()(implicit actorRef: ActorRef, ec: ExecutionContext)
-    extends ActorTransaction {
+case class ObligacionTributariaTransaction(monitoring: Monitoring)(implicit actorRef: ActorRef, ec: ExecutionContext)
+    extends ActorTransaction(monitoring) {
 
   val topic = "DGR-COP-OBLIGACIONES-TRI"
 

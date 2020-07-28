@@ -5,13 +5,15 @@ import java.time.LocalDateTime
 import akka.actor.typed.ActorSystem
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.{Directive, Route}
-import components.QueryStateAPI
 import consumers.registral.etapas_procesales.application.entities.EtapasProcesalesQueries.GetStateEtapasProcesales
 import consumers.registral.etapas_procesales.infrastructure.dependency_injection.EtapasProcesalesActor
 import consumers.registral.etapas_procesales.infrastructure.json._
+import design_principles.actor_model.mechanism.QueryStateAPI
+import monitoring.Monitoring
 
-case class EtapasProcesalesStateAPI()(implicit actor: EtapasProcesalesActor, system: ActorSystem[_])
-    extends QueryStateAPI {
+case class EtapasProcesalesStateAPI(monitoring: Monitoring)(implicit actor: EtapasProcesalesActor,
+                                                            system: ActorSystem[_])
+    extends QueryStateAPI(monitoring) {
   import EtapasProcesalesStateAPI._
 
   def getState: Route =
@@ -24,7 +26,7 @@ case class EtapasProcesalesStateAPI()(implicit actor: EtapasProcesalesActor, sys
       }
     }
 
-  def routes: Route = GET(getState)
+  def route: Route = GET(getState)
 }
 
 object EtapasProcesalesStateAPI {

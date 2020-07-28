@@ -1,7 +1,7 @@
-package components
+package design_principles.actor_model.mechanism
 
-import akka.AkkaHttpServer
 import akka.actor.{ActorRef, ActorSystem}
+import akka.http.Controller
 import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.model.StatusCodes.{InternalServerError, NotFound, OK}
 import akka.http.scaladsl.server.Directives._
@@ -9,12 +9,13 @@ import akka.http.scaladsl.server.{Directive, Route}
 import cqrs.BasePersistentShardedTypedActor.CQRS.BasePersistentShardedTypedActorWithCQRS
 import design_principles.actor_model.mechanism.TypedAsk.{AkkaClassicTypedAsk, AkkaTypedTypedAsk}
 import design_principles.actor_model.{Query, Response}
+import monitoring.Monitoring
 import play.api.libs.json.{Format, Json}
 
-import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.reflect.ClassTag
 
-trait QueryStateAPI extends AkkaHttpServer {
+abstract class QueryStateAPI(monitoring: Monitoring) extends Controller(monitoring) {
   private val urlPrefix: Directive[Unit] = pathPrefix("state")
   def GET(route: Route): Route = (get & urlPrefix) { route }
   def POST(route: Route): Route = (post & urlPrefix) { route }
@@ -25,19 +26,24 @@ trait QueryStateAPI extends AkkaHttpServer {
       isEmpty: GetStateResponse => Boolean
   )(implicit system: ActorSystem): Route = {
     import system.dispatcher
-    complete {
-      actorRef
-        .ask[Response](query)
-        .map {
-          case result: GetStateResponse if isEmpty(result) => HttpResponse(NotFound)
+    requests.increment()
+    handleErrors(exceptionHandler) {
+      complete {
+        val futureResponse: Future[HttpResponse] = actorRef
+          .ask[Response](query)
+          .map {
+            case result: GetStateResponse if isEmpty(result) => HttpResponse(NotFound)
 
-          case result: GetStateResponse =>
-            HttpResponse(
-              OK,
-              entity = QueryStateAPI.standarization(Json.prettyPrint(format.writes(result)))
-            )
-        }
-        .recover { case e: Exception => HttpResponse(InternalServerError, entity = e.getMessage) }
+            case result: GetStateResponse =>
+              HttpResponse(
+                OK,
+                entity = QueryStateAPI.standarization(Json.prettyPrint(format.writes(result)))
+              )
+          }
+          .recover { case e: Exception => HttpResponse(InternalServerError, entity = e.getMessage) }
+        latency.recordFuture(futureResponse)
+        futureResponse
+      }
     }
   }
 
@@ -55,19 +61,23 @@ trait QueryStateAPI extends AkkaHttpServer {
       isEmpty: QueryMessage#ReturnType => Boolean
   )(implicit system: akka.actor.typed.ActorSystem[_]): Route = {
     implicit val ec: ExecutionContextExecutor = system.classicSystem.dispatcher
-    complete {
-      actor
-        .ask(query)
-        .map {
-          case result if isEmpty(result) => HttpResponse(NotFound)
 
-          case result =>
-            HttpResponse(
-              OK,
-              entity = QueryStateAPI.standarization(Json.prettyPrint(format.writes(result)))
-            )
-        }
-        .recover { case e: Exception => HttpResponse(InternalServerError, entity = e.getMessage) }
+    requests.increment()
+    handleErrors(exceptionHandler) {
+      complete {
+        actor
+          .ask(query)
+          .map {
+            case result if isEmpty(result) => HttpResponse(NotFound)
+
+            case result =>
+              HttpResponse(
+                OK,
+                entity = QueryStateAPI.standarization(Json.prettyPrint(format.writes(result)))
+              )
+          }
+          .recover { case e: Exception => HttpResponse(InternalServerError, entity = e.getMessage) }
+      }
     }
   }
 }

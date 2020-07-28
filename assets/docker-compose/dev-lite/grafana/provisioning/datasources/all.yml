@@ -1,0 +1,9 @@
+datasources:
+- name: 'akka kamon prometheus'
+  type: 'prometheus'
+  access: 'direct'
+  org_id: 1
+  url: 'http://localhost:9095'
+  is_default: true
+  version: 1
+  editable: true

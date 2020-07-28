@@ -84,6 +84,14 @@ object ObjetoEvents {
       porcentajeExencion: Option[BigDecimal]
   ) extends ObjetoEvents
 
+  case class ObjetoUpdatedFromObligacionBajaSet(
+      deliveryId: BigInt,
+      sujetoId: String,
+      objetoId: String,
+      tipoObjeto: String,
+      obligacionId: String
+  ) extends ObjetoEvents
+
   case class ObjetoAddedExencion(
       deliveryId: BigInt,
       sujetoId: String,

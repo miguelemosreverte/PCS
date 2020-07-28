@@ -45,7 +45,7 @@ trait SujetoSpec extends NoRegistralesTestSuite {
   }
 
   "un sujeto" should
-  "desacumular saldo a partir de la baja de un objeto" in parallelActorSystemRunner { implicit s =>
+  "Desacumular saldo a partir de la baja de un objeto" in parallelActorSystemRunner { implicit s =>
     val context = testContext()
 
     val anotherOne = examples.obligacionWithSaldo50.copy(

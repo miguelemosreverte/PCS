@@ -8,19 +8,20 @@ import consumers.registral.domicilio_sujeto.infrastructure.kafka.{
   DomicilioSujetoNoTributarioTransaction,
   DomicilioSujetoTributarioTransaction
 }
+import monitoring.Monitoring
 
 object DomicilioSujetoMicroservice {
 
   import akka.http.scaladsl.server.Directives._
-  def routes(implicit system: ActorSystem): Route = {
+  def route(monitoring: Monitoring)(implicit system: ActorSystem): Route = {
     import akka.actor.typed.scaladsl.adapter._
 
     implicit val typedSystem = system.toTyped
     implicit val actor = DomicilioSujetoActor()
     Seq(
-      DomicilioSujetoStateAPI().routes,
-      DomicilioSujetoTributarioTransaction().routes,
-      DomicilioSujetoNoTributarioTransaction().routes
+      DomicilioSujetoStateAPI(monitoring).route,
+      DomicilioSujetoTributarioTransaction(monitoring).route,
+      DomicilioSujetoNoTributarioTransaction(monitoring).route
     ) reduce (_ ~ _)
   }
 }

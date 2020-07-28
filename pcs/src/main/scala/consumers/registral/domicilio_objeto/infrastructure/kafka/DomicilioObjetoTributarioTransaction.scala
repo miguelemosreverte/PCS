@@ -8,12 +8,14 @@ import consumers.registral.domicilio_objeto.application.entities.DomicilioObjeto
 import consumers.registral.domicilio_objeto.infrastructure.dependency_injection.DomicilioObjetoActor
 import consumers.registral.domicilio_objeto.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
 import scala.concurrent.Future
 
-case class DomicilioObjetoTributarioTransaction()(implicit actor: DomicilioObjetoActor, system: ActorSystem[_])
-    extends ActorTransaction {
+case class DomicilioObjetoTributarioTransaction(monitoring: Monitoring)(implicit actor: DomicilioObjetoActor,
+                                                                        system: ActorSystem[_])
+    extends ActorTransaction(monitoring) {
 
   val topic = "DGR-COP-DOMICILIO-OBJ-TRI"
 

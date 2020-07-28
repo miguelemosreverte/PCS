@@ -7,12 +7,14 @@ import consumers.registral.plan_pago.application.entities.{PlanPagoCommands, Pla
 import consumers.registral.plan_pago.infrastructure.dependency_injection.PlanPagoActor
 import consumers.registral.plan_pago.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
 import scala.concurrent.Future
 
-case class PlanPagoNoTributarioTransaction()(implicit actor: PlanPagoActor, system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction {
+case class PlanPagoNoTributarioTransaction(monitoring: Monitoring)(implicit actor: PlanPagoActor,
+                                                                   system: akka.actor.typed.ActorSystem[_])
+    extends ActorTransaction(monitoring) {
 
   val topic = "DGR-COP-PLANES-ANT"
 

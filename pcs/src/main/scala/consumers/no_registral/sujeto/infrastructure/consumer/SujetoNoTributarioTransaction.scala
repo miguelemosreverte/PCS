@@ -1,16 +1,17 @@
 package consumers.no_registral.sujeto.infrastructure.consumer
 
 import scala.concurrent.{ExecutionContext, Future}
-
 import akka.Done
 import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import consumers.no_registral.sujeto.application.entity.SujetoCommands
 import consumers.no_registral.sujeto.application.entity.SujetoExternalDto.SujetoAnt
 import consumers.no_registral.sujeto.infrastructure.json._
+import monitoring.Monitoring
 import serialization.decodeF
 
-case class SujetoNoTributarioTransaction()(implicit actorRef: ActorRef, ec: ExecutionContext) extends ActorTransaction {
+case class SujetoNoTributarioTransaction(monitoring: Monitoring)(implicit actorRef: ActorRef, ec: ExecutionContext)
+    extends ActorTransaction(monitoring) {
 
   val topic = "DGR-COP-SUJETO-ANT"
 

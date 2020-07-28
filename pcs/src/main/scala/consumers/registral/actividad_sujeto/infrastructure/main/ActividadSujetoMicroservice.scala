@@ -7,16 +7,17 @@ import akka.http.scaladsl.server.Route
 import consumers.registral.actividad_sujeto.infrastructure.dependency_injection.ActividadSujetoActor
 import consumers.registral.actividad_sujeto.infrastructure.http.ActividadSujetoStateAPI
 import consumers.registral.actividad_sujeto.infrastructure.kafka.ActividadSujetoTransaction
+import monitoring.Monitoring
 
 object ActividadSujetoMicroservice {
 
-  def routes(implicit system: ActorSystem): Route = {
+  def route(monitoring: Monitoring)(implicit system: ActorSystem): Route = {
     implicit val typedSystem: typed.ActorSystem[Nothing] = system.toTyped
     implicit val actor: ActividadSujetoActor = ActividadSujetoActor()
 
     Seq(
-      ActividadSujetoStateAPI().routes,
-      ActividadSujetoTransaction().routes
+      ActividadSujetoStateAPI(monitoring).route,
+      ActividadSujetoTransaction(monitoring).route
     ) reduce (_ ~ _)
   }
 

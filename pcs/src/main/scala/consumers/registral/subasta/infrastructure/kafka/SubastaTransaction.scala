@@ -6,12 +6,14 @@ import consumers.registral.subasta.application.entities.{SubastaCommands, Subast
 import consumers.registral.subasta.infrastructure.dependency_injection.SubastaActor
 import consumers.registral.subasta.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
 import scala.concurrent.Future
 
-case class SubastaTransaction()(implicit actor: SubastaActor, system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction {
+case class SubastaTransaction(monitoring: Monitoring)(implicit actor: SubastaActor,
+                                                      system: akka.actor.typed.ActorSystem[_])
+    extends ActorTransaction(monitoring) {
 
   val topic = "DGR-COP-SUBASTAS"
 

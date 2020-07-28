@@ -7,12 +7,14 @@ import consumers.registral.tramite.application.entities.{TramiteCommands, Tramit
 import consumers.registral.tramite.infrastructure.dependency_injection.TramiteActor
 import consumers.registral.tramite.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
 import scala.concurrent.Future
 
-case class TramiteTransaction()(implicit actor: TramiteActor, system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction {
+case class TramiteTransaction(monitoring: Monitoring)(implicit actor: TramiteActor,
+                                                      system: akka.actor.typed.ActorSystem[_])
+    extends ActorTransaction(monitoring) {
 
   val topic = "DGR-COP-TRAMITES"
 

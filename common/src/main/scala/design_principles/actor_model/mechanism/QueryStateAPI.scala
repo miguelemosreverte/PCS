@@ -1,19 +1,21 @@
-package components
+package design_principles.actor_model.mechanism
 
 import akka.actor.{ActorRef, ActorSystem}
+import akka.http.Controller
 import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.model.StatusCodes.{InternalServerError, NotFound, OK}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{Directive, Route}
-import controller.Controller
 import cqrs.BasePersistentShardedTypedActor.CQRS.BasePersistentShardedTypedActorWithCQRS
 import design_principles.actor_model.mechanism.TypedAsk.{AkkaClassicTypedAsk, AkkaTypedTypedAsk}
 import design_principles.actor_model.{Query, Response}
+import monitoring.Monitoring
 import play.api.libs.json.{Format, Json}
+
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.reflect.ClassTag
 
-trait QueryStateAPI extends AkkaHttpServer(monitoring){
+abstract class QueryStateAPI(monitoring: Monitoring) extends Controller(monitoring) {
   private val urlPrefix: Directive[Unit] = pathPrefix("state")
   def GET(route: Route): Route = (get & urlPrefix) { route }
   def POST(route: Route): Route = (post & urlPrefix) { route }

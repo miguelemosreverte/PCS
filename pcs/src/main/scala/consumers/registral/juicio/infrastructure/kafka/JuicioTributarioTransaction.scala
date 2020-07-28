@@ -7,13 +7,15 @@ import consumers.registral.juicio.application.entities.JuicioExternalDto.{Detall
 import consumers.registral.juicio.infrastructure.dependency_injection.JuicioActor
 import consumers.registral.juicio.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import play.api.libs.json.Reads
 import serialization.decodeF
 
 import scala.concurrent.Future
 
-case class JuicioTributarioTransaction()(implicit actorRef: JuicioActor, system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction {
+case class JuicioTributarioTransaction(monitoring: Monitoring)(implicit actorRef: JuicioActor,
+                                                               system: akka.actor.typed.ActorSystem[_])
+    extends ActorTransaction(monitoring) {
 
   val topic = "DGR-COP-JUICIOS-TRI"
 

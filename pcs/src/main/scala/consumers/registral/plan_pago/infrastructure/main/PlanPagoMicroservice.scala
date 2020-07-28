@@ -8,19 +8,20 @@ import consumers.registral.plan_pago.infrastructure.kafka.{
   PlanPagoNoTributarioTransaction,
   PlanPagoTributarioTransaction
 }
+import monitoring.Monitoring
 
 object PlanPagoMicroservice {
 
   import akka.http.scaladsl.server.Directives._
-  def routes(implicit system: ActorSystem): Route = {
+  def route(monitoring: Monitoring)(implicit system: ActorSystem): Route = {
     import akka.actor.typed.scaladsl.adapter._
 
     implicit val typedSystem = system.toTyped
     implicit val actor = PlanPagoActor()
     Seq(
-      PlanPagoStateAPI().routes,
-      PlanPagoTributarioTransaction().routes,
-      PlanPagoNoTributarioTransaction().routes
+      PlanPagoStateAPI(monitoring).route,
+      PlanPagoTributarioTransaction(monitoring).route,
+      PlanPagoNoTributarioTransaction(monitoring).route
     ) reduce (_ ~ _)
   }
 }

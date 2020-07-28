@@ -617,7 +617,7 @@ broadcast_address: 172.22.0.6
 # the listen_address, allowing nodes to communicate in both
 # interfaces.
 # Ignore this property if the network configuration automatically
-# routes  between the public and private networks such as EC2.
+# route  between the public and private networks such as EC2.
 # listen_on_broadcast_address: false
 
 # Internode authentication backend, implementing IInternodeAuthenticator;

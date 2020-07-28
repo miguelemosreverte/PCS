@@ -9,7 +9,7 @@ import akka.{Done, actor => classic}
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
-class ReadSideHttpServer(routes: Route, host: String, port: Int, system: ActorSystem[_]) {
+class ReadSideHttpServer(route: Route, host: String, port: Int, system: ActorSystem[_]) {
   import akka.actor.typed.scaladsl.adapter._
   implicit val classicSystem: classic.ActorSystem = system.toClassic
   private val shutdown = CoordinatedShutdown(classicSystem)
@@ -17,7 +17,7 @@ class ReadSideHttpServer(routes: Route, host: String, port: Int, system: ActorSy
   import system.executionContext
 
   def start(): Unit = {
-    Http().bindAndHandle(routes, host, port).onComplete {
+    Http().bindAndHandle(route, host, port).onComplete {
       case Success(binding) =>
         val address = binding.localAddress
         system.log.info(s"ReadSide online at http://$host:$port/", address.getHostString, address.getPort)

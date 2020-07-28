@@ -4,13 +4,15 @@ import java.time.LocalDateTime
 
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.Route
-import components.QueryStateAPI
 import consumers.registral.tramite.application.entities.TramiteQueries.GetStateTramite
 import consumers.registral.tramite.infrastructure.dependency_injection.TramiteActor
 import consumers.registral.tramite.infrastructure.json._
+import design_principles.actor_model.mechanism.QueryStateAPI
+import monitoring.Monitoring
 
-case class TramiteStateAPI()(implicit actor: TramiteActor, system: akka.actor.typed.ActorSystem[_])
-    extends QueryStateAPI {
+case class TramiteStateAPI(monitoring: Monitoring)(implicit actor: TramiteActor,
+                                                   system: akka.actor.typed.ActorSystem[_])
+    extends QueryStateAPI(monitoring) {
   import TramiteStateAPI._
   def getState: Route =
     withSujeto { sujetoId =>
@@ -23,7 +25,7 @@ case class TramiteStateAPI()(implicit actor: TramiteActor, system: akka.actor.ty
       }
     }
 
-  def routes: Route = GET(getState)
+  def route: Route = GET(getState)
 }
 
 object TramiteStateAPI {

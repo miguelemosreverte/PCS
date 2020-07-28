@@ -8,19 +8,20 @@ import consumers.registral.etapas_procesales.infrastructure.kafka.{
   EtapasProcesalesNoTributarioTransaction,
   EtapasProcesalesTributarioTransaction
 }
+import monitoring.Monitoring
 
 object EtapasProcesalesMicroservice {
 
   import akka.http.scaladsl.server.Directives._
-  def routes(implicit system: ActorSystem): Route = {
+  def route(monitoring: Monitoring)(implicit system: ActorSystem): Route = {
     import akka.actor.typed.scaladsl.adapter._
 
     implicit val typedSystem = system.toTyped
     implicit val actor = EtapasProcesalesActor()
     Seq(
-      EtapasProcesalesStateAPI().routes,
-      EtapasProcesalesTributarioTransaction().routes,
-      EtapasProcesalesNoTributarioTransaction().routes
+      EtapasProcesalesStateAPI(monitoring).route,
+      EtapasProcesalesTributarioTransaction(monitoring).route,
+      EtapasProcesalesNoTributarioTransaction(monitoring).route
     ) reduce (_ ~ _)
   }
 }

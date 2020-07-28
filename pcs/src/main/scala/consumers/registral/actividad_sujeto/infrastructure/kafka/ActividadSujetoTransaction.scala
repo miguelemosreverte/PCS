@@ -9,12 +9,14 @@ import consumers.registral.actividad_sujeto.application.entities.ActividadSujeto
 import consumers.registral.actividad_sujeto.infrastructure.dependency_injection.ActividadSujetoActor
 import consumers.registral.actividad_sujeto.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
 import scala.concurrent.Future
 
-case class ActividadSujetoTransaction()(implicit actor: ActividadSujetoActor, system: ActorSystem[_])
-    extends ActorTransaction {
+case class ActividadSujetoTransaction(monitoring: Monitoring)(implicit actor: ActividadSujetoActor,
+                                                              system: ActorSystem[_])
+    extends ActorTransaction(monitoring) {
 
   val topic = "DGR-COP-ACTIVIDADES"
 

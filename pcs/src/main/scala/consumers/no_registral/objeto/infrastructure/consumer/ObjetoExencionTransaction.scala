@@ -1,16 +1,17 @@
 package consumers.no_registral.objeto.infrastructure.consumer
 
 import scala.concurrent.{ExecutionContext, Future}
-
 import akka.Done
 import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.objeto.application.entities.ObjetoExternalDto.Exencion
 import consumers.no_registral.objeto.infrastructure.json._
+import monitoring.Monitoring
 import serialization.decodeF
 
-case class ObjetoExencionTransaction()(implicit actorRef: ActorRef, ec: ExecutionContext) extends ActorTransaction {
+case class ObjetoExencionTransaction(monitoring: Monitoring)(implicit actorRef: ActorRef, ec: ExecutionContext)
+    extends ActorTransaction(monitoring) {
 
   val topic = "DGR-COP-EXENCIONES"
 

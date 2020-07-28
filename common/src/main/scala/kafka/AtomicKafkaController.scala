@@ -5,20 +5,24 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.server.Directives.{complete, path, pathPrefix, post, _}
 import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import akka.stream.UniqueKillSwitch
-import akka.{AkkaHttpServer, _}
+import akka._
+import akka.http.{AkkaHttpServer, Controller}
 import api.actor_transaction.ActorTransaction
+import monitoring.Monitoring
 
 object AtomicKafkaController {
   def fromTyped(
-      actorTransaction: ActorTransaction
+      actorTransaction: ActorTransaction,
+      monitoring: Monitoring
   )(implicit system: akka.actor.typed.ActorSystem[_]): AtomicKafkaController = {
     import akka.actor.typed.scaladsl.adapter._
-    new AtomicKafkaController(actorTransaction)(system.toClassic)
+    new AtomicKafkaController(actorTransaction, monitoring)(system.toClassic)
   }
 }
 
-case class AtomicKafkaController(actorTransaction: ActorTransaction)(implicit system: ActorSystem)
-    extends AkkaHttpServer {
+case class AtomicKafkaController(actorTransaction: ActorTransaction, monitoring: Monitoring)(
+    implicit system: ActorSystem
+) extends Controller(monitoring) {
 
   implicit private val ec: ExecutionContextExecutor = system.dispatcher
 
@@ -86,7 +90,7 @@ case class AtomicKafkaController(actorTransaction: ActorTransaction)(implicit sy
       }
     }
 
-  def routes: Route =
+  def route: Route =
     pathPrefix("kafka") {
       start_kafka ~ stop_kafka
     }

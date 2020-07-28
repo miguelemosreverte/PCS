@@ -10,13 +10,14 @@ import consumers.registral.etapas_procesales.application.entities.{
 import consumers.registral.etapas_procesales.infrastructure.dependency_injection.EtapasProcesalesActor
 import consumers.registral.etapas_procesales.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
 import scala.concurrent.Future
 
-case class EtapasProcesalesNoTributarioTransaction()(implicit actor: EtapasProcesalesActor,
-                                                     system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction {
+case class EtapasProcesalesNoTributarioTransaction(monitoring: Monitoring)(implicit actor: EtapasProcesalesActor,
+                                                                           system: akka.actor.typed.ActorSystem[_])
+    extends ActorTransaction(monitoring) {
 
   val topic = "DGR-COP-ETAPROCESALES-ANT"
 

@@ -1,12 +1,13 @@
-package controller
+package life_cycle.controller
 
+import akka.http.Controller
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import akka.http.scaladsl.server.Directives._
-import play.api.libs.json.{JsObject, JsString}
-import monitoring.Monitoring
+import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import life_cycle.AppLifecycle
+import monitoring.Monitoring
 import org.slf4j.Logger
+import play.api.libs.json.{JsObject, JsString}
 
 final class ShutdownController(appLifecycle: AppLifecycle, logger: Logger, monitoring: Monitoring)
     extends Controller(monitoring) {

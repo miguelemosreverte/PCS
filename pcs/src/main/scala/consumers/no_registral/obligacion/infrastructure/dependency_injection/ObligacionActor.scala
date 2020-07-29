@@ -17,7 +17,7 @@ class ObligacionActor() extends PersistentBaseActor[ObligacionEvents, Obligacion
   override def receiveCommand: Receive = super.receiveCommand.orElse(oldReceiveCommand)
   def oldReceiveCommand: Receive = {
     case _: DeleteMessagesSuccess =>
-      logger.info(s"[$persistenceId] Success to clean this actor akka.messages")
+      logger.debug(s"[$persistenceId] Success to clean this actor akka.messages")
 
     case _: DeleteMessagesFailure =>
       logger.error(s"[$persistenceId] Failed to clean this actor akka.messages")

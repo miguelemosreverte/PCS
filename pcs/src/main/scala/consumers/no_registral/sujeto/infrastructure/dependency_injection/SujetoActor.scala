@@ -56,7 +56,6 @@ class SujetoActor(objetoActorProps: Props = ObjetoActor.props) extends Persisten
   def customReceiveRecover: Receive = {
     case evt: SujetoEvents.SujetoUpdatedFromObjeto =>
       state += evt
-      logger.info(s"[$persistenceId] recovered with [${evt.toString.pretty}]")
       objetos((evt.sujetoId, evt.objetoId, evt.tipoObjeto))
   }
 

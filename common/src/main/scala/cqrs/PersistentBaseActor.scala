@@ -27,7 +27,6 @@ abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[
 
   override def receiveRecover: Receive = {
     case e: E =>
-      logger.info(s"[$persistenceId] Recovered with $e")
       (state + e) match {
         case s: State => state = s
         case e =>
@@ -48,7 +47,7 @@ abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[
 
   def persistEvent(event: E, tags: Set[String] = Set.empty)(handler: () => Unit = () => ()): Unit =
     persist(if (tags.nonEmpty) Tagged(event, tags) else event) { _ =>
-      logger.info(s"[$persistenceId] Persist event | $event")
+      logger.debug(s"[$persistenceId] Persist event | $event")
       handler()
     }
 }

@@ -31,7 +31,7 @@ object KafkaProducer {
     publication.onComplete {
       case Success(Done) =>
         data foreach { s =>
-          log.info(s"""Published $s to $topic""")
+          log.debug(s"""Published $s to $topic""")
         }
 
         handler(data)

@@ -27,7 +27,7 @@ class ExencionProjectionHandler(settings: ProjectionSettings, system: ActorSyste
   override def process(envelope: EventEnvelope[ObjetoAddedExencion]): Future[Done] = {
     envelope.event match {
       case evt: ObjetoEvents.ObjetoAddedExencion =>
-        log.info(
+        log.debug(
           s"ExencionProjectionHandler consumed $evt from $tag with seqNr ${envelope.sequenceNr}",
           settings.tag,
           envelope.event,

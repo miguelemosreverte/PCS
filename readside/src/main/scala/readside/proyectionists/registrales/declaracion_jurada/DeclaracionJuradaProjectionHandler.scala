@@ -26,7 +26,7 @@ class DeclaracionJuradaProjectionHandler(settings: ProjectionSettings, system: A
   override def process(envelope: EventEnvelope[DeclaracionJuradaEvents]): Future[Done] = {
     envelope.event match {
       case evt: DeclaracionJuradaEvents.DeclaracionJuradaUpdatedFromDto =>
-        log.info(
+        log.debug(
           s"DeclaracionJuradaProjectionHandler consumed $evt from $tag with seqNr ${envelope.sequenceNr}",
           settings.tag,
           envelope.event,

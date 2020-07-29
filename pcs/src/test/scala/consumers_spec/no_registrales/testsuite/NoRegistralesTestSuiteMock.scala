@@ -27,12 +27,6 @@ trait NoRegistralesTestSuiteMock extends NoRegistralesTestSuite {
   class MockTestContext(implicit system: ActorSystem) extends TestContext {
     import system.dispatcher
 
-    // EL PROBLEMA ESTA ACA, EL ACTOR HACE START EN SUJETO Y CONSIGUE UN ACTOR NUEVO
-    // ESTE ACTOR POSEE EL KAFKA MOCK CORRECTO, QUE SERIA EL DE SUJETO.
-    // LUEGO COTITULARIDAD HACE START EN SUJETO Y NO CONSIGUE UN ACTOR NUEVO, CONSIGUE EL CREADO ANTERIORMENTE POR SUJETO
-    // ENTONCES EL ACTOR POSEE EL KAFKA MOCK INCORRECTO, QUE SERIA EL DE SUJETO
-    // SOLUCION: ESTAN USANDO EL MISMO ACTOR SYSTEM???????
-    // RESPUESTA: Si. Lo estaban haciendo. Por eso el error.
     val sujeto: ActorRef = new SujetoActorWithMockPersistence(messageProducer).start
     val cotitularidadActor: ActorRef = new CotitularidadActorWithMockPersistence(messageProducer).start
 

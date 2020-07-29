@@ -34,14 +34,12 @@ abstract class ActorSpec
     with BeforeAndAfterEach
     with Eventually
     with IntegrationPatience
-    with RandomTestOrder // TODO add
+    with RandomTestOrder
     with ScalaFutures {
-
-  lazy val actorConfig: Config = ActorSpec.config
 
   def parallelActorSystemRunner(testContext: ActorSystem => Unit): Unit =
     ActorSystemParallelizerBuilder.actor
-      .ask(RunTest(actorConfig, testContext))(2.minutes)
+      .ask(RunTest(testContext))(2.minutes)
       .mapTo[Try[Unit]]
       .futureValue(timeout(2.minutes))
       .get

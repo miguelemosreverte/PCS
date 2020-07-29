@@ -26,3 +26,6 @@ target
 .DS_Store
 
 *.pyc
+
+# archivos generados por procedimientos
+assets / docker-compose / dev-lite / cassandra / config / cassandra.yaml

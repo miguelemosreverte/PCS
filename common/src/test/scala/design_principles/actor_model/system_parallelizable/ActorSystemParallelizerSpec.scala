@@ -23,10 +23,9 @@ class ActorSystemParallelizerSpec
 
   val log: Logger = LoggerFactory.getLogger(this.getClass)
 
-  lazy val actorConfig: Config = ActorSystemParallelizerSpec.config
   def parallelActorSystemRunner(testContext: ActorSystem => Unit): Unit =
     ActorSystemParallelizerBuilder.actor
-      .ask(RunTest(actorConfig, testContext))(2.minutes)
+      .ask(RunTest(testContext))(2.minutes)
       .mapTo[Try[Unit]]
       .futureValue(timeout(2.minutes))
       .get

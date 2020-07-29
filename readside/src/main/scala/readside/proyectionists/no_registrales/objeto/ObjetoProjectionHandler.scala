@@ -26,6 +26,13 @@ class ObjetoProjectionHandler(settings: ProjectionSettings, system: ActorSystem[
   override def process(envelope: EventEnvelope[ObjetoEvents]): Future[Done] = {
     envelope.event match {
       case evt: ObjetoEvents.ObjetoSnapshotPersisted =>
+        log.debug(
+          s"ObjetoProjectionHandler consumed $evt from $tag with seqNr ${envelope.sequenceNr}",
+          settings.tag,
+          envelope.event,
+          envelope.persistenceId,
+          envelope.sequenceNr
+        )
         val projection = ObjetoSnapshotPersistedProjection(evt)
         cassandra writeState projection
       case other =>

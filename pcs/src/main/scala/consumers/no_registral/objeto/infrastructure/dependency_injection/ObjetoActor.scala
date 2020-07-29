@@ -66,7 +66,6 @@ class ObjetoActor(obligacionActorProps: Props = ObligacionActor.props)
   def customReceiveRecover: Receive = {
     case evt: ObjetoEvents =>
       state += evt
-      logger.info(s"[$persistenceId] recovered with [${evt.toString.pretty}]")
       evt match {
         case evt: ObjetoEvents.ObjetoUpdatedFromObligacion =>
           obligaciones((evt.sujetoId, evt.objetoId, evt.tipoObjeto, evt.obligacionId))

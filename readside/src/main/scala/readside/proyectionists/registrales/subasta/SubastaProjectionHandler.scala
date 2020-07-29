@@ -25,7 +25,7 @@ class SubastaProjectionHandler(settings: ProjectionSettings, system: ActorSystem
   override def process(envelope: EventEnvelope[SubastaEvents]): Future[Done] = {
     envelope.event match {
       case evt: SubastaEvents.SubastaUpdatedFromDto =>
-        log.info(
+        log.debug(
           s"SubastaProjectionHandler consumed $evt from $tag with seqNr ${envelope.sequenceNr}",
           settings.tag,
           envelope.event,

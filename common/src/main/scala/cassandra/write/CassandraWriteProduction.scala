@@ -29,7 +29,7 @@ class CassandraWriteProduction(implicit session: CassandraSession) extends Cassa
     } yield done
     result.onComplete {
       case Failure(throwable) =>
-        logger.warn("Cassandra failed due to {}", throwable.toString)
+        logger.warn("Cassandra failed with {} due to {}", state.event.toString, throwable.toString)
       case Success(value) =>
         logger.debug("Cassandra succeeded with value {}", value.toString)
     }

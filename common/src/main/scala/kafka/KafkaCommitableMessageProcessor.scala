@@ -44,7 +44,7 @@ class KafkaCommitableMessageProcessor()(
         val input: String = message.record.value
 
         //this.logger.info(message)(LoggableTransaction)
-        log.info(message.record.value)
+        log.debug(message.record.value)
 
         algorithm(input)
           .map { a: Seq[String] =>
@@ -99,7 +99,7 @@ class KafkaCommitableMessageProcessor()(
 
     done.onComplete {
       case Success(value) =>
-        log.info(s"Stream completed with success -- ${value}")
+        log.warn(s"Stream completed with success -- ${value}")
       case Failure(ex) =>
         log.error(s"Stream completed with failure -- ${ex.getMessage}")
     }

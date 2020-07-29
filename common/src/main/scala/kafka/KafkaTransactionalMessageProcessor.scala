@@ -44,7 +44,7 @@ class KafkaTransactionalMessageProcessor()(
 
         val input: String = message.record.value
 
-        log.info(message.record.value)
+        log.debug(message.record.value)
 
         algorithm(input)
           .map { a: Seq[String] =>

@@ -26,7 +26,7 @@ class DomicilioSujetoProjectionHandler(settings: ProjectionSettings, system: Act
   override def process(envelope: EventEnvelope[DomicilioSujetoEvents]): Future[Done] = {
     envelope.event match {
       case evt: DomicilioSujetoEvents.DomicilioSujetoUpdatedFromDto =>
-        log.info(
+        log.debug(
           s"DomicilioSujetoProjectionHandler consumed $evt from $tag with seqNr ${envelope.sequenceNr}",
           settings.tag,
           envelope.event,

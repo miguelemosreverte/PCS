@@ -29,7 +29,7 @@ trait NoRegistralesTestSuiteMock extends BaseE2ESpec {
 
   class MockE2ETestContext(implicit system: ActorSystem) extends BaseE2ETestContext {
 
-    import system.dispatcher
+    implicit val ec = system.dispatcher
 
     val cassandraTestkit = new CassandraTestkitMock({
       case e: ObjetoSnapshotPersisted =>

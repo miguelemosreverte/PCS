@@ -5,25 +5,31 @@ import java.net.ServerSocket
 import scala.io.Source
 import scala.reflect.io.File
 import java.io.FileOutputStream
+import java.net.ServerSocket
 
 object AvailablePortProvider {
 
-  val maxReasonableAmmountOfTests = 500
+  val maxReasonableAmmountOfTests = 5500
 
-  import ReservedPortRepository._
+  // import ReservedPortRepository._
 
+  var givenPorts: Set[Int] = Set.empty
   def port: Int = synchronized {
     val r = new scala.util.Random
-    val availablePort = r.between(2600, 2601 + maxReasonableAmmountOfTests)
+    val availablePort = new ServerSocket(0).getLocalPort //r.between(2600, 2601 + maxReasonableAmmountOfTests)
 
     if (givenPorts contains availablePort)
       port
     else {
-      addPort(availablePort)
+      givenPorts = givenPorts + availablePort
+      println(Console.CYAN)
+      println("givenPorts ")
+      givenPorts.foreach(println)
+      println(Console.RESET)
       availablePort
     }
   }
-
+  /*
   object ReservedPortRepository {
 
     val record = s"/tmp/akka-ports-reserved-by-tests.txt"
@@ -45,6 +51,6 @@ object AvailablePortProvider {
 
     def reset: Boolean =
       File(record).delete()
-  }
+  }*/
 
 }

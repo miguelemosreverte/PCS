@@ -23,7 +23,11 @@ object ActorSpec {
 
   def system: ActorSystem = {
     val availablePort = AvailablePortProvider.port
-    Generators.actorSystem(availablePort)
+    try {
+      Generators.actorSystem(availablePort)
+    } catch {
+      case e: Throwable => system
+    }
   }
 }
 
@@ -37,11 +41,9 @@ abstract class ActorSpec
     with RandomTestOrder // TODO add
     with ScalaFutures {
 
-  lazy val actorConfig: Config = ActorSpec.config
-
   def parallelActorSystemRunner(testContext: ActorSystem => Unit): Unit =
     ActorSystemParallelizerBuilder.actor
-      .ask(RunTest(actorConfig, testContext))(2.minutes)
+      .ask(RunTest(testContext))(2.minutes)
       .mapTo[Try[Unit]]
       .futureValue(timeout(2.minutes))
       .get

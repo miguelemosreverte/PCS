@@ -33,7 +33,7 @@ object Settings extends Dependencies with CommonScalac {
   )
 
   lazy val testSettings = Seq(
-    Test / parallelExecution := false,
+    Test / parallelExecution := true,
     Test / fork := true,
     Test / javaOptions += "-Xmx2G",
     triggeredMessage := Watched.clearWhenTriggered,
@@ -59,10 +59,10 @@ object Settings extends Dependencies with CommonScalac {
   )
 
   scalacOptions ++= Seq(
-    "-feature",
-    "-unchecked",
-    "-language:higherKinds",
-    "-language:postfixOps",
-    "-deprecation"
-  ) ++ scalacSettings
+      "-feature",
+      "-unchecked",
+      "-language:higherKinds",
+      "-language:postfixOps",
+      "-deprecation"
+    ) ++ scalacSettings
 }

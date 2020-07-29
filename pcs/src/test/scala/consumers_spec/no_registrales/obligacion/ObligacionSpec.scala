@@ -68,6 +68,7 @@ trait ObligacionSpec extends NoRegistralesTestSuite {
       )
       eventually {
         val response = context.Query getStateObligacion examples.obligacionWithSaldo200
+        println(response)
         response.saldo should be(0)
       }
       Thread.sleep(200)

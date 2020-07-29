@@ -39,7 +39,7 @@ case class ObligacionTributariaTransaction(monitoring: Monitoring)(implicit acto
     } yield detalles
 
     val command =
-      if (registro.BOB_ESTADO.contains("BAJA"))
+      if (registro.BOB_ESTADO.contains("BAJA")) {
         ObligacionCommands.DownObligacion(
           sujetoId = registro.BOB_SUJ_IDENTIFICADOR,
           objetoId = registro.BOB_SOJ_IDENTIFICADOR,
@@ -47,7 +47,7 @@ case class ObligacionTributariaTransaction(monitoring: Monitoring)(implicit acto
           obligacionId = registro.BOB_OBN_ID,
           deliveryId = registro.EV_ID
         )
-      else
+      } else
         ObligacionCommands.ObligacionUpdateFromDto(
           sujetoId = registro.BOB_SUJ_IDENTIFICADOR,
           objetoId = registro.BOB_SOJ_IDENTIFICADOR,

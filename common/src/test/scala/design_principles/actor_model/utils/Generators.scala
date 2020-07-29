@@ -1,11 +1,13 @@
 package design_principles.actor_model.utils
 
 import akka.actor.ActorSystem
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import serialization.EventSerializer
 
 object Generators {
-  def actorSystem(port: Int = 2559, name: String = "PersonClassificationService"): ActorSystem = {
+  def actorSystem(port: Int = 2559,
+                  name: String = "PersonClassificationService",
+                  extraConfig: Config = ConfigFactory.empty()): ActorSystem = {
     val randomAvailablePort = port
     val customConf =
       ConfigFactory.parseString(s"""
@@ -16,6 +18,7 @@ object Generators {
       ConfigFactory parseString EventSerializer.eventAdapterConf,
       ConfigFactory parseString EventSerializer.serializationConf,
       customConf,
+      extraConfig, // maybe move up in position to override customConf
       ConfigFactory.load()
     ).reduce(_ withFallback _)
 

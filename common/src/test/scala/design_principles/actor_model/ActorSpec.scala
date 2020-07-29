@@ -23,11 +23,7 @@ object ActorSpec {
 
   def system: ActorSystem = {
     val availablePort = AvailablePortProvider.port
-    try {
-      Generators.actorSystem(availablePort)
-    } catch {
-      case e: Throwable => system
-    }
+    Generators.actorSystem(availablePort)
   }
 }
 
@@ -38,7 +34,7 @@ abstract class ActorSpec
     with BeforeAndAfterEach
     with Eventually
     with IntegrationPatience
-    with RandomTestOrder // TODO add
+    with RandomTestOrder
     with ScalaFutures {
 
   def parallelActorSystemRunner(testContext: ActorSystem => Unit): Unit =

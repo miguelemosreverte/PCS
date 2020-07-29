@@ -65,11 +65,11 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
         cmd.sujetoResponsable
       )
       persist(event) { _ =>
-        log.info(s"[$persistenceId] Persist event | $event")
+        log.debug(s"[$persistenceId] Persist event | $event")
 
         state += event
 
-        log.info(s"[$persistenceId] Cotitulares: | ${state}")
+        log.debug(s"[$persistenceId] Cotitulares: | ${state}")
 
         snapshot = snapshot.copy(
           sujetoId = cmd.sujetoId,
@@ -98,7 +98,7 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
         val messages = informCotitularesOfAddedCotitular map serialization.encode[ObjetoUpdateCotitulares]
         if (messages.nonEmpty)
           publishToKafka(messages, topic) { _ =>
-            log.info(
+            log.debug(
               s"[$persistenceId] Published message | ObjetoSnapshot to Sujeto(${cmd.sujetoId})"
             )
             replyTo ! akka.Done
@@ -130,7 +130,7 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
 
       if (messages.nonEmpty)
         publishToKafka(messages.toSeq, topic) { _ =>
-          log.info(
+          log.debug(
             s"[$persistenceId] Published message | ObjetoSnapshot to Sujeto(${state.sujetosCotitulares.mkString(",")})"
           )
           replyTo ! akka.Done
@@ -144,11 +144,9 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
   override def receiveRecover: Receive = {
     case evt: CotitularidadEvents =>
       state += evt
-      log.info(s"[$persistenceId] Event received [${evt.toString.pretty}]")
     case SnapshotOffer(_, snapshot: CotitularidadState) =>
       state = snapshot
     case r: RecoveryCompleted =>
-      log.info(s"[$persistenceId] recovered with [$r]")
     case unknown =>
       log.error(s"[$persistenceId] error received recover with [$unknown]")
   }

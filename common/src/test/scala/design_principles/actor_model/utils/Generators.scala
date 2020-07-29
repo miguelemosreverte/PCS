@@ -27,8 +27,10 @@ object Generators {
     lazy val config: Config = Seq(
       ConfigFactory parseString EventSerializer.eventAdapterConf,
       ConfigFactory parseString EventSerializer.serializationConf,
-      customConf
-    ).reduce(_ withFallback _).resolve()
+      customConf,
+      extraConfig, // maybe move up in position to override customConf
+      ConfigFactory.load()
+    ).reduce(_ withFallback _)
 
     ActorSystem(name, config)
   }

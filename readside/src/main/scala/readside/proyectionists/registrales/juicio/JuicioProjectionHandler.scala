@@ -25,7 +25,7 @@ class JuicioProjectionHandler(settings: ProjectionSettings, system: ActorSystem[
   override def process(envelope: EventEnvelope[JuicioEvents]): Future[Done] = {
     envelope.event match {
       case evt: JuicioEvents.JuicioUpdatedFromDto =>
-        log.info(
+        log.debug(
           s"JuicioProjectionHandler consumed $evt from $tag with seqNr ${envelope.sequenceNr}",
           settings.tag,
           envelope.event,

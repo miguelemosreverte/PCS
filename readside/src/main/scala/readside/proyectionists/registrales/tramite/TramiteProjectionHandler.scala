@@ -25,7 +25,7 @@ class TramiteProjectionHandler(settings: ProjectionSettings, system: ActorSystem
   override def process(envelope: EventEnvelope[TramiteEvents]): Future[Done] = {
     envelope.event match {
       case evt: TramiteEvents.TramiteUpdatedFromDto =>
-        log.info(
+        log.debug(
           s"TramiteProjectionHandler consumed $evt from $tag with seqNr ${envelope.sequenceNr}",
           settings.tag,
           envelope.event,

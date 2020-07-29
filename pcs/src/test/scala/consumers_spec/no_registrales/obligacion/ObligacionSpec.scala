@@ -57,6 +57,7 @@ trait ObligacionSpec extends NoRegistralesTestSuite {
     implicit s =>
       val context = testContext()
       context.messageProducer produceObligacion examples.obligacionWithSaldo200
+
       eventually {
         val response = context.Query getStateObligacion examples.obligacionWithSaldo200
         response.saldo should be(examples.obligacionWithSaldo200.BOB_SALDO)
@@ -70,6 +71,8 @@ trait ObligacionSpec extends NoRegistralesTestSuite {
         println(response)
         response.saldo should be(0)
       }
+      Thread.sleep(200)
+      context.close()
   }
 
 }

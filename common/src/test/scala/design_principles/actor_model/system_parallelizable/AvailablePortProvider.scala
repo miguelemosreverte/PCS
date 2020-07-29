@@ -18,39 +18,13 @@ object AvailablePortProvider {
     val r = new scala.util.Random
     val availablePort = new ServerSocket(0).getLocalPort //r.between(2600, 2601 + maxReasonableAmmountOfTests)
 
+
     if (givenPorts contains availablePort)
       port
     else {
       givenPorts = givenPorts + availablePort
-      println(Console.CYAN)
-      println("givenPorts ")
-      givenPorts.foreach(println)
-      println(Console.RESET)
       availablePort
     }
   }
-  /*
-  object ReservedPortRepository {
-
-    val record = s"/tmp/akka-ports-reserved-by-tests.txt"
-
-    def maybeCreateFile(): Unit =
-      new FileOutputStream(record, false).close()
-
-    def givenPorts: Set[Int] = {
-      maybeCreateFile()
-      val source = Source.fromFile(record)
-      val ports = source.getLines.toArray.map(_.toInt)
-      source.close()
-      if (ports.length > maxReasonableAmmountOfTests) reset
-      ports.toSet
-    }
-
-    def addPort(port: Int): Unit =
-      File(record).appendAll(port.toString)
-
-    def reset: Boolean =
-      File(record).delete()
-  }*/
 
 }

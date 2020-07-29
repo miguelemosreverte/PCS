@@ -23,11 +23,7 @@ class ActorSystemGenerator extends Actor {
   override def receive: Receive = {
 
     case RunTest(config, test) =>
-      val r = new scala.util.Random
-      val availablePort = r.between(2600, 3000)
-      val actorSystemConfig = customConf(availablePort) withFallback config
-
-      val system = ActorSpec.system //ActorSystem(s"$actorSystemName-$availablePort", actorSystemConfig)
+      val system = ActorSpec.system
       childSystems.addOne(system)
 
       processTest(test, system)
@@ -49,13 +45,5 @@ class ActorSystemGenerator extends Actor {
 }
 
 object ActorSystemGenerator {
-  val actorSystemName = "ActorSystemGenerator"
-
-  def customConf(port: Int): Config =
-    ConfigFactory.parseString(s"""
-      akka.cluster.seed-nodes = ["akka://$actorSystemName@0.0.0.0:$port"]
-      akka.remote.artery.canonical.port = $port
-     """)
-
-  case class RunTest(config: Config, test: ActorSystem => Unit)
+  case class RunTest(actorConfig: Config, test: ActorSystem => Unit)
 }

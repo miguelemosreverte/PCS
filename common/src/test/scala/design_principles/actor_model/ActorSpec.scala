@@ -7,7 +7,7 @@ import scala.util.Try
 import akka.actor.ActorSystem
 import akka.pattern.ask
 import com.typesafe.config.{Config, ConfigFactory}
-import design_principles.actor_model.system_parallelizable.ActorSystemGenerator.RunTest
+import design_principles.actor_model.system_parallelizable.ActorSystemGenerator.{actorSystemName, customConf, RunTest}
 import design_principles.actor_model.system_parallelizable.ActorSystemParallelizerBuilder
 import design_principles.actor_model.utils.Generators
 import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
@@ -40,15 +40,15 @@ abstract class ActorSpec
     with BeforeAndAfterEach
     with Eventually
     with IntegrationPatience
-    // with RandomTestOrder
+    // with RandomTestOrder // TODO add
     with ScalaFutures {
 
   lazy val actorConfig: Config = ActorSpec.config
+
   def parallelActorSystemRunner(testContext: ActorSystem => Unit): Unit =
-    testContext(ActorSpec.system)
-  /*ActorSystemParallelizerBuilder.actor
+    ActorSystemParallelizerBuilder.actor
       .ask(RunTest(actorConfig, testContext))(2.minutes)
       .mapTo[Try[Unit]]
       .futureValue(timeout(2.minutes))
-      .get*/
+      .get
 }

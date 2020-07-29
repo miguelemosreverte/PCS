@@ -4,7 +4,7 @@ import scala.concurrent.Await
 
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter._
-import akka.actor.{ActorPath, ActorSelection, ActorSystem, Identify, PoisonPill}
+import akka.actor.{ActorPath, ActorSelection, ActorSystem, Identify}
 import infrastructure.cassandra.CassandraClient
 import infrastructure.cassandra.CassandraTestkit.RowValidation
 import readside.proyectionists.common.infrastructure.Guardian

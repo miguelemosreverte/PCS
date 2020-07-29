@@ -6,7 +6,7 @@ import scala.util.Try
 import akka.actor.ActorSystem
 import akka.pattern.ask
 import com.typesafe.config.{Config, ConfigFactory}
-import design_principles.actor_model.system_parallelizable.ActorSystemParallelizer.RunTest
+import design_principles.actor_model.system_parallelizable.ActorSystemGenerator.RunTest
 import org.scalatest.concurrent.{Eventually, ScalaFutures}
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers

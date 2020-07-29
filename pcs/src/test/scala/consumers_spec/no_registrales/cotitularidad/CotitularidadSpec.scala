@@ -49,7 +49,8 @@ trait CotitularidadSpec extends NoRegistralesTestSuite {
 
     eventually {
       context.messageProcessor.messageHistory.last match {
-        case (topic, _) if topic == "AddCotitularTransaction" => true
+        case (topic, a) if topic == "AddCotitularTransaction" =>
+          true
       }
     }
 

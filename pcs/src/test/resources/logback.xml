@@ -9,7 +9,7 @@
     </appender>
 
 
-    <logger name="akka" level="DEBUG"/>
+    <logger name="akka" level="ERROR"/>
     <logger name="akka.kafka" level="ERROR"/>
     <logger name="org.apache.zookeeper" level="ERROR"/>
     <logger name="org.I0Itec.zkclient" level="ERROR"/>

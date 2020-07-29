@@ -21,7 +21,6 @@ class DownObligacionHandler(actor: ObligacionActor) extends SyncCommandHandler[D
     actor.persistEvent(event, ObligacionTags.ObligacionReadside) { () =>
       actor.state += event
       actor.informBajaToParent(command)
-      actor.context.stop(actor.self)
     }
     Success(akka.Done)
   }

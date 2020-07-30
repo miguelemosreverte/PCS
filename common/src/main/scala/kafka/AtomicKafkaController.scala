@@ -60,13 +60,19 @@ case class AtomicKafkaController(actorTransaction: ActorTransaction[_], monitori
     post {
       pathPrefix("start") {
         path(actorTransaction.topic) {
-          for {
-            _ <- actorTransactionController.ask[akka.Done](StopStartKafkaActor.StartKafka())
-          } yield akka.Done
+          handleErrors(exceptionHandler) {
+            latency.recordFuture {
+              for {
+                _ <- actorTransactionController.ask[akka.Done](StopStartKafkaActor.StartKafka())
+              } yield akka.Done
+            }
 
-          killSwitches = startTransaction()
-          isKafkaStarted = true
-          complete("Starting Kafka")
+            killSwitches = startTransaction()
+            isKafkaStarted = true
+            requests.increment()
+
+            complete("Starting Kafka")
+          }
         }
       }
     }
@@ -76,16 +82,21 @@ case class AtomicKafkaController(actorTransaction: ActorTransaction[_], monitori
     post {
       pathPrefix("stop") {
         path(actorTransaction.topic) {
-          for {
-            _ <- actorTransactionController.ask[akka.Done](StopStartKafkaActor.StopKafka())
-          } yield akka.Done
 
-          killSwitches.shutdown()
-          log.info("Stopped Kafka")
-          killSwitches = null
-          isKafkaStarted = false
+          handleErrors(exceptionHandler) {
+            latency.recordFuture {
+              for {
+                _ <- actorTransactionController.ask[akka.Done](StopStartKafkaActor.StopKafka())
+              } yield akka.Done
+            }
 
-          complete("Stopping Kafka")
+            killSwitches.shutdown()
+            log.info("Stopped Kafka")
+            killSwitches = null
+            isKafkaStarted = false
+            requests.increment()
+            complete("Stopping Kafka")
+          }
         }
       }
     }

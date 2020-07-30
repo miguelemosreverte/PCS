@@ -19,8 +19,8 @@ object SubastaMicroservice {
     implicit val actor: SubastaActor = SubastaActor()
     implicit val e: ExecutionContext = ec
     Seq(
-      SubastaStateAPI(monitoring).route,
-      SubastaTransaction(monitoring).route
+      SubastaStateAPI(actor, monitoring).route,
+      SubastaTransaction(actor, monitoring).route
     ) reduce (_ ~ _)
   }
 }

@@ -21,11 +21,11 @@ object ObjetoMicroservice {
     implicit val actor: ActorRef = SujetoActor.start
     implicit val e: ExecutionContext = ec
     Seq(
-      ObjetoStateAPI(monitoring).route,
-      ObjetoExencionTransaction(monitoring).routeClassic,
-      ObjetoNoTributarioTransaction(monitoring).routeClassic,
-      ObjetoTributarioTransaction(monitoring).routeClassic,
-      ObjetoUpdateNovedadTransaction(monitoring).routeClassic
+      ObjetoStateAPI(actor, monitoring).route,
+      ObjetoExencionTransaction(actor, monitoring).routeClassic,
+      ObjetoNoTributarioTransaction(actor, monitoring).routeClassic,
+      ObjetoTributarioTransaction(actor, monitoring).routeClassic,
+      ObjetoUpdateNovedadTransaction(actor, monitoring).routeClassic
     ) reduce (_ ~ _)
   }
 }

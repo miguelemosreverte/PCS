@@ -19,9 +19,9 @@ object ObligacionMicroservice {
     implicit val actor: ActorRef = SujetoActor.start
     implicit val e: ExecutionContext = ec
     Seq(
-      ObligacionStateAPI(monitoring).route,
-      ObligacionTributariaTransaction(monitoring).routeClassic,
-      ObligacionNoTributariaTransaction(monitoring).routeClassic
+      ObligacionStateAPI(actor, monitoring).route,
+      ObligacionTributariaTransaction(actor, monitoring).routeClassic,
+      ObligacionNoTributariaTransaction(actor, monitoring).routeClassic
     ) reduce (_ ~ _)
   }
 

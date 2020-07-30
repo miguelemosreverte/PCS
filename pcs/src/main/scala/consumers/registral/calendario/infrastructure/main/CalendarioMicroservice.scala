@@ -19,8 +19,8 @@ object CalendarioMicroservice {
     implicit val actor: CalendarioActor = CalendarioActor()
     implicit val e: ExecutionContext = ec
     Seq(
-      CalendarioStateAPI(monitoring).route,
-      CalendarioTransaction(monitoring).route
+      CalendarioStateAPI(actor, monitoring).route,
+      CalendarioTransaction(actor, monitoring).route
     ) reduce (_ ~ _)
   }
 }

@@ -22,9 +22,9 @@ object EtapasProcesalesMicroservice {
     implicit val actor: EtapasProcesalesActor = EtapasProcesalesActor()
     implicit val e: ExecutionContext = ec
     Seq(
-      EtapasProcesalesStateAPI(monitoring).route,
-      EtapasProcesalesTributarioTransaction(monitoring).route,
-      EtapasProcesalesNoTributarioTransaction(monitoring).route
+      EtapasProcesalesStateAPI(actor, monitoring).route,
+      EtapasProcesalesTributarioTransaction(actor, monitoring).route,
+      EtapasProcesalesNoTributarioTransaction(actor, monitoring).route
     ) reduce (_ ~ _)
   }
 }

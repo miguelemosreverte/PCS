@@ -19,9 +19,9 @@ object JuicioMicroservice {
     implicit val actor: JuicioActor = JuicioActor()
     implicit val e: ExecutionContext = ec
     Seq(
-      JuicioStateAPI(monitoring).route,
-      JuicioTributarioTransaction(monitoring).route,
-      JuicioNoTributarioTransaction(monitoring).route
+      JuicioStateAPI(actor, monitoring).route,
+      JuicioTributarioTransaction(actor, monitoring).route,
+      JuicioNoTributarioTransaction(actor, monitoring).route
     ) reduce (_ ~ _)
   }
 }

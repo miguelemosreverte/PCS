@@ -12,9 +12,9 @@ import serialization.decodeF
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class TramiteTransaction(monitoring: Monitoring)(implicit actor: TramiteActor,
-                                                      system: akka.actor.typed.ActorSystem[_],
-                                                      ex: ExecutionContext)
+case class TramiteTransaction(actor: TramiteActor, monitoring: Monitoring)(implicit
+                                                                           system: akka.actor.typed.ActorSystem[_],
+                                                                           ex: ExecutionContext)
     extends ActorTransaction[Tramite](monitoring) {
 
   val topic = "DGR-COP-TRAMITES"

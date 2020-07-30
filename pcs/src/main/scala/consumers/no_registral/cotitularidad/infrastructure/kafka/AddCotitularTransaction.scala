@@ -10,7 +10,7 @@ import design_principles.actor_model.mechanism.TypedAsk.AkkaClassicTypedAsk
 import monitoring.Monitoring
 import play.api.libs.json.Json
 
-case class AddCotitularTransaction(monitoring: Monitoring)(implicit actorRef: ActorRef, ec: ExecutionContext)
+case class AddCotitularTransaction(actorRef: ActorRef, monitoring: Monitoring)(implicit ec: ExecutionContext)
     extends ActorTransaction[CotitularidadAddSujetoCotitular](monitoring) {
 
   val topic = "AddCotitularTransaction"

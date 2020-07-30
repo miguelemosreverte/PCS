@@ -11,8 +11,8 @@ import consumers.registral.etapas_procesales.infrastructure.json._
 import design_principles.actor_model.mechanism.QueryStateAPI
 import monitoring.Monitoring
 
-case class EtapasProcesalesStateAPI(monitoring: Monitoring)(implicit actor: EtapasProcesalesActor,
-                                                            system: ActorSystem[_])
+case class EtapasProcesalesStateAPI(actor: EtapasProcesalesActor, monitoring: Monitoring)(implicit
+                                                                                          system: ActorSystem[_])
     extends QueryStateAPI(monitoring) {
   import EtapasProcesalesStateAPI._
 

@@ -23,9 +23,9 @@ object ParametricaRecargoMicroservice {
     implicit val e: ExecutionContext = ec
 
     Seq(
-      ParametricaRecargoStateAPI(monitoring).route,
-      ParametricaRecargoTributarioTransaction(monitoring).route,
-      ParametricaRecargoNoTributarioTransaction(monitoring).route
+      ParametricaRecargoStateAPI(actor, monitoring).route,
+      ParametricaRecargoTributarioTransaction(actor, monitoring).route,
+      ParametricaRecargoNoTributarioTransaction(actor, monitoring).route
     ) reduce (_ ~ _)
   }
 }

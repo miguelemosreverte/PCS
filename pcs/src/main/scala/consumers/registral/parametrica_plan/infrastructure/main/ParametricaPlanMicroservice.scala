@@ -22,9 +22,9 @@ object ParametricaPlanMicroservice {
     implicit val actor: ParametricaPlanActor = ParametricaPlanActor()
     implicit val e: ExecutionContext = ec
     Seq(
-      ParametricaPlanStateAPI(monitoring).route,
-      ParametricaPlanTributarioTransaction(monitoring).route,
-      ParametricaPlanNoTributarioTransaction(monitoring).route
+      ParametricaPlanStateAPI(actor, monitoring).route,
+      ParametricaPlanTributarioTransaction(actor, monitoring).route,
+      ParametricaPlanNoTributarioTransaction(actor, monitoring).route
     ) reduce (_ ~ _)
   }
 }

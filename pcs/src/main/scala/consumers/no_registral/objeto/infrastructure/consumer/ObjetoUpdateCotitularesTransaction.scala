@@ -9,7 +9,7 @@ import consumers.no_registral.objeto.infrastructure.json._
 import monitoring.Monitoring
 import serialization.decodeF
 
-case class ObjetoUpdateCotitularesTransaction(monitoring: Monitoring)(implicit actorRef: ActorRef, ec: ExecutionContext)
+case class ObjetoUpdateCotitularesTransaction(actorRef: ActorRef, monitoring: Monitoring)(implicit ec: ExecutionContext)
     extends ActorTransaction[ObjetoUpdateCotitulares](monitoring) {
 
   val topic = "ObjetoUpdatedCotitulares"

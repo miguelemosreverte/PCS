@@ -12,9 +12,9 @@ import serialization.decodeF
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class CalendarioTransaction(monitoring: Monitoring)(implicit actor: CalendarioActor,
-                                                         system: ActorSystem[_],
-                                                         ec: ExecutionContext)
+case class CalendarioTransaction(actor: CalendarioActor, monitoring: Monitoring)(implicit
+                                                                                 system: ActorSystem[_],
+                                                                                 ec: ExecutionContext)
     extends ActorTransaction[CalendarioExternalDto](monitoring) {
 
   val topic = "DGR-COP-CALENDARIOS"

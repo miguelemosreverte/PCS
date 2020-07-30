@@ -16,7 +16,7 @@ import consumers.no_registral.obligacion.infrastructure.json._
 import design_principles.actor_model.mechanism.QueryStateAPI
 import monitoring.Monitoring
 
-case class ObligacionStateAPI(monitoring: Monitoring)(implicit actor: ActorRef, system: ActorSystem)
+case class ObligacionStateAPI(actor: ActorRef, monitoring: Monitoring)(implicit system: ActorSystem)
     extends QueryStateAPI(monitoring) {
   import ObligacionStateAPI._
   implicit def ec = system.dispatcher

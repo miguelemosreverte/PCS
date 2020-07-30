@@ -10,9 +10,10 @@ import consumers.registral.domicilio_sujeto.infrastructure.json._
 import design_principles.actor_model.mechanism.QueryStateAPI
 import monitoring.Monitoring
 
-case class DomicilioSujetoStateAPI(monitoring: Monitoring)(implicit actor: DomicilioSujetoActor,
-                                                           system: akka.actor.typed.ActorSystem[_])
-    extends QueryStateAPI(monitoring) {
+case class DomicilioSujetoStateAPI(actor: DomicilioSujetoActor, monitoring: Monitoring)(
+    implicit
+    system: akka.actor.typed.ActorSystem[_]
+) extends QueryStateAPI(monitoring) {
   import DomicilioSujetoStateAPI._
   def getState: Route =
     withSujeto { sujetoId =>

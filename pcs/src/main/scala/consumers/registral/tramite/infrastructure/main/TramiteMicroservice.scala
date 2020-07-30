@@ -19,8 +19,8 @@ object TramiteMicroservice {
     implicit val actor: TramiteActor = TramiteActor()
     implicit val e: ExecutionContext = ec
     Seq(
-      TramiteStateAPI(monitoring).route,
-      TramiteTransaction(monitoring).route
+      TramiteStateAPI(actor, monitoring).route,
+      TramiteTransaction(actor, monitoring).route
     ) reduce (_ ~ _)
   }
 }

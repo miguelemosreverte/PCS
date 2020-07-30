@@ -13,10 +13,11 @@ import serialization.decodeF
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class JuicioTributarioTransaction(monitoring: Monitoring)(implicit actorRef: JuicioActor,
-                                                               system: akka.actor.typed.ActorSystem[_],
-                                                               ec: ExecutionContext)
-    extends ActorTransaction[JuicioTri](monitoring) {
+case class JuicioTributarioTransaction(actor: JuicioActor, monitoring: Monitoring)(
+    implicit
+    system: akka.actor.typed.ActorSystem[_],
+    ec: ExecutionContext
+) extends ActorTransaction[JuicioTri](monitoring) {
 
   val topic = "DGR-COP-JUICIOS-TRI"
 
@@ -40,7 +41,7 @@ case class JuicioTributarioTransaction(monitoring: Monitoring)(implicit actorRef
         detalles.getOrElse(Seq.empty)
       )
 
-    actorRef ask command
+    actor ask command
   }
 
 }

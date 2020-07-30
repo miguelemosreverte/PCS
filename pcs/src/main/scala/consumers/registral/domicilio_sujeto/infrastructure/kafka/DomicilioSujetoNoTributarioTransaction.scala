@@ -13,10 +13,11 @@ import serialization.decodeF
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class DomicilioSujetoNoTributarioTransaction(monitoring: Monitoring)(implicit actor: DomicilioSujetoActor,
-                                                                          system: ActorSystem[_],
-                                                                          ec: ExecutionContext)
-    extends ActorTransaction[DomicilioSujetoAnt](monitoring) {
+case class DomicilioSujetoNoTributarioTransaction(actor: DomicilioSujetoActor, monitoring: Monitoring)(
+    implicit
+    system: ActorSystem[_],
+    ec: ExecutionContext
+) extends ActorTransaction[DomicilioSujetoAnt](monitoring) {
 
   val topic = "DGR-COP-DOMICILIO-SUJ-ANT"
 

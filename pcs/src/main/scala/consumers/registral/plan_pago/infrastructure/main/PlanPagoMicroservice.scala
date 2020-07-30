@@ -22,9 +22,9 @@ object PlanPagoMicroservice {
     implicit val actor: PlanPagoActor = PlanPagoActor()
     implicit val e: ExecutionContext = ec
     Seq(
-      PlanPagoStateAPI(monitoring).route,
-      PlanPagoTributarioTransaction(monitoring).route,
-      PlanPagoNoTributarioTransaction(monitoring).route
+      PlanPagoStateAPI(actor, monitoring).route,
+      PlanPagoTributarioTransaction(actor, monitoring).route,
+      PlanPagoNoTributarioTransaction(actor, monitoring).route
     ) reduce (_ ~ _)
   }
 }

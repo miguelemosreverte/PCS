@@ -22,9 +22,9 @@ object DomicilioObjetoMicroservice {
     implicit val actor: DomicilioObjetoActor = DomicilioObjetoActor()
     implicit val e: ExecutionContext = ec
     Seq(
-      DomicilioObjetoStateAPI(monitoring).route,
-      DomicilioObjetoTributarioTransaction(monitoring).route,
-      DomicilioObjetoNoTributarioTransaction(monitoring).route
+      DomicilioObjetoStateAPI(actor, monitoring).route,
+      DomicilioObjetoTributarioTransaction(actor, monitoring).route,
+      DomicilioObjetoNoTributarioTransaction(actor, monitoring).route
     ) reduce (_ ~ _)
   }
 }

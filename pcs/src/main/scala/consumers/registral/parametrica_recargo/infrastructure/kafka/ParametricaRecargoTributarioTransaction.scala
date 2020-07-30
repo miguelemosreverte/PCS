@@ -15,10 +15,11 @@ import serialization.decodeF
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class ParametricaRecargoTributarioTransaction(monitoring: Monitoring)(implicit actor: ParametricaRecargoActor,
-                                                                           system: akka.actor.typed.ActorSystem[_],
-                                                                           ec: ExecutionContext)
-    extends ActorTransaction[ParametricaRecargoTri](monitoring) {
+case class ParametricaRecargoTributarioTransaction(actor: ParametricaRecargoActor, monitoring: Monitoring)(
+    implicit
+    system: akka.actor.typed.ActorSystem[_],
+    ec: ExecutionContext
+) extends ActorTransaction[ParametricaRecargoTri](monitoring) {
 
   val topic = "DGR-COP-PARAMRECARGO-TRI"
 

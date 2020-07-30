@@ -11,8 +11,8 @@ import consumers.registral.declaracion_jurada.infrastructure.json._
 import design_principles.actor_model.mechanism.QueryStateAPI
 import monitoring.Monitoring
 
-case class DeclaracionJuradaStateAPI(monitoring: Monitoring)(implicit actor: DeclaracionJuradaActor,
-                                                             system: ActorSystem[_])
+case class DeclaracionJuradaStateAPI(actor: DeclaracionJuradaActor, monitoring: Monitoring)(implicit
+                                                                                            system: ActorSystem[_])
     extends QueryStateAPI(monitoring) {
   import DeclaracionJuradaStateAPI._
 

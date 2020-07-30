@@ -10,7 +10,7 @@ import consumers.registral.juicio.infrastructure.json._
 import design_principles.actor_model.mechanism.QueryStateAPI
 import monitoring.Monitoring
 
-case class JuicioStateAPI(monitoring: Monitoring)(implicit actor: JuicioActor, system: akka.actor.typed.ActorSystem[_])
+case class JuicioStateAPI(actor: JuicioActor, monitoring: Monitoring)(implicit system: akka.actor.typed.ActorSystem[_])
     extends QueryStateAPI(monitoring) {
   import JuicioStateAPI._
 

@@ -19,8 +19,8 @@ object DeclaracionJuradaMicroservice {
     implicit val actor: DeclaracionJuradaActor = DeclaracionJuradaActor()
     implicit val e: ExecutionContext = ec
     Seq(
-      DeclaracionJuradaStateAPI(monitoring).route,
-      DeclaracionJuradaTransaction(monitoring).route
+      DeclaracionJuradaStateAPI(actor, monitoring).route,
+      DeclaracionJuradaTransaction(actor, monitoring).route
     ) reduce (_ ~ _)
   }
 }

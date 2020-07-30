@@ -15,12 +15,12 @@ import scala.concurrent.ExecutionContext
 
 object SujetoMicroservice {
   def route(monitoring: Monitoring, ec: ExecutionContext)(implicit system: ActorSystem): Route = {
-    implicit val sujetoActor: ActorRef = SujetoActor.start
+    implicit val actor: ActorRef = SujetoActor.start
     implicit val e: ExecutionContext = ec
     Seq(
-      SujetoStateAPI(monitoring).route,
-      SujetoTributarioTransaction(monitoring).routeClassic,
-      SujetoNoTributarioTransaction(monitoring).routeClassic
+      SujetoStateAPI(actor, monitoring).route,
+      SujetoTributarioTransaction(actor, monitoring).routeClassic,
+      SujetoNoTributarioTransaction(actor, monitoring).routeClassic
     ) reduce (_ ~ _)
   }
 

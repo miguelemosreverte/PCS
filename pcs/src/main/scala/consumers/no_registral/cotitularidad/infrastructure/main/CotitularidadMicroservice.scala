@@ -21,9 +21,9 @@ object CotitularidadMicroservice {
       CotitularidadActor.startWithRequirements(KafkaMessageProcessorRequirements.productionSettings())
     implicit val e: ExecutionContext = ec
     Seq(
-      CotitularidadStateAPI(monitoring).route,
-      AddCotitularTransaction(monitoring).routeClassic,
-      CotitularPublishSnapshotTransaction(monitoring).routeClassic
+      CotitularidadStateAPI(actor, monitoring).route,
+      AddCotitularTransaction(actor, monitoring).routeClassic,
+      CotitularPublishSnapshotTransaction(actor, monitoring).routeClassic
     ) reduce (_ ~ _)
   }
 }

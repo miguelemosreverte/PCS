@@ -15,10 +15,11 @@ import serialization.decodeF
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class EtapasProcesalesTributarioTransaction(monitoring: Monitoring)(implicit actor: EtapasProcesalesActor,
-                                                                         system: akka.actor.typed.ActorSystem[_],
-                                                                         ec: ExecutionContext)
-    extends ActorTransaction[EtapasProcesalesTri](monitoring) {
+case class EtapasProcesalesTributarioTransaction(actor: EtapasProcesalesActor, monitoring: Monitoring)(
+    implicit
+    system: akka.actor.typed.ActorSystem[_],
+    ec: ExecutionContext
+) extends ActorTransaction[EtapasProcesalesTri](monitoring) {
 
   val topic = "DGR-COP-ETAPROCESALES-TRI"
 

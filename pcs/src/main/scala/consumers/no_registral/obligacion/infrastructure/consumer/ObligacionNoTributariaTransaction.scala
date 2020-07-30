@@ -14,7 +14,7 @@ import monitoring.Monitoring
 import play.api.libs.json.Reads
 import serialization.decodeF
 
-case class ObligacionNoTributariaTransaction(monitoring: Monitoring)(implicit actorRef: ActorRef, ec: ExecutionContext)
+case class ObligacionNoTributariaTransaction(actorRef: ActorRef, monitoring: Monitoring)(implicit ec: ExecutionContext)
     extends ActorTransaction[ObligacionesAnt](monitoring) {
 
   val topic = "DGR-COP-OBLIGACIONES-ANT"

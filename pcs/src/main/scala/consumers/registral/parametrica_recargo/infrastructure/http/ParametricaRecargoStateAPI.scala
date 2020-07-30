@@ -10,9 +10,10 @@ import consumers.registral.parametrica_recargo.infrastructure.json._
 import design_principles.actor_model.mechanism.QueryStateAPI
 import monitoring.Monitoring
 
-case class ParametricaRecargoStateAPI(monitoring: Monitoring)(implicit actor: ParametricaRecargoActor,
-                                                              system: akka.actor.typed.ActorSystem[_])
-    extends QueryStateAPI(monitoring) {
+case class ParametricaRecargoStateAPI(actor: ParametricaRecargoActor, monitoring: Monitoring)(
+    implicit
+    system: akka.actor.typed.ActorSystem[_]
+) extends QueryStateAPI(monitoring) {
   import ParametricaRecargoStateAPI._
 
   def getState: Route =

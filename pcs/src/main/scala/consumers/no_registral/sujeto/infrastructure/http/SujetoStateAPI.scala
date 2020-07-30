@@ -13,7 +13,7 @@ import consumers.no_registral.sujeto.application.entity.SujetoResponses.GetSujet
 import consumers.no_registral.sujeto.infrastructure.json._
 import design_principles.actor_model.mechanism.QueryStateAPI
 import monitoring.Monitoring
-case class SujetoStateAPI(monitoring: Monitoring)(implicit actor: ActorRef, system: ActorSystem)
+case class SujetoStateAPI(actor: ActorRef, monitoring: Monitoring)(implicit system: ActorSystem)
     extends QueryStateAPI(monitoring) {
   def developerTools: Route =
     withSujeto { sujetoId =>

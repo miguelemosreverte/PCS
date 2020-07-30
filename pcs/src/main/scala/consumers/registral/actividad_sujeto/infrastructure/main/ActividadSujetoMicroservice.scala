@@ -18,8 +18,8 @@ object ActividadSujetoMicroservice {
     implicit val actor: ActividadSujetoActor = ActividadSujetoActor()
     implicit val e: ExecutionContext = ec
     Seq(
-      ActividadSujetoStateAPI(monitoring).route,
-      ActividadSujetoTransaction(monitoring).route
+      ActividadSujetoStateAPI(actor, monitoring).route,
+      ActividadSujetoTransaction(actor, monitoring).route
     ) reduce (_ ~ _)
   }
 

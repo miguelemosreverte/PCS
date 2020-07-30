@@ -12,10 +12,11 @@ import serialization.decodeF
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class ParametricaPlanNoTributarioTransaction(monitoring: Monitoring)(implicit actor: ParametricaPlanActor,
-                                                                          system: akka.actor.typed.ActorSystem[_],
-                                                                          ec: ExecutionContext)
-    extends ActorTransaction[ParametricaPlanAnt](monitoring) {
+case class ParametricaPlanNoTributarioTransaction(actor: ParametricaPlanActor, monitoring: Monitoring)(
+    implicit
+    system: akka.actor.typed.ActorSystem[_],
+    ec: ExecutionContext
+) extends ActorTransaction[ParametricaPlanAnt](monitoring) {
 
   val topic = "DGR-COP-PARAMPLAN-ANT"
 

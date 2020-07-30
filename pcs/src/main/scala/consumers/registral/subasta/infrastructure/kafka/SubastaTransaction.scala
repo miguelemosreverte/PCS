@@ -11,9 +11,9 @@ import serialization.decodeF
 
 import scala.concurrent.{ExecutionContext, Future}
 
-case class SubastaTransaction(monitoring: Monitoring)(implicit actor: SubastaActor,
-                                                      system: akka.actor.typed.ActorSystem[_],
-                                                      ec: ExecutionContext)
+case class SubastaTransaction(actor: SubastaActor, monitoring: Monitoring)(implicit
+                                                                           system: akka.actor.typed.ActorSystem[_],
+                                                                           ec: ExecutionContext)
     extends ActorTransaction[SubastaExternalDto](monitoring) {
 
   val topic = "DGR-COP-SUBASTAS"

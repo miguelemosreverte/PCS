@@ -10,7 +10,7 @@ import consumers.no_registral.sujeto.infrastructure.json._
 import monitoring.Monitoring
 import serialization.decodeF
 
-case class SujetoNoTributarioTransaction(monitoring: Monitoring)(implicit actorRef: ActorRef, ec: ExecutionContext)
+case class SujetoNoTributarioTransaction(actorRef: ActorRef, monitoring: Monitoring)(implicit ec: ExecutionContext)
     extends ActorTransaction[SujetoAnt](monitoring) {
 
   val topic = "DGR-COP-SUJETO-ANT"

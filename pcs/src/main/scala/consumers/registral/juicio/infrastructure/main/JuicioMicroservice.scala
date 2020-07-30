@@ -1,20 +1,23 @@
 package consumers.registral.juicio.infrastructure.main
 
-import akka.actor.ActorSystem
+import akka.actor.{typed, ActorSystem}
 import akka.http.scaladsl.server.Route
 import consumers.registral.juicio.infrastructure.dependency_injection.JuicioActor
 import consumers.registral.juicio.infrastructure.http.JuicioStateAPI
 import consumers.registral.juicio.infrastructure.kafka.{JuicioNoTributarioTransaction, JuicioTributarioTransaction}
 import monitoring.Monitoring
 
+import scala.concurrent.ExecutionContext
+
 object JuicioMicroservice {
 
   import akka.http.scaladsl.server.Directives._
-  def route(monitoring: Monitoring)(implicit system: ActorSystem): Route = {
+  def route(monitoring: Monitoring, ec: ExecutionContext)(implicit system: ActorSystem): Route = {
     import akka.actor.typed.scaladsl.adapter._
 
-    implicit val typedSystem = system.toTyped
-    implicit val actor = JuicioActor()
+    implicit val typedSystem: typed.ActorSystem[Nothing] = system.toTyped
+    implicit val actor: JuicioActor = JuicioActor()
+    implicit val e: ExecutionContext = ec
     Seq(
       JuicioStateAPI(monitoring).route,
       JuicioTributarioTransaction(monitoring).route,

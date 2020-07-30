@@ -1,5 +1,7 @@
 package design_principles.actor_model.mechanism
 
+import java.time.LocalDateTime
+
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.Controller
 import akka.http.scaladsl.model.HttpResponse
@@ -61,23 +63,19 @@ abstract class QueryStateAPI(monitoring: Monitoring) extends Controller(monitori
       isEmpty: QueryMessage#ReturnType => Boolean
   )(implicit system: akka.actor.typed.ActorSystem[_]): Route = {
     implicit val ec: ExecutionContextExecutor = system.classicSystem.dispatcher
+    complete {
+      actor
+        .ask(query)
+        .map {
+          case result if isEmpty(result) => HttpResponse(NotFound)
 
-    requests.increment()
-    handleErrors(exceptionHandler) {
-      complete {
-        actor
-          .ask(query)
-          .map {
-            case result if isEmpty(result) => HttpResponse(NotFound)
-
-            case result =>
-              HttpResponse(
-                OK,
-                entity = QueryStateAPI.standarization(Json.prettyPrint(format.writes(result)))
-              )
-          }
-          .recover { case e: Exception => HttpResponse(InternalServerError, entity = e.getMessage) }
-      }
+          case result =>
+            HttpResponse(
+              OK,
+              entity = QueryStateAPI.standarization(Json.prettyPrint(format.writes(result)))
+            )
+        }
+        .recover { case e: Exception => HttpResponse(InternalServerError, entity = e.getMessage) }
     }
   }
 }

@@ -11,19 +11,9 @@ import monitoring.Monitoring
 import serialization.decodeF
 
 case class SujetoNoTributarioTransaction(monitoring: Monitoring)(implicit actorRef: ActorRef, ec: ExecutionContext)
-    extends ActorTransaction(monitoring) {
+    extends ActorTransaction[SujetoAnt](monitoring) {
 
   val topic = "DGR-COP-SUJETO-ANT"
-
-  override def transaction(input: String): Future[Done] =
-    for {
-      cmd <- processInput(input)
-      done <- processCommand(cmd)
-    } yield done
-
-  def processInput(input: String): Future[SujetoAnt] = Future {
-    decodeF[SujetoAnt](input)
-  }
 
   def processCommand(registro: SujetoAnt): Future[Done] = {
     val command = SujetoCommands.SujetoUpdateFromAnt(

@@ -13,7 +13,7 @@ package object serialization {
   // This function will throw an exception to be catched by the surrounding Transaction
   def decodeF[DTO: ClassTag](input: String)(implicit format: Format[DTO]): DTO = {
     serialization.decode[DTO](input) match {
-      case Left(error) => throw new Exception(error) // to be catched by transactional
+      case Left(error) => throw new SerializationError(error) // to be catched by transactional
       case Right(value) => value
     }
   }
@@ -42,5 +42,9 @@ package object serialization {
         case None => Left(s"Failed to decode ${AClass.getName} $a)}")
       }
     }
+  }
+
+  class SerializationError(message: String) extends Exception {
+    override def getMessage: String = message
   }
 }

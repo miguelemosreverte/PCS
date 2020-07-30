@@ -10,19 +10,9 @@ import monitoring.Monitoring
 import serialization.decodeF
 
 case class ObjetoUpdateCotitularesTransaction(monitoring: Monitoring)(implicit actorRef: ActorRef, ec: ExecutionContext)
-    extends ActorTransaction(monitoring) {
+    extends ActorTransaction[ObjetoUpdateCotitulares](monitoring) {
 
   val topic = "ObjetoUpdatedCotitulares"
-
-  override def transaction(input: String): Future[Done] =
-    for {
-      cmd <- processInput(input)
-      done <- processCommand(cmd)
-    } yield done
-
-  def processInput(input: String): Future[ObjetoUpdateCotitulares] = Future {
-    decodeF[ObjetoUpdateCotitulares](input)
-  }
 
   def processCommand(cmd: ObjetoUpdateCotitulares): Future[Done] = {
     actorRef.ask[akka.Done](cmd)

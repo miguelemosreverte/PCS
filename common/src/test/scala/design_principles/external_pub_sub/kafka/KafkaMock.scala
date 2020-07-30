@@ -61,7 +61,7 @@ class KafkaMock() extends MessageProducer with MessageProcessor with MessageProc
 object KafkaMock {
 
   implicit class MessageProcessorImplicits(messageConsumer: MessageProcessor) {
-    def subscribeActorTransaction(SOURCE_TOPIC: String, actorTransaction: ActorTransaction)(
+    def subscribeActorTransaction(SOURCE_TOPIC: String, actorTransaction: ActorTransaction[_])(
         implicit ec: ExecutionContext
     ): (_, Future[Done]) =
       messageConsumer match {

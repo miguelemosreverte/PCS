@@ -11,27 +11,24 @@ import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case class DomicilioObjetoNoTributarioTransaction(monitoring: Monitoring)(implicit actor: DomicilioObjetoActor,
-                                                                          system: ActorSystem[_])
-    extends ActorTransaction(monitoring) {
+                                                                          system: ActorSystem[_],
+                                                                          ec: ExecutionContext)
+    extends ActorTransaction[DomicilioObjetoAnt](monitoring) {
 
   val topic = "DGR-COP-DOMICILIO-OBJ-ANT"
 
-  override def transaction(input: String): Future[Done] = {
-    val registro: DomicilioObjetoAnt = decodeF[DomicilioObjetoAnt](input)
-    val command = registro match {
-      case registro: DomicilioObjetoAnt =>
-        DomicilioObjetoCommands.DomicilioObjetoUpdateFromDto(
-          sujetoId = registro.BDO_SUJ_IDENTIFICADOR,
-          objetoId = registro.BDO_SOJ_IDENTIFICADOR,
-          tipoObjeto = registro.BDO_SOJ_TIPO_OBJETO,
-          domicilioId = registro.BDO_DOM_ID,
-          deliveryId = BigInt(registro.EV_ID),
-          registro = registro
-        )
-    }
+  override def processCommand(registro: DomicilioObjetoAnt): Future[Done] = {
+    val command = DomicilioObjetoCommands.DomicilioObjetoUpdateFromDto(
+      sujetoId = registro.BDO_SUJ_IDENTIFICADOR,
+      objetoId = registro.BDO_SOJ_IDENTIFICADOR,
+      tipoObjeto = registro.BDO_SOJ_TIPO_OBJETO,
+      domicilioId = registro.BDO_DOM_ID,
+      deliveryId = BigInt(registro.EV_ID),
+      registro = registro
+    )
     actor ask command
   }
 

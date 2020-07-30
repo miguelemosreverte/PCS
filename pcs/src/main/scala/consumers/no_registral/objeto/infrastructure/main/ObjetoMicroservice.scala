@@ -13,11 +13,13 @@ import consumers.no_registral.objeto.infrastructure.http._
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor
 import monitoring.Monitoring
 
+import scala.concurrent.ExecutionContext
+
 object ObjetoMicroservice {
 
-  def route(monitoring: Monitoring)(implicit system: ActorSystem): Route = {
+  def route(monitoring: Monitoring, ec: ExecutionContext)(implicit system: ActorSystem): Route = {
     implicit val actor: ActorRef = SujetoActor.start
-    import system.dispatcher
+    implicit val e: ExecutionContext = ec
     Seq(
       ObjetoStateAPI(monitoring).route,
       ObjetoExencionTransaction(monitoring).routeClassic,

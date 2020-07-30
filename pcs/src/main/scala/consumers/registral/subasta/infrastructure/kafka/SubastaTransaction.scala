@@ -9,27 +9,24 @@ import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 case class SubastaTransaction(monitoring: Monitoring)(implicit actor: SubastaActor,
-                                                      system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction(monitoring) {
+                                                      system: akka.actor.typed.ActorSystem[_],
+                                                      ec: ExecutionContext)
+    extends ActorTransaction[SubastaExternalDto](monitoring) {
 
   val topic = "DGR-COP-SUBASTAS"
 
-  override def transaction(input: String): Future[Done] = {
-    val registro: SubastaExternalDto = decodeF[SubastaExternalDto](input)
-    val command = registro match {
-      case registro: SubastaExternalDto =>
-        SubastaCommands.SubastaUpdateFromDto(
-          sujetoId = registro.BSB_SUJ_IDENTIFICADOR_ADQ,
-          objetoId = registro.BSB_SOJ_IDENTIFICADOR,
-          tipoObjeto = registro.BSB_SOJ_TIPO_OBJETO,
-          subastaId = registro.BSB_SUB_ID,
-          deliveryId = BigInt(registro.EV_ID),
-          registro = registro
-        )
-    }
+  override def processCommand(registro: SubastaExternalDto): Future[Done] = {
+    val command = SubastaCommands.SubastaUpdateFromDto(
+      sujetoId = registro.BSB_SUJ_IDENTIFICADOR_ADQ,
+      objetoId = registro.BSB_SOJ_IDENTIFICADOR,
+      tipoObjeto = registro.BSB_SOJ_TIPO_OBJETO,
+      subastaId = registro.BSB_SUB_ID,
+      deliveryId = BigInt(registro.EV_ID),
+      registro = registro
+    )
     actor ask command
   }
 

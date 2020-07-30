@@ -12,7 +12,7 @@ import monitoring.Monitoring
 
 object AtomicKafkaController {
   def fromTyped(
-      actorTransaction: ActorTransaction,
+      actorTransaction: ActorTransaction[_],
       monitoring: Monitoring
   )(implicit system: akka.actor.typed.ActorSystem[_]): AtomicKafkaController = {
     import akka.actor.typed.scaladsl.adapter._
@@ -20,7 +20,7 @@ object AtomicKafkaController {
   }
 }
 
-case class AtomicKafkaController(actorTransaction: ActorTransaction, monitoring: Monitoring)(
+case class AtomicKafkaController(actorTransaction: ActorTransaction[_], monitoring: Monitoring)(
     implicit system: ActorSystem
 ) extends Controller(monitoring) {
 

@@ -15,19 +15,9 @@ import play.api.libs.json.Reads
 import serialization.decodeF
 
 case class ObligacionTributariaTransaction(monitoring: Monitoring)(implicit actorRef: ActorRef, ec: ExecutionContext)
-    extends ActorTransaction(monitoring) {
+    extends ActorTransaction[ObligacionesTri](monitoring) {
 
   val topic = "DGR-COP-OBLIGACIONES-TRI"
-
-  override def transaction(input: String): Future[Done] =
-    for {
-      cmd <- processInput(input)
-      done <- processCommand(cmd)
-    } yield done
-
-  def processInput(input: String): Future[ObligacionesTri] = Future {
-    decodeF[ObligacionesTri](input)
-  }
 
   def processCommand(registro: ObligacionesTri): Future[Done] = {
     implicit val b: Reads[Seq[DetallesObligacion]] = Reads.seq(DetallesObligacionF.reads)

@@ -2,7 +2,7 @@ package kafka
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 import akka.Done
 import akka.actor.ActorSystem
@@ -22,6 +22,10 @@ class KafkaTransactionalMessageProcessor()(
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
+  val THROTTLE_ELEMENTS: Int = Try(System.getenv("THROTTLE_ELEMENTS")).map(_.toInt).getOrElse(10000)
+  val THROTTLE_ELEMENTS_PER: Int = Try(System.getenv("THROTTLE_ELEMENTS_PER")).map(_.toInt).getOrElse(100)
+  val CONSUMER_PARALLELISM: Int = Try(System.getenv("CONSUMER_PARALLELISM")).map(_.toInt).getOrElse(1)
+
   def run(
       SOURCE_TOPIC: String,
       SINK_TOPIC: String,
@@ -38,8 +42,8 @@ class KafkaTransactionalMessageProcessor()(
 
     val stream = Transactional
       .source(consumer, Subscriptions.topics(SOURCE_TOPIC))
-      .throttle(3000, 100 millis)
-      .mapAsync(1) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
+      .throttle(THROTTLE_ELEMENTS, THROTTLE_ELEMENTS_PER millis)
+      .mapAsync(CONSUMER_PARALLELISM) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
         val message = msg
 
         val input: String = message.record.value

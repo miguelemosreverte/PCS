@@ -32,50 +32,50 @@ class MessageTestkitUtils(sujeto: ActorRef, cotitularidadActor: ActorRef, messag
       // COTITULARIDAD CONSUMERS
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "AddCotitularTransaction",
-        AddCotitularTransaction(monitoring)(cotitularidadActor, ec)
+        AddCotitularTransaction(cotitularidadActor, monitoring)(ec)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "CotitularidadPublishSnapshot",
-        CotitularPublishSnapshotTransaction(monitoring)(cotitularidadActor, ec)
+        CotitularPublishSnapshotTransaction(cotitularidadActor, monitoring)(ec)
       )
       // OBJETO CONSUMERS
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "DGR-COP-EXENCIONES",
-        ObjetoExencionTransaction(monitoring)(sujeto, ec)
+        ObjetoExencionTransaction(sujeto, monitoring)(ec)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "DGR-COP-OBJETOS-ANT",
-        ObjetoNoTributarioTransaction(monitoring)(sujeto, ec)
+        ObjetoNoTributarioTransaction(sujeto, monitoring)(ec)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "DGR-COP-OBJETOS-TRI",
-        ObjetoTributarioTransaction(monitoring)(sujeto, ec)
+        ObjetoTributarioTransaction(sujeto, monitoring)(ec)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "ObjetoUpdateCotitularesTransaction",
-        ObjetoUpdateCotitularesTransaction(monitoring)(sujeto, ec)
+        ObjetoUpdateCotitularesTransaction(sujeto, monitoring)(ec)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "ObjetoReceiveSnapshot",
-        ObjetoUpdateNovedadTransaction(monitoring)(sujeto, ec)
+        ObjetoUpdateNovedadTransaction(sujeto, monitoring)(ec)
       )
       // OBLIGACION CONSUMERS
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-OBLIGACIONES-ANT",
-        ObligacionNoTributariaTransaction(monitoring)(sujeto, ec)
+        ObligacionNoTributariaTransaction(sujeto, monitoring)(ec)
       )
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-OBLIGACIONES-TRI",
-        ObligacionTributariaTransaction(monitoring)(sujeto, ec)
+        ObligacionTributariaTransaction(sujeto, monitoring)(ec)
       )
       // SUJETO CONSUMERS
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-SUJETO-TRI",
-        SujetoTributarioTransaction(monitoring)(sujeto, ec)
+        SujetoTributarioTransaction(sujeto, monitoring)(ec)
       )
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-SUJETO-ANT",
-        SujetoNoTributarioTransaction(monitoring)(sujeto, ec)
+        SujetoNoTributarioTransaction(sujeto, monitoring)(ec)
       )
       ()
     }

@@ -15,7 +15,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 12,
   "links": [],
   "panels": [
     {
@@ -85,7 +85,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(copernico_histograms_bucket{entity=\"actor-transaction-_sujeto_tributario_transaction-latency\",  le=\"100000.0\"}) - sum(copernico_counters_total{entity=\"SujetoTributarioTransactionSuccessCounter\"}) ",
+          "expr": "sum(copernico_histograms_bucket{entity=\"actor-transaction-sujeto_tributario_transaction-latency\",  le=\"100000.0\"}) - sum(copernico_counters_total{entity=\"SujetoTributarioTransactionSuccessCounter\"}) ",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -245,9 +245,11 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "copernico_histograms_bucket{entity=\"actor-transaction-_sujeto_tributario_transaction-latency\"}",
+          "expr": "copernico_histograms_bucket{entity=\"actor-transaction-sujeto_tributario_transaction-latency\"}",
           "format": "time_series",
+          "interval": "",
           "intervalFactor": 1,
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -329,7 +331,7 @@
     ]
   },
   "timezone": "",
-  "title": "Sujeto",
+  "title": "DGR-COP-SUJETO-TRI - Lost Messages",
   "uid": "CSLXq-4Mz",
   "version": 1
 }

@@ -23,9 +23,10 @@ class SujetoUpdateFromTriHandler(actor: SujetoActor) extends SyncCommandHandler[
     } else {
       actor.persistEvent(event) { () =>
         actor.state += event
-        actor.persistSnapshot()
-        SujetoUpdateFromTriHandlerSucessCounters.increment()
-        replyTo ! akka.Done
+        actor.persistSnapshot() { () =>
+          SujetoUpdateFromTriHandlerSucessCounters.increment()
+          replyTo ! akka.Done
+        }
       }
     }
     Success(akka.Done)

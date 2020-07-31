@@ -1,6 +1,12 @@
 import os
 import json
+import argparse
 from string import Template
+
+
+parser = argparse.ArgumentParser(description='The ammount of messages you want. :) ')
+parser.add_argument('messages', metavar='M', type=int, help='The ammount of messages you want. :) ', default=42)
+args = parser.parse_args()
 
 obligacionTriTemplate = Template("""
 {
@@ -38,7 +44,7 @@ obligacionTriTemplate = Template("""
 }
 """)
 
-for i in range(0, 1000):
+for i in range(0, args.messages):
     sujetoId = 1
     objetoId = 1
     obligacionId = i

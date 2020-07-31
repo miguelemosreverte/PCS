@@ -63,11 +63,11 @@ lazy val pcs = project
     mainClass := Some("Main")
   )
   .settings(
-    dockerBaseImage := "openjdk:8-jdk",
+    dockerBaseImage := "openjdk:8",
     dockerUsername := Some("pcs"),
     dockerEntrypoint := Seq("/opt/docker/bin/pcs"),
     dockerExposedPorts := Seq(
-        2551, 2552, 2553, 8081, 8083, 8084, 8558, 9095, 5266
+        2551, 2552, 2553, 8081, 8083, 8084, 8558
       )
   )
   .settings(

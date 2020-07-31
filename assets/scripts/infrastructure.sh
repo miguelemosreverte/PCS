@@ -7,8 +7,6 @@ echo "== killed containers == "
 
 docker-compose -f assets/docker-compose/dev-lite/docker-compose.yml down -v
 docker-compose -f assets/docker-compose/dev-lite/docker-compose.yml up -d
-docker-compose -f assets/docker-compose/monitoring/docker-compose.yml down -v
-docker-compose -f assets/docker-compose/monitoring/docker-compose.yml up -d
 
 sleep 30
 

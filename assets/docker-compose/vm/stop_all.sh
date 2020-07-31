@@ -11,5 +11,3 @@ echo "== kafka stopped =="
 echo "== stopping actores =="
 docker-compose -f assets/docker-compose/vm/docker-compose.yml down -v
 echo "== actores stopped =="
-
-docker-compose -f assets/docker-compose/monitoring/docker-compose.yml down -v

@@ -1,0 +1,30 @@
+---
+version: '3.3'
+
+services:
+
+  calendar:
+    container_name: calendar
+    image: 'calendar/calendar:1.0'
+    ports:
+      - '2590:2551'
+      - '8590:8558'
+      - '8090:8081'
+    environment:
+      SEED_NODES: 'akka://PersonClassificationService@172.22.6.3:2551'
+      KAFKA_BROKERS_LIST: '172.22.0.5:29092'
+      CASSANDRA_IP: '172.22.0.6'
+      CASSANDRA_PORT: '9042'
+      CASSANDRA_REPLICAS: 1
+      LOGSTASH: '172.22.5.3:5000'
+      CLUSTER_IP: 172.22.6.3
+      CLUSTER_PORT: 2551
+    networks:
+      kafka_copernico_net:
+        ipv4_address: 172.22.6.3
+
+
+networks:
+  kafka_copernico_net:
+    external:
+      name: kafka_copernico_net

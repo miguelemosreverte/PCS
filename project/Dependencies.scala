@@ -134,7 +134,6 @@ object Dependencies {
     private lazy val reflections = "org.reflections" % "reflections" % "0.9.10"
     private lazy val shapeless = "com.chuusai" %% "shapeless" % "2.3.3"
     private lazy val heikoseeberger = "de.heikoseeberger" %% "akka-http-play-json" % "1.30.0"
-    private lazy val classFinder = "org.clapper" %% "classutil" % "1.5.0"
 
     override def modules: Seq[ModuleID] =
       logback ::
@@ -147,13 +146,12 @@ object Dependencies {
       reflections ::
       shapeless ::
       heikoseeberger ::
-      classFinder ::
       Nil
   }
 
   // Projects
   lazy val mainDeps
-      : Seq[sbt.ModuleID] = Akka.modules ++ ScalaZ.modules ++ Cassandra.modules ++ Utils.modules ++ Kamon.modules
+    : Seq[sbt.ModuleID] = Akka.modules ++ ScalaZ.modules ++ Cassandra.modules ++ Utils.modules ++ Kamon.modules
   lazy val testDeps: Seq[sbt.ModuleID] = Test.modules ++ TestDB.modules
 }
 

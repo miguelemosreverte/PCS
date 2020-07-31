@@ -18,7 +18,6 @@ object Inference {
         "model",
         "consumers",
         "readside",
-        "design_principles",
         "serialization",
         "cassandra"
       )

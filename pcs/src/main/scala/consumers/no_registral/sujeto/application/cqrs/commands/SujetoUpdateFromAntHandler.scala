@@ -21,10 +21,8 @@ class SujetoUpdateFromAntHandler(actor: SujetoActor) extends SyncCommandHandler[
     } else {
       actor.persistEvent(event) { () =>
         actor.state += event
-        actor.persistSnapshot() { () =>
-          replyTo ! akka.Done
-        }
-
+        actor.persistSnapshot()
+        replyTo ! akka.Done
       }
     }
     Success(akka.Done)

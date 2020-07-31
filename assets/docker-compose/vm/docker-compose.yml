@@ -31,8 +31,6 @@ services:
       - '2551:2551'
       - '8558:8558'
       - '8081:8081'
-      - '5000:9095'
-      - '5001:5266'
     environment:
       SEED_NODES: 'akka://PersonClassificationService@172.22.1.3:2551'
       KAFKA_BROKERS_LIST: '172.22.0.5:29092'
@@ -51,8 +49,6 @@ services:
     ports:
       - '2552:2551'
       - '8083:8083'
-      - '5002:9095'
-      - '5003:5266'
     environment:
       SEED_NODES: 'akka://PersonClassificationService@172.22.1.3:2551'
       KAFKA_BROKERS_LIST: '172.22.0.5:29092'
@@ -72,8 +68,6 @@ services:
     ports:
       - '2553:2551'
       - '8084:8084'
-      - '5004:9095'
-      - '5005:5266'
     environment:
       SEED_NODES: 'akka://PersonClassificationService@172.22.1.3:2551'
       KAFKA_BROKERS_LIST: '172.22.0.5:29092'

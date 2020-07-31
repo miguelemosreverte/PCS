@@ -7,21 +7,24 @@ import consumers.registral.juicio.application.entities.JuicioExternalDto.{Detall
 import consumers.registral.juicio.infrastructure.dependency_injection.JuicioActor
 import consumers.registral.juicio.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import play.api.libs.json.Reads
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class JuicioTributarioTransaction()(implicit actorRef: JuicioActor, system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction {
+case class JuicioTributarioTransaction(actor: JuicioActor, monitoring: Monitoring)(
+    implicit
+    system: akka.actor.typed.ActorSystem[_],
+    ec: ExecutionContext
+) extends ActorTransaction[JuicioTri](monitoring) {
 
   val topic = "DGR-COP-JUICIOS-TRI"
 
-  override def transaction(input: String): Future[Done] = {
+  override def processCommand(registro: JuicioTri): Future[Done] = {
 
     implicit val b: Reads[Seq[DetallesJuicio]] = Reads.seq(DetallesJuicioF.reads)
 
-    val registro = decodeF[JuicioTri](input)
     val detalles: Option[Seq[DetallesJuicio]] = for {
       bjuDetalles <- (registro.BJU_OTROS_ATRIBUTOS \ "BJU_DETALLES").toOption
       detalles = serialization.decodeF[Seq[DetallesJuicio]](bjuDetalles.toString)
@@ -38,7 +41,7 @@ case class JuicioTributarioTransaction()(implicit actorRef: JuicioActor, system:
         detalles.getOrElse(Seq.empty)
       )
 
-    actorRef ask command
+    actor ask command
   }
 
 }

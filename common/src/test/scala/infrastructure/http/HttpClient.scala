@@ -2,9 +2,8 @@ package infrastructure.http
 
 import scala.concurrent.Future
 import scala.reflect.ClassTag
-
-import akka.AkkaHttpClient
 import akka.actor.ActorSystem
+import akka.http.AkkaHttpClient
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import play.api.libs.json.Format
 import serialization.decode

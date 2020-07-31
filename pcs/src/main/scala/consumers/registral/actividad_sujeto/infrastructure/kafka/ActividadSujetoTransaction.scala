@@ -9,20 +9,19 @@ import consumers.registral.actividad_sujeto.application.entities.ActividadSujeto
 import consumers.registral.actividad_sujeto.infrastructure.dependency_injection.ActividadSujetoActor
 import consumers.registral.actividad_sujeto.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class ActividadSujetoTransaction()(implicit actor: ActividadSujetoActor, system: ActorSystem[_])
-    extends ActorTransaction {
+case class ActividadSujetoTransaction(actor: ActividadSujetoActor, monitoring: Monitoring)(implicit
+                                                                                           system: ActorSystem[_],
+                                                                                           ec: ExecutionContext)
+    extends ActorTransaction[ActividadSujeto](monitoring) {
 
   val topic = "DGR-COP-ACTIVIDADES"
 
-  override def transaction(input: String): Future[Done] = {
-    import scala.concurrent.duration._
-    implicit val timeout: Timeout = Timeout(30 seconds)
-    val registro: ActividadSujeto = decodeF[ActividadSujeto](input)
-
+  override def processCommand(registro: ActividadSujeto): Future[Done] = {
     val command =
       ActividadSujetoUpdateFromDto(
         sujetoId = registro.BAT_SUJ_IDENTIFICADOR,

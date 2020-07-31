@@ -7,26 +7,25 @@ import consumers.registral.tramite.application.entities.{TramiteCommands, Tramit
 import consumers.registral.tramite.infrastructure.dependency_injection.TramiteActor
 import consumers.registral.tramite.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class TramiteTransaction()(implicit actor: TramiteActor, system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction {
+case class TramiteTransaction(actor: TramiteActor, monitoring: Monitoring)(implicit
+                                                                           system: akka.actor.typed.ActorSystem[_],
+                                                                           ex: ExecutionContext)
+    extends ActorTransaction[Tramite](monitoring) {
 
   val topic = "DGR-COP-TRAMITES"
 
-  override def transaction(input: String): Future[Done] = {
-    val registro: Tramite = decodeF[Tramite](input)
-    val command = registro match {
-      case registro: TramiteExternalDto.Tramite =>
-        TramiteCommands.TramiteUpdateFromDto(
-          sujetoId = registro.BTR_SUJ_IDENTIFICADOR,
-          tramiteId = registro.BTR_TRMID,
-          deliveryId = BigInt(registro.EV_ID),
-          registro = registro
-        )
-    }
+  override def processCommand(registro: Tramite): Future[Done] = {
+    val command = TramiteCommands.TramiteUpdateFromDto(
+      sujetoId = registro.BTR_SUJ_IDENTIFICADOR,
+      tramiteId = registro.BTR_TRMID,
+      deliveryId = BigInt(registro.EV_ID),
+      registro = registro
+    )
     actor ask command
   }
 

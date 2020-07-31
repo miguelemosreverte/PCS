@@ -78,4 +78,25 @@ trait ObjetoSpec extends NoRegistralesTestSuite {
     }
     context.close()
   }
+
+  "un objeto" should
+  "Restar saldo y eliminar una obligacion cuando la misma se da de baja" in parallelActorSystemRunner { implicit s =>
+    val context = testContext()
+
+    val obligacionBaja = examples.obligacionWithSaldo200.copy(BOB_OBN_ID = "obligationBaja")
+
+    context.messageProducer produceObligacion obligacionBaja
+    eventually {
+      val response = context.Query getStateObjeto obligacionBaja
+      response.saldo should be(obligacionBaja.BOB_SALDO)
+    }
+
+    context.messageProducer produceObligacion obligacionBaja.copy(BOB_ESTADO = Some("BAJA"))
+    eventually {
+      val response = context.Query getStateObjeto obligacionBaja
+      response.saldo should be(0)
+    }
+    context.close()
+  }
+
 }

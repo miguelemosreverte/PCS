@@ -56,14 +56,13 @@ class SujetoActor(objetoActorProps: Props = ObjetoActor.props) extends Persisten
   def customReceiveRecover: Receive = {
     case evt: SujetoEvents.SujetoUpdatedFromObjeto =>
       state += evt
-      logger.info(s"[$persistenceId] recovered with [${evt.toString.pretty}]")
       objetos((evt.sujetoId, evt.objetoId, evt.tipoObjeto))
   }
 
-  def persistSnapshot(): Unit = {
+  def persistSnapshot()(handler: () => Unit = () => Unit): Unit = {
     val sujetoId = SujetoMessageRoots.extractor(persistenceId).sujetoId
     val event = SujetoSnapshotPersisted(0, sujetoId, state.registro, state.saldo)
-    persistEvent(event, SujetoTags.SujetoReadside)(() => ())
+    persistEvent(event, SujetoTags.SujetoReadside)(handler)
   }
 
 }

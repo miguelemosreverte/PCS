@@ -114,7 +114,10 @@ object Dependencies {
     private lazy val kamonAPM = "io.kamon" %% "kamon-apm-reporter" % "2.0.0"
     // private lazy val kamonLogStash = "com.codekeepersinc" %% "kamonlogstash" % "0.0.1"
 
-    override def modules: Seq[sbt.ModuleID] = kamonBundle :: kamonAPM :: Nil
+    val core = "io.kamon" %% "kamon-core" % "2.1.4"
+    val status = "io.kamon" %% "kamon-status-page" % "2.1.4"
+    val prometheus = "io.kamon" %% "kamon-prometheus" % "2.1.4"
+    override def modules: Seq[sbt.ModuleID] = core :: status :: prometheus :: Nil
   }
 
   object Utils extends Module {
@@ -131,6 +134,7 @@ object Dependencies {
     private lazy val reflections = "org.reflections" % "reflections" % "0.9.10"
     private lazy val shapeless = "com.chuusai" %% "shapeless" % "2.3.3"
     private lazy val heikoseeberger = "de.heikoseeberger" %% "akka-http-play-json" % "1.30.0"
+    private lazy val classFinder = "org.clapper" %% "classutil" % "1.5.0"
 
     override def modules: Seq[ModuleID] =
       logback ::
@@ -143,12 +147,13 @@ object Dependencies {
       reflections ::
       shapeless ::
       heikoseeberger ::
+      classFinder ::
       Nil
   }
 
   // Projects
   lazy val mainDeps
-    : Seq[sbt.ModuleID] = Akka.modules ++ ScalaZ.modules ++ Cassandra.modules ++ Utils.modules ++ Kamon.modules
+      : Seq[sbt.ModuleID] = Akka.modules ++ ScalaZ.modules ++ Cassandra.modules ++ Utils.modules ++ Kamon.modules
   lazy val testDeps: Seq[sbt.ModuleID] = Test.modules ++ TestDB.modules
 }
 

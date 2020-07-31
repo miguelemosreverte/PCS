@@ -26,7 +26,7 @@ class PlanPagoProjectionHandler(settings: ProjectionSettings, system: ActorSyste
   override def process(envelope: EventEnvelope[PlanPagoEvents]): Future[Done] = {
     envelope.event match {
       case evt: PlanPagoEvents.PlanPagoUpdatedFromDto =>
-        log.info(
+        log.debug(
           s"PlanPagoProjectionHandler consumed $evt from $tag with seqNr ${envelope.sequenceNr}",
           settings.tag,
           envelope.event,

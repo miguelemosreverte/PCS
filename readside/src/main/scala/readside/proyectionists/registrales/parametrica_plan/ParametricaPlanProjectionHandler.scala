@@ -26,7 +26,7 @@ class ParametricaPlanProjectionHandler(settings: ProjectionSettings, system: Act
   override def process(envelope: EventEnvelope[ParametricaPlanEvents]): Future[Done] = {
     envelope.event match {
       case evt: ParametricaPlanEvents.ParametricaPlanUpdatedFromDto =>
-        log.info(
+        log.debug(
           s"ParametricaPlanProjectionHandler consumed $evt from $tag with seqNr ${envelope.sequenceNr}",
           settings.tag,
           envelope.event,

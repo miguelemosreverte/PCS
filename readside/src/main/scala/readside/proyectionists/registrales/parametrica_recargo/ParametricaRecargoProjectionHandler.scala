@@ -26,7 +26,7 @@ class ParametricaRecargoProjectionHandler(settings: ProjectionSettings, system: 
   override def process(envelope: EventEnvelope[ParametricaRecargoEvents]): Future[Done] = {
     envelope.event match {
       case evt: ParametricaRecargoEvents.ParametricaRecargoUpdatedFromDto =>
-        log.info(
+        log.debug(
           s"ParametricaRecargoProjectionHandler consumed $evt from $tag with seqNr ${envelope.sequenceNr}",
           settings.tag,
           envelope.event,

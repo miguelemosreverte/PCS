@@ -5,13 +5,15 @@ import java.time.LocalDateTime
 import akka.actor.typed.ActorSystem
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.Route
-import components.QueryStateAPI
 import consumers.registral.declaracion_jurada.application.entities.DeclaracionJuradaQueries.GetStateDeclaracionJurada
 import consumers.registral.declaracion_jurada.infrastructure.dependency_injection.DeclaracionJuradaActor
 import consumers.registral.declaracion_jurada.infrastructure.json._
+import design_principles.actor_model.mechanism.QueryStateAPI
+import monitoring.Monitoring
 
-case class DeclaracionJuradaStateAPI()(implicit actor: DeclaracionJuradaActor, system: ActorSystem[_])
-    extends QueryStateAPI {
+case class DeclaracionJuradaStateAPI(actor: DeclaracionJuradaActor, monitoring: Monitoring)(implicit
+                                                                                            system: ActorSystem[_])
+    extends QueryStateAPI(monitoring) {
   import DeclaracionJuradaStateAPI._
 
   def getState: Route =
@@ -29,7 +31,7 @@ case class DeclaracionJuradaStateAPI()(implicit actor: DeclaracionJuradaActor, s
       }
     }
 
-  def routes: Route = GET(getState)
+  def route: Route = GET(getState)
 }
 
 object DeclaracionJuradaStateAPI {

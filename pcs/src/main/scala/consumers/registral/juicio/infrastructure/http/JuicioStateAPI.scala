@@ -4,13 +4,14 @@ import java.time.LocalDateTime
 
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.Route
-import components.QueryStateAPI
 import consumers.registral.juicio.application.entities.JuicioQueries.GetStateJuicio
 import consumers.registral.juicio.infrastructure.dependency_injection.JuicioActor
 import consumers.registral.juicio.infrastructure.json._
+import design_principles.actor_model.mechanism.QueryStateAPI
+import monitoring.Monitoring
 
-case class JuicioStateAPI()(implicit actor: JuicioActor, system: akka.actor.typed.ActorSystem[_])
-    extends QueryStateAPI {
+case class JuicioStateAPI(actor: JuicioActor, monitoring: Monitoring)(implicit system: akka.actor.typed.ActorSystem[_])
+    extends QueryStateAPI(monitoring) {
   import JuicioStateAPI._
 
   def getState: Route =
@@ -27,7 +28,7 @@ case class JuicioStateAPI()(implicit actor: JuicioActor, system: akka.actor.type
       }
     }
 
-  def routes: Route = GET(getState)
+  def route: Route = GET(getState)
 }
 
 object JuicioStateAPI {

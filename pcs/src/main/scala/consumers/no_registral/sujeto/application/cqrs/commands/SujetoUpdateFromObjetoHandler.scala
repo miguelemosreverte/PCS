@@ -4,6 +4,7 @@ import akka.Done
 import consumers.no_registral.sujeto.application.entity.SujetoCommands.SujetoUpdateFromObjeto
 import consumers.no_registral.sujeto.domain.SujetoEvents
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor
+import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor.ChildHasAlreadyAnswered
 import cqrs.untyped.command.CommandHandler.SyncCommandHandler
 
 import scala.util.{Success, Try}
@@ -21,7 +22,7 @@ class SujetoUpdateFromObjetoHandler(actor: SujetoActor) extends SyncCommandHandl
 
     actor.persistEvent(event) { () =>
       actor.state += event
-      actor.persistSnapshot()
+      actor.persistSnapshot()()
     }
     Success(akka.Done)
   }

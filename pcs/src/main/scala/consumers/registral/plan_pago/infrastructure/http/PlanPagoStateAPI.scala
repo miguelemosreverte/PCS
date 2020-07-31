@@ -4,13 +4,15 @@ import java.time.LocalDateTime
 
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.Route
-import components.QueryStateAPI
 import consumers.registral.plan_pago.application.entities.PlanPagoQueries.GetStatePlanPago
 import consumers.registral.plan_pago.infrastructure.dependency_injection.PlanPagoActor
 import consumers.registral.plan_pago.infrastructure.json._
+import design_principles.actor_model.mechanism.QueryStateAPI
+import monitoring.Monitoring
 
-case class PlanPagoStateAPI()(implicit actor: PlanPagoActor, system: akka.actor.typed.ActorSystem[_])
-    extends QueryStateAPI {
+case class PlanPagoStateAPI(actor: PlanPagoActor, monitoring: Monitoring)(implicit
+                                                                          system: akka.actor.typed.ActorSystem[_])
+    extends QueryStateAPI(monitoring) {
   import PlanPagoStateAPI._
 
   def getState: Route =
@@ -27,7 +29,7 @@ case class PlanPagoStateAPI()(implicit actor: PlanPagoActor, system: akka.actor.
       }
     }
 
-  def routes: Route = GET(getState)
+  def route: Route = GET(getState)
 }
 
 object PlanPagoStateAPI {

@@ -17,7 +17,7 @@ class ObligacionActor() extends PersistentBaseActor[ObligacionEvents, Obligacion
   override def receiveCommand: Receive = super.receiveCommand.orElse(oldReceiveCommand)
   def oldReceiveCommand: Receive = {
     case _: DeleteMessagesSuccess =>
-      logger.info(s"[$persistenceId] Success to clean this actor akka.messages")
+      logger.debug(s"[$persistenceId] Success to clean this actor akka.messages")
 
     case _: DeleteMessagesFailure =>
       logger.error(s"[$persistenceId] Failed to clean this actor akka.messages")
@@ -31,6 +31,7 @@ class ObligacionActor() extends PersistentBaseActor[ObligacionEvents, Obligacion
     commandBus.subscribe[ObligacionCommands.ObligacionUpdateFromDto](new ObligacionUpdateFromDtoHandler(this).handle)
     commandBus.subscribe[ObligacionCommands.ObligacionUpdateExencion](new ObligacionUpdateExencionHandler(this).handle)
     commandBus.subscribe[ObligacionCommands.ObligacionRemove](new ObligacionRemoveHandler(this).handle)
+    commandBus.subscribe[ObligacionCommands.DownObligacion](new DownObligacionHandler(this).handle)
     eventBus.subscribe[ObligacionEvents.ObligacionPersistedSnapshot](
       new ObligacionPersistedSnapshotHandler(this).handle
     )
@@ -49,6 +50,17 @@ class ObligacionActor() extends PersistentBaseActor[ObligacionEvents, Obligacion
       state.porcentajeExencion
     )
   }
+
+  def informBajaToParent(cmd: ObligacionCommands): Unit = {
+    context.parent ! ObjetoCommands.ObjetoUpdateFromSetBajaObligacion(
+      cmd.deliveryId,
+      cmd.sujetoId,
+      cmd.objetoId,
+      cmd.tipoObjeto,
+      cmd.obligacionId
+    )
+  }
+
 }
 
 object ObligacionActor {

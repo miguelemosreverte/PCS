@@ -9,16 +9,19 @@ import consumers.no_registral.obligacion.infrastructure.consumer.{
 }
 import consumers.no_registral.obligacion.infrastructure.http.ObligacionStateAPI
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor
+import monitoring.Monitoring
+
+import scala.concurrent.ExecutionContext
 
 object ObligacionMicroservice {
 
-  def routes(implicit system: ActorSystem): Route = {
+  def route(monitoring: Monitoring, ec: ExecutionContext)(implicit system: ActorSystem): Route = {
     implicit val actor: ActorRef = SujetoActor.start
-    import system.dispatcher
+    implicit val e: ExecutionContext = ec
     Seq(
-      ObligacionStateAPI().routes,
-      ObligacionTributariaTransaction().routesClassic,
-      ObligacionNoTributariaTransaction().routesClassic
+      ObligacionStateAPI(actor, monitoring).route,
+      ObligacionTributariaTransaction(actor, monitoring).routeClassic,
+      ObligacionNoTributariaTransaction(actor, monitoring).routeClassic
     ) reduce (_ ~ _)
   }
 

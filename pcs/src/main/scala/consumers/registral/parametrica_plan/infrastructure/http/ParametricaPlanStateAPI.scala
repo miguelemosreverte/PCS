@@ -4,13 +4,16 @@ import java.time.LocalDateTime
 
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.{Directive, Route}
-import components.QueryStateAPI
 import consumers.registral.parametrica_plan.application.entities.ParametricaPlanQueries.GetStateParametricaPlan
 import consumers.registral.parametrica_plan.infrastructure.dependency_injection.ParametricaPlanActor
 import consumers.registral.parametrica_plan.infrastructure.json._
+import design_principles.actor_model.mechanism.QueryStateAPI
+import monitoring.Monitoring
 
-case class ParametricaPlanStateAPI()(implicit actor: ParametricaPlanActor, system: akka.actor.typed.ActorSystem[_])
-    extends QueryStateAPI {
+case class ParametricaPlanStateAPI(actor: ParametricaPlanActor, monitoring: Monitoring)(
+    implicit
+    system: akka.actor.typed.ActorSystem[_]
+) extends QueryStateAPI(monitoring) {
   import ParametricaPlanStateAPI._
 
   def getState: Route =
@@ -21,7 +24,7 @@ case class ParametricaPlanStateAPI()(implicit actor: ParametricaPlanActor, syste
       )
     }
 
-  def routes: Route = GET(getState)
+  def route: Route = GET(getState)
 }
 
 object ParametricaPlanStateAPI {

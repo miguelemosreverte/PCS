@@ -7,12 +7,14 @@ import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.model.StatusCodes.OK
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.Route
-import components.QueryStateAPI
 import consumers.no_registral.obligacion.infrastructure.http.ObligacionStateAPI.withSujeto
 import consumers.no_registral.sujeto.application.entity.SujetoQueries.GetStateSujeto
 import consumers.no_registral.sujeto.application.entity.SujetoResponses.GetSujetoResponse
 import consumers.no_registral.sujeto.infrastructure.json._
-case class SujetoStateAPI()(implicit actor: ActorRef, system: ActorSystem) extends QueryStateAPI {
+import design_principles.actor_model.mechanism.QueryStateAPI
+import monitoring.Monitoring
+case class SujetoStateAPI(actor: ActorRef, monitoring: Monitoring)(implicit system: ActorSystem)
+    extends QueryStateAPI(monitoring) {
   def developerTools: Route =
     withSujeto { sujetoId =>
       withDeveloperTools { command =>
@@ -32,6 +34,6 @@ case class SujetoStateAPI()(implicit actor: ActorRef, system: ActorSystem) exten
         state => state.fechaUltMod == LocalDateTime.MIN
       )
     }
-  def routes: Route = GET(getState) ~ GET(developerTools)
+  def route: Route = GET(getState) ~ GET(developerTools)
   def withDeveloperTools = path("developer" / "tools" / Segment)
 }

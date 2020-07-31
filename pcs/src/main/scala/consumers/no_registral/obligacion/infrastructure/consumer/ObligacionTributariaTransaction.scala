@@ -1,7 +1,6 @@
 package consumers.no_registral.obligacion.infrastructure.consumer
 
 import scala.concurrent.{ExecutionContext, Future}
-
 import akka.Done
 import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
@@ -11,23 +10,14 @@ import consumers.no_registral.obligacion.application.entities.ObligacionExternal
   ObligacionesTri
 }
 import consumers.no_registral.obligacion.infrastructure.json._
+import monitoring.Monitoring
 import play.api.libs.json.Reads
 import serialization.decodeF
 
-case class ObligacionTributariaTransaction()(implicit actorRef: ActorRef, ec: ExecutionContext)
-    extends ActorTransaction {
+case class ObligacionTributariaTransaction(actorRef: ActorRef, monitoring: Monitoring)(implicit ec: ExecutionContext)
+    extends ActorTransaction[ObligacionesTri](monitoring) {
 
   val topic = "DGR-COP-OBLIGACIONES-TRI"
-
-  override def transaction(input: String): Future[Done] =
-    for {
-      cmd <- processInput(input)
-      done <- processCommand(cmd)
-    } yield done
-
-  def processInput(input: String): Future[ObligacionesTri] = Future {
-    decodeF[ObligacionesTri](input)
-  }
 
   def processCommand(registro: ObligacionesTri): Future[Done] = {
     implicit val b: Reads[Seq[DetallesObligacion]] = Reads.seq(DetallesObligacionF.reads)
@@ -38,15 +28,25 @@ case class ObligacionTributariaTransaction()(implicit actorRef: ActorRef, ec: Ex
       detalles = serialization.decodeF[Seq[DetallesObligacion]](bobDetalles.toString)
     } yield detalles
 
-    val command = ObligacionCommands.ObligacionUpdateFromDto(
-      sujetoId = registro.BOB_SUJ_IDENTIFICADOR,
-      objetoId = registro.BOB_SOJ_IDENTIFICADOR,
-      tipoObjeto = registro.BOB_SOJ_TIPO_OBJETO,
-      obligacionId = registro.BOB_OBN_ID,
-      deliveryId = registro.EV_ID,
-      registro = registro,
-      detallesObligacion = detalles.getOrElse(Seq.empty)
-    )
+    val command =
+      if (registro.BOB_ESTADO.contains("BAJA")) {
+        ObligacionCommands.DownObligacion(
+          sujetoId = registro.BOB_SUJ_IDENTIFICADOR,
+          objetoId = registro.BOB_SOJ_IDENTIFICADOR,
+          tipoObjeto = registro.BOB_SOJ_TIPO_OBJETO,
+          obligacionId = registro.BOB_OBN_ID,
+          deliveryId = registro.EV_ID
+        )
+      } else
+        ObligacionCommands.ObligacionUpdateFromDto(
+          sujetoId = registro.BOB_SUJ_IDENTIFICADOR,
+          objetoId = registro.BOB_SOJ_IDENTIFICADOR,
+          tipoObjeto = registro.BOB_SOJ_TIPO_OBJETO,
+          obligacionId = registro.BOB_OBN_ID,
+          deliveryId = registro.EV_ID,
+          registro = registro,
+          detallesObligacion = detalles.getOrElse(Seq.empty)
+        )
     actorRef.ask[akka.Done](command)
   }
 }

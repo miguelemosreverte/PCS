@@ -4,13 +4,16 @@ import java.time.LocalDateTime
 
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.Route
-import components.QueryStateAPI
 import consumers.registral.calendario.application.entities.CalendarioQueries.GetStateCalendario
 import consumers.registral.calendario.infrastructure.dependency_injection.CalendarioActor
 import consumers.registral.calendario.infrastructure.json._
+import design_principles.actor_model.mechanism.QueryStateAPI
+import monitoring.Monitoring
 
-case class CalendarioStateAPI()(implicit actor: CalendarioActor, system: akka.actor.typed.ActorSystem[_])
-    extends QueryStateAPI {
+case class CalendarioStateAPI(actor: CalendarioActor, monitoring: Monitoring)(
+    implicit
+    system: akka.actor.typed.ActorSystem[_]
+) extends QueryStateAPI(monitoring) {
   import CalendarioStateAPI._
   def getState: Route =
     withCalendario { calendarioId =>
@@ -20,7 +23,7 @@ case class CalendarioStateAPI()(implicit actor: CalendarioActor, system: akka.ac
       )
     }
 
-  def routes: Route = GET(getState)
+  def route: Route = GET(getState)
 }
 
 object CalendarioStateAPI {

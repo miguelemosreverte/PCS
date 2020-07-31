@@ -10,27 +10,26 @@ import consumers.registral.etapas_procesales.application.entities.{
 import consumers.registral.etapas_procesales.infrastructure.dependency_injection.EtapasProcesalesActor
 import consumers.registral.etapas_procesales.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class EtapasProcesalesNoTributarioTransaction()(implicit actor: EtapasProcesalesActor,
-                                                     system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction {
+case class EtapasProcesalesNoTributarioTransaction(actor: EtapasProcesalesActor, monitoring: Monitoring)(
+    implicit
+    system: akka.actor.typed.ActorSystem[_],
+    ec: ExecutionContext
+) extends ActorTransaction[EtapasProcesalesAnt](monitoring) {
 
   val topic = "DGR-COP-ETAPROCESALES-ANT"
 
-  override def transaction(input: String): Future[Done] = {
-    val registro: EtapasProcesalesAnt = decodeF[EtapasProcesalesAnt](input)
-    val command = registro match {
-      case registro: EtapasProcesalesExternalDto.EtapasProcesalesAnt =>
-        EtapasProcesalesCommands.EtapasProcesalesUpdateFromDto(
-          juicioId = registro.BEP_JUI_ID,
-          etapaId = registro.BPE_ETA_ID,
-          deliveryId = BigInt(registro.EV_ID),
-          registro = registro
-        )
-    }
+  override def processCommand(registro: EtapasProcesalesAnt): Future[Done] = {
+    val command = EtapasProcesalesCommands.EtapasProcesalesUpdateFromDto(
+      juicioId = registro.BEP_JUI_ID,
+      etapaId = registro.BPE_ETA_ID,
+      deliveryId = BigInt(registro.EV_ID),
+      registro = registro
+    )
     actor ask command
   }
 

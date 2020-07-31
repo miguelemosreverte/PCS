@@ -4,13 +4,16 @@ import java.time.LocalDateTime
 
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.{Directive, Route}
-import components.QueryStateAPI
 import consumers.registral.domicilio_sujeto.application.entities.DomicilioSujetoQueries.GetStateDomicilioSujeto
 import consumers.registral.domicilio_sujeto.infrastructure.dependency_injection.DomicilioSujetoActor
 import consumers.registral.domicilio_sujeto.infrastructure.json._
+import design_principles.actor_model.mechanism.QueryStateAPI
+import monitoring.Monitoring
 
-case class DomicilioSujetoStateAPI()(implicit actor: DomicilioSujetoActor, system: akka.actor.typed.ActorSystem[_])
-    extends QueryStateAPI {
+case class DomicilioSujetoStateAPI(actor: DomicilioSujetoActor, monitoring: Monitoring)(
+    implicit
+    system: akka.actor.typed.ActorSystem[_]
+) extends QueryStateAPI(monitoring) {
   import DomicilioSujetoStateAPI._
   def getState: Route =
     withSujeto { sujetoId =>
@@ -22,7 +25,7 @@ case class DomicilioSujetoStateAPI()(implicit actor: DomicilioSujetoActor, syste
       }
     }
 
-  def routes: Route = GET(getState)
+  def route: Route = GET(getState)
 }
 
 object DomicilioSujetoStateAPI {

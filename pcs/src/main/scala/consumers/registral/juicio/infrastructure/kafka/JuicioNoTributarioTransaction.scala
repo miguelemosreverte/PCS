@@ -7,21 +7,24 @@ import consumers.registral.juicio.application.entities.JuicioExternalDto.{Detall
 import consumers.registral.juicio.infrastructure.dependency_injection.JuicioActor
 import consumers.registral.juicio.infrastructure.json._
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import monitoring.Monitoring
 import play.api.libs.json.Reads
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class JuicioNoTributarioTransaction()(implicit actorRef: JuicioActor, system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction {
+case class JuicioNoTributarioTransaction(actorRef: JuicioActor, monitoring: Monitoring)(
+    implicit
+    system: akka.actor.typed.ActorSystem[_],
+    ec: ExecutionContext
+) extends ActorTransaction[JuicioAnt](monitoring) {
 
   val topic = "DGR-COP-JUICIOS-ANT"
 
-  override def transaction(input: String): Future[Done] = {
+  override def processCommand(registro: JuicioAnt): Future[Done] = {
 
     implicit val b: Reads[Seq[DetallesJuicio]] = Reads.seq(DetallesJuicioF.reads)
 
-    val registro = decodeF[JuicioAnt](input)
     val detalles: Option[Seq[DetallesJuicio]] = for {
       bjuDetalles <- (registro.BJU_OTROS_ATRIBUTOS \ "BJU_DETALLES").toOption
       detalles = serialization.decodeF[Seq[DetallesJuicio]](bjuDetalles.toString)

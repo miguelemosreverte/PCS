@@ -1,6 +1,6 @@
 package consumers.no_registral.cotitularidad.infrastructure.main
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import consumers.no_registral.cotitularidad.infrastructure.dependency_injection.CotitularidadActor
@@ -10,17 +10,20 @@ import consumers.no_registral.cotitularidad.infrastructure.kafka.{
   CotitularPublishSnapshotTransaction
 }
 import kafka.KafkaMessageProcessorRequirements
+import monitoring.Monitoring
+
+import scala.concurrent.ExecutionContext
 
 object CotitularidadMicroservice {
 
-  def routes(implicit system: ActorSystem): Route = {
-    implicit val actor =
+  def route(monitoring: Monitoring, ec: ExecutionContext)(implicit system: ActorSystem): Route = {
+    implicit val actor: ActorRef =
       CotitularidadActor.startWithRequirements(KafkaMessageProcessorRequirements.productionSettings())
-    import system.dispatcher
+    implicit val e: ExecutionContext = ec
     Seq(
-      CotitularidadStateAPI().routes,
-      AddCotitularTransaction().routesClassic,
-      CotitularPublishSnapshotTransaction().routesClassic
+      CotitularidadStateAPI(actor, monitoring).route,
+      AddCotitularTransaction(actor, monitoring).routeClassic,
+      CotitularPublishSnapshotTransaction(actor, monitoring).routeClassic
     ) reduce (_ ~ _)
   }
 }

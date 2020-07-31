@@ -1,6 +1,6 @@
 package consumers.registral.plan_pago.infrastructure.main
 
-import akka.actor.ActorSystem
+import akka.actor.{typed, ActorSystem}
 import akka.http.scaladsl.server.Route
 import consumers.registral.plan_pago.infrastructure.dependency_injection.PlanPagoActor
 import consumers.registral.plan_pago.infrastructure.http.PlanPagoStateAPI
@@ -8,19 +8,23 @@ import consumers.registral.plan_pago.infrastructure.kafka.{
   PlanPagoNoTributarioTransaction,
   PlanPagoTributarioTransaction
 }
+import monitoring.Monitoring
+
+import scala.concurrent.ExecutionContext
 
 object PlanPagoMicroservice {
 
   import akka.http.scaladsl.server.Directives._
-  def routes(implicit system: ActorSystem): Route = {
+  def route(monitoring: Monitoring, ec: ExecutionContext)(implicit system: ActorSystem): Route = {
     import akka.actor.typed.scaladsl.adapter._
 
-    implicit val typedSystem = system.toTyped
-    implicit val actor = PlanPagoActor()
+    implicit val typedSystem: typed.ActorSystem[Nothing] = system.toTyped
+    implicit val actor: PlanPagoActor = PlanPagoActor()
+    implicit val e: ExecutionContext = ec
     Seq(
-      PlanPagoStateAPI().routes,
-      PlanPagoTributarioTransaction().routes,
-      PlanPagoNoTributarioTransaction().routes
+      PlanPagoStateAPI(actor, monitoring).route,
+      PlanPagoTributarioTransaction(actor, monitoring).route,
+      PlanPagoNoTributarioTransaction(actor, monitoring).route
     ) reduce (_ ~ _)
   }
 }

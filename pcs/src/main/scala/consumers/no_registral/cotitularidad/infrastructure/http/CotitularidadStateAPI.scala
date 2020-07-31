@@ -5,12 +5,14 @@ import java.time.LocalDateTime
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.Route
-import components.QueryStateAPI
 import consumers.no_registral.cotitularidad.application.entities.CotitularidadQueries.GetCotitulares
 import consumers.no_registral.cotitularidad.application.entities.CotitularidadResponses.GetCotitularesResponse
 import consumers.no_registral.cotitularidad.infrastructure.json._
+import design_principles.actor_model.mechanism.QueryStateAPI
+import monitoring.Monitoring
 
-case class CotitularidadStateAPI()(implicit actor: ActorRef, system: ActorSystem) extends QueryStateAPI {
+case class CotitularidadStateAPI(actor: ActorRef, monitoring: Monitoring)(implicit system: ActorSystem)
+    extends QueryStateAPI(monitoring) {
   import CotitularidadStateAPI._
   def getState: Route =
     withObjeto { objetoId =>
@@ -23,7 +25,7 @@ case class CotitularidadStateAPI()(implicit actor: ActorRef, system: ActorSystem
 
     }
 
-  def routes: Route = GET(getState)
+  def route: Route = GET(getState)
 }
 
 object CotitularidadStateAPI {

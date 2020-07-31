@@ -7,12 +7,14 @@ import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.model.StatusCodes.OK
 import akka.http.scaladsl.server.Directives.{path, _}
 import akka.http.scaladsl.server.Route
-import components.QueryStateAPI
 import consumers.no_registral.objeto.application.entities.ObjetoQueries.{GetStateExencion, GetStateObjeto}
 import consumers.no_registral.objeto.application.entities.ObjetoResponses.{GetExencionResponse, GetObjetoResponse}
 import consumers.no_registral.objeto.infrastructure.json._
+import design_principles.actor_model.mechanism.QueryStateAPI
+import monitoring.Monitoring
 
-case class ObjetoStateAPI()(implicit actor: ActorRef, system: ActorSystem) extends QueryStateAPI {
+case class ObjetoStateAPI(actor: ActorRef, monitoring: Monitoring)(implicit system: ActorSystem)
+    extends QueryStateAPI(monitoring) {
   import ObjetoStateAPI._
 
   def developerTools: Route =
@@ -63,7 +65,7 @@ case class ObjetoStateAPI()(implicit actor: ActorRef, system: ActorSystem) exten
       }
     }
 
-  def routes: Route = GET(getState) ~ GET(getExencion) ~ POST(developerTools)
+  def route: Route = GET(getState) ~ GET(getExencion) ~ POST(developerTools)
 
 }
 

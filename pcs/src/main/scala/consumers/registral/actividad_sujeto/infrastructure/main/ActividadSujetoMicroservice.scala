@@ -9,15 +9,17 @@ import consumers.registral.actividad_sujeto.infrastructure.http.ActividadSujetoS
 import consumers.registral.actividad_sujeto.infrastructure.kafka.ActividadSujetoTransaction
 import monitoring.Monitoring
 
+import scala.concurrent.ExecutionContext
+
 object ActividadSujetoMicroservice {
 
-  def route(monitoring: Monitoring)(implicit system: ActorSystem): Route = {
+  def route(monitoring: Monitoring, ec: ExecutionContext)(implicit system: ActorSystem): Route = {
     implicit val typedSystem: typed.ActorSystem[Nothing] = system.toTyped
     implicit val actor: ActividadSujetoActor = ActividadSujetoActor()
-
+    implicit val e: ExecutionContext = ec
     Seq(
-      ActividadSujetoStateAPI(monitoring).route,
-      ActividadSujetoTransaction(monitoring).route
+      ActividadSujetoStateAPI(actor, monitoring).route,
+      ActividadSujetoTransaction(actor, monitoring).route
     ) reduce (_ ~ _)
   }
 

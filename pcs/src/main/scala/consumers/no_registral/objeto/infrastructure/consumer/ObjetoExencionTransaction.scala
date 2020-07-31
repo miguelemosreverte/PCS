@@ -10,20 +10,10 @@ import consumers.no_registral.objeto.infrastructure.json._
 import monitoring.Monitoring
 import serialization.decodeF
 
-case class ObjetoExencionTransaction(monitoring: Monitoring)(implicit actorRef: ActorRef, ec: ExecutionContext)
-    extends ActorTransaction(monitoring) {
+case class ObjetoExencionTransaction(actorRef: ActorRef, monitoring: Monitoring)(implicit ec: ExecutionContext)
+    extends ActorTransaction[Exencion](monitoring) {
 
   val topic = "DGR-COP-EXENCIONES"
-
-  override def transaction(input: String): Future[Done] =
-    for {
-      cmd <- processInput(input)
-      done <- processCommand(cmd)
-    } yield done
-
-  def processInput(input: String): Future[Exencion] = Future {
-    decodeF[Exencion](input)
-  }
 
   def processCommand(exencion: Exencion): Future[Done] = {
     val command = ObjetoCommands.ObjetoAddExencion(

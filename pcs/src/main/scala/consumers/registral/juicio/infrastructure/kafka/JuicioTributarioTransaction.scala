@@ -11,19 +11,20 @@ import monitoring.Monitoring
 import play.api.libs.json.Reads
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class JuicioTributarioTransaction(monitoring: Monitoring)(implicit actorRef: JuicioActor,
-                                                               system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction(monitoring) {
+case class JuicioTributarioTransaction(actor: JuicioActor, monitoring: Monitoring)(
+    implicit
+    system: akka.actor.typed.ActorSystem[_],
+    ec: ExecutionContext
+) extends ActorTransaction[JuicioTri](monitoring) {
 
   val topic = "DGR-COP-JUICIOS-TRI"
 
-  override def transaction(input: String): Future[Done] = {
+  override def processCommand(registro: JuicioTri): Future[Done] = {
 
     implicit val b: Reads[Seq[DetallesJuicio]] = Reads.seq(DetallesJuicioF.reads)
 
-    val registro = decodeF[JuicioTri](input)
     val detalles: Option[Seq[DetallesJuicio]] = for {
       bjuDetalles <- (registro.BJU_OTROS_ATRIBUTOS \ "BJU_DETALLES").toOption
       detalles = serialization.decodeF[Seq[DetallesJuicio]](bjuDetalles.toString)
@@ -40,7 +41,7 @@ case class JuicioTributarioTransaction(monitoring: Monitoring)(implicit actorRef
         detalles.getOrElse(Seq.empty)
       )
 
-    actorRef ask command
+    actor ask command
   }
 
 }

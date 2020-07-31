@@ -10,9 +10,10 @@ import consumers.registral.calendario.infrastructure.json._
 import design_principles.actor_model.mechanism.QueryStateAPI
 import monitoring.Monitoring
 
-case class CalendarioStateAPI(monitoring: Monitoring)(implicit actor: CalendarioActor,
-                                                      system: akka.actor.typed.ActorSystem[_])
-    extends QueryStateAPI(monitoring) {
+case class CalendarioStateAPI(actor: CalendarioActor, monitoring: Monitoring)(
+    implicit
+    system: akka.actor.typed.ActorSystem[_]
+) extends QueryStateAPI(monitoring) {
   import CalendarioStateAPI._
   def getState: Route =
     withCalendario { calendarioId =>

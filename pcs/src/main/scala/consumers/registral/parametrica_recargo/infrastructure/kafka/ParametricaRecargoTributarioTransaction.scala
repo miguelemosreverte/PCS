@@ -13,25 +13,22 @@ import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class ParametricaRecargoTributarioTransaction(monitoring: Monitoring)(implicit actor: ParametricaRecargoActor,
-                                                                           system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction(monitoring) {
+case class ParametricaRecargoTributarioTransaction(actor: ParametricaRecargoActor, monitoring: Monitoring)(
+    implicit
+    system: akka.actor.typed.ActorSystem[_],
+    ec: ExecutionContext
+) extends ActorTransaction[ParametricaRecargoTri](monitoring) {
 
   val topic = "DGR-COP-PARAMRECARGO-TRI"
 
-  override def transaction(input: String): Future[Done] = {
-
-    val registro: ParametricaRecargoTri = decodeF[ParametricaRecargoTri](input)
-    val command = registro match {
-      case registro: ParametricaRecargoExternalDto.ParametricaRecargoTri =>
-        ParametricaRecargoCommands.ParametricaRecargoUpdateFromDto(
-          parametricaRecargoId = registro.BPR_INDICE,
-          deliveryId = BigInt(registro.EV_ID),
-          registro = registro
-        )
-    }
+  override def processCommand(registro: ParametricaRecargoTri): Future[Done] = {
+    val command = ParametricaRecargoCommands.ParametricaRecargoUpdateFromDto(
+      parametricaRecargoId = registro.BPR_INDICE,
+      deliveryId = BigInt(registro.EV_ID),
+      registro = registro
+    )
     actor ask command
   }
 }

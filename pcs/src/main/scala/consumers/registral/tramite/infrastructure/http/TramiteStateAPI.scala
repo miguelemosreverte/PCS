@@ -10,8 +10,8 @@ import consumers.registral.tramite.infrastructure.json._
 import design_principles.actor_model.mechanism.QueryStateAPI
 import monitoring.Monitoring
 
-case class TramiteStateAPI(monitoring: Monitoring)(implicit actor: TramiteActor,
-                                                   system: akka.actor.typed.ActorSystem[_])
+case class TramiteStateAPI(actor: TramiteActor, monitoring: Monitoring)(implicit
+                                                                        system: akka.actor.typed.ActorSystem[_])
     extends QueryStateAPI(monitoring) {
   import TramiteStateAPI._
   def getState: Route =

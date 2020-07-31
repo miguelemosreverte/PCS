@@ -10,15 +10,16 @@ import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class CalendarioTransaction(monitoring: Monitoring)(implicit actor: CalendarioActor, system: ActorSystem[_])
-    extends ActorTransaction(monitoring) {
+case class CalendarioTransaction(actor: CalendarioActor, monitoring: Monitoring)(implicit
+                                                                                 system: ActorSystem[_],
+                                                                                 ec: ExecutionContext)
+    extends ActorTransaction[CalendarioExternalDto](monitoring) {
 
   val topic = "DGR-COP-CALENDARIOS"
 
-  override def transaction(input: String): Future[Done] = {
-    val registro: CalendarioExternalDto = decodeF[CalendarioExternalDto](input)
+  override def processCommand(registro: CalendarioExternalDto): Future[Done] = {
     val command = registro match {
       case registro: CalendarioExternalDto =>
         CalendarioCommands.CalendarioUpdateFromDto(

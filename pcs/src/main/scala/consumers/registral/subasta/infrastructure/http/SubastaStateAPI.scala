@@ -10,8 +10,8 @@ import consumers.registral.subasta.infrastructure.json._
 import design_principles.actor_model.mechanism.QueryStateAPI
 import monitoring.Monitoring
 
-case class SubastaStateAPI(monitoring: Monitoring)(implicit actor: SubastaActor,
-                                                   system: akka.actor.typed.ActorSystem[_])
+case class SubastaStateAPI(actor: SubastaActor, monitoring: Monitoring)(implicit
+                                                                        system: akka.actor.typed.ActorSystem[_])
     extends QueryStateAPI(monitoring) {
   import SubastaStateAPI._
   def getState: Route =

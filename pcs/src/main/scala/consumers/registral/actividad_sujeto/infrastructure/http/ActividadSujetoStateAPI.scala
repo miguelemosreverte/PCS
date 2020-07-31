@@ -11,7 +11,7 @@ import consumers.registral.actividad_sujeto.infrastructure.json._
 import design_principles.actor_model.mechanism.QueryStateAPI
 import monitoring.Monitoring
 
-case class ActividadSujetoStateAPI(monitoring: Monitoring)(implicit actor: ActividadSujetoActor, system: ActorSystem[_])
+case class ActividadSujetoStateAPI(actor: ActividadSujetoActor, monitoring: Monitoring)(implicit system: ActorSystem[_])
     extends QueryStateAPI(monitoring) {
   import ActividadSujetoStateAPI._
   def getState: Route =

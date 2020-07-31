@@ -10,20 +10,10 @@ import design_principles.actor_model.mechanism.TypedAsk.AkkaClassicTypedAsk
 import monitoring.Monitoring
 import play.api.libs.json.Json
 
-case class AddCotitularTransaction(monitoring: Monitoring)(implicit actorRef: ActorRef, ec: ExecutionContext)
-    extends ActorTransaction(monitoring) {
+case class AddCotitularTransaction(actorRef: ActorRef, monitoring: Monitoring)(implicit ec: ExecutionContext)
+    extends ActorTransaction[CotitularidadAddSujetoCotitular](monitoring) {
 
   val topic = "AddCotitularTransaction"
-
-  override def transaction(input: String): Future[Done] =
-    for {
-      cmd <- processInput(input)
-      done <- processCommand(cmd)
-    } yield done
-
-  def processInput(input: String): Future[CotitularidadAddSujetoCotitular] = Future {
-    Json.parse(input).as[CotitularidadAddSujetoCotitular]
-  }
 
   def processCommand(cmd: CotitularidadAddSujetoCotitular): Future[Done] = {
     actorRef.ask[akka.Done](cmd)

@@ -10,9 +10,10 @@ import consumers.registral.parametrica_plan.infrastructure.json._
 import design_principles.actor_model.mechanism.QueryStateAPI
 import monitoring.Monitoring
 
-case class ParametricaPlanStateAPI(monitoring: Monitoring)(implicit actor: ParametricaPlanActor,
-                                                           system: akka.actor.typed.ActorSystem[_])
-    extends QueryStateAPI(monitoring) {
+case class ParametricaPlanStateAPI(actor: ParametricaPlanActor, monitoring: Monitoring)(
+    implicit
+    system: akka.actor.typed.ActorSystem[_]
+) extends QueryStateAPI(monitoring) {
   import ParametricaPlanStateAPI._
 
   def getState: Route =

@@ -10,27 +10,25 @@ import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class PlanPagoTributarioTransaction(monitoring: Monitoring)(implicit actor: PlanPagoActor,
-                                                                 system: akka.actor.typed.ActorSystem[_])
-    extends ActorTransaction(monitoring) {
+case class PlanPagoTributarioTransaction(actor: PlanPagoActor, monitoring: Monitoring)(
+    implicit
+    system: akka.actor.typed.ActorSystem[_],
+    ec: ExecutionContext
+) extends ActorTransaction[PlanPagoTri](monitoring) {
 
   val topic = "DGR-COP-PLANES-TRI"
 
-  override def transaction(input: String): Future[Done] = {
-    val registro: PlanPagoTri = decodeF[PlanPagoTri](input)
-    val command = registro match {
-      case registro: PlanPagoExternalDto.PlanPagoTri =>
-        PlanPagoCommands.PlanPagoUpdateFromDto(
-          sujetoId = registro.BPL_SUJ_IDENTIFICADOR,
-          objetoId = registro.BPL_SOJ_IDENTIFICADOR,
-          tipoObjeto = registro.BPL_SOJ_TIPO_OBJETO,
-          planPagoId = registro.BPL_PLN_ID,
-          deliveryId = BigInt(registro.EV_ID),
-          registro = registro
-        )
-    }
+  override def processCommand(registro: PlanPagoTri): Future[Done] = {
+    val command = PlanPagoCommands.PlanPagoUpdateFromDto(
+      sujetoId = registro.BPL_SUJ_IDENTIFICADOR,
+      objetoId = registro.BPL_SOJ_IDENTIFICADOR,
+      tipoObjeto = registro.BPL_SOJ_TIPO_OBJETO,
+      planPagoId = registro.BPL_PLN_ID,
+      deliveryId = BigInt(registro.EV_ID),
+      registro = registro
+    )
     actor ask command
   }
 }

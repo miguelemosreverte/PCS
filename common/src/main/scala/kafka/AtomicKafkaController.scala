@@ -12,7 +12,7 @@ import monitoring.Monitoring
 
 object AtomicKafkaController {
   def fromTyped(
-      actorTransaction: ActorTransaction,
+      actorTransaction: ActorTransaction[_],
       monitoring: Monitoring
   )(implicit system: akka.actor.typed.ActorSystem[_]): AtomicKafkaController = {
     import akka.actor.typed.scaladsl.adapter._
@@ -20,7 +20,7 @@ object AtomicKafkaController {
   }
 }
 
-case class AtomicKafkaController(actorTransaction: ActorTransaction, monitoring: Monitoring)(
+case class AtomicKafkaController(actorTransaction: ActorTransaction[_], monitoring: Monitoring)(
     implicit system: ActorSystem
 ) extends Controller(monitoring) {
 
@@ -60,13 +60,19 @@ case class AtomicKafkaController(actorTransaction: ActorTransaction, monitoring:
     post {
       pathPrefix("start") {
         path(actorTransaction.topic) {
-          for {
-            _ <- actorTransactionController.ask[akka.Done](StopStartKafkaActor.StartKafka())
-          } yield akka.Done
+          handleErrors(exceptionHandler) {
+            latency.recordFuture {
+              for {
+                _ <- actorTransactionController.ask[akka.Done](StopStartKafkaActor.StartKafka())
+              } yield akka.Done
+            }
 
-          killSwitches = startTransaction()
-          isKafkaStarted = true
-          complete("Starting Kafka")
+            killSwitches = startTransaction()
+            isKafkaStarted = true
+            requests.increment()
+
+            complete("Starting Kafka")
+          }
         }
       }
     }
@@ -76,16 +82,21 @@ case class AtomicKafkaController(actorTransaction: ActorTransaction, monitoring:
     post {
       pathPrefix("stop") {
         path(actorTransaction.topic) {
-          for {
-            _ <- actorTransactionController.ask[akka.Done](StopStartKafkaActor.StopKafka())
-          } yield akka.Done
 
-          killSwitches.shutdown()
-          log.info("Stopped Kafka")
-          killSwitches = null
-          isKafkaStarted = false
+          handleErrors(exceptionHandler) {
+            latency.recordFuture {
+              for {
+                _ <- actorTransactionController.ask[akka.Done](StopStartKafkaActor.StopKafka())
+              } yield akka.Done
+            }
 
-          complete("Stopping Kafka")
+            killSwitches.shutdown()
+            log.info("Stopped Kafka")
+            killSwitches = null
+            isKafkaStarted = false
+            requests.increment()
+            complete("Stopping Kafka")
+          }
         }
       }
     }

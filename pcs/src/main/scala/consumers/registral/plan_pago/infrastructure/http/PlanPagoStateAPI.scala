@@ -10,8 +10,8 @@ import consumers.registral.plan_pago.infrastructure.json._
 import design_principles.actor_model.mechanism.QueryStateAPI
 import monitoring.Monitoring
 
-case class PlanPagoStateAPI(monitoring: Monitoring)(implicit actor: PlanPagoActor,
-                                                    system: akka.actor.typed.ActorSystem[_])
+case class PlanPagoStateAPI(actor: PlanPagoActor, monitoring: Monitoring)(implicit
+                                                                          system: akka.actor.typed.ActorSystem[_])
     extends QueryStateAPI(monitoring) {
   import PlanPagoStateAPI._
 

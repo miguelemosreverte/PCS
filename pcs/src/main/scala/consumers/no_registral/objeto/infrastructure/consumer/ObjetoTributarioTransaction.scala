@@ -11,20 +11,10 @@ import monitoring.Monitoring
 import play.api.libs.json.Reads
 import serialization.decodeF
 
-case class ObjetoTributarioTransaction(monitoring: Monitoring)(implicit actorRef: ActorRef, ec: ExecutionContext)
-    extends ActorTransaction(monitoring) {
+case class ObjetoTributarioTransaction(actorRef: ActorRef, monitoring: Monitoring)(implicit ec: ExecutionContext)
+    extends ActorTransaction[ObjetosTri](monitoring) {
 
   val topic = "DGR-COP-OBJETOS-TRI"
-
-  override def transaction(input: String): Future[Done] =
-    for {
-      cmd <- processInput(input)
-      done <- processCommand(cmd)
-    } yield done
-
-  def processInput(input: String): Future[ObjetosTri] = Future {
-    decodeF[ObjetosTri](input)
-  }
 
   def processCommand(registro: ObjetosTri): Future[Done] = {
     implicit val a: Reads[Seq[ObjetosTri]] = Reads.seq(ObjetosTriF.reads)

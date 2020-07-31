@@ -11,26 +11,23 @@ import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
 import serialization.decodeF
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-case class DeclaracionJuradaTransaction(monitoring: Monitoring)(implicit actor: DeclaracionJuradaActor,
-                                                                system: ActorSystem[_])
-    extends ActorTransaction(monitoring) {
+case class DeclaracionJuradaTransaction(actor: DeclaracionJuradaActor, monitoring: Monitoring)(implicit
+                                                                                               system: ActorSystem[_],
+                                                                                               ec: ExecutionContext)
+    extends ActorTransaction[DeclaracionJurada](monitoring) {
   val topic = "DGR-COP-DECJURADAS"
 
-  override def transaction(input: String): Future[Done] = {
-    val registro: DeclaracionJurada = decodeF[DeclaracionJurada](input)
-    val command = registro match {
-      case registro: DeclaracionJurada =>
-        DeclaracionJuradaCommands.DeclaracionJuradaUpdateFromDto(
-          sujetoId = registro.BDJ_SUJ_IDENTIFICADOR,
-          objetoId = registro.BDJ_SOJ_IDENTIFICADOR,
-          tipoObjeto = registro.BDJ_SOJ_TIPO_OBJETO,
-          declaracionJuradaId = registro.BDJ_DDJ_ID,
-          deliveryId = BigInt(registro.EV_ID),
-          registro = registro
-        )
-    }
+  override def processCommand(registro: DeclaracionJurada): Future[Done] = {
+    val command = DeclaracionJuradaCommands.DeclaracionJuradaUpdateFromDto(
+      sujetoId = registro.BDJ_SUJ_IDENTIFICADOR,
+      objetoId = registro.BDJ_SOJ_IDENTIFICADOR,
+      tipoObjeto = registro.BDJ_SOJ_TIPO_OBJETO,
+      declaracionJuradaId = registro.BDJ_DDJ_ID,
+      deliveryId = BigInt(registro.EV_ID),
+      registro = registro
+    )
 
     actor ask command
 

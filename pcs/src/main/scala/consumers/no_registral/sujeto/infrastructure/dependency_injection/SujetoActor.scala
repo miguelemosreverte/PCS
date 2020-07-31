@@ -59,7 +59,7 @@ class SujetoActor(objetoActorProps: Props = ObjetoActor.props) extends Persisten
       objetos((evt.sujetoId, evt.objetoId, evt.tipoObjeto))
   }
 
-  def persistSnapshot()(handler: () => Unit = () => Unit): Unit = {
+  def persistSnapshot()(handler: () => Unit = () => ()): Unit = {
     val sujetoId = SujetoMessageRoots.extractor(persistenceId).sujetoId
     val event = SujetoSnapshotPersisted(0, sujetoId, state.registro, state.saldo)
     persistEvent(event, SujetoTags.SujetoReadside)(handler)

@@ -36,21 +36,3 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-
-  grafana:
-    build: './grafana'
-    container_name: 'grafana'
-    network_mode: host
-    ports:
-      - '3000:3000'
-
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    network_mode: host
-    ports:
-      - 9090:9090
-    command:
-      - --config.file=/etc/prometheus/prometheus.yml
-    volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro

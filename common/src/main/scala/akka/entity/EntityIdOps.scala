@@ -5,14 +5,6 @@ import scala.io.Codec
 import java.nio.charset.CodingErrorAction
 
 object EntityIdOps {
-
-  object AggregateRootCandidates {
-    val separatedByUpperLine: String = "11-22"
-    val justString: String = "Foo22"
-    val numeric: String = "22"
-    val uuid: String = "00000000-0000-0000-C000-000000000046"
-  }
-
   val mapping: Map[Char, Int] = {
     val decoder = Codec.UTF8.decoder.onMalformedInput(CodingErrorAction.IGNORE)
     Source
@@ -42,5 +34,4 @@ object EntityIdOps {
       .reduce(_ + _)
 
   def fromEncodedToBigInt(encoded: String): BigInt = BigInt(encoded.split('|').mkString(""))
-
 }

@@ -18,7 +18,6 @@ object AvailablePortProvider {
     val r = new scala.util.Random
     val availablePort = new ServerSocket(0).getLocalPort //r.between(2600, 2601 + maxReasonableAmmountOfTests)
 
-
     if (givenPorts contains availablePort)
       port
     else {

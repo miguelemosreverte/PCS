@@ -61,7 +61,7 @@ class SujetoActor(objetoActorProps: Props = ObjetoActor.props) extends Persisten
 
   def persistSnapshot(): Unit = {
     val sujetoId = SujetoMessageRoots.extractor(persistenceId).sujetoId
-    val event = SujetoSnapshotPersisted(0, sujetoId, state.registro, state.saldo)
+    val event = SujetoSnapshotPersisted(state.registro.map(_.EV_ID).getOrElse(0), sujetoId, state.registro, state.saldo)
     persistEvent(event, SujetoTags.SujetoReadside)(() => ())
   }
 

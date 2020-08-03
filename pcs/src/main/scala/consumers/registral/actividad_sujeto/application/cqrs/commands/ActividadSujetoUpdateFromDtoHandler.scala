@@ -8,7 +8,8 @@ import consumers.registral.actividad_sujeto.domain.ActividadSujetoState
 
 class ActividadSujetoUpdateFromDtoHandler() {
 
-  def handle(command: ActividadSujetoUpdateFromDto)(replyTo: ActorRef[akka.Done]) =
+  def handle(command: ActividadSujetoUpdateFromDto)(replyTo: ActorRef[akka.Done]) = {
+    println("[ACTIVIDAD_SUJETO ACTOR] HERE THE MESSAGE ARRIVES: " + command)
     Effect
       .persist[
         ActividadSujetoUpdatedFromDto,
@@ -21,5 +22,6 @@ class ActividadSujetoUpdateFromDtoHandler() {
         )
       )
       .thenReply(replyTo)(state => akka.Done)
+  }
 
 }

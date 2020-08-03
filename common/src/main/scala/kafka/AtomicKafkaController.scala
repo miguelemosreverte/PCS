@@ -40,6 +40,8 @@ case class AtomicKafkaController(actorTransaction: ActorTransaction[_], monitori
 
   def startTransaction(): UniqueKillSwitch = {
     log.info(s"Starting transactional consumer for $topic")
+
+    println(s"Starting transaction ${actorTransaction.topic} 3?")
     val (killSwitch, done) = new KafkaTransactionalMessageProcessor()
       .run(topic, s"${topic}SINK", message => {
         requirements.actorTransactions.transaction(message).map { output: akka.Done =>
@@ -60,13 +62,14 @@ case class AtomicKafkaController(actorTransaction: ActorTransaction[_], monitori
     post {
       pathPrefix("start") {
         path(actorTransaction.topic) {
+          println(s"Starting transaction ${actorTransaction.topic} 1?")
           handleErrors(exceptionHandler) {
             latency.recordFuture {
               for {
                 _ <- actorTransactionController.ask[akka.Done](StopStartKafkaActor.StartKafka())
               } yield akka.Done
             }
-
+            println(s"Starting transaction ${actorTransaction.topic} 2?")
             killSwitches = startTransaction()
             isKafkaStarted = true
             requests.increment()

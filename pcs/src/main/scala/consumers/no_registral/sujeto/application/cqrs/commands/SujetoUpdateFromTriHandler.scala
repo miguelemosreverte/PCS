@@ -20,6 +20,7 @@ class SujetoUpdateFromTriHandler(actor: SujetoActor) extends SyncCommandHandler[
       replyTo ! akka.Done
     } else {
       actor.persistEvent(event) { () =>
+        println("[SUJETO ACTOR] HERE THE MESSAGE ARRIVES: " + command)
         actor.state += event
         actor.persistSnapshot()
         replyTo ! akka.Done

@@ -1,9 +1,10 @@
 package kafka
 
+import java.util.UUID
+
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.kafka.scaladsl.Transactional
@@ -32,6 +33,7 @@ class KafkaTransactionalMessageProcessor()(
       algorithm: String => Future[Seq[String]]
   ): (KillSwitch, Future[Done]) = {
 
+    println(s"Starting transaction ${SOURCE_TOPIC} 3?")
     type Msg = ConsumerMessage.TransactionalMessage[String, String]
 
     implicit val system: ActorSystem = transactionRequirements.system
@@ -39,9 +41,18 @@ class KafkaTransactionalMessageProcessor()(
     val producer = transactionRequirements.producer
 
     import system.dispatcher
+    println(s"Starting transaction ${SOURCE_TOPIC} 3.5?")
+
+    import akka.actor.typed.scaladsl.adapter._
+    val rebalancerRef =
+      transactionRequirements.system
+        .spawn(TopicListener(this.getClass.getName + UUID.randomUUID()), "rebalancerRef" + UUID.randomUUID())
+    println(s"Starting transaction ${SOURCE_TOPIC} 4?")
+
+    val subscription = Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerRef.toClassic)
 
     val stream = Transactional
-      .source(consumer, Subscriptions.topics(SOURCE_TOPIC))
+      .source(consumer, subscription) //Subscriptions.topics(SOURCE_TOPIC))
       .throttle(THROTTLE_ELEMENTS, THROTTLE_ELEMENTS_PER millis)
       .mapAsync(CONSUMER_PARALLELISM) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
         val message = msg
@@ -49,6 +60,8 @@ class KafkaTransactionalMessageProcessor()(
         val input: String = message.record.value
 
         log.debug(message.record.value)
+
+        println("[KAFKA TRANSACTION] HERE THE MESSAGE ARRIVES: " + message.record.value())
 
         algorithm(input)
           .map { a: Seq[String] =>

@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
   // Versions
   lazy val scalaVersion = "2.13.1"
-  private lazy val akkaVersion = "2.6.6"
+  private lazy val akkaVersion = "2.6.5"
 
   // Resolvers
   lazy val commonResolvers = Seq(
@@ -151,7 +151,7 @@ object Dependencies {
 
   // Projects
   lazy val mainDeps
-    : Seq[sbt.ModuleID] = Akka.modules ++ ScalaZ.modules ++ Cassandra.modules ++ Utils.modules ++ Kamon.modules
+      : Seq[sbt.ModuleID] = Akka.modules ++ ScalaZ.modules ++ Cassandra.modules ++ Utils.modules ++ Kamon.modules
   lazy val testDeps: Seq[sbt.ModuleID] = Test.modules ++ TestDB.modules
 }
 

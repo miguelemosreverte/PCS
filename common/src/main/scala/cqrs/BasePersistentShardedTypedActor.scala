@@ -1,8 +1,16 @@
 package cqrs
 
+import java.nio.charset.StandardCharsets
+
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
-import akka.cluster.sharding.typed.HashCodeNoEnvelopeMessageExtractor
+import akka.cluster.sharding.external.ExternalShardAllocationStrategy
+import akka.cluster.sharding.typed.{
+  ClusterShardingSettings,
+  HashCodeNoEnvelopeMessageExtractor,
+  Murmur2NoEnvelopeMessageExtractor,
+  ShardingMessageExtractor
+}
 import akka.cluster.sharding.typed.scaladsl.{ClusterSharding, Entity, EntityRef, EntityTypeKey}
 import akka.persistence.typed.PersistenceId
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
@@ -12,8 +20,8 @@ import design_principles.actor_model.{Command, Query}
 import cqrs.typed.command.SyncEffectCommandBus
 import cqrs.typed.query.SyncEffectQueryBus
 import org.slf4j.LoggerFactory
-import scala.reflect.ClassTag
 
+import scala.reflect.ClassTag
 import cqrs.typed.event.SyncEffectEventBus
 
 abstract class BasePersistentShardedTypedActor[ActorMessages <: design_principles.actor_model.ShardedMessage: ClassTag,
@@ -31,12 +39,28 @@ abstract class BasePersistentShardedTypedActor[ActorMessages <: design_principle
   // shards as there are nodes, hence the numberOfShards value of 30
   val messageExtractor: HashCodeNoEnvelopeMessageExtractor[ActorMessages] =
     new HashCodeNoEnvelopeMessageExtractor[ActorMessages](numberOfShards = 30) {
-      override def entityId(message: ActorMessages): String = message.aggregateRoot
+      override def entityId(message: ActorMessages): String = message.aggregateRoot.hashCode.toString
     }
+
+  class UserIdMessageExtractor(nrKafkaPartitions: Int) extends ShardingMessageExtractor[ActorMessages, ActorMessages] {
+    override def entityId(message: ActorMessages): String = message.aggregateRoot
+
+    override def shardId(entityId: String): String = {
+      import org.apache.kafka.common.utils.Utils.{murmur2 => KafkaMurmur2}
+      val clean = entityId.hashCode.toString
+      val a = KafkaMurmur2(clean.getBytes(StandardCharsets.UTF_8))
+      (math.abs(a) % nrKafkaPartitions).toString
+    }
+
+    override def unwrapMessage(message: ActorMessages): ActorMessages = message
+  }
   val shardActor: ActorRef[ActorMessages] = sharding.init(
     Entity(TypeKey) { context =>
       persistentEntity(context.entityId, context.shard)
     }.withMessageExtractor(messageExtractor)
+      .withAllocationStrategy(new ExternalShardAllocationStrategy(system, TypeKey.name))
+      .withMessageExtractor(new UserIdMessageExtractor(120))
+      .withSettings(ClusterShardingSettings(system))
   )
 
   def commandHandler(state: State, command: ActorMessages): Effect[ActorEvents, State]

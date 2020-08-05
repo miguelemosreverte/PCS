@@ -14,10 +14,11 @@ import consumers.no_registral.obligacion.application.entities.{ObligacionCommand
 import consumers.no_registral.obligacion.infrastructure.dependency_injection.ObligacionActor
 import consumers.no_registral.sujeto.application.entity.SujetoCommands
 import cqrs.PersistentBaseActor
+import monitoring.Monitoring
 import utils.implicits.StringT._
 
-class ObjetoActor(obligacionActorProps: Props = ObligacionActor.props)
-    extends PersistentBaseActor[ObjetoEvents, ObjetoState] {
+class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Props] = None)
+    extends PersistentBaseActor[ObjetoEvents, ObjetoState](monitoring) {
   import ObjetoActor._
 
   var state = ObjetoState()
@@ -40,20 +41,26 @@ class ObjetoActor(obligacionActorProps: Props = ObligacionActor.props)
     queryBus.subscribe[ObjetoQueries.GetStateExencion](new GetStateExencionHandler(this).handle)
   }
 
-  val obligaciones = new ObjetoActorRefMap(
-    {
-      case (sujetoId, objetoId, tipoObjeto, obligacionId) =>
-        val obligacionAggregateRoot = ObligacionMessageRoots(
-          sujetoId,
-          objetoId,
-          tipoObjeto,
-          obligacionId
-        ).toString()
-        context.actorOf(obligacionActorProps, obligacionAggregateRoot)
-
-      case other => context.actorOf(obligacionActorProps, other toString)
+  val obligaciones = {
+    val obligacionActorProps = obligacionActorPropsOption match {
+      case Some(props) => props
+      case None => ObligacionActor.props(monitoring)
     }
-  )
+    new ObjetoActorRefMap(
+      {
+        case (sujetoId, objetoId, tipoObjeto, obligacionId) =>
+          val obligacionAggregateRoot = ObligacionMessageRoots(
+            sujetoId,
+            objetoId,
+            tipoObjeto,
+            obligacionId
+          ).toString()
+          context.actorOf(obligacionActorProps, obligacionAggregateRoot)
+
+        case other => context.actorOf(obligacionActorProps, other toString)
+      }
+    )
+  }
 
   override def receiveCommand: Receive = customReceiveCommand orElse super.receiveCommand
   override def receiveRecover: Receive = customReceiveRecover orElse super.receiveRecover
@@ -167,7 +174,7 @@ class ObjetoActor(obligacionActorProps: Props = ObligacionActor.props)
 }
 
 object ObjetoActor {
-  def props: Props = Props(new ObjetoActor)
+  def props(monitoring: Monitoring): Props = Props(new ObjetoActor(monitoring))
 
   object ObjetoTags {
     val ObjetoReadside = Set("Objeto")

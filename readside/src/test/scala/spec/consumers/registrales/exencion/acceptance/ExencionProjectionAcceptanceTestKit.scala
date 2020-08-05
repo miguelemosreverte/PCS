@@ -1,13 +1,13 @@
 package spec.consumers.registrales.exencion.acceptance
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
 import consumers.no_registral.objeto.application.entities.ObjetoMessage.ExencionMessageRoot
 import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoAddedExencion
 import design_principles.projection.infrastructure.CassandraTestkitProduction
+import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
 
@@ -35,5 +35,5 @@ class ExencionProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implici
   }
 
   def projectionHandler =
-    new readside.proyectionists.registrales.exencion.ExencionProjectionHandler()
+    new readside.proyectionists.registrales.exencion.ExencionProjectionHandler(new DummyMonitoring)
 }

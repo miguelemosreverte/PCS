@@ -1,7 +1,6 @@
 package spec.consumers.registrales.exencion.unit_test
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
@@ -9,6 +8,7 @@ import consumers.no_registral.objeto.application.entities.ObjetoMessage.Exencion
 import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoAddedExencion
 import consumers.no_registral.objeto.infrastructure.json._
 import design_principles.projection.mock.{CassandraTestkitMock, CassandraWriteMock}
+import monitoring.DummyMonitoring
 import readside.proyectionists.registrales.exencion.ExencionProjectionHandler
 import readside.proyectionists.registrales.exencion.projections.ObjetoAddedExencionProjection
 import spec.testkit.ProjectionTestkitMock
@@ -27,7 +27,7 @@ class ExencionProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: Ac
     exencionProyectionist process envelope
 
   def exencionProyectionist: ExencionProjectionHandler =
-    new readside.proyectionists.registrales.exencion.ExencionProjectionHandler() {
+    new readside.proyectionists.registrales.exencion.ExencionProjectionHandler(new DummyMonitoring) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 }

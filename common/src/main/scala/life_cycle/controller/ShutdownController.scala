@@ -6,11 +6,9 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{ExceptionHandler, Route}
 import life_cycle.AppLifecycle
 import monitoring.Monitoring
-import org.slf4j.Logger
 import play.api.libs.json.{JsObject, JsString}
 
-final class ShutdownController(appLifecycle: AppLifecycle, logger: Logger, monitoring: Monitoring)
-    extends Controller(monitoring) {
+final class ShutdownController(appLifecycle: AppLifecycle, monitoring: Monitoring) extends Controller(monitoring) {
 
   override val exceptionHandler = ExceptionHandler {
     case _ =>
@@ -22,7 +20,6 @@ final class ShutdownController(appLifecycle: AppLifecycle, logger: Logger, monit
     path("api" / "system" / "shutdown") {
       handleErrors(exceptionHandler) {
         requests.increment()
-        logger.warn("shutting down rules engine application")
         appLifecycle.shutdown()
         complete(JsObject(Map("status" -> JsString("shutting_down"))))
       }

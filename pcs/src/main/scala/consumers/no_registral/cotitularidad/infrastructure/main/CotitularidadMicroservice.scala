@@ -13,17 +13,21 @@ import kafka.KafkaMessageProcessorRequirements
 import monitoring.Monitoring
 
 import scala.concurrent.ExecutionContext
+import api.actor_transaction.ActorTransaction.Implicits._
 
 object CotitularidadMicroservice {
 
-  def route(monitoring: Monitoring, ec: ExecutionContext)(implicit system: ActorSystem): Route = {
+  def route(
+      monitoring: Monitoring,
+      ec: ExecutionContext
+  )(implicit system: ActorSystem, kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements): Route = {
     implicit val actor: ActorRef =
-      CotitularidadActor.startWithRequirements(KafkaMessageProcessorRequirements.productionSettings())
+      CotitularidadActor.startWithRequirements(kafkaMessageProcessorRequirements)
     implicit val e: ExecutionContext = ec
     Seq(
       CotitularidadStateAPI(actor, monitoring).route,
-      AddCotitularTransaction(actor, monitoring).routeClassic,
-      CotitularPublishSnapshotTransaction(actor, monitoring).routeClassic
+      AddCotitularTransaction(actor, monitoring).route,
+      CotitularPublishSnapshotTransaction(actor, monitoring).route
     ) reduce (_ ~ _)
   }
 }

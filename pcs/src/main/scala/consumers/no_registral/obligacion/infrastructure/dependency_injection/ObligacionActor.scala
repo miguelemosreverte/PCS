@@ -9,8 +9,10 @@ import consumers.no_registral.obligacion.application.entities.{ObligacionCommand
 import consumers.no_registral.obligacion.domain.{ObligacionEvents, ObligacionState}
 import consumers.no_registral.obligacion.infrastructure.event_bus.ObligacionPersistedSnapshotHandler
 import cqrs.PersistentBaseActor
+import monitoring.Monitoring
 
-class ObligacionActor() extends PersistentBaseActor[ObligacionEvents, ObligacionState] {
+class ObligacionActor(monitoring: Monitoring)
+    extends PersistentBaseActor[ObligacionEvents, ObligacionState](monitoring) {
 
   var state = ObligacionState()
 
@@ -64,7 +66,7 @@ class ObligacionActor() extends PersistentBaseActor[ObligacionEvents, Obligacion
 }
 
 object ObligacionActor {
-  def props: Props = Props(new ObligacionActor)
+  def props(monitoring: Monitoring): Props = Props(new ObligacionActor(monitoring))
 
   object ObligacionTags {
     val ObligacionReadside: Set[String] = Set("Obligacion")

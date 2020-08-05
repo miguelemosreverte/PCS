@@ -4,3 +4,6 @@ scrape_configs:
     static_configs:
       - targets:
           - 0.0.0.0:9095
+          - 0.0.0.0:5000
+          - 0.0.0.0:5001
+          - 0.0.0.0:5002

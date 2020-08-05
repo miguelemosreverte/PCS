@@ -11,102 +11,76 @@ import api.actor_transaction.ActorTransaction
 import monitoring.Monitoring
 
 object AtomicKafkaController {
-  def fromTyped(
-      actorTransaction: ActorTransaction[_],
-      monitoring: Monitoring
-  )(implicit system: akka.actor.typed.ActorSystem[_]): AtomicKafkaController = {
-    import akka.actor.typed.scaladsl.adapter._
-    new AtomicKafkaController(actorTransaction, monitoring)(system.toClassic)
-  }
-}
 
-case class AtomicKafkaController(actorTransaction: ActorTransaction[_], monitoring: Monitoring)(
-    implicit system: ActorSystem
-) extends Controller(monitoring) {
+  case class AtomicKafkaController(actorTransaction: ActorTransaction[_],
+                                   requirements: KafkaMessageProcessorRequirements)(
+      implicit system: ActorSystem
+  ) extends Controller(requirements.monitoring) {
 
-  implicit private val ec: ExecutionContextExecutor = system.dispatcher
+    implicit private val ec: ExecutionContextExecutor = system.dispatcher
 
-  implicit private val transactionRequirements: KafkaMessageProcessorRequirements =
-    KafkaMessageProcessorRequirements.productionSettings()
-  val requirements = StopStartKafka.StartStopKafkaRequirements(actorTransaction, transactionRequirements)
-  val actorTransactionController: ActorRef =
-    StopStartKafkaActor.startWithRequirements(
-      requirements
-    )
+    var killSwitches: UniqueKillSwitch = _
+    var isKafkaStarted: Boolean = false
 
-  var killSwitches: UniqueKillSwitch = _
-  var isKafkaStarted: Boolean = false
-  val topic: String = requirements.actorTransactions.topic
+    def startTransaction(): UniqueKillSwitch = {
 
-  def startTransaction(): UniqueKillSwitch = {
-    log.info(s"Starting transactional consumer for $topic")
+      val topic = actorTransaction.topic
+      val transaction = actorTransaction.transaction _
 
-    println(s"Starting transaction ${actorTransaction.topic} 3?")
-    val (killSwitch, done) = new KafkaTransactionalMessageProcessor()
-      .run(topic, s"${topic}SINK", message => {
-        requirements.actorTransactions.transaction(message).map { output: akka.Done =>
-          Seq(output.toString)
-        }
-      })
-    done.onComplete { result =>
-      if (isKafkaStarted) {
-        // restart if the flag is set to true
-        log.warn(s"Transaction finished with $result. Restarting it.")
-        startTransaction()
-      }
-    }
-    killSwitch
-  }
-
-  def start_kafka: Route = {
-    post {
-      pathPrefix("start") {
-        path(actorTransaction.topic) {
-          println(s"Starting transaction ${actorTransaction.topic} 1?")
-          handleErrors(exceptionHandler) {
-            latency.recordFuture {
-              for {
-                _ <- actorTransactionController.ask[akka.Done](StopStartKafkaActor.StartKafka())
-              } yield akka.Done
-            }
-            println(s"Starting transaction ${actorTransaction.topic} 2?")
-            killSwitches = startTransaction()
-            isKafkaStarted = true
-            requests.increment()
-
-            complete("Starting Kafka")
+      val (killSwitch, done) = new KafkaTransactionalMessageProcessor(requirements)
+        .run(topic, s"${topic}SINK", message => {
+          transaction(message).map { output: akka.Done =>
+            Seq(output.toString)
           }
+        })
+      done.onComplete { result =>
+        if (isKafkaStarted) {
+          // restart if the flag is set to true
+          log.warn(s"Transaction finished with $result. Restarting it.")
+          startTransaction()
         }
       }
+      killSwitch
     }
-  }
 
-  def stop_kafka: Route =
-    post {
-      pathPrefix("stop") {
-        path(actorTransaction.topic) {
-
-          handleErrors(exceptionHandler) {
-            latency.recordFuture {
-              for {
-                _ <- actorTransactionController.ask[akka.Done](StopStartKafkaActor.StopKafka())
-              } yield akka.Done
+    def start_kafka: Route = {
+      post {
+        pathPrefix("start") {
+          path(actorTransaction.topic) {
+            handleErrors(exceptionHandler) {
+              log.info("Starting Kafka")
+              killSwitches = startTransaction()
+              isKafkaStarted = true
+              requests.increment()
+              complete("Starting Kafka")
             }
-
-            killSwitches.shutdown()
-            log.info("Stopped Kafka")
-            killSwitches = null
-            isKafkaStarted = false
-            requests.increment()
-            complete("Stopping Kafka")
           }
         }
       }
     }
 
-  def route: Route =
-    pathPrefix("kafka") {
-      start_kafka ~ stop_kafka
-    }
+    def stop_kafka: Route =
+      post {
+        pathPrefix("stop") {
+          path(actorTransaction.topic) {
+
+            handleErrors(exceptionHandler) {
+              killSwitches.shutdown()
+              log.info("Stopped Kafka")
+              killSwitches = null
+              isKafkaStarted = false
+              requests.increment()
+              complete("Stopping Kafka")
+            }
+          }
+        }
+      }
+
+    def route: Route =
+      pathPrefix("kafka") {
+        start_kafka ~ stop_kafka
+      }
+
+  }
 
 }

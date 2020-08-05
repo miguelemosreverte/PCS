@@ -8,7 +8,7 @@ import readside.proyectionists.common.infrastructure.{Guardian, ReadSideHttpRout
 import serialization.EventSerializer
 
 object Main extends App {
-  val monitoring = new KamonMonitoring
+  private val monitoring = new KamonMonitoring
 
   private val config: Config = Seq(
     ConfigFactory parseString EventSerializer.eventAdapterConf,

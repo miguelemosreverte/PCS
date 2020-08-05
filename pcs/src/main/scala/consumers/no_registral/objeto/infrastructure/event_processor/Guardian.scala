@@ -6,6 +6,7 @@ import akka.cluster.sharding.typed.scaladsl.ShardedDaemonProcess
 import akka.cluster.sharding.typed.{ClusterShardingSettings, ShardedDaemonProcessSettings}
 import akka.projection.ProjectionBehavior
 import akka.projections.{ProjectionFactory, ProjectionSettings}
+import monitoring.{KamonMonitoring, Monitoring}
 import org.slf4j.LoggerFactory
 
 object Guardian {
@@ -17,8 +18,9 @@ object Guardian {
       log.info("Running Proyections")
       val shardingSettings = ClusterShardingSettings(system)
       val shardedDaemonProcessSettings = ShardedDaemonProcessSettings(system).withShardingSettings(shardingSettings)
+      val monitoring: Monitoring = new KamonMonitoring
 
-      val objetoSettings = ProjectionSettings("ObjetoNovedadCotitularidad", 1)
+      val objetoSettings = ProjectionSettings("ObjetoNovedadCotitularidad", 1, monitoring)
       ShardedDaemonProcess(system).init(
         name = "ObjetoNovedadCotitularidad",
         objetoSettings.parallelism,

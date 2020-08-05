@@ -1,13 +1,13 @@
 package spec.consumers.registrales.parametrica_plan.acceptance
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
 import consumers.registral.parametrica_plan.application.entities.ParametricaPlanMessage.ParametricaPlanMessageRoots
 import consumers.registral.parametrica_plan.domain.ParametricaPlanEvents
 import design_principles.projection.infrastructure.CassandraTestkitProduction
+import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
 
@@ -28,5 +28,5 @@ class ParametricaPlanProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(
   }
 
   def projectionHandler =
-    new readside.proyectionists.registrales.parametrica_plan.ParametricaPlanProjectionHandler()
+    new readside.proyectionists.registrales.parametrica_plan.ParametricaPlanProjectionHandler(new DummyMonitoring)
 }

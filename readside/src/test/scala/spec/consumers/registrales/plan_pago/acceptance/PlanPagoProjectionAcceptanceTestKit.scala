@@ -1,13 +1,13 @@
 package spec.consumers.registrales.plan_pago.acceptance
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
 import consumers.registral.plan_pago.application.entities.PlanPagoMessage.PlanPagoMessageRoots
 import consumers.registral.plan_pago.domain.PlanPagoEvents
 import design_principles.projection.infrastructure.CassandraTestkitProduction
+import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
 
@@ -36,5 +36,5 @@ class PlanPagoProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implici
   }
 
   def projectionHandler =
-    new readside.proyectionists.registrales.plan_pago.PlanPagoProjectionHandler()
+    new readside.proyectionists.registrales.plan_pago.PlanPagoProjectionHandler(new DummyMonitoring)
 }

@@ -10,15 +10,20 @@ import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoAddedExencion
 import consumers.no_registral.obligacion.domain.ObligacionEvents
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor
 import kafka.MessageProducer
+import monitoring.Monitoring
 
 class SujetoActorWithMockPersistence(
     exencionProjectionist: Handler[EventEnvelope[ObjetoAddedExencion]]
 )(implicit system: ActorSystem)
-    extends ShardedEntityNoRequirements {
+    extends ShardedEntity[Monitoring] {
 
-  override def props(requirements: ShardedEntity.NoRequirements): Props = Props(
-    new SujetoActor(
-      new ObjetoActorWithMockPersistence(exencionProjectionist).props
+  override def props(monitoring: Monitoring): Props = {
+    val objetoProps = new ObjetoActorWithMockPersistence(exencionProjectionist).props(monitoring)
+    Props(
+      new SujetoActor(
+        monitoring,
+        Some(objetoProps)
+      )
     )
-  )
+  }
 }

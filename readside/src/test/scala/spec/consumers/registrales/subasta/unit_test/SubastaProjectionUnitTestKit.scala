@@ -1,7 +1,6 @@
 package spec.consumers.registrales.subasta.unit_test
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
@@ -10,6 +9,7 @@ import consumers.registral.subasta.domain.SubastaEvents
 import consumers.registral.subasta.domain.SubastaEvents.SubastaUpdatedFromDto
 import consumers.registral.subasta.infrastructure.json._
 import design_principles.projection.mock.{CassandraTestkitMock, CassandraWriteMock}
+import monitoring.DummyMonitoring
 import readside.proyectionists.registrales.subasta.SubastaProjectionHandler
 import readside.proyectionists.registrales.subasta.projections.SubastaUpdatedFromDtoProjection
 import spec.testkit.ProjectionTestkitMock
@@ -28,7 +28,7 @@ class SubastaProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: Act
     subastaProyectionist process envelope
 
   def subastaProyectionist: SubastaProjectionHandler =
-    new readside.proyectionists.registrales.subasta.SubastaProjectionHandler() {
+    new readside.proyectionists.registrales.subasta.SubastaProjectionHandler(new DummyMonitoring) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 }

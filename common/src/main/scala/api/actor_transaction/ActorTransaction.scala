@@ -1,8 +1,9 @@
 package api.actor_transaction
 
 import akka.Done
-import akka.actor.ActorRef
 import akka.http.scaladsl.server.Route
+import akka.stream.UniqueKillSwitch
+import kafka.{KafkaMessageProcessorRequirements, KafkaTransactionalMessageProcessor}
 import monitoring.Monitoring
 import play.api.libs.json.Format
 import serialization.decodeF
@@ -33,10 +34,37 @@ abstract class ActorTransaction[ExternalDto](
 
   def processCommand(registro: ExternalDto): Future[Done]
 
-  final def routeClassic(implicit system: akka.actor.ActorSystem): Route = {
-    kafka.AtomicKafkaController(this, monitoring)(system).route
-  }
-  final def route(implicit system: akka.actor.typed.ActorSystem[_]): Route = {
-    kafka.AtomicKafkaController.fromTyped(this, monitoring)(system).route
+}
+
+object ActorTransaction {
+  object Implicits {
+    implicit class ActorTransactionRoute(actorTransaction: ActorTransaction[_])(
+        implicit requirements: KafkaMessageProcessorRequirements
+    ) {
+
+      final def route(implicit system: akka.actor.ActorSystem): Route = {
+        kafka.AtomicKafkaController.AtomicKafkaController(actorTransaction, requirements)(system).route
+      }
+
+    }
+
+    implicit class ActorTransactionStart(actorTransaction: ActorTransaction[_])(
+        implicit requirements: KafkaMessageProcessorRequirements,
+        ec: ExecutionContext
+    ) {
+
+      final def start(
+          requirements: KafkaMessageProcessorRequirements
+      )(implicit system: akka.actor.ActorSystem): (UniqueKillSwitch, Future[Done]) = {
+        val topic = actorTransaction.topic
+        val transaction = actorTransaction.transaction _
+        new KafkaTransactionalMessageProcessor(requirements)
+          .run(topic, s"${topic}SINK", message => {
+            transaction(message).map { output: akka.Done =>
+              Seq(output.toString)
+            }
+          })
+      }
+    }
   }
 }

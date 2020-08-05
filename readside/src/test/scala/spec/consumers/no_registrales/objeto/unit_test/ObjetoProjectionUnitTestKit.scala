@@ -1,7 +1,6 @@
 package spec.consumers.no_registrales.objeto.unit_test
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
@@ -13,6 +12,7 @@ import readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler
 import readside.proyectionists.no_registrales.objeto.projections.ObjetoSnapshotPersistedProjection
 import spec.testkit.ProjectionTestkitMock
 import consumers.no_registral.objeto.infrastructure.json._
+import monitoring.DummyMonitoring
 
 class ObjetoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
     extends ProjectionTestkitMock[ObjetoEvents, ObjetoMessageRoots] {
@@ -27,7 +27,7 @@ class ObjetoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: Acto
   override def process(envelope: EventEnvelope[ObjetoEvents]): Future[Done] = objetoProyectionist process envelope
 
   def objetoProyectionist: ObjetoProjectionHandler =
-    new readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler() {
+    new readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler(new DummyMonitoring) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 

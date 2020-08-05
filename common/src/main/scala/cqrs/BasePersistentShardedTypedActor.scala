@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory
 
 import scala.reflect.ClassTag
 import cqrs.typed.event.SyncEffectEventBus
+import org.apache.kafka.common.utils.Utils
 
 abstract class BasePersistentShardedTypedActor[ActorMessages <: design_principles.actor_model.ShardedMessage: ClassTag,
                                                ActorEvents,
@@ -46,14 +47,12 @@ abstract class BasePersistentShardedTypedActor[ActorMessages <: design_principle
     override def entityId(message: ActorMessages): String = message.aggregateRoot
 
     override def shardId(entityId: String): String = {
-      import org.apache.kafka.common.utils.Utils.{murmur2 => KafkaMurmur2}
-      val clean = entityId.hashCode.toString
-      val a = KafkaMurmur2(clean.getBytes(StandardCharsets.UTF_8))
-      (math.abs(a) % nrKafkaPartitions).toString
+      BasePersistentShardedTypedActor.shardAndPartition(entityId).toString
     }
 
     override def unwrapMessage(message: ActorMessages): ActorMessages = message
   }
+
   val shardActor: ActorRef[ActorMessages] = sharding.init(
     Entity(TypeKey) { context =>
       persistentEntity(context.entityId, context.shard)
@@ -97,6 +96,12 @@ abstract class BasePersistentShardedTypedActor[ActorMessages <: design_principle
 
 object BasePersistentShardedTypedActor {
 
+  def shardAndPartition(entityId: String): Int = {
+    // this logic MUST be replicated in the MessageExtractor entityId -> shardId function!
+    val shardAndPartition = (Utils.toPositive(Utils.murmur2(entityId.getBytes(StandardCharsets.UTF_8))) % 120)
+    shardAndPartition
+  }
+
   trait AbstractState[Commands, Events, State <: AbstractState[Commands, Events, State]]
 
   object CQRS {
@@ -119,6 +124,7 @@ object BasePersistentShardedTypedActor {
       val queryBus = new SyncEffectQueryBus[ActorEvents, State](LoggerFactory.getLogger(getClass))
       val eventBus = new SyncEffectEventBus[ActorEvents, State]()
 
+      var NMessages = 0
       def commandHandler(
           state: State,
           command: MessageWithAutomaticReplyTo[ActorMessages, ActorMessages#ReturnType]
@@ -127,6 +133,9 @@ object BasePersistentShardedTypedActor {
           case query: Query =>
             queryBus.ask(state, query)(command.replyTo.asInstanceOf[ActorRef[Query#ReturnType]])
           case cmd: Command =>
+            NMessages += 1
+
+            println("NMessages: " + Console.GREEN + NMessages.toString + Console.RESET)
             commandBus.publish(cmd)(command.replyTo.asInstanceOf[ActorRef[akka.Done]])
         }
       }

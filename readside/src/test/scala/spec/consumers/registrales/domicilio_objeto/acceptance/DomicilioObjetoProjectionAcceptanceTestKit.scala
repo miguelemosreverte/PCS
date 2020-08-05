@@ -1,13 +1,13 @@
 package spec.consumers.registrales.domicilio_objeto.acceptance
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
 import consumers.registral.domicilio_objeto.application.entities.DomicilioObjetoMessage.DomicilioObjetoMessageRoots
 import consumers.registral.domicilio_objeto.domain.DomicilioObjetoEvents
 import design_principles.projection.infrastructure.CassandraTestkitProduction
+import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
 
@@ -36,5 +36,5 @@ class DomicilioObjetoProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(
   }
 
   def projectionHandler =
-    new readside.proyectionists.registrales.domicilio_objeto.DomicilioObjetoProjectionHandler()
+    new readside.proyectionists.registrales.domicilio_objeto.DomicilioObjetoProjectionHandler(new DummyMonitoring)
 }

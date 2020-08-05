@@ -12,15 +12,20 @@ import consumers.no_registral.sujeto.infrastructure.http.SujetoStateAPI
 import monitoring.Monitoring
 
 import scala.concurrent.ExecutionContext
+import api.actor_transaction.ActorTransaction.Implicits._
+import kafka.KafkaMessageProcessorRequirements
 
 object SujetoMicroservice {
-  def route(monitoring: Monitoring, ec: ExecutionContext)(implicit system: ActorSystem): Route = {
-    implicit val actor: ActorRef = SujetoActor.start
+  def route(
+      monitoring: Monitoring,
+      ec: ExecutionContext
+  )(implicit system: ActorSystem, kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements): Route = {
+    implicit val actor: ActorRef = SujetoActor.startWithRequirements(monitoring)
     implicit val e: ExecutionContext = ec
     Seq(
       SujetoStateAPI(actor, monitoring).route,
-      SujetoTributarioTransaction(actor, monitoring).routeClassic,
-      SujetoNoTributarioTransaction(actor, monitoring).routeClassic
+      SujetoTributarioTransaction(actor, monitoring).route,
+      SujetoNoTributarioTransaction(actor, monitoring).route
     ) reduce (_ ~ _)
   }
 

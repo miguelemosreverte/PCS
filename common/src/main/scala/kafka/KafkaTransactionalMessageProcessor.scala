@@ -1,10 +1,5 @@
 package kafka
 
-import java.util.UUID
-
-import scala.concurrent.Future
-import scala.concurrent.duration._
-import scala.util.{Failure, Success, Try}
 import akka.Done
 import akka.actor.ActorSystem
 import akka.kafka.scaladsl.Transactional
@@ -14,8 +9,11 @@ import akka.stream.scaladsl.{Keep, Sink}
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.LoggerFactory
 
-class KafkaTransactionalMessageProcessor()(
-    implicit
+import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.util.{Failure, Success, Try}
+
+class KafkaTransactionalMessageProcessor(
     transactionRequirements: KafkaMessageProcessorRequirements
 ) extends MessageProcessor {
 
@@ -39,18 +37,14 @@ class KafkaTransactionalMessageProcessor()(
     implicit val system: ActorSystem = transactionRequirements.system
     val consumer = transactionRequirements.consumer
     val producer = transactionRequirements.producer
+    val rebalancerListener = transactionRequirements.rebalancerListener
 
     import system.dispatcher
-    println(s"Starting transaction ${SOURCE_TOPIC} 3.5?")
+    val subscription = rebalancerListener match {
+      case Some(rebalancerListener) => Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerListener)
 
-    import akka.actor.typed.scaladsl.adapter._
-    val rebalancerRef =
-      transactionRequirements.system
-        .spawn(TopicListener(this.getClass.getName + UUID.randomUUID()), "rebalancerRef" + UUID.randomUUID())
-    println(s"Starting transaction ${SOURCE_TOPIC} 4?")
-
-    val subscription = Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerRef.toClassic)
-
+      case None => Subscriptions.topics(SOURCE_TOPIC)
+    }
     val stream = Transactional
       .source(consumer, subscription) //Subscriptions.topics(SOURCE_TOPIC))
       .throttle(THROTTLE_ELEMENTS, THROTTLE_ELEMENTS_PER millis)
@@ -58,10 +52,8 @@ class KafkaTransactionalMessageProcessor()(
         val message = msg
 
         val input: String = message.record.value
-
+        println(input)
         log.debug(message.record.value)
-
-        println("[KAFKA TRANSACTION] HERE THE MESSAGE ARRIVES: " + message.record.value())
 
         algorithm(input)
           .map { a: Seq[String] =>

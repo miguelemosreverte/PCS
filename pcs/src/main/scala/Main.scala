@@ -1,20 +1,20 @@
-import akka.actor.typed.ActorSystem
-import akka.actor.typed.Terminated
-import akka.actor.typed.scaladsl.Behaviors
+import java.util.UUID
+
 import akka.actor.typed.scaladsl.adapter._
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import akka.actor.typed.{ActorRef, ActorSystem, Terminated}
 import akka.cluster.ClusterEvent.MemberUp
-import akka.cluster.typed.Cluster
-import akka.cluster.typed.Subscribe
-import akka.http.scaladsl._
-import akka.http.scaladsl.model.HttpRequest
-import akka.http.scaladsl.model.HttpResponse
+import akka.cluster.typed.{Cluster, Subscribe}
+import akka.kafka.ConsumerRebalanceEvent
+import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.management.scaladsl.AkkaManagement
 import akka.stream.Materializer
-import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
+import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor
+import kafka.{KafkaMessageProcessorRequirements, TopicListener}
+import monitoring.{KamonMonitoring, Monitoring}
+import org.slf4j.LoggerFactory
 import serialization.EventSerializer
-
-import scala.concurrent.Future
 
 object Main extends App {
   lazy val config = Seq(
@@ -32,7 +32,9 @@ object Main extends App {
   def startNode(remotingPort: Int, akkaManagementPort: Int, frontEndPort: Int): Unit = {
     ActorSystem(
       Behaviors.setup[MemberUp] { ctx =>
+        val a: ActorContext[MemberUp] = ctx
         implicit val s = ctx.system
+        implicit val sc = s.toClassic
         implicit val mat = Materializer.createMaterializer(ctx.system.toClassic)
         implicit val ec = ctx.executionContext
         AkkaManagement(ctx.system.toClassic).start()
@@ -43,8 +45,40 @@ object Main extends App {
           .receiveMessage[MemberUp] {
             case MemberUp(member) if member.uniqueAddress == cluster.selfMember.uniqueAddress =>
               ctx.log.info("Joined the cluster. Starting sharding and kafka processor")
-              val eventProcessor = ctx.spawn[Nothing](UserEventsKafkaProcessor(), "kafka-event-processor")
-              ctx.watch(eventProcessor)
+
+              import akka.actor.typed.scaladsl.adapter._
+              val rebalancerListener: ActorRef[ConsumerRebalanceEvent] =
+                ctx.spawn(TopicListener(this.getClass.getName + UUID.randomUUID()), "rebalancerRef" + UUID.randomUUID())
+
+              val monitoring: Monitoring = new KamonMonitoring
+              implicit val transactionRequirements: KafkaMessageProcessorRequirements =
+                KafkaMessageProcessorRequirements.productionSettings(Some(rebalancerListener.toClassic), monitoring)
+              val sujetoActor = SujetoActor.startWithRequirements(monitoring)
+              /*  SujetoNoTributarioTransaction(sujetoActor, monitoring).start(transactionRequirements)
+              SujetoTributarioTransaction(sujetoActor, monitoring).start(transactionRequirements)
+              ObjetoNoTributarioTransaction(sujetoActor, monitoring).start(transactionRequirements)
+              ObjetoTributarioTransaction(sujetoActor, monitoring).start(transactionRequirements)
+              ObligacionTributariaTransaction(sujetoActor, monitoring).start(transactionRequirements)
+              ObligacionNoTributariaTransaction(sujetoActor, monitoring).start(transactionRequirements)
+              ObjetoExencionTransaction(sujetoActor, monitoring).start(transactionRequirements)
+              ObjetoUpdateCotitularesTransaction(sujetoActor, monitoring).start(transactionRequirements)
+              ObjetoUpdateNovedadTransaction(sujetoActor, monitoring).start(transactionRequirements)
+
+               */
+
+              val log = LoggerFactory.getLogger(this.getClass)
+
+              lazy val config = Seq(
+                ConfigFactory.load(),
+                ConfigFactory parseString EventSerializer.eventAdapterConf,
+                ConfigFactory parseString EventSerializer.serializationConf
+              ).reduce(_ withFallback _)
+
+              AkkaManagement(s).start()
+              ClusterBootstrap(s).start()
+
+              ctx.spawn(Routes.apply(monitoring), "routes")
+
               Behaviors.same
             case MemberUp(member) =>
               ctx.log.info("Member up {}", member)

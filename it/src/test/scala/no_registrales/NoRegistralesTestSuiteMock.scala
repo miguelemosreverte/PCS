@@ -19,6 +19,7 @@ import design_principles.actor_model.testkit.QueryTestkit.AgainstActors
 import design_principles.external_pub_sub.kafka.{KafkaMock, MessageProcessorLogging}
 import design_principles.projection.mock.{CassandraTestkitMock, CassandraWriteMock}
 import kafka.{MessageProcessor, MessageProducer}
+import monitoring.{DummyMonitoring, Monitoring}
 import no_registrales.testkit.mocks.SujetoActorWithMockPersistence
 import readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler
 import readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler
@@ -57,20 +58,21 @@ trait NoRegistralesTestSuiteMock extends BaseE2ESpec {
     override def messageProcessor: MessageProcessor with MessageProcessorLogging = kafkaMock
 
     val obligacionProyectionist: ObligacionProjectionHandler =
-      new readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler() {
+      new readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler(new DummyMonitoring) {
         override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
       }
 
     val objetoProyectionist: ObjetoProjectionHandler =
-      new readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler() {
+      new readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler(new DummyMonitoring) {
         override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
       }
 
     val sujetoProyectionist: SujetoProjectionHandler =
-      new readside.proyectionists.no_registrales.sujeto.SujetoProjectionHandler() {
+      new readside.proyectionists.no_registrales.sujeto.SujetoProjectionHandler(new DummyMonitoring) {
         override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
       }
 
+    val monitoring: Monitoring = new DummyMonitoring
     val sujeto: ActorRef =
       new SujetoActorWithMockPersistence(
         obligacionProyectionist,
@@ -78,9 +80,10 @@ trait NoRegistralesTestSuiteMock extends BaseE2ESpec {
         sujetoProyectionist,
         _ => (),
         messageProducer
-      ).start
+      ).startWithRequirements(monitoring)
 
-    val cotitularidadActor: ActorRef = new CotitularidadActorWithMockPersistence(messageProducer).start
+    val cotitularidadActor: ActorRef =
+      new CotitularidadActorWithMockPersistence(messageProducer).startWithRequirements(monitoring)
 
     val Query: NoRegistralesQueryTestKit with AgainstActors =
       new NoRegistralesQueryWithActorRef(sujeto)

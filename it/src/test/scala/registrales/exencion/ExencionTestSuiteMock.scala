@@ -11,6 +11,7 @@ import consumers_spec.no_registrales.testkit.mocks.CotitularidadActorWithMockPer
 import design_principles.external_pub_sub.kafka.{KafkaMock, MessageProcessorLogging}
 import design_principles.projection.mock.{CassandraTestkitMock, CassandraWriteMock}
 import kafka.{MessageProcessor, MessageProducer}
+import monitoring.{DummyMonitoring, Monitoring}
 import readside.proyectionists.registrales.exencion.ExencionProjectionHandler
 import registrales.exencion.testkit.query.ExencionQueryTestkitAgainstActors
 
@@ -45,16 +46,18 @@ trait ExencionTestSuiteMock extends ExencionSpec {
     override def messageProcessor: MessageProcessor with MessageProcessorLogging = kafkaMock
 
     lazy val exencionProyectionist: ExencionProjectionHandler =
-      new readside.proyectionists.registrales.exencion.ExencionProjectionHandler() {
+      new readside.proyectionists.registrales.exencion.ExencionProjectionHandler(new DummyMonitoring) {
         override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
       }
 
+    val monitoring: Monitoring = new DummyMonitoring
     lazy val sujeto: ActorRef =
       new registrales.exencion.testkit.mocks.SujetoActorWithMockPersistence(
         exencionProyectionist
-      ).start
+      ).startWithRequirements(monitoring)
 
-    lazy val cotitularidadActor: ActorRef = new CotitularidadActorWithMockPersistence(messageProducer).start
+    lazy val cotitularidadActor: ActorRef =
+      new CotitularidadActorWithMockPersistence(messageProducer).startWithRequirements(monitoring)
 
     lazy val Query = ExencionQueryTestkitAgainstActors(sujeto)
 

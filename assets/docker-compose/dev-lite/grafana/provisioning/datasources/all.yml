@@ -1,7 +1,7 @@
 datasources:
 - name: 'akka kamon prometheus'
   type: 'prometheus'
-  access: 'direct'
+  access: 'proxy'
   org_id: 1
   url: '0.0.0.0:9090'
   is_default: true

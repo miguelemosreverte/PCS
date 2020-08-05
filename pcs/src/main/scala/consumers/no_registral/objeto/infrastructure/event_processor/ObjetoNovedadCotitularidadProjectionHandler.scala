@@ -77,7 +77,7 @@ class ObjetoNovedadCotitularidadProjectionHandler(settings: ProjectionSettings, 
 
   def publishMessageToKafka(messages: Seq[String], topic: String): Future[Done] = {
     implicit val producerSettings: ProducerSettings[String, String] =
-      KafkaMessageProcessorRequirements.productionSettings().producer
+      KafkaMessageProcessorRequirements.productionSettings(None, settings.monitoring).producer
     produce(messages, topic)(_ =>
       log.debug(s"[ObjetoNovedadCotitularidad] Published message | CotitularidadAddSujetoCotitular")
     )

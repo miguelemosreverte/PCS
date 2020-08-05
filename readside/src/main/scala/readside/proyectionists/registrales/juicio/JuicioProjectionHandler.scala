@@ -7,9 +7,10 @@ import akka.{Done, actor => classic}
 import consumers.registral.juicio.domain.JuicioEvents
 import org.slf4j.LoggerFactory
 import readside.proyectionists.registrales.juicio.projections.JuicioUpdatedFromDtoProjection
-import scala.concurrent.Future
 
+import scala.concurrent.Future
 import akka.projections.cassandra.CassandraProjectionHandler
+import monitoring.Monitoring
 
 class JuicioProjectionHandler(settings: ProjectionSettings, system: ActorSystem[_])
     extends CassandraProjectionHandler[JuicioEvents](settings, system) {
@@ -19,8 +20,8 @@ class JuicioProjectionHandler(settings: ProjectionSettings, system: ActorSystem[
 
   private val tag = settings.tag
 
-  def this()(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("Juicio", 1), classicSystem.toTyped)
+  def this(monitoring: Monitoring)(implicit classicSystem: akka.actor.ActorSystem) {
+    this(ProjectionSettings("Juicio", 1, monitoring), classicSystem.toTyped)
   }
   override def process(envelope: EventEnvelope[JuicioEvents]): Future[Done] = {
     envelope.event match {

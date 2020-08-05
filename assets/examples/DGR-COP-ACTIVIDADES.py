@@ -5,7 +5,8 @@ from string import Template
 
 
 parser = argparse.ArgumentParser(description='The ammount of messages you want. :) ')
-parser.add_argument('messages', metavar='M', type=int, help='The ammount of messages you want. :) ', default=42)
+parser.add_argument('From', type=int, help='The ammount of messages you want. :) ', default=42)
+parser.add_argument('To', type=int, help='The ammount of messages you want. :) ', default=42)
 args = parser.parse_args()
 
 
@@ -24,7 +25,7 @@ actividadSujetoTemplate = Template("""
 }
 """)
 
-for i in range(1, args.messages):
+for i in range(args.From, args.To):
     sujetoId = i
     deliveryId = i
 
@@ -35,6 +36,8 @@ for i in range(1, args.messages):
     ACTIVIDAD_SUJETO_ID=sujetoId
     )
 
-    print(actividadSujeto)
 
-    os.system(f"""echo '{json.dumps(json.loads(actividadSujeto))}' | kafkacat -P -b 0.0.0.0:9092 -t DGR-COP-ACTIVIDADES """)
+    key = f"Sujeto-{sujetoId}-ActividadSujeto-{sujetoId}"
+    order = f"""echo '{key}:{json.dumps(json.loads(actividadSujeto))}' | kafkacat -P -b 0.0.0.0:9092 -t DGR-COP-ACTIVIDADES -K :"""
+    print(order)
+    os.system(order)

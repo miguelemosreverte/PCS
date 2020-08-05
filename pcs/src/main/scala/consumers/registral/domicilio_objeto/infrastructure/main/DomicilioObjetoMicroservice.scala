@@ -11,11 +11,16 @@ import consumers.registral.domicilio_objeto.infrastructure.kafka.{
 import monitoring.Monitoring
 
 import scala.concurrent.ExecutionContext
+import api.actor_transaction.ActorTransaction.Implicits._
+import kafka.KafkaMessageProcessorRequirements
 
 object DomicilioObjetoMicroservice {
 
   import akka.http.scaladsl.server.Directives._
-  def route(monitoring: Monitoring, ec: ExecutionContext)(implicit system: ActorSystem): Route = {
+  def route(
+      monitoring: Monitoring,
+      ec: ExecutionContext
+  )(implicit system: ActorSystem, kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements): Route = {
     import akka.actor.typed.scaladsl.adapter._
 
     implicit val typedSystem: typed.ActorSystem[Nothing] = system.toTyped

@@ -12,6 +12,7 @@ import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoA
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor.SujetoTags
 import consumers_spec.no_registrales.testsuite.NoRegistralesTestSuite.eventEnvelope
 import kafka.MessageProducer
+import monitoring.Monitoring
 
 class SujetoActorWithMockPersistence(
     obligacionProyectionist: Handler[EventEnvelope[ObligacionEvents]],
@@ -20,22 +21,24 @@ class SujetoActorWithMockPersistence(
     validateReadside: Any => Any,
     messageProducer: MessageProducer
 )(implicit system: ActorSystem)
-    extends ShardedEntityNoRequirements {
+    extends ShardedEntity[Monitoring] {
 
-  override def props(requirements: ShardedEntity.NoRequirements): Props = Props(
-    new SujetoActor(
+  override def props(monitoring: Monitoring): Props = {
+    val objetoProps =
       new ObjetoActorWithMockPersistence(obligacionProyectionist,
                                          objetoProyectionist,
                                          validateReadside,
-                                         messageProducer).props
-    ) {
-      override def persistEvent(event: SujetoEvents, tags: Set[String])(handler: () => Unit): Unit = {
-        super.persistEvent(event, tags)(handler)
-        if (SujetoTags.SujetoReadside subsetOf tags) {
-          sujetoProyectionist.process(eventEnvelope(event))
-          validateReadside(event)
+                                         messageProducer).props(monitoring)
+    Props(
+      new SujetoActor(monitoring, Some(objetoProps)) {
+        override def persistEvent(event: SujetoEvents, tags: Set[String])(handler: () => Unit): Unit = {
+          super.persistEvent(event, tags)(handler)
+          if (SujetoTags.SujetoReadside subsetOf tags) {
+            sujetoProyectionist.process(eventEnvelope(event))
+            validateReadside(event)
+          }
         }
       }
-    }
-  )
+    )
+  }
 }

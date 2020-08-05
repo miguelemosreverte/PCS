@@ -11,6 +11,7 @@ import design_principles.actor_model.testkit.QueryTestkit.AgainstActors
 import design_principles.external_pub_sub.kafka.MessageProcessorLogging
 import design_principles.projection.infrastructure.CassandraTestkitProduction
 import kafka.{KafkaMessageProcessorRequirements, MessageProcessor, MessageProducer}
+import monitoring.{DummyMonitoring, Monitoring}
 
 trait NoRegistralesTestSuiteAcceptance extends NoRegistralesTestSuite {
   def testContext()(implicit system: ActorSystem): TestContext = new AcceptanceTestContext()
@@ -18,9 +19,10 @@ trait NoRegistralesTestSuiteAcceptance extends NoRegistralesTestSuite {
   class AcceptanceTestContext(implicit system: ActorSystem) extends TestContext {
     import system.dispatcher
 
-    lazy val sujeto: ActorRef = SujetoActor.start
+    val monitoring: Monitoring = new DummyMonitoring
+    lazy val sujeto: ActorRef = SujetoActor.startWithRequirements(monitoring)
     lazy val cotitularidadActor: ActorRef =
-      CotitularidadActor.startWithRequirements(KafkaMessageProcessorRequirements.productionSettings())
+      CotitularidadActor.startWithRequirements(KafkaMessageProcessorRequirements.productionSettings(None, monitoring))
 
     lazy val cassandraTestkit: CassandraTestkitProduction = CassandraTestkitProduction()
     lazy val kafka = new KafkaTestkit()

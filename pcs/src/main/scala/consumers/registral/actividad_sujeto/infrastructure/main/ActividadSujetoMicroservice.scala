@@ -10,10 +10,15 @@ import consumers.registral.actividad_sujeto.infrastructure.kafka.ActividadSujeto
 import monitoring.Monitoring
 
 import scala.concurrent.ExecutionContext
+import api.actor_transaction.ActorTransaction.Implicits._
+import kafka.KafkaMessageProcessorRequirements
 
 object ActividadSujetoMicroservice {
 
-  def route(monitoring: Monitoring, ec: ExecutionContext)(implicit system: ActorSystem): Route = {
+  def route(
+      monitoring: Monitoring,
+      ec: ExecutionContext
+  )(implicit system: ActorSystem, kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements): Route = {
     implicit val typedSystem: typed.ActorSystem[Nothing] = system.toTyped
     implicit val actor: ActividadSujetoActor = ActividadSujetoActor()
     implicit val e: ExecutionContext = ec

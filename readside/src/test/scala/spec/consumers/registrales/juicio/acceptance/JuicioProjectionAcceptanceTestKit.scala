@@ -1,13 +1,13 @@
 package spec.consumers.registrales.juicio.acceptance
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
 import consumers.registral.juicio.application.entities.JuicioMessage.JuicioMessageRoots
 import consumers.registral.juicio.domain.JuicioEvents
 import design_principles.projection.infrastructure.CassandraTestkitProduction
+import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
 
@@ -35,5 +35,5 @@ class JuicioProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit 
   }
 
   def projectionHandler =
-    new readside.proyectionists.registrales.juicio.JuicioProjectionHandler()
+    new readside.proyectionists.registrales.juicio.JuicioProjectionHandler(new DummyMonitoring)
 }

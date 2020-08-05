@@ -2,28 +2,21 @@ package akka.http
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Directives.{complete, _}
+import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server._
-import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
-import monitoring.{Counter, Histogram, Monitoring}
+import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsArray, JsObject, JsString}
 
 import scala.concurrent.Future
 
 object AkkaHttpServer {
-  def start(route: Route, host: String = "0.0.0.0", port: Int = 8081)(implicit system: ActorSystem): Future[Unit] = {
+  val config = ConfigFactory.load()
+  def start(route: Route, host: String = config.getString("http.ip"), port: Int = config.getInt("http.port"))(
+      implicit system: ActorSystem
+  ): Future[ServerBinding] = {
     import system.dispatcher
-    Http()
+    Http()(system)
       .bindAndHandle(route, host, port)
-      .map { binding =>
-        log.info(s"Starting ${this.getClass.getSimpleName} on $host:$port")
-      }
-      .recover {
-        case ex =>
-          log.error(s"Models observer could not bind to $host:$port/ ${ex.getMessage}")
-      }
   }
   val log = LoggerFactory.getLogger(this.getClass)
 

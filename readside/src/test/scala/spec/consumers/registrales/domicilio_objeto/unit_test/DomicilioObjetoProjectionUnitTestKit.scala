@@ -1,7 +1,6 @@
 package spec.consumers.registrales.domicilio_objeto.unit_test
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
@@ -10,6 +9,7 @@ import consumers.registral.domicilio_objeto.domain.DomicilioObjetoEvents
 import consumers.registral.domicilio_objeto.domain.DomicilioObjetoEvents.DomicilioObjetoUpdatedFromDto
 import consumers.registral.domicilio_objeto.infrastructure.json._
 import design_principles.projection.mock.{CassandraTestkitMock, CassandraWriteMock}
+import monitoring.DummyMonitoring
 import readside.proyectionists.registrales.domicilio_objeto.DomicilioObjetoProjectionHandler
 import readside.proyectionists.registrales.domicilio_objeto.projections.DomicilioObjetoUpdatedFromDtoProjection
 import spec.testkit.ProjectionTestkitMock
@@ -28,7 +28,7 @@ class DomicilioObjetoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit sys
     domicilio_objetoProyectionist process envelope
 
   def domicilio_objetoProyectionist: DomicilioObjetoProjectionHandler =
-    new readside.proyectionists.registrales.domicilio_objeto.DomicilioObjetoProjectionHandler() {
+    new readside.proyectionists.registrales.domicilio_objeto.DomicilioObjetoProjectionHandler(new DummyMonitoring) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 }

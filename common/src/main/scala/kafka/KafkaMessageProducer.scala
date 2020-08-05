@@ -2,12 +2,12 @@ package kafka
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
-
 import akka.Done
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
 import akka.kafka.ProducerSettings
 import akka.kafka.scaladsl.Producer
 import akka.stream.scaladsl.Source
+import monitoring.Monitoring
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.LoggerFactory
 
@@ -47,11 +47,11 @@ class KafkaMessageProducer()(
 
 object KafkaMessageProducer {
 
-  def apply(implicit system: ActorSystem): KafkaMessageProducer = {
-
+  def apply(monitoring: Monitoring,
+            rebalancerListener: ActorRef)(implicit system: ActorSystem): KafkaMessageProducer = {
     implicit def kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements =
-      KafkaMessageProcessorRequirements.productionSettings()
-    implicit def producerSettings = KafkaMessageProcessorRequirements.productionSettings().producer
+      KafkaMessageProcessorRequirements.productionSettings(Some(rebalancerListener), monitoring)
+    implicit def producerSettings = kafkaMessageProcessorRequirements.producer
     new KafkaMessageProducer()
   }
 }

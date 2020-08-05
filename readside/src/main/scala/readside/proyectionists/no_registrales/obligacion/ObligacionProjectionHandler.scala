@@ -1,6 +1,5 @@
 package readside.proyectionists.no_registrales.obligacion
 import scala.concurrent.{ExecutionContextExecutor, Future}
-
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter._
 import akka.projection.eventsourced.EventEnvelope
@@ -10,6 +9,7 @@ import akka.stream.alpakka.cassandra.CassandraSessionSettings
 import akka.stream.alpakka.cassandra.scaladsl.{CassandraSession, CassandraSessionRegistry}
 import akka.{Done, actor => classic}
 import consumers.no_registral.obligacion.domain.ObligacionEvents
+import monitoring.Monitoring
 import org.slf4j.LoggerFactory
 import readside.proyectionists.no_registrales.obligacion.projectionists.ObligacionSnapshotProjection
 
@@ -28,8 +28,8 @@ class ObligacionProjectionHandler(settings: ProjectionSettings, system: ActorSys
     super.stop()
   }
 
-  def this()(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("Obligacion", 1), classicSystem.toTyped)
+  def this(monitoring: Monitoring)(implicit classicSystem: akka.actor.ActorSystem) {
+    this(ProjectionSettings("Obligacion", 1, monitoring), classicSystem.toTyped)
   }
 
   // val message = EventProcessorPrinter.prettifyEventProcessorLog(eventEnvelope.toString)

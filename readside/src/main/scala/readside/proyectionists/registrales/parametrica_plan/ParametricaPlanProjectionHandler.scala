@@ -1,6 +1,5 @@
 package readside.proyectionists.registrales.parametrica_plan
 import scala.concurrent.Future
-
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter._
 import akka.projection.eventsourced.EventEnvelope
@@ -8,6 +7,7 @@ import akka.projections.ProjectionSettings
 import akka.projections.cassandra.CassandraProjectionHandler
 import akka.{Done, actor => classic}
 import consumers.registral.parametrica_plan.domain.ParametricaPlanEvents
+import monitoring.Monitoring
 import org.slf4j.LoggerFactory
 import readside.proyectionists.registrales.parametrica_plan.projections.ParametricaPlanUpdatedFromDtoProjection
 
@@ -19,8 +19,8 @@ class ParametricaPlanProjectionHandler(settings: ProjectionSettings, system: Act
 
   private val tag = settings.tag
 
-  def this()(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("ParametricaPlan", 1), classicSystem.toTyped)
+  def this(monitoring: Monitoring)(implicit classicSystem: akka.actor.ActorSystem) {
+    this(ProjectionSettings("ParametricaPlan", 1, monitoring), classicSystem.toTyped)
   }
 
   override def process(envelope: EventEnvelope[ParametricaPlanEvents]): Future[Done] = {

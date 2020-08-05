@@ -1,7 +1,6 @@
 package spec.consumers.no_registrales.obligacion.unit_test
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
@@ -13,6 +12,7 @@ import readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHan
 import readside.proyectionists.no_registrales.obligacion.projectionists.ObligacionSnapshotProjection
 import spec.testkit.ProjectionTestkitMock
 import consumers.no_registral.obligacion.infrastructure.json._
+import monitoring.DummyMonitoring
 
 class ObligacionProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
     extends ProjectionTestkitMock[ObligacionEvents, ObligacionMessageRoots] {
@@ -35,7 +35,7 @@ class ObligacionProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: 
     }
 
   def obligacionProyectionist: ObligacionProjectionHandler =
-    new readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler() {
+    new readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler(new DummyMonitoring) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 }

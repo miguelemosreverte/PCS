@@ -1,7 +1,6 @@
 package spec.consumers.registrales.etapas_procesales.unit_test
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
@@ -10,6 +9,7 @@ import consumers.registral.etapas_procesales.domain.EtapasProcesalesEvents
 import consumers.registral.etapas_procesales.domain.EtapasProcesalesEvents.EtapasProcesalesUpdatedFromDto
 import consumers.registral.etapas_procesales.infrastructure.json._
 import design_principles.projection.mock.{CassandraTestkitMock, CassandraWriteMock}
+import monitoring.DummyMonitoring
 import readside.proyectionists.registrales.etapas_procesales.EtapasProcesalesProjectionHandler
 import readside.proyectionists.registrales.etapas_procesales.projections.EtapasProcesalesUpdatedFromDtoProjection
 import spec.testkit.ProjectionTestkitMock
@@ -28,7 +28,7 @@ class EtapasProcesalesProjectionUnitTestKit(c: CassandraTestkitMock)(implicit sy
     etapas_procesalesProyectionist process envelope
 
   def etapas_procesalesProyectionist: EtapasProcesalesProjectionHandler =
-    new readside.proyectionists.registrales.etapas_procesales.EtapasProcesalesProjectionHandler() {
+    new readside.proyectionists.registrales.etapas_procesales.EtapasProcesalesProjectionHandler(new DummyMonitoring) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 }

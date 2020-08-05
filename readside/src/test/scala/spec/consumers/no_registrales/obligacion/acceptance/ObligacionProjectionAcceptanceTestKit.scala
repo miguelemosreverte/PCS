@@ -1,7 +1,6 @@
 package spec.consumers.no_registrales.obligacion.acceptance
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
@@ -9,6 +8,7 @@ import consumers.no_registral.obligacion.application.entities.ObligacionMessage.
 import consumers.no_registral.obligacion.domain.ObligacionEvents
 import design_principles.projection.CassandraTestkit
 import design_principles.projection.infrastructure.CassandraTestkitProduction
+import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
 
@@ -37,5 +37,5 @@ class ObligacionProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(impli
   }
 
   def obligacionProyectionist =
-    new readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler()
+    new readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler(new DummyMonitoring)
 }

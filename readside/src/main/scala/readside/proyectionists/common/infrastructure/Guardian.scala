@@ -6,6 +6,7 @@ import akka.cluster.sharding.typed.scaladsl.ShardedDaemonProcess
 import akka.cluster.sharding.typed.{ClusterShardingSettings, ShardedDaemonProcessSettings}
 import akka.projection.ProjectionBehavior
 import akka.projections.{ProjectionFactory, ProjectionSettings}
+import monitoring.{KamonMonitoring, Monitoring}
 import org.slf4j.LoggerFactory
 import readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler
 import readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler
@@ -33,7 +34,9 @@ object Guardian {
       val shardingSettings = ClusterShardingSettings(system)
       val shardedDaemonProcessSettings = ShardedDaemonProcessSettings(system).withShardingSettings(shardingSettings)
 
-      val sujetoSettings = ProjectionSettings("Sujeto", 1)
+      val monitoring: Monitoring = new KamonMonitoring
+
+      val sujetoSettings = ProjectionSettings("Sujeto", 1, monitoring)
       ShardedDaemonProcess(system).init(
         name = "SujetoProjection",
         sujetoSettings.parallelism,
@@ -49,7 +52,7 @@ object Guardian {
         Some(ProjectionBehavior.Stop)
       )
 
-      val objetoSettings = ProjectionSettings("Objeto", 1)
+      val objetoSettings = ProjectionSettings("Objeto", 1, monitoring)
       ShardedDaemonProcess(system).init(
         name = "ObjetoProjection",
         objetoSettings.parallelism,
@@ -65,7 +68,7 @@ object Guardian {
         Some(ProjectionBehavior.Stop)
       )
 
-      val obligacionSettings = ProjectionSettings("Obligacion", 1)
+      val obligacionSettings = ProjectionSettings("Obligacion", 1, monitoring)
       ShardedDaemonProcess(system).init(
         name = "ObligacionProjection",
         obligacionSettings.parallelism,
@@ -81,7 +84,7 @@ object Guardian {
         Some(ProjectionBehavior.Stop)
       )
 
-      val actividadSujetoSettings = ProjectionSettings("ActividadSujeto", 1)
+      val actividadSujetoSettings = ProjectionSettings("ActividadSujeto", 1, monitoring)
       ShardedDaemonProcess(system).init(
         name = "ActividadSujetoProjection",
         actividadSujetoSettings.parallelism,
@@ -97,7 +100,7 @@ object Guardian {
         Some(ProjectionBehavior.Stop)
       )
 
-      val declaracionJuradaSettings = ProjectionSettings("DeclaracionJurada", 1)
+      val declaracionJuradaSettings = ProjectionSettings("DeclaracionJurada", 1, monitoring)
       ShardedDaemonProcess(system).init(
         name = "DeclaracionJuradaProjection",
         declaracionJuradaSettings.parallelism,
@@ -113,7 +116,7 @@ object Guardian {
         Some(ProjectionBehavior.Stop)
       )
 
-      val domicilioObjetoSettings = ProjectionSettings("DomicilioObjeto", 1)
+      val domicilioObjetoSettings = ProjectionSettings("DomicilioObjeto", 1, monitoring)
       ShardedDaemonProcess(system).init(
         name = "DomicilioObjetoProjection",
         domicilioObjetoSettings.parallelism,
@@ -129,7 +132,7 @@ object Guardian {
         Some(ProjectionBehavior.Stop)
       )
 
-      val domicilioSujetoSettings = ProjectionSettings("DomicilioSujeto", 1)
+      val domicilioSujetoSettings = ProjectionSettings("DomicilioSujeto", 1, monitoring)
       ShardedDaemonProcess(system).init(
         name = "DomicilioSujetoProjection",
         domicilioSujetoSettings.parallelism,
@@ -145,7 +148,7 @@ object Guardian {
         Some(ProjectionBehavior.Stop)
       )
 
-      val etapasProcesalesSettings = ProjectionSettings("EtapasProcesales", 1)
+      val etapasProcesalesSettings = ProjectionSettings("EtapasProcesales", 1, monitoring)
       ShardedDaemonProcess(system).init(
         name = "EtapasProcesalesProjection",
         etapasProcesalesSettings.parallelism,
@@ -161,7 +164,7 @@ object Guardian {
         Some(ProjectionBehavior.Stop)
       )
 
-      val exencionSettings = ProjectionSettings("Exencion", 1)
+      val exencionSettings = ProjectionSettings("Exencion", 1, monitoring)
       ShardedDaemonProcess(system).init(
         name = "ExencionProjection",
         exencionSettings.parallelism,
@@ -177,7 +180,7 @@ object Guardian {
         Some(ProjectionBehavior.Stop)
       )
 
-      val juicioSettings = ProjectionSettings("Juicio", 1)
+      val juicioSettings = ProjectionSettings("Juicio", 1, monitoring)
       ShardedDaemonProcess(system).init(
         name = "JuicioProjection",
         juicioSettings.parallelism,
@@ -193,7 +196,7 @@ object Guardian {
         Some(ProjectionBehavior.Stop)
       )
 
-      val parametricaPlanSettings = ProjectionSettings("ParametricaPlan", 1)
+      val parametricaPlanSettings = ProjectionSettings("ParametricaPlan", 1, monitoring)
       ShardedDaemonProcess(system).init(
         name = "ParametricaPlanProjection",
         parametricaPlanSettings.parallelism,
@@ -209,7 +212,7 @@ object Guardian {
         Some(ProjectionBehavior.Stop)
       )
 
-      val parametricaRecargoSettings = ProjectionSettings("ParametricaRecargo", 1)
+      val parametricaRecargoSettings = ProjectionSettings("ParametricaRecargo", 1, monitoring)
       ShardedDaemonProcess(system).init(
         name = "ParametricaRecargoProjection",
         parametricaRecargoSettings.parallelism,
@@ -225,7 +228,7 @@ object Guardian {
         Some(ProjectionBehavior.Stop)
       )
 
-      val planPagoSettings = ProjectionSettings("PlanPago", 1)
+      val planPagoSettings = ProjectionSettings("PlanPago", 1, monitoring)
       ShardedDaemonProcess(system).init(
         name = "PlanPagoProjection",
         planPagoSettings.parallelism,
@@ -241,7 +244,7 @@ object Guardian {
         Some(ProjectionBehavior.Stop)
       )
 
-      val subastaSettings = ProjectionSettings("Subasta", 1)
+      val subastaSettings = ProjectionSettings("Subasta", 1, monitoring)
       ShardedDaemonProcess(system).init(
         name = "SubastaProjection",
         subastaSettings.parallelism,
@@ -256,7 +259,7 @@ object Guardian {
         shardedDaemonProcessSettings,
         Some(ProjectionBehavior.Stop)
       )
-      val tramiteSettings = ProjectionSettings("Tramite", 1)
+      val tramiteSettings = ProjectionSettings("Tramite", 1, monitoring)
       ShardedDaemonProcess(system).init(
         name = "TramiteProjection",
         tramiteSettings.parallelism,

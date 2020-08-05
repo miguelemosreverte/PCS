@@ -1,7 +1,6 @@
 package spec.consumers.registrales.parametrica_plan.unit_test
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
@@ -10,6 +9,7 @@ import consumers.registral.parametrica_plan.domain.ParametricaPlanEvents
 import consumers.registral.parametrica_plan.domain.ParametricaPlanEvents.ParametricaPlanUpdatedFromDto
 import consumers.registral.parametrica_plan.infrastructure.json._
 import design_principles.projection.mock.{CassandraTestkitMock, CassandraWriteMock}
+import monitoring.DummyMonitoring
 import readside.proyectionists.registrales.parametrica_plan.ParametricaPlanProjectionHandler
 import readside.proyectionists.registrales.parametrica_plan.projections.ParametricaPlanUpdatedFromDtoProjection
 import spec.testkit.ProjectionTestkitMock
@@ -28,7 +28,7 @@ class ParametricaPlanProjectionUnitTestKit(c: CassandraTestkitMock)(implicit sys
     parametrica_planProyectionist process envelope
 
   def parametrica_planProyectionist: ParametricaPlanProjectionHandler =
-    new readside.proyectionists.registrales.parametrica_plan.ParametricaPlanProjectionHandler() {
+    new readside.proyectionists.registrales.parametrica_plan.ParametricaPlanProjectionHandler(new DummyMonitoring) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 }

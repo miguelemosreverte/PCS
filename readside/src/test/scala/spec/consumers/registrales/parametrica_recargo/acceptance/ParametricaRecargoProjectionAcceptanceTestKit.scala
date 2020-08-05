@@ -1,13 +1,13 @@
 package spec.consumers.registrales.parametrica_recargo.acceptance
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
 import consumers.registral.parametrica_recargo.application.entities.ParametricaRecargoMessage.ParametricaRecargoMessageRoots
 import consumers.registral.parametrica_recargo.domain.ParametricaRecargoEvents
 import design_principles.projection.infrastructure.CassandraTestkitProduction
+import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
 
@@ -25,5 +25,5 @@ class ParametricaRecargoProjectionAcceptanceTestKit(c: CassandraTestkitProductio
   }
 
   def projectionHandler =
-    new readside.proyectionists.registrales.parametrica_recargo.ParametricaRecargoProjectionHandler()
+    new readside.proyectionists.registrales.parametrica_recargo.ParametricaRecargoProjectionHandler(new DummyMonitoring)
 }

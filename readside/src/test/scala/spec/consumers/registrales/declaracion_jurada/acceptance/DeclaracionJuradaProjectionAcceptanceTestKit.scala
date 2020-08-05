@@ -1,13 +1,13 @@
 package spec.consumers.registrales.declaracion_jurada.acceptance
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
 import consumers.registral.declaracion_jurada.application.entities.DeclaracionJuradaMessage.DeclaracionJuradaMessageRoots
 import consumers.registral.declaracion_jurada.domain.DeclaracionJuradaEvents
 import design_principles.projection.infrastructure.CassandraTestkitProduction
+import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
 
@@ -36,5 +36,5 @@ class DeclaracionJuradaProjectionAcceptanceTestKit(c: CassandraTestkitProduction
   }
 
   def projectionHandler =
-    new readside.proyectionists.registrales.declaracion_jurada.DeclaracionJuradaProjectionHandler()
+    new readside.proyectionists.registrales.declaracion_jurada.DeclaracionJuradaProjectionHandler(new DummyMonitoring)
 }

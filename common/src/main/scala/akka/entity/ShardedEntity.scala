@@ -2,6 +2,7 @@ package akka.entity
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
+import cqrs.BasePersistentShardedTypedActor
 
 trait ShardedEntity[Requirements] extends ClusterEntity[Requirements] {
 
@@ -36,9 +37,8 @@ object ShardedEntity {
 
   def extractShardId(numberOfShards: Int): ShardRegion.ExtractShardId = {
     case s: Sharded =>
-      val result = EntityIdOps.fromEncodedToBigInt(EntityIdOps.encode(s.shardedId)) // s.shardedId.hashCode.abs
-      val sharded = (result % numberOfShards).toString
-      sharded
+      val sharded = BasePersistentShardedTypedActor.shardAndPartition(s.shardedId)
+      sharded.toString
 
   }
 

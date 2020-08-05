@@ -3,6 +3,7 @@ package consumers.no_registral.objeto.infrastructure.main
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import api.actor_transaction.ActorTransaction.Implicits._
 import consumers.no_registral.objeto.infrastructure.consumer.{
   ObjetoExencionTransaction,
   ObjetoNoTributarioTransaction,
@@ -11,19 +12,18 @@ import consumers.no_registral.objeto.infrastructure.consumer.{
 }
 import consumers.no_registral.objeto.infrastructure.http._
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor
+import consumers.no_registral.sujeto.infrastructure.main.MicroserviceRequirements
 import kafka.KafkaMessageProcessorRequirements
-import monitoring.Monitoring
 
 import scala.concurrent.ExecutionContext
-import api.actor_transaction.ActorTransaction.Implicits._
 object ObjetoMicroservice {
 
-  def route(
-      monitoring: Monitoring,
-      ec: ExecutionContext
-  )(implicit system: ActorSystem, kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements): Route = {
+  def route(m: MicroserviceRequirements): Route = {
+    val monitoring = m.monitoring
+    implicit val ec: ExecutionContext = m.executionContext
+    implicit val system: ActorSystem = m.system
+    implicit val kafkaProcesorRequirements: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
     implicit val actor: ActorRef = SujetoActor.startWithRequirements(monitoring)
-    implicit val e: ExecutionContext = ec
     Seq(
       ObjetoStateAPI(actor, monitoring).route,
       ObjetoExencionTransaction(actor, monitoring).route,

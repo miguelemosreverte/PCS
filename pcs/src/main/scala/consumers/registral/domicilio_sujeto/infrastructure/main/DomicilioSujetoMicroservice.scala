@@ -2,30 +2,30 @@ package consumers.registral.domicilio_sujeto.infrastructure.main
 
 import akka.actor.{typed, ActorSystem}
 import akka.http.scaladsl.server.Route
+import api.actor_transaction.ActorTransaction.Implicits._
+import consumers.no_registral.sujeto.infrastructure.main.MicroserviceRequirements
 import consumers.registral.domicilio_sujeto.infrastructure.dependency_injection.DomicilioSujetoActor
 import consumers.registral.domicilio_sujeto.infrastructure.http.DomicilioSujetoStateAPI
 import consumers.registral.domicilio_sujeto.infrastructure.kafka.{
   DomicilioSujetoNoTributarioTransaction,
   DomicilioSujetoTributarioTransaction
 }
-import monitoring.Monitoring
+import kafka.KafkaMessageProcessorRequirements
 
 import scala.concurrent.ExecutionContext
-import api.actor_transaction.ActorTransaction.Implicits._
-import kafka.KafkaMessageProcessorRequirements
 
 object DomicilioSujetoMicroservice {
 
   import akka.http.scaladsl.server.Directives._
-  def route(
-      monitoring: Monitoring,
-      ec: ExecutionContext
-  )(implicit system: ActorSystem, kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements): Route = {
+  def route(m: MicroserviceRequirements): Route = {
+    val monitoring = m.monitoring
+    implicit val ec: ExecutionContext = m.executionContext
+    implicit val system: ActorSystem = m.system
+    implicit val kafkaProcesorRequirements: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
     import akka.actor.typed.scaladsl.adapter._
 
     implicit val typedSystem: typed.ActorSystem[Nothing] = system.toTyped
     implicit val actor: DomicilioSujetoActor = DomicilioSujetoActor()
-    implicit val e: ExecutionContext = ec
     Seq(
       DomicilioSujetoStateAPI(actor, monitoring).route,
       DomicilioSujetoTributarioTransaction(actor, monitoring).route,

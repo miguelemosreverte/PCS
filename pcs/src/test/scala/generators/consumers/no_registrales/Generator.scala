@@ -8,10 +8,10 @@ import generators.consumers.no_registrales.Generator.KafkaKeyValue
 trait Generator[E <: ExternalDto] {
   val i: AtomicInteger = new AtomicInteger()
   def example: E
-  def next: E
+  def next(id: Int): E
 
-  final def nextKafkaKeyValue: KafkaKeyValue = {
-    val e = next
+  final def nextKafkaKeyValue(i: Int): KafkaKeyValue = {
+    val e = next(i)
     KafkaKeyValue(
       aggregateRoot = aggregateRoot(e),
       json = toJson(e)

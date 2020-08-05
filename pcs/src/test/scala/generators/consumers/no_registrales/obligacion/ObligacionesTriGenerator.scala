@@ -23,15 +23,13 @@ class ObligacionesTriGenerator extends Generator[ObligacionesTri] {
   import ObligacionesTriGenerator._
   lazy val example: ObligacionesTri = loadExample[ObligacionesTri]("assets/examples/DGR-COP-OBLIGACIONES-TRI.json")
 
-  def next: ObligacionesTri = {
-    val id = i.incrementAndGet().toString
+  def next(id: Int): ObligacionesTri =
     example.copy(
-      EV_ID = id.toInt,
-      BOB_SUJ_IDENTIFICADOR = id,
-      BOB_SOJ_IDENTIFICADOR = id,
-      BOB_OBN_ID = id
+      EV_ID = id,
+      BOB_SUJ_IDENTIFICADOR = id.toString,
+      BOB_SOJ_IDENTIFICADOR = id.toString,
+      BOB_OBN_ID = id.toString
     )
-  }
 
   override def toJson(e: ObligacionesTri): String = e.toJson
 

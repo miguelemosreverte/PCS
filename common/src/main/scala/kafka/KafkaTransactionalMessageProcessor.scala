@@ -31,7 +31,6 @@ class KafkaTransactionalMessageProcessor(
       algorithm: String => Future[Seq[String]]
   ): (KillSwitch, Future[Done]) = {
 
-    println(s"Starting transaction ${SOURCE_TOPIC} 3?")
     type Msg = ConsumerMessage.TransactionalMessage[String, String]
 
     implicit val system: ActorSystem = transactionRequirements.system
@@ -52,7 +51,7 @@ class KafkaTransactionalMessageProcessor(
         val message = msg
 
         val input: String = message.record.value
-        println(input)
+
         log.debug(message.record.value)
 
         algorithm(input)
@@ -108,10 +107,13 @@ class KafkaTransactionalMessageProcessor(
     val (killSwitch, done) = stream.run()
 
     done.onComplete {
-      case Success(value) =>
-        log.info(s"Stream completed with success -- $value")
-        killSwitch.shutdown()
-        run(SOURCE_TOPIC, SINK_TOPIC, algorithm)
+      case Success(_) =>
+        log.debug(s"""
+             |     Stream completed with success 
+             |     This is caused by the HTTP endpoint /kafka/stop/$SOURCE_TOPIC
+             |     Because of this we will take no action to interfere: 
+             |     The topic will not be restarted on it's own.
+          """.stripMargin)
       case Failure(ex) =>
         log.error(s"Stream completed with failure -- ${ex.getMessage}")
         killSwitch.shutdown()

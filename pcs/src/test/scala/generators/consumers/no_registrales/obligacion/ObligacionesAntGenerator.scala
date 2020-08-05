@@ -23,15 +23,13 @@ class ObligacionesAntGenerator extends Generator[ObligacionesAnt] {
 
   lazy val example: ObligacionesAnt = loadExample[ObligacionesAnt]("assets/examples/DGR-COP-OBLIGACIONES-ANT.json")
 
-  def next: ObligacionesAnt = {
-    val id = i.incrementAndGet().toString
+  def next(id: Int): ObligacionesAnt =
     example.copy(
-      EV_ID = deliveryId,
-      BOB_SUJ_IDENTIFICADOR = id,
-      BOB_SOJ_IDENTIFICADOR = id,
-      BOB_OBN_ID = id
+      EV_ID = id,
+      BOB_SUJ_IDENTIFICADOR = id.toString,
+      BOB_SOJ_IDENTIFICADOR = id.toString,
+      BOB_OBN_ID = id.toString
     )
-  }
 
   override def toJson(e: ObligacionesAnt): String = e.toJson
 

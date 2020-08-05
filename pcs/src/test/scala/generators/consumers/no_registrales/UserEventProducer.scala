@@ -30,7 +30,7 @@ object UserEventProducer {
     }
   }
 
-  def produce(topic: String, from: Int, to: Int): Unit = {
+  def produce(topic: String, From: Int, To: Int): Unit = {
 
     implicit val system: ActorSystem = ActorSystem(
       "UserEventProducer",
@@ -57,15 +57,16 @@ object UserEventProducer {
     def producerRecord(keyValue: KafkaKeyValue): ProducerRecord[String, String] = {
       val entityId = keyValue.key
       val message = keyValue.value
-
+      println(entityId)
       val shardAndPartition = BasePersistentShardedTypedActor.shardAndPartition(entityId)
       new ProducerRecord[String, String](topic, shardAndPartition, entityId, message)
     }
 
     val done: Future[Done] =
       akka.stream.scaladsl.Source
-        .tick(1.second, 0.1 seconds, "tick")
-        .map(_ => generator.nextKafkaKeyValue)
+        .fromIterator[Int](() => (From to To).iterator)
+        .throttle(1, 0.1 seconds)
+        .map(i => generator.nextKafkaKeyValue(i))
         .map(producerRecord)
         .runWith(Producer.plainSink(producerSettings))
 

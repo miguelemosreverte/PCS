@@ -1,4 +1,4 @@
-package generators.consumers.no_registrales.obligacion
+package generator.no_registrales.obligacion
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -10,13 +10,12 @@ import consumers.no_registral.obligacion.application.entities.ObligacionExternal
 }
 import consumers.no_registral.obligacion.domain.ObligacionEvents.ObligacionUpdatedFromDto
 import consumers.no_registral.obligacion.infrastructure.json.DetallesObligacionF
-import generators.consumers.no_registrales.{Generator, Helper}
+import generator.Helper
 import play.api.libs.json.Reads
-import stubs.consumers.no_registrales.obligacion.ObligacionCommands.detallesObligaciones
-import stubs.loadExample
-import utils.generators.Model.deliveryId
 import consumers.no_registral.obligacion.infrastructure.json._
 import consumers.no_registral.sujeto.application.entity.SujetoExternalDto.SujetoAnt
+import generator.Generator.{deliveryId, loadExample}
+import generator.{Generator, Helper}
 
 class ObligacionesAntGenerator extends Generator[ObligacionesAnt] {
   import ObligacionesAntGenerator._
@@ -57,12 +56,6 @@ object ObligacionesAntGenerator {
       implicit val b: Reads[Seq[DetallesObligacion]] =
         Reads.seq(DetallesObligacionF.reads)
 
-      val detallesObligaciones: Option[Seq[DetallesObligacion]] = for {
-        otrosAtributos <- obligacionesAnt.BOB_OTROS_ATRIBUTOS
-        bjuDetalles <- (otrosAtributos \ "BOB_DETALLES").toOption
-        detalles = serialization.decodeF[Seq[DetallesObligacion]](bjuDetalles.toString)
-      } yield detalles
-
       def obligacionUpdatedFromDtoStub =
         ObligacionUpdateFromDto(
           obligacionesAnt.BOB_SUJ_IDENTIFICADOR,
@@ -76,6 +69,12 @@ object ObligacionesAntGenerator {
 
       obligacionUpdatedFromDtoStub
     }
+
+    val detallesObligaciones: Option[Seq[DetallesObligacion]] = for {
+      otrosAtributos <- obligacionesAnt.BOB_OTROS_ATRIBUTOS
+      bjuDetalles <- (otrosAtributos \ "BOB_DETALLES").toOption
+      detalles = serialization.decodeF[Seq[DetallesObligacion]](bjuDetalles.toString)
+    } yield detalles
 
   }
 }

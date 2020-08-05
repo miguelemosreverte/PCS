@@ -1,4 +1,4 @@
-package generators.consumers.no_registrales
+package no_registrales
 
 import java.util.concurrent.atomic.AtomicInteger
 

@@ -1,4 +1,4 @@
-package generators.consumers.no_registrales
+package generator
 
 import design_principles.actor_model.{Command, Event}
 

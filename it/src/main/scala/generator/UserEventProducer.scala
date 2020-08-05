@@ -1,4 +1,4 @@
-package generators.consumers.no_registrales
+package generator
 
 import akka.Done
 import akka.actor.ActorSystem
@@ -7,9 +7,9 @@ import akka.kafka.ProducerSettings
 import akka.kafka.scaladsl.Producer
 import com.typesafe.config.ConfigFactory
 import cqrs.BasePersistentShardedTypedActor
-import generators.consumers.no_registrales.Generator.KafkaKeyValue
-import generators.consumers.no_registrales.obligacion.{ObligacionesAntGenerator, ObligacionesTriGenerator}
-import generators.consumers.no_registrales.sujeto.{SujetoAntGenerator, SujetoTriGenerator}
+import generator.Generator.KafkaKeyValue
+import generator.no_registrales.sujeto.{SujetoAntGenerator, SujetoTriGenerator}
+import no_registrales.obligacion.{ObligacionesAntGenerator, ObligacionesTriGenerator}
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 

@@ -1,4 +1,4 @@
-package generators.consumers.no_registrales.obligacion
+package generator.no_registrales.obligacion
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -10,12 +10,12 @@ import consumers.no_registral.obligacion.application.entities.ObligacionExternal
 }
 import consumers.no_registral.obligacion.domain.ObligacionEvents.ObligacionUpdatedFromDto
 import consumers.no_registral.obligacion.infrastructure.json.DetallesObligacionF
-import generators.consumers.no_registrales.{Generator, Helper}
+import generator.Helper
 import play.api.libs.json.Reads
-import stubs.consumers.no_registrales.obligacion.ObligacionCommands.detallesObligaciones
-import stubs.loadExample
-import utils.generators.Model.deliveryId
 import consumers.no_registral.obligacion.infrastructure.json._
+import generator.Generator.{deliveryId, loadExample}
+import generator.{Generator, Helper}
+import play.api.libs.json.JsPath.\
 
 import scala.util.Random
 
@@ -58,12 +58,6 @@ object ObligacionesTriGenerator {
       implicit val b: Reads[Seq[DetallesObligacion]] =
         Reads.seq(DetallesObligacionF.reads)
 
-      val detallesObligaciones: Option[Seq[DetallesObligacion]] = for {
-        otrosAtributos <- obligacionesTri.BOB_OTROS_ATRIBUTOS
-        bjuDetalles <- (otrosAtributos \ "BOB_DETALLES").toOption
-        detalles = serialization.decodeF[Seq[DetallesObligacion]](bjuDetalles.toString)
-      } yield detalles
-
       def obligacionUpdatedFromDtoStub =
         ObligacionUpdateFromDto(
           obligacionesTri.BOB_SUJ_IDENTIFICADOR,
@@ -78,5 +72,12 @@ object ObligacionesTriGenerator {
       obligacionUpdatedFromDtoStub
     }
 
+    val detallesObligaciones: Option[Seq[DetallesObligacion]] = for {
+      otrosAtributos <- obligacionesTri.BOB_OTROS_ATRIBUTOS
+      bjuDetalles <- (otrosAtributos \ "BOB_DETALLES").toOption
+      detalles = serialization.decodeF[Seq[DetallesObligacion]](bjuDetalles.toString)
+    } yield detalles
+
   }
+
 }

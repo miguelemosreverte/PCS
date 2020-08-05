@@ -1,13 +1,11 @@
-package generators.consumers.no_registrales.sujeto
+package generator.no_registrales.sujeto
 
 import consumers.no_registral.sujeto.application.entity.SujetoCommands.SujetoUpdateFromTri
 import consumers.no_registral.sujeto.application.entity.SujetoExternalDto.SujetoTri
 import consumers.no_registral.sujeto.domain.SujetoEvents.SujetoUpdatedFromTri
 import consumers.no_registral.sujeto.infrastructure.json._
-import generators.consumers.no_registrales.{Generator, Helper}
-import stubs.consumers.no_registrales.sujeto.SujetoExternalDto.sujetoTriStub
-import stubs.loadExample
-import utils.generators.Model.deliveryId
+import generator.Generator.{deliveryId, loadExample}
+import generator.{Generator, Helper}
 
 class SujetoTriGenerator extends Generator[SujetoTri] {
   import SujetoTriGenerator._
@@ -32,10 +30,10 @@ object SujetoTriGenerator {
       serialization.encode(sujetoTri)
 
     def toEvent: SujetoUpdatedFromTri =
-      SujetoUpdatedFromTri(deliveryId, sujetoTriStub.SUJ_IDENTIFICADOR, sujetoTriStub)
+      SujetoUpdatedFromTri(deliveryId, sujetoTri.SUJ_IDENTIFICADOR, sujetoTri)
 
     def toCommand: SujetoUpdateFromTri =
-      SujetoUpdateFromTri(deliveryId, sujetoTriStub.SUJ_IDENTIFICADOR, sujetoTriStub)
+      SujetoUpdateFromTri(deliveryId, sujetoTri.SUJ_IDENTIFICADOR, sujetoTri)
 
   }
 }

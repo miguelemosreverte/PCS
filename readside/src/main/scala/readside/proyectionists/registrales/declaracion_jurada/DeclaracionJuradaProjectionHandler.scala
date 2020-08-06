@@ -19,10 +19,6 @@ class DeclaracionJuradaProjectionHandler(settings: ProjectionSettings, system: A
 
   private val tag = settings.tag
 
-  def this(monitoring: Monitoring)(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("DeclaracionJurada", 1, monitoring), classicSystem.toTyped)
-  }
-
   override def process(envelope: EventEnvelope[DeclaracionJuradaEvents]): Future[Done] = {
     envelope.event match {
       case evt: DeclaracionJuradaEvents.DeclaracionJuradaUpdatedFromDto =>
@@ -45,5 +41,17 @@ class DeclaracionJuradaProjectionHandler(settings: ProjectionSettings, system: A
         )
         Future.successful(Done)
     }
+  }
+}
+
+object DeclaracionJuradaProjectionHandler {
+  val defaultTag = "DeclaracionJurada"
+  val defaultParallelism = 1
+  val defaultProjectionSettings: Monitoring => ProjectionSettings =
+    ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): DeclaracionJuradaProjectionHandler = {
+    val projectionSettings = defaultProjectionSettings(monitoring)
+    new DeclaracionJuradaProjectionHandler(projectionSettings, system)
+
   }
 }

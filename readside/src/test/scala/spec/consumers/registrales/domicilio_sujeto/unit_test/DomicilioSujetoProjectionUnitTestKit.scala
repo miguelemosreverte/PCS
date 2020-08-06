@@ -13,6 +13,7 @@ import monitoring.DummyMonitoring
 import readside.proyectionists.registrales.domicilio_sujeto.DomicilioSujetoProjectionHandler
 import readside.proyectionists.registrales.domicilio_sujeto.projections.DomicilioSujetoUpdatedFromDtoProjection
 import spec.testkit.ProjectionTestkitMock
+import akka.actor.typed.scaladsl.adapter._
 
 class DomicilioSujetoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
     extends ProjectionTestkitMock[DomicilioSujetoEvents, DomicilioSujetoMessageRoots] {
@@ -28,7 +29,10 @@ class DomicilioSujetoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit sys
     domicilio_sujetoProyectionist process envelope
 
   def domicilio_sujetoProyectionist: DomicilioSujetoProjectionHandler =
-    new readside.proyectionists.registrales.domicilio_sujeto.DomicilioSujetoProjectionHandler(new DummyMonitoring) {
+    new readside.proyectionists.registrales.domicilio_sujeto.DomicilioSujetoProjectionHandler(
+      DomicilioSujetoProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    ) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 }

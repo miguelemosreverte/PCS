@@ -24,6 +24,6 @@ class ObjetoUpdateFromSetBajaObligacionHandler(actor: ObjetoActor)
       actor.state += event
       actor.persistSnapshot(event, actor.state)(() => ())
     }
-    Success(Response.SuccessProcessing())
+    Success(Response.SuccessProcessing(command.deliveryId))
   }
 }

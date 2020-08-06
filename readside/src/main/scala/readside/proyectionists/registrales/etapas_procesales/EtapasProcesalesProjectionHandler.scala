@@ -19,10 +19,6 @@ class EtapasProcesalesProjectionHandler(settings: ProjectionSettings, system: Ac
 
   private val tag = settings.tag
 
-  def this(monitoring: Monitoring)(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("EtapasProcesales", 1, monitoring), classicSystem.toTyped)
-  }
-
   override def process(envelope: EventEnvelope[EtapasProcesalesEvents]): Future[Done] = {
     envelope.event match {
       case evt: EtapasProcesalesEvents.EtapasProcesalesUpdatedFromDto =>
@@ -45,5 +41,16 @@ class EtapasProcesalesProjectionHandler(settings: ProjectionSettings, system: Ac
         )
         Future.successful(Done)
     }
+  }
+}
+
+object EtapasProcesalesProjectionHandler {
+  val defaultTag = "EtapasProcesales"
+  val defaultParallelism = 1
+  val defaultProjectionSettings: Monitoring => ProjectionSettings =
+    ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): EtapasProcesalesProjectionHandler = {
+    val projectionSettings = defaultProjectionSettings(monitoring)
+    new EtapasProcesalesProjectionHandler(projectionSettings, system)
   }
 }

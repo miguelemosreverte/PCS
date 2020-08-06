@@ -25,7 +25,7 @@ class ObjetoAddExencionHandler(actor: ObjetoActor) extends SyncCommandHandler[Ob
     val lastDeliveryId = actor.state.lastDeliveryIdByEvents.getOrElse(documentName, BigInt(0))
     if (event.deliveryId <= lastDeliveryId) {
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
-      replyTo ! Success(Response.SuccessProcessing())
+      replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
     } else {
       actor.persistEvent(event, Set("Exencion")) { () =>
         actor.state += event
@@ -39,10 +39,10 @@ class ObjetoAddExencionHandler(actor: ObjetoActor) extends SyncCommandHandler[Ob
                                                                    command.exencion)
         }
         actor.informParent(command, actor.state)
-        replyTo ! Success(Response.SuccessProcessing())
+        replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
       }
     }
-    Success(Response.SuccessProcessing())
+    Success(Response.SuccessProcessing(command.deliveryId))
   }
 
 }

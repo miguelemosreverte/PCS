@@ -11,6 +11,7 @@ import akka.{Done, actor => classic}
 import consumers.no_registral.obligacion.domain.ObligacionEvents
 import monitoring.Monitoring
 import org.slf4j.LoggerFactory
+import readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler
 import readside.proyectionists.no_registrales.obligacion.projectionists.ObligacionSnapshotProjection
 
 class ObligacionProjectionHandler(settings: ProjectionSettings, system: ActorSystem[_])
@@ -26,10 +27,6 @@ class ObligacionProjectionHandler(settings: ProjectionSettings, system: ActorSys
   override def stop(): Future[Done] = {
     session.close(ec)
     super.stop()
-  }
-
-  def this(monitoring: Monitoring)(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("Obligacion", 1, monitoring), classicSystem.toTyped)
   }
 
   // val message = EventProcessorPrinter.prettifyEventProcessorLog(eventEnvelope.toString)
@@ -69,5 +66,17 @@ class ObligacionProjectionHandler(settings: ProjectionSettings, system: ActorSys
         )
         Future.successful(Done)
     }
+  }
+}
+
+object ObligacionProjectionHandler {
+  val defaultTag = "Obligacion"
+  val defaultParallelism = 1
+  val defaultProjectionSettings: Monitoring => ProjectionSettings =
+    ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): ObligacionProjectionHandler = {
+    val projectionSettings = defaultProjectionSettings(monitoring)
+    new ObligacionProjectionHandler(projectionSettings, system)
+
   }
 }

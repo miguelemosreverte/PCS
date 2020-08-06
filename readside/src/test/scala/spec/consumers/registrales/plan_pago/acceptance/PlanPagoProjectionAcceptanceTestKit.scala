@@ -10,6 +10,8 @@ import design_principles.projection.infrastructure.CassandraTestkitProduction
 import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
+import akka.actor.typed.scaladsl.adapter._
+import readside.proyectionists.registrales.plan_pago.PlanPagoProjectionHandler
 
 class PlanPagoProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
     extends ProjectionTestkit[PlanPagoEvents, PlanPagoMessageRoots]
@@ -36,5 +38,8 @@ class PlanPagoProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implici
   }
 
   def projectionHandler =
-    new readside.proyectionists.registrales.plan_pago.PlanPagoProjectionHandler(new DummyMonitoring)
+    new readside.proyectionists.registrales.plan_pago.PlanPagoProjectionHandler(
+      PlanPagoProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    )
 }

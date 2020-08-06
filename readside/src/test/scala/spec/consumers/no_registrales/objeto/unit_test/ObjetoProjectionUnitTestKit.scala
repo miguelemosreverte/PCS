@@ -13,6 +13,7 @@ import readside.proyectionists.no_registrales.objeto.projections.ObjetoSnapshotP
 import spec.testkit.ProjectionTestkitMock
 import consumers.no_registral.objeto.infrastructure.json._
 import monitoring.DummyMonitoring
+import akka.actor.typed.scaladsl.adapter._
 
 class ObjetoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
     extends ProjectionTestkitMock[ObjetoEvents, ObjetoMessageRoots] {
@@ -27,7 +28,10 @@ class ObjetoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: Acto
   override def process(envelope: EventEnvelope[ObjetoEvents]): Future[Done] = objetoProyectionist process envelope
 
   def objetoProyectionist: ObjetoProjectionHandler =
-    new readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler(new DummyMonitoring) {
+    new readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler(
+      ObjetoProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    ) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 

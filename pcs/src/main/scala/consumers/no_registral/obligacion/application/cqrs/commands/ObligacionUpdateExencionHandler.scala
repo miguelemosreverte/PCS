@@ -38,11 +38,11 @@ class ObligacionUpdateExencionHandler(actor: ObligacionActor)
       actor.persistEvent(event) { () =>
         actor.state += event
         actor.persistSnapshot() { () =>
-          actor.context.sender() ! Success(Response.SuccessProcessing())
+          actor.context.sender() ! Success(Response.SuccessProcessing(command.deliveryId))
         }
       }
     }
-    Success(Response.SuccessProcessing())
+    Success(Response.SuccessProcessing(command.deliveryId))
 
   }
 }

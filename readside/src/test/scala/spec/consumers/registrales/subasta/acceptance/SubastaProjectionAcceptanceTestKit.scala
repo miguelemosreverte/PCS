@@ -9,7 +9,9 @@ import consumers.registral.subasta.domain.SubastaEvents
 import design_principles.projection.infrastructure.CassandraTestkitProduction
 import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
+import readside.proyectionists.registrales.subasta.SubastaProjectionHandler
 import spec.testkit.ProjectionTestkit
+import akka.actor.typed.scaladsl.adapter._
 
 class SubastaProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
     extends ProjectionTestkit[SubastaEvents, SubastaMessageRoots]
@@ -36,5 +38,8 @@ class SubastaProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit
   }
 
   def projectionHandler =
-    new readside.proyectionists.registrales.subasta.SubastaProjectionHandler(new DummyMonitoring)
+    new readside.proyectionists.registrales.subasta.SubastaProjectionHandler(
+      SubastaProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    )
 }

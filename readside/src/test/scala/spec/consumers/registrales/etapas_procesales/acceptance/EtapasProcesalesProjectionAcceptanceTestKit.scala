@@ -10,6 +10,8 @@ import design_principles.projection.infrastructure.CassandraTestkitProduction
 import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
+import akka.actor.typed.scaladsl.adapter._
+import readside.proyectionists.registrales.etapas_procesales.EtapasProcesalesProjectionHandler
 
 class EtapasProcesalesProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
     extends ProjectionTestkit[EtapasProcesalesEvents, EtapasProcesalesMessageRoots]
@@ -31,5 +33,8 @@ class EtapasProcesalesProjectionAcceptanceTestKit(c: CassandraTestkitProduction)
   }
 
   def projectionHandler =
-    new readside.proyectionists.registrales.etapas_procesales.EtapasProcesalesProjectionHandler(new DummyMonitoring)
+    new readside.proyectionists.registrales.etapas_procesales.EtapasProcesalesProjectionHandler(
+      EtapasProcesalesProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    )
 }

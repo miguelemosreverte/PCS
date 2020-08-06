@@ -19,10 +19,6 @@ class ParametricaPlanProjectionHandler(settings: ProjectionSettings, system: Act
 
   private val tag = settings.tag
 
-  def this(monitoring: Monitoring)(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("ParametricaPlan", 1, monitoring), classicSystem.toTyped)
-  }
-
   override def process(envelope: EventEnvelope[ParametricaPlanEvents]): Future[Done] = {
     envelope.event match {
       case evt: ParametricaPlanEvents.ParametricaPlanUpdatedFromDto =>
@@ -45,5 +41,16 @@ class ParametricaPlanProjectionHandler(settings: ProjectionSettings, system: Act
         )
         Future.successful(Done)
     }
+  }
+}
+
+object ParametricaPlanProjectionHandler {
+  val defaultTag = "ParametricaPlan"
+  val defaultParallelism = 1
+  val defaultProjectionSettings: Monitoring => ProjectionSettings =
+    ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): ParametricaPlanProjectionHandler = {
+    val projectionSettings = defaultProjectionSettings(monitoring)
+    new ParametricaPlanProjectionHandler(projectionSettings, system)
   }
 }

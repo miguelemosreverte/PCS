@@ -20,10 +20,6 @@ class ExencionProjectionHandler(settings: ProjectionSettings, system: ActorSyste
 
   private val tag = settings.tag
 
-  def this(monitoring: Monitoring)(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("Exencion", 1, monitoring), classicSystem.toTyped)
-  }
-
   override def process(envelope: EventEnvelope[ObjetoAddedExencion]): Future[Done] = {
     envelope.event match {
       case evt: ObjetoEvents.ObjetoAddedExencion =>
@@ -46,5 +42,16 @@ class ExencionProjectionHandler(settings: ProjectionSettings, system: ActorSyste
         )
         Future.successful(Done)
     }
+  }
+}
+
+object ExencionProjectionHandler {
+  val defaultTag = "Exencion"
+  val defaultParallelism = 1
+  val defaultProjectionSettings: Monitoring => ProjectionSettings =
+    ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): ExencionProjectionHandler = {
+    val projectionSettings = defaultProjectionSettings(monitoring)
+    new ExencionProjectionHandler(projectionSettings, system)
   }
 }

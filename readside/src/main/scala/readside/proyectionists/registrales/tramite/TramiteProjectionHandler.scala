@@ -19,9 +19,6 @@ class TramiteProjectionHandler(settings: ProjectionSettings, system: ActorSystem
 
   private val tag = settings.tag
 
-  def this(monitoring: Monitoring)(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("Tramite", 1, monitoring), classicSystem.toTyped)
-  }
   override def process(envelope: EventEnvelope[TramiteEvents]): Future[Done] = {
     envelope.event match {
       case evt: TramiteEvents.TramiteUpdatedFromDto =>
@@ -44,5 +41,16 @@ class TramiteProjectionHandler(settings: ProjectionSettings, system: ActorSystem
         )
         Future.successful(Done)
     }
+  }
+}
+
+object TramiteProjectionHandler {
+  val defaultTag = "Tramite"
+  val defaultParallelism = 1
+  val defaultProjectionSettings: Monitoring => ProjectionSettings =
+    ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): TramiteProjectionHandler = {
+    val projectionSettings = defaultProjectionSettings(monitoring)
+    new TramiteProjectionHandler(projectionSettings, system)
   }
 }

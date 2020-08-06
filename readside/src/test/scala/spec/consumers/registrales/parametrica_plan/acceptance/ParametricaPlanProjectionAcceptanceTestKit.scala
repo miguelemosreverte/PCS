@@ -10,6 +10,8 @@ import design_principles.projection.infrastructure.CassandraTestkitProduction
 import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
+import akka.actor.typed.scaladsl.adapter._
+import readside.proyectionists.registrales.parametrica_plan.ParametricaPlanProjectionHandler
 
 class ParametricaPlanProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
     extends ProjectionTestkit[ParametricaPlanEvents, ParametricaPlanMessageRoots]
@@ -28,5 +30,8 @@ class ParametricaPlanProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(
   }
 
   def projectionHandler =
-    new readside.proyectionists.registrales.parametrica_plan.ParametricaPlanProjectionHandler(new DummyMonitoring)
+    new readside.proyectionists.registrales.parametrica_plan.ParametricaPlanProjectionHandler(
+      ParametricaPlanProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    )
 }

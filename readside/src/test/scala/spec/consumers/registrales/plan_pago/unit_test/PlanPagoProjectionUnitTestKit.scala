@@ -13,6 +13,7 @@ import monitoring.DummyMonitoring
 import readside.proyectionists.registrales.plan_pago.PlanPagoProjectionHandler
 import readside.proyectionists.registrales.plan_pago.projections.PlanPagoUpdatedFromDtoProjection
 import spec.testkit.ProjectionTestkitMock
+import akka.actor.typed.scaladsl.adapter._
 
 class PlanPagoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
     extends ProjectionTestkitMock[PlanPagoEvents, PlanPagoMessageRoots] {
@@ -28,7 +29,10 @@ class PlanPagoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: Ac
     plan_pagoProyectionist process envelope
 
   def plan_pagoProyectionist: PlanPagoProjectionHandler =
-    new readside.proyectionists.registrales.plan_pago.PlanPagoProjectionHandler(new DummyMonitoring) {
+    new readside.proyectionists.registrales.plan_pago.PlanPagoProjectionHandler(
+      PlanPagoProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    ) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 }

@@ -13,6 +13,7 @@ import monitoring.DummyMonitoring
 import readside.proyectionists.registrales.parametrica_plan.ParametricaPlanProjectionHandler
 import readside.proyectionists.registrales.parametrica_plan.projections.ParametricaPlanUpdatedFromDtoProjection
 import spec.testkit.ProjectionTestkitMock
+import akka.actor.typed.scaladsl.adapter._
 
 class ParametricaPlanProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
     extends ProjectionTestkitMock[ParametricaPlanEvents, ParametricaPlanMessageRoots] {
@@ -28,7 +29,10 @@ class ParametricaPlanProjectionUnitTestKit(c: CassandraTestkitMock)(implicit sys
     parametrica_planProyectionist process envelope
 
   def parametrica_planProyectionist: ParametricaPlanProjectionHandler =
-    new readside.proyectionists.registrales.parametrica_plan.ParametricaPlanProjectionHandler(new DummyMonitoring) {
+    new readside.proyectionists.registrales.parametrica_plan.ParametricaPlanProjectionHandler(
+      ParametricaPlanProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    ) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 }

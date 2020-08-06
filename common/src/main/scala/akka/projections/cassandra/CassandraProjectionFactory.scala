@@ -1,4 +1,4 @@
-package akka.projections
+package akka.projections.cassandra
 
 import akka.actor.typed.ActorSystem
 import akka.persistence.cassandra.query.scaladsl.CassandraReadJournal
@@ -6,8 +6,9 @@ import akka.projection.ProjectionId
 import akka.projection.cassandra.scaladsl.{AtLeastOnceCassandraProjection, CassandraProjection}
 import akka.projection.eventsourced.EventEnvelope
 import akka.projection.eventsourced.scaladsl.EventSourcedProvider
+import akka.projections.ProjectionHandler
 
-object ProjectionFactory {
+private[cassandra] object CassandraProjectionFactory {
   def createProjectionFor[T](
       system: ActorSystem[_],
       projectionId: String,

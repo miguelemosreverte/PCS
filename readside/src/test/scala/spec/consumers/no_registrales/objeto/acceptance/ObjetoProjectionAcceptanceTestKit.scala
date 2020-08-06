@@ -11,6 +11,7 @@ import design_principles.projection.infrastructure.CassandraTestkitProduction
 import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
+import akka.actor.typed.scaladsl.adapter._
 
 class ObjetoProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
     extends ProjectionTestkit[ObjetoEvents, ObjetoMessageRoots]
@@ -34,5 +35,5 @@ class ObjetoProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit 
   }
 
   def objetoProyectionist =
-    new readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler(new DummyMonitoring)
+    readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler(new DummyMonitoring, system.toTyped)
 }

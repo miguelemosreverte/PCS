@@ -9,15 +9,19 @@ import consumers.registral.parametrica_recargo.infrastructure.kafka.{
   ParametricaRecargoNoTributarioTransaction,
   ParametricaRecargoTributarioTransaction
 }
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
+}
 import design_principles.microservice.{Microservice, MicroserviceRequirements}
 import kafka.KafkaMessageProcessorRequirements
 
 import scala.concurrent.ExecutionContext
 
-object ParametricaRecargoMicroservice extends Microservice {
+object ParametricaRecargoMicroservice extends KafkaConsumerMicroservice {
 
   import akka.http.scaladsl.server.Directives._
-  def route(m: MicroserviceRequirements): Route = {
+  def route(m: KafkaConsumerMicroserviceRequirements): Route = {
     val monitoring = m.monitoring
     implicit val ec: ExecutionContext = m.executionContext
     val ctx = m.ctx

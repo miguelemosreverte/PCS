@@ -6,14 +6,18 @@ import api.actor_transaction.ActorTransaction.Implicits._
 import consumers.registral.declaracion_jurada.infrastructure.dependency_injection.DeclaracionJuradaActor
 import consumers.registral.declaracion_jurada.infrastructure.http.DeclaracionJuradaStateAPI
 import consumers.registral.declaracion_jurada.infrastructure.kafka.DeclaracionJuradaTransaction
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
+}
 import design_principles.microservice.{Microservice, MicroserviceRequirements}
 import kafka.KafkaMessageProcessorRequirements
 
 import scala.concurrent.ExecutionContext
-object DeclaracionJuradaMicroservice extends Microservice {
+object DeclaracionJuradaMicroservice extends KafkaConsumerMicroservice {
 
   import akka.http.scaladsl.server.Directives._
-  def route(m: MicroserviceRequirements): Route = {
+  def route(m: KafkaConsumerMicroserviceRequirements): Route = {
     val monitoring = m.monitoring
     implicit val ec: ExecutionContext = m.executionContext
     val ctx = m.ctx

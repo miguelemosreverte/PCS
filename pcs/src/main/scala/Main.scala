@@ -1,6 +1,7 @@
 import com.typesafe.config.ConfigFactory
 import design_principles.microservice.Microservice
-import design_principles.structure.MainApplication.startMicroservices
+import design_principles.microservice.kafka_consumer_microservice.KafkaConsumerMicroservice
+import design_principles.microservice.kafka_consumer_microservice.MainApplication.startMicroservices
 
 object Main extends App {
 
@@ -11,7 +12,7 @@ object Main extends App {
 
   startMicroservices(microservices, ip, port, actorSystemName)
 
-  def microservices: Seq[Microservice] = Seq(
+  def microservices: Seq[KafkaConsumerMicroservice] = Seq(
     consumers.no_registral.sujeto.infrastructure.main.SujetoMicroservice,
     consumers.no_registral.cotitularidad.infrastructure.main.CotitularidadMicroservice,
     consumers.no_registral.objeto.infrastructure.main.ObjetoMicroservice,

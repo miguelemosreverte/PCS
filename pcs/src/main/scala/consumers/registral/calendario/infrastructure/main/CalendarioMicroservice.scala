@@ -6,14 +6,18 @@ import api.actor_transaction.ActorTransaction.Implicits._
 import consumers.registral.calendario.infrastructure.dependency_injection.CalendarioActor
 import consumers.registral.calendario.infrastructure.http.CalendarioStateAPI
 import consumers.registral.calendario.infrastructure.kafka.CalendarioTransaction
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
+}
 import design_principles.microservice.{Microservice, MicroserviceRequirements}
 import kafka.KafkaMessageProcessorRequirements
 
 import scala.concurrent.ExecutionContext
-object CalendarioMicroservice extends Microservice {
+object CalendarioMicroservice extends KafkaConsumerMicroservice {
 
   import akka.http.scaladsl.server.Directives._
-  def route(m: MicroserviceRequirements): Route = {
+  def route(m: KafkaConsumerMicroserviceRequirements): Route = {
     val monitoring = m.monitoring
     implicit val ec: ExecutionContext = m.executionContext
     val ctx = m.ctx

@@ -32,10 +32,104 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 6,
+        "h": 7,
         "w": 24,
         "x": 0,
         "y": 0
+      },
+      "hiddenSeries": false,
+      "id": 10,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pluginVersion": "7.1.1",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "sum(rate(copernico_counters_total{entity=\"actor-transaction-_obligacion_tributaria_transaction-request\"} [1m]) )",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Transactions Per Minute (RPM)",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:442",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:443",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 7
       },
       "hiddenSeries": false,
       "id": 8,
@@ -62,7 +156,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum(rate(copernico_histograms_bucket{entity=\"actor-transaction-_obligacion_tributaria_transaction-latency\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(copernico_histograms_bucket{entity=\"actor-transaction-_obligacion_tributaria_transaction-latency\"}[1m])) by (le))",
           "interval": "",
           "legendFormat": "actor-transaction-_obligacion_tributaria_transaction-latency",
           "refId": "A"
@@ -129,7 +223,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 6
+        "y": 13
       },
       "hiddenSeries": false,
       "id": 2,
@@ -222,7 +316,7 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 6
+        "y": 13
       },
       "hiddenSeries": false,
       "id": 4,
@@ -308,8 +402,8 @@
     "list": []
   },
   "time": {
-    "from": "now-3h",
-    "to": "now"
+    "from": "2020-08-06T01:50:56.375Z",
+    "to": "2020-08-06T03:35:38.423Z"
   },
   "timepicker": {
     "refresh_intervals": [

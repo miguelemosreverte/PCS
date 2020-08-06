@@ -10,14 +10,18 @@ import consumers.no_registral.cotitularidad.infrastructure.kafka.{
   AddCotitularTransaction,
   CotitularPublishSnapshotTransaction
 }
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
+}
 import design_principles.microservice.{Microservice, MicroserviceRequirements}
 import kafka.KafkaMessageProcessorRequirements
 
 import scala.concurrent.ExecutionContext
 
-object CotitularidadMicroservice extends Microservice {
+object CotitularidadMicroservice extends KafkaConsumerMicroservice {
 
-  def route(m: MicroserviceRequirements): Route = {
+  def route(m: KafkaConsumerMicroserviceRequirements): Route = {
     val monitoring = m.monitoring
     implicit val ec: ExecutionContext = m.executionContext
     val ctx = m.ctx

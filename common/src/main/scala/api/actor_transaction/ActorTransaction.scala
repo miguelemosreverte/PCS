@@ -43,7 +43,7 @@ object ActorTransaction {
     ) {
 
       final def route(implicit system: akka.actor.ActorSystem): Route = {
-        kafka.AtomicKafkaController.AtomicKafkaController(actorTransaction, requirements)(system).route
+        kafka.KafkaTransactionalMessageProcessorController(actorTransaction, requirements)(system).route
       }
 
     }

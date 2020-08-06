@@ -10,13 +10,17 @@ import consumers.no_registral.sujeto.infrastructure.consumer.{
 }
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor
 import consumers.no_registral.sujeto.infrastructure.http.SujetoStateAPI
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
+}
 import design_principles.microservice.{Microservice, MicroserviceRequirements}
 import kafka.KafkaMessageProcessorRequirements
 
 import scala.concurrent.ExecutionContext
 
-object SujetoMicroservice extends Microservice {
-  def route(m: MicroserviceRequirements): Route = {
+object SujetoMicroservice extends KafkaConsumerMicroservice {
+  def route(m: KafkaConsumerMicroserviceRequirements): Route = {
     val monitoring = m.monitoring
     implicit val ec: ExecutionContext = m.executionContext
     val ctx = m.ctx

@@ -10,7 +10,7 @@ import akka.http.scaladsl.server.Directives._
 
 import scala.concurrent.ExecutionContext
 
-object AppLifecycleMicroservice extends Microservice {
+object AppLifecycleMicroservice extends Microservice[MicroserviceRequirements] {
   def route(microserviceRequirements: MicroserviceRequirements): Route = {
     val ctx = microserviceRequirements.ctx
     implicit val system: typed.ActorSystem[Nothing] = ctx.system

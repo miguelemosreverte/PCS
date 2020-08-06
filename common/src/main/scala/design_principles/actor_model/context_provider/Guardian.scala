@@ -7,12 +7,9 @@ import akka.cluster.ClusterEvent.MemberUp
 import akka.cluster.typed.{Cluster, Subscribe}
 import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.management.scaladsl.AkkaManagement
-import design_principles.dependency_injection.ContextProvider2
 
-object ActorSystemContextProvider
-    extends ContextProvider2[ActorSystemRequirements, ActorContext[MemberUp], Behavior[Done], ActorSystem[MemberUp]] {
-
-  override def getContext(
+object Guardian {
+  def getContext(
       requirements: ActorSystemRequirements
   )(start: ActorContext[MemberUp] => Behavior[Done]): ActorSystem[MemberUp] = {
 

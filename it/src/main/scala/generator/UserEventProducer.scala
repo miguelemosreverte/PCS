@@ -6,11 +6,13 @@ import akka.event.Logging
 import akka.kafka.ProducerSettings
 import akka.kafka.scaladsl.Producer
 import com.typesafe.config.ConfigFactory
-import cqrs.BasePersistentShardedTypedActor
+import design_principles.actor_model.mechanism.local_processing.{
+  KafkaMessageProducer,
+  LocalizedProcessingMessageExtractor
+}
 import generator.Generator.KafkaKeyValue
+import generator.no_registrales.obligacion.{ObligacionesAntGenerator, ObligacionesTriGenerator}
 import generator.no_registrales.sujeto.{SujetoAntGenerator, SujetoTriGenerator}
-import no_registrales.obligacion.{ObligacionesAntGenerator, ObligacionesTriGenerator}
-import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 
 import scala.concurrent.Future
@@ -54,20 +56,15 @@ object UserEventProducer {
       case "DGR-COP-SUJETO-ANT" => new SujetoAntGenerator()
     }
 
-    def producerRecord(keyValue: KafkaKeyValue): ProducerRecord[String, String] = {
-      val entityId = keyValue.key
-      val message = keyValue.value
-      println(entityId)
-      val shardAndPartition = BasePersistentShardedTypedActor.shardAndPartition(entityId)
-      new ProducerRecord[String, String](topic, shardAndPartition, entityId, message)
-    }
+    def produce(keyValue: KafkaKeyValue) =
+      KafkaMessageProducer.producerRecord(topic, 120, keyValue.aggregateRoot, keyValue.json)
 
     val done: Future[Done] =
       akka.stream.scaladsl.Source
         .fromIterator[Int](() => (From to To).iterator)
         .throttle(1, 0.1 seconds)
         .map(i => generator.nextKafkaKeyValue(i))
-        .map(producerRecord)
+        .map(produce)
         .runWith(Producer.plainSink(producerSettings))
 
   }

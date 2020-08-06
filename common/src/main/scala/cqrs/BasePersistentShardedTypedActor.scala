@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory
 
 import scala.reflect.ClassTag
 import cqrs.typed.event.SyncEffectEventBus
+import design_principles.actor_model.mechanism.local_processing.LocalizedProcessingMessageExtractor
 import org.apache.kafka.common.utils.Utils
 
 abstract class BasePersistentShardedTypedActor[ActorMessages <: design_principles.actor_model.ShardedMessage: ClassTag,
@@ -43,22 +44,11 @@ abstract class BasePersistentShardedTypedActor[ActorMessages <: design_principle
       override def entityId(message: ActorMessages): String = message.aggregateRoot.hashCode.toString
     }
 
-  class UserIdMessageExtractor(nrKafkaPartitions: Int) extends ShardingMessageExtractor[ActorMessages, ActorMessages] {
-    override def entityId(message: ActorMessages): String = message.aggregateRoot
-
-    override def shardId(entityId: String): String = {
-      BasePersistentShardedTypedActor.shardAndPartition(entityId).toString
-    }
-
-    override def unwrapMessage(message: ActorMessages): ActorMessages = message
-  }
-
   val shardActor: ActorRef[ActorMessages] = sharding.init(
     Entity(TypeKey) { context =>
       persistentEntity(context.entityId, context.shard)
-    }.withMessageExtractor(messageExtractor)
-      .withAllocationStrategy(new ExternalShardAllocationStrategy(system, TypeKey.name))
-      .withMessageExtractor(new UserIdMessageExtractor(120))
+    }.withAllocationStrategy(new ExternalShardAllocationStrategy(system, TypeKey.name))
+      .withMessageExtractor(new LocalizedProcessingMessageExtractor[ActorMessages](120))
       .withSettings(ClusterShardingSettings(system))
   )
 

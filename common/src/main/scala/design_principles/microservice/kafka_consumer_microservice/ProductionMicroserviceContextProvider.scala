@@ -1,17 +1,16 @@
-package design_principles.microservice.context_provider
+package design_principles.microservice.kafka_consumer_microservice
 
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.cluster.ClusterEvent.MemberUp
 import akka.http.scaladsl.server.Route
 import akka.kafka.ConsumerRebalanceEvent
-import design_principles.microservice.MicroserviceRequirements
 import kafka.{KafkaMessageProcessorRequirements, TopicListener}
 import monitoring.KamonMonitoring
 
-object ProductionMicroserviceContextProvider extends MicroserviceContextProvider {
+object ProductionMicroserviceContextProvider {
 
-  override def getContext(ctx: ActorContext[MemberUp])(visitor: MicroserviceRequirements => Route): Route = {
+  def getContext(ctx: ActorContext[MemberUp])(visitor: KafkaConsumerMicroserviceRequirements => Route): Route = {
     import akka.actor.typed.scaladsl.adapter._
 
     val monitoring = new KamonMonitoring
@@ -32,7 +31,7 @@ object ProductionMicroserviceContextProvider extends MicroserviceContextProvider
       )
 
     visitor(
-      MicroserviceRequirements(
+      KafkaConsumerMicroserviceRequirements(
         monitoring = monitoring,
         executionContext = ctx.system.toClassic.dispatcher,
         ctx = ctx,

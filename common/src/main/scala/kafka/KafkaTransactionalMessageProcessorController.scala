@@ -9,10 +9,14 @@ import api.actor_transaction.ActorTransaction
 
 import scala.concurrent.ExecutionContextExecutor
 
-object AtomicKafkaController {
+object KafkaTransactionalMessageProcessorController {
 
-  case class AtomicKafkaController(actorTransaction: ActorTransaction[_],
-                                   requirements: KafkaMessageProcessorRequirements)(
+  def apply(actorTransaction: ActorTransaction[_], requirements: KafkaMessageProcessorRequirements)(
+      implicit system: ActorSystem
+  ) = KafkaTransactionalMessageProcessorController(actorTransaction, requirements)
+
+  case class KafkaTransactionalMessageProcessorController(actorTransaction: ActorTransaction[_],
+                                                          requirements: KafkaMessageProcessorRequirements)(
       implicit system: ActorSystem
   ) extends Controller(requirements.monitoring) {
 

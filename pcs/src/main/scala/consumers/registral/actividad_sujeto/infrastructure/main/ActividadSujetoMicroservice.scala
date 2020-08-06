@@ -7,14 +7,18 @@ import api.actor_transaction.ActorTransaction.Implicits._
 import consumers.registral.actividad_sujeto.infrastructure.dependency_injection.ActividadSujetoActor
 import consumers.registral.actividad_sujeto.infrastructure.http.ActividadSujetoStateAPI
 import consumers.registral.actividad_sujeto.infrastructure.kafka.ActividadSujetoTransaction
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
+}
 import design_principles.microservice.{Microservice, MicroserviceRequirements}
 import kafka.KafkaMessageProcessorRequirements
 
 import scala.concurrent.ExecutionContext
 
-object ActividadSujetoMicroservice extends Microservice {
+object ActividadSujetoMicroservice extends KafkaConsumerMicroservice {
 
-  def route(m: MicroserviceRequirements): Route = {
+  def route(m: KafkaConsumerMicroserviceRequirements): Route = {
     val monitoring = m.monitoring
     implicit val ec: ExecutionContext = m.executionContext
     val ctx = m.ctx

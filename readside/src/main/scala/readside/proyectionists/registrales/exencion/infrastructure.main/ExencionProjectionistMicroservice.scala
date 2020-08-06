@@ -18,6 +18,8 @@ object ExencionProjectionistMicroservice extends CassandraProjectionistMicroserv
   override def route(context: CassandraProjectionistMicroserviceRequirements): Route = {
     val monitoring = context.monitoring
     val system = context.ctx.system
-    ExencionProjectionHandler(monitoring, system).route
+    val projectionist = ExencionProjectionHandler(monitoring, system)
+    projectionist.run()
+    projectionist.route
   }
 }

@@ -10,8 +10,10 @@ import akka.projections.{ProjectionHandler, ProjectionSettings}
 import akka.stream.alpakka.cassandra.CassandraSessionSettings
 import akka.stream.alpakka.cassandra.scaladsl.{CassandraSession, CassandraSessionRegistry}
 import cassandra.write.{CassandraWrite, CassandraWriteProduction}
-import scalaz.concurrent.Task.Try
 import akka.http.scaladsl.server.Directives._
+import org.slf4j.LoggerFactory
+
+import scala.util.{Failure, Success, Try}
 
 abstract class CassandraProjectionHandler[T](settings: ProjectionSettings, system: ActorSystem[_])
     extends ProjectionHandler[T](settings, system) {
@@ -21,26 +23,28 @@ abstract class CassandraProjectionHandler[T](settings: ProjectionSettings, syste
 
   val cassandra: CassandraWrite = new CassandraWriteProduction()
 
+  protected val log = LoggerFactory.getLogger(this.getClass)
+
   def run(): Unit =
-    CassandraProjectionist.startProjection(
-      CassandraProjectionistRequirements(
-        projectionSettings = settings,
-        system = system,
-        projectionHandler = this
+    Try(
+      CassandraProjectionist.startProjection(
+        CassandraProjectionistRequirements(
+          projectionSettings = settings,
+          system = system,
+          projectionHandler = this
+        )
       )
-    )
+    ) match {
+      case Failure(exception) =>
+        log.error(s"CassandraProjection ${settings.name} started with Failure(${exception.getMessage})")
+      case Success(value) =>
+        log.info(s"CassandraProjection ${settings.name} started with Success($value)")
+    }
 
   def route: Route =
     path("api" / "projection" / settings.name / "start") {
       complete {
-        Try {
-          run()
-        }.toEither match {
-          case Left(e) =>
-            HttpResponse(InternalServerError, entity = e.getMessage)
-          case Right(value) =>
-            StatusCodes.OK
-        }
+        StatusCodes.OK
       }
     }
 

@@ -18,6 +18,8 @@ object DeclaracionJuradaProjectionistMicroservice extends CassandraProjectionist
   override def route(context: CassandraProjectionistMicroserviceRequirements): Route = {
     val monitoring = context.monitoring
     val system = context.ctx.system
-    DeclaracionJuradaProjectionHandler(monitoring, system).route
+    val projectionist = DeclaracionJuradaProjectionHandler(monitoring, system)
+    projectionist.run()
+    projectionist.route
   }
 }

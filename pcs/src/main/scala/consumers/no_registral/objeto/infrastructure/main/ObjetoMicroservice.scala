@@ -32,8 +32,11 @@ object ObjetoMicroservice extends KafkaConsumerMicroservice {
     implicit val kafkaProcesorRequirements: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
     implicit val actor: ActorRef = SujetoActor.startWithRequirements(monitoring)
 
+    val feedbackLoop = ObjetoNovedadCotitularidadProjectionHandler(monitoring, systemTyped)
+    feedbackLoop.run()
+
     Seq(
-      ObjetoNovedadCotitularidadProjectionHandler(monitoring, systemTyped).route,
+      feedbackLoop.route,
       ObjetoStateAPI(actor, monitoring).route,
       ObjetoExencionTransaction(actor, monitoring).route,
       ObjetoNoTributarioTransaction(actor, monitoring).route,

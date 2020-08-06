@@ -18,6 +18,8 @@ object PlanPagoProjectionistMicroservice extends CassandraProjectionistMicroserv
   override def route(context: CassandraProjectionistMicroserviceRequirements): Route = {
     val monitoring = context.monitoring
     val system = context.ctx.system
-    PlanPagoProjectionHandler(monitoring, system).route
+    val projectionist = PlanPagoProjectionHandler(monitoring, system)
+    projectionist.run()
+    projectionist.route
   }
 }

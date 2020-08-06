@@ -16,8 +16,6 @@ class JuicioProjectionHandler(settings: ProjectionSettings, system: ActorSystem[
     extends CassandraProjectionHandler[JuicioEvents](settings, system) {
   implicit val classicSystem: classic.ActorSystem = system.toClassic
   import classicSystem.dispatcher
-  private val log = LoggerFactory.getLogger(getClass)
-
   private val tag = settings.tag
 
   def this(monitoring: Monitoring)(implicit classicSystem: akka.actor.ActorSystem) {

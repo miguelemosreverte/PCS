@@ -27,7 +27,6 @@ class ObjetoNovedadCotitularidadProjectionHandler(settings: ProjectionSettings, 
     extends CassandraProjectionHandler[ObjetoEvents](settings, system) {
   implicit val classicSystem: classic.ActorSystem = system.toClassic
   implicit val ec: ExecutionContextExecutor = classicSystem.dispatcher
-  private val log = LoggerFactory.getLogger(getClass)
 
   override def process(envelope: EventEnvelope[ObjetoEvents]): Future[Done] =
     processEvent(envelope.event)

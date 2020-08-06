@@ -18,7 +18,9 @@ object ObjetoProjectionistMicroservice extends CassandraProjectionistMicroservic
   override def route(context: CassandraProjectionistMicroserviceRequirements): Route = {
     val monitoring = context.monitoring
     val system = context.ctx.system
-    ObjetoProjectionHandler(monitoring, system).route
+    val projectionist = ObjetoProjectionHandler(monitoring, system)
+    projectionist.run()
+    projectionist.route
   }
 
 }

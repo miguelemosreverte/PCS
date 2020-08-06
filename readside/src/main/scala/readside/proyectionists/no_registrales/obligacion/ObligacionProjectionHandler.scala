@@ -18,7 +18,6 @@ class ObligacionProjectionHandler(settings: ProjectionSettings, system: ActorSys
     extends CassandraProjectionHandler[ObligacionEvents](settings, system) {
   implicit val classicSystem: classic.ActorSystem = system.toClassic
   implicit val ec: ExecutionContextExecutor = classicSystem.dispatcher
-  private val log = LoggerFactory.getLogger(getClass)
   private val tag = settings.tag
 
   val sessionSettings: CassandraSessionSettings = CassandraSessionSettings.create()

@@ -18,6 +18,8 @@ object SubastaProjectionistMicroservice extends CassandraProjectionistMicroservi
   override def route(context: CassandraProjectionistMicroserviceRequirements): Route = {
     val monitoring = context.monitoring
     val system = context.ctx.system
-    SubastaProjectionHandler(monitoring, system).route
+    val projectionist = SubastaProjectionHandler(monitoring, system)
+    projectionist.run()
+    projectionist.route
   }
 }

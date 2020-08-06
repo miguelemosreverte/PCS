@@ -16,7 +16,6 @@ class ObjetoProjectionHandler(settings: ProjectionSettings, system: ActorSystem[
     extends CassandraProjectionHandler[ObjetoEvents](settings, system) {
   implicit val classicSystem: classic.ActorSystem = system.toClassic
   import classicSystem.dispatcher
-  private val log = LoggerFactory.getLogger(getClass)
 
   private val tag = settings.tag
 

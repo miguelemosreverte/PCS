@@ -18,6 +18,8 @@ object ParametricaRecargoProjectionistMicroservice extends CassandraProjectionis
   override def route(context: CassandraProjectionistMicroserviceRequirements): Route = {
     val monitoring = context.monitoring
     val system = context.ctx.system
-    ParametricaRecargoProjectionHandler(monitoring, system).route
+    val projectionist = ParametricaRecargoProjectionHandler(monitoring, system)
+    projectionist.run()
+    projectionist.route
   }
 }

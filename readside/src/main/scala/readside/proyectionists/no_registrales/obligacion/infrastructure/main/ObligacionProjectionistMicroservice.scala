@@ -18,6 +18,8 @@ object ObligacionProjectionistMicroservice extends CassandraProjectionistMicrose
   override def route(context: CassandraProjectionistMicroserviceRequirements): Route = {
     val monitoring = context.monitoring
     val system = context.ctx.system
-    ObligacionProjectionHandler(monitoring, system).route
+    val projectionist = ObligacionProjectionHandler(monitoring, system)
+    projectionist.run()
+    projectionist.route
   }
 }

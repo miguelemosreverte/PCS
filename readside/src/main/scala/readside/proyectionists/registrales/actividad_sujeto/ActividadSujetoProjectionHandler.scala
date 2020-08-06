@@ -15,8 +15,6 @@ class ActividadSujetoProjectionHandler(settings: ProjectionSettings, system: Act
     extends CassandraProjectionHandler[ActividadSujetoEvents](settings, system) {
   implicit val classicSystem: classic.ActorSystem = system.toClassic
   import classicSystem.dispatcher
-  private val log = LoggerFactory.getLogger(getClass)
-
   private val tag = settings.tag
 
   override def process(envelope: EventEnvelope[ActividadSujetoEvents]): Future[Done] = {

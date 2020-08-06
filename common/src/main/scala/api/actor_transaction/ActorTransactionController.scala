@@ -10,9 +10,10 @@ import akka.stream.UniqueKillSwitch
 import kafka.{KafkaMessageProcessorRequirements, KafkaTransactionalMessageProcessor}
 
 class ActorTransactionController(
-  actorTransaction: ActorTransaction[_],
-  requirements: KafkaMessageProcessorRequirements
-)(implicit system: ActorSystem) extends Controller(requirements.monitoring) {
+    actorTransaction: ActorTransaction[_],
+    requirements: KafkaMessageProcessorRequirements
+)(implicit system: ActorSystem)
+    extends Controller(requirements.monitoring) {
 
   implicit private val ec: ExecutionContextExecutor = system.dispatcher
 

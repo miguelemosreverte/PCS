@@ -2,13 +2,16 @@ package consumers.registral.subasta.infrastructure.main
 
 import scala.concurrent.ExecutionContext
 
-import akka.actor.{ActorSystem, typed}
+import akka.actor.{typed, ActorSystem}
 import akka.http.scaladsl.server.Route
 
 import consumers.registral.subasta.infrastructure.dependency_injection.SubastaActor
 import consumers.registral.subasta.infrastructure.http.SubastaStateAPI
 import consumers.registral.subasta.infrastructure.kafka.SubastaTransaction
-import design_principles.microservice.kafka_consumer_microservice.{KafkaConsumerMicroservice, KafkaConsumerMicroserviceRequirements}
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
+}
 import kafka.KafkaMessageProcessorRequirements
 
 object SubastaMicroservice extends KafkaConsumerMicroservice {

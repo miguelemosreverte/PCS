@@ -2,13 +2,19 @@ package consumers.registral.plan_pago.infrastructure.main
 
 import scala.concurrent.ExecutionContext
 
-import akka.actor.{ActorSystem, typed}
+import akka.actor.{typed, ActorSystem}
 import akka.http.scaladsl.server.Route
 
 import consumers.registral.plan_pago.infrastructure.dependency_injection.PlanPagoActor
 import consumers.registral.plan_pago.infrastructure.http.PlanPagoStateAPI
-import consumers.registral.plan_pago.infrastructure.kafka.{PlanPagoNoTributarioTransaction, PlanPagoTributarioTransaction}
-import design_principles.microservice.kafka_consumer_microservice.{KafkaConsumerMicroservice, KafkaConsumerMicroserviceRequirements}
+import consumers.registral.plan_pago.infrastructure.kafka.{
+  PlanPagoNoTributarioTransaction,
+  PlanPagoTributarioTransaction
+}
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
+}
 import kafka.KafkaMessageProcessorRequirements
 
 object PlanPagoMicroservice extends KafkaConsumerMicroservice {

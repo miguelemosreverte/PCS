@@ -2,13 +2,16 @@ package consumers.registral.tramite.infrastructure.main
 
 import scala.concurrent.ExecutionContext
 
-import akka.actor.{ActorSystem, typed}
+import akka.actor.{typed, ActorSystem}
 import akka.http.scaladsl.server.Route
 
 import consumers.registral.tramite.infrastructure.dependency_injection.TramiteActor
 import consumers.registral.tramite.infrastructure.http.TramiteStateAPI
 import consumers.registral.tramite.infrastructure.kafka.TramiteTransaction
-import design_principles.microservice.kafka_consumer_microservice.{KafkaConsumerMicroservice, KafkaConsumerMicroserviceRequirements}
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
+}
 import kafka.KafkaMessageProcessorRequirements
 
 object TramiteMicroservice extends KafkaConsumerMicroservice {

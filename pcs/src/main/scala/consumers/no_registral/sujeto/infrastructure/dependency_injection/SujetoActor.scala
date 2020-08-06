@@ -7,7 +7,12 @@ import consumers.no_registral.objeto.application.entities.ObjetoMessage
 import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMessageRoots
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
 import consumers.no_registral.obligacion.application.entities.ObligacionMessage
-import consumers.no_registral.sujeto.application.cqrs.commands.{SujetoSetBajaFromObjetoHandler, SujetoUpdateFromAntHandler, SujetoUpdateFromObjetoHandler, SujetoUpdateFromTriHandler}
+import consumers.no_registral.sujeto.application.cqrs.commands.{
+  SujetoSetBajaFromObjetoHandler,
+  SujetoUpdateFromAntHandler,
+  SujetoUpdateFromObjetoHandler,
+  SujetoUpdateFromTriHandler
+}
 import consumers.no_registral.sujeto.application.cqrs.queries.GetStateSujetoHandler
 import consumers.no_registral.sujeto.application.entity.SujetoMessage.SujetoMessageRoots
 import consumers.no_registral.sujeto.application.entity.{SujetoCommands, SujetoQueries}
@@ -77,7 +82,6 @@ object SujetoActor extends ShardedEntity[Monitoring] {
   }
 
   type ObjetoAggregateRoot = (String, String, String)
-  class SujetoActorRefMap(newActor: ObjetoAggregateRoot => ActorRef)
-      extends ActorRefMap[ObjetoAggregateRoot](newActor)
+  class SujetoActorRefMap(newActor: ObjetoAggregateRoot => ActorRef) extends ActorRefMap[ObjetoAggregateRoot](newActor)
 
 }

@@ -2,14 +2,17 @@ package consumers.registral.actividad_sujeto.infrastructure.main
 
 import scala.concurrent.ExecutionContext
 
-import akka.actor.{ActorSystem, typed}
+import akka.actor.{typed, ActorSystem}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 
 import consumers.registral.actividad_sujeto.infrastructure.dependency_injection.ActividadSujetoActor
 import consumers.registral.actividad_sujeto.infrastructure.http.ActividadSujetoStateAPI
 import consumers.registral.actividad_sujeto.infrastructure.kafka.ActividadSujetoTransaction
-import design_principles.microservice.kafka_consumer_microservice.{KafkaConsumerMicroservice, KafkaConsumerMicroserviceRequirements}
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
+}
 import kafka.KafkaMessageProcessorRequirements
 
 object ActividadSujetoMicroservice extends KafkaConsumerMicroservice {

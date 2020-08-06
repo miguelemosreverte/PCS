@@ -2,13 +2,16 @@ package consumers.registral.declaracion_jurada.infrastructure.main
 
 import scala.concurrent.ExecutionContext
 
-import akka.actor.{ActorSystem, typed}
+import akka.actor.{typed, ActorSystem}
 import akka.http.scaladsl.server.Route
 
 import consumers.registral.declaracion_jurada.infrastructure.dependency_injection.DeclaracionJuradaActor
 import consumers.registral.declaracion_jurada.infrastructure.http.DeclaracionJuradaStateAPI
 import consumers.registral.declaracion_jurada.infrastructure.kafka.DeclaracionJuradaTransaction
-import design_principles.microservice.kafka_consumer_microservice.{KafkaConsumerMicroservice, KafkaConsumerMicroserviceRequirements}
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
+}
 import kafka.KafkaMessageProcessorRequirements
 object DeclaracionJuradaMicroservice extends KafkaConsumerMicroservice {
 

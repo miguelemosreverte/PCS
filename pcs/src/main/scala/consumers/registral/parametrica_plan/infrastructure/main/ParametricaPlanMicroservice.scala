@@ -2,13 +2,19 @@ package consumers.registral.parametrica_plan.infrastructure.main
 
 import scala.concurrent.ExecutionContext
 
-import akka.actor.{ActorSystem, typed}
+import akka.actor.{typed, ActorSystem}
 import akka.http.scaladsl.server.Route
 
 import consumers.registral.parametrica_plan.infrastructure.dependency_injection.ParametricaPlanActor
 import consumers.registral.parametrica_plan.infrastructure.http.ParametricaPlanStateAPI
-import consumers.registral.parametrica_plan.infrastructure.kafka.{ParametricaPlanNoTributarioTransaction, ParametricaPlanTributarioTransaction}
-import design_principles.microservice.kafka_consumer_microservice.{KafkaConsumerMicroservice, KafkaConsumerMicroserviceRequirements}
+import consumers.registral.parametrica_plan.infrastructure.kafka.{
+  ParametricaPlanNoTributarioTransaction,
+  ParametricaPlanTributarioTransaction
+}
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
+}
 import kafka.KafkaMessageProcessorRequirements
 
 object ParametricaPlanMicroservice extends KafkaConsumerMicroservice {

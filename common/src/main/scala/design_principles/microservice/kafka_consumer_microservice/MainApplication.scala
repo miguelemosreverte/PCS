@@ -5,7 +5,7 @@ import akka.cluster.ClusterEvent
 import akka.http.AkkaHttpServer
 import akka.http.scaladsl.server.Directives._
 import com.typesafe.config.{Config, ConfigFactory}
-import design_principles.actor_model.context_provider.{GuardianRequirements, Guardian}
+import design_principles.actor_model.context_provider.{Guardian, GuardianRequirements}
 import life_cycle.AppLifecycleMicroservice
 import serialization.EventSerializer
 

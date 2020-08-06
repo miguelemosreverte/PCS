@@ -2,14 +2,20 @@ package consumers.no_registral.obligacion.infrastructure.main
 
 import scala.concurrent.ExecutionContext
 
-import akka.actor.{ActorRef, ActorSystem, typed}
+import akka.actor.{typed, ActorRef, ActorSystem}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 
-import consumers.no_registral.obligacion.infrastructure.consumer.{ObligacionNoTributariaTransaction, ObligacionTributariaTransaction}
+import consumers.no_registral.obligacion.infrastructure.consumer.{
+  ObligacionNoTributariaTransaction,
+  ObligacionTributariaTransaction
+}
 import consumers.no_registral.obligacion.infrastructure.http.ObligacionStateAPI
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor
-import design_principles.microservice.kafka_consumer_microservice.{KafkaConsumerMicroservice, KafkaConsumerMicroserviceRequirements}
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
+}
 import kafka.KafkaMessageProcessorRequirements
 
 object ObligacionMicroservice extends KafkaConsumerMicroservice {

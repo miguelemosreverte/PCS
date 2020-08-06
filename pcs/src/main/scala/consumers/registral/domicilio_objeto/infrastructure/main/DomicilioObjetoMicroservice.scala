@@ -2,13 +2,19 @@ package consumers.registral.domicilio_objeto.infrastructure.main
 
 import scala.concurrent.ExecutionContext
 
-import akka.actor.{ActorSystem, typed}
+import akka.actor.{typed, ActorSystem}
 import akka.http.scaladsl.server.Route
 
 import consumers.registral.domicilio_objeto.infrastructure.dependency_injection.DomicilioObjetoActor
 import consumers.registral.domicilio_objeto.infrastructure.http.DomicilioObjetoStateAPI
-import consumers.registral.domicilio_objeto.infrastructure.kafka.{DomicilioObjetoNoTributarioTransaction, DomicilioObjetoTributarioTransaction}
-import design_principles.microservice.kafka_consumer_microservice.{KafkaConsumerMicroservice, KafkaConsumerMicroserviceRequirements}
+import consumers.registral.domicilio_objeto.infrastructure.kafka.{
+  DomicilioObjetoNoTributarioTransaction,
+  DomicilioObjetoTributarioTransaction
+}
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
+}
 import kafka.KafkaMessageProcessorRequirements
 
 object DomicilioObjetoMicroservice extends KafkaConsumerMicroservice {

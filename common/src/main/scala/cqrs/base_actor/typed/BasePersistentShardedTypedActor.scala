@@ -25,14 +25,6 @@ abstract class BasePersistentShardedTypedActor[
     utils.Inference.getSimpleName(this.getClass.getName)
   )
 
-  // define a message extractor that knows how to retrieve the entityId from a message
-  // we plan on deploying on a 3-node cluster, as a rule of thumb there should be 10 times as many
-  // shards as there are nodes, hence the numberOfShards value of 30
-  // val messageExtractor: HashCodeNoEnvelopeMessageExtractor[ActorMessages] =
-  //   new HashCodeNoEnvelopeMessageExtractor[ActorMessages](numberOfShards = 30) {
-  //     override def entityId(message: ActorMessages): String = message.aggregateRoot.hashCode.toString
-  //   }
-
   val shardActor: ActorRef[ActorMessages] = sharding.init(
     Entity(TypeKey) { context =>
       persistentEntity(context.entityId, context.shard)

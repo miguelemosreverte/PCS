@@ -25,6 +25,6 @@ class JuicioUpdateFromDtoHandler() {
           command.detallesJuicio
         )
       )
-      .thenReply(replyTo)(state => Success(Response.SuccessProcessing()))
+      .thenReply(replyTo)(state => Success(Response.SuccessProcessing(command.deliveryId)))
 
 }

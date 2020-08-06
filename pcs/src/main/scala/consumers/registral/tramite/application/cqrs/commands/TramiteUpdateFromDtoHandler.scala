@@ -22,6 +22,6 @@ class TramiteUpdateFromDtoHandler() {
           command.registro
         )
       )
-      .thenReply(replyTo)(state => Success(Response.SuccessProcessing()))
+      .thenReply(replyTo)(state => Success(Response.SuccessProcessing(command.deliveryId)))
 
 }

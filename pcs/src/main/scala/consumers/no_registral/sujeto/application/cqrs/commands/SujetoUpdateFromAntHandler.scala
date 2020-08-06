@@ -18,16 +18,16 @@ class SujetoUpdateFromAntHandler(actor: SujetoActor) extends SyncCommandHandler[
 
     if (command.deliveryId <= lastDeliveryId) {
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
-      replyTo ! Success(Response.SuccessProcessing())
+      replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
     } else {
       actor.persistEvent(event) { () =>
         actor.state += event
         actor.persistSnapshot() { () =>
-          actor.context.sender() ! Success(Response.SuccessProcessing())
+          actor.context.sender() ! Success(Response.SuccessProcessing(command.deliveryId))
         }
       }
     }
-    Success(Response.SuccessProcessing())
+    Success(Response.SuccessProcessing(command.deliveryId))
   }
 
 }

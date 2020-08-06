@@ -7,15 +7,14 @@ import akka.kafka.ProducerSettings
 import akka.stream.UniqueKillSwitch
 import design_principles.external_pub_sub.kafka.MessageProcessorLogging
 import kafka.{KafkaMessageProcessorRequirements, KafkaMessageProducer, KafkaTransactionalMessageProcessor}
-import monitoring.DummyMonitoring
+import monitoring.{DummyMonitoring, Monitoring}
 
-class KafkaTestkit(implicit system: ActorSystem) {
-  val dummyMonitoring = new DummyMonitoring
+class KafkaTestkit(monitoring: Monitoring)(implicit system: ActorSystem) {
 
   private implicit def kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements =
-    KafkaMessageProcessorRequirements.productionSettings(None, dummyMonitoring, system)
+    KafkaMessageProcessorRequirements.productionSettings(None, monitoring, system)
   private implicit def producerSettings: ProducerSettings[String, String] =
-    KafkaMessageProcessorRequirements.productionSettings(None, dummyMonitoring, system).producer
+    KafkaMessageProcessorRequirements.productionSettings(None, monitoring, system).producer
   def messageProducer: KafkaMessageProducer = new KafkaMessageProducer()
 
   def messageProcessor: KafkaTransactionalMessageProcessor with MessageProcessorLogging =

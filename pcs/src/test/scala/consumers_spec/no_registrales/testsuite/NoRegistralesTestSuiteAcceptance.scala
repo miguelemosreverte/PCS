@@ -28,7 +28,7 @@ trait NoRegistralesTestSuiteAcceptance extends NoRegistralesTestSuite {
       )
 
     lazy val cassandraTestkit: CassandraTestkitProduction = CassandraTestkitProduction()
-    lazy val kafka = new KafkaTestkit()
+    lazy val kafka = new KafkaTestkit(monitoring)
 
     // start feedback loop
     ObjetoNovedadCotitularidadProjectionHandler(monitoring, system.toTyped).run()

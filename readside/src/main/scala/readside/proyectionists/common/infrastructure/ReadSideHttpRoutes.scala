@@ -4,9 +4,8 @@ import akka.actor.typed.ActorSystem
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.{actor => classic}
-import life_cycle.controller.LivenessController
-import life_cycle.typed.controller.{ReadinessControllerTyped, ShutdownControllerTyped}
-import life_cycle.typed.{AppLifecycleActorTyped, AppLifecycleTyped}
+import life_cycle.typed.controller.{LivenessController, ReadinessController, ShutdownController}
+import life_cycle.typed.{AppLifecycle, AppLifecycleActor}
 import monitoring.Monitoring
 
 import scala.concurrent.ExecutionContext
@@ -17,10 +16,10 @@ class ReadSideHttpRoutes(monitoring: Monitoring)(implicit system: ActorSystem[_]
 
   implicit val ec: ExecutionContext = classicSystem.dispatcher
 
-  private val appLifecycle = new AppLifecycleTyped(AppLifecycleActorTyped.init(system))
+  private val appLifecycle = new AppLifecycle(AppLifecycleActor.init(system))
   private val livenessController = new LivenessController(monitoring)
-  private val readinessController = new ReadinessControllerTyped(appLifecycle, monitoring)
-  private val shutdownController = new ShutdownControllerTyped(appLifecycle, monitoring)
+  private val readinessController = new ReadinessController(appLifecycle, monitoring)
+  private val shutdownController = new ShutdownController(appLifecycle, monitoring)
   private val appLifeCycleRoutes =
     livenessController.route ~
     readinessController.route ~

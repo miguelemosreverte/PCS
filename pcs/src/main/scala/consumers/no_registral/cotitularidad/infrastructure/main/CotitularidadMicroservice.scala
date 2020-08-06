@@ -10,17 +10,20 @@ import consumers.no_registral.cotitularidad.infrastructure.kafka.{
   AddCotitularTransaction,
   CotitularPublishSnapshotTransaction
 }
-import consumers.no_registral.sujeto.infrastructure.main.MicroserviceRequirements
+import design_principles.microservice.{Microservice, MicroserviceRequirements}
 import kafka.KafkaMessageProcessorRequirements
 
 import scala.concurrent.ExecutionContext
 
-object CotitularidadMicroservice {
+object CotitularidadMicroservice extends Microservice {
 
   def route(m: MicroserviceRequirements): Route = {
     val monitoring = m.monitoring
     implicit val ec: ExecutionContext = m.executionContext
-    implicit val system: ActorSystem = m.system
+    val ctx = m.ctx
+    import akka.actor.typed.scaladsl.adapter._
+    implicit val systemTyped = ctx.system
+    implicit val system: ActorSystem = ctx.system.toClassic
     implicit val kafkaProcesorRequirements: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
     implicit val actor: ActorRef =
       CotitularidadActor.startWithRequirements(kafkaProcesorRequirements)

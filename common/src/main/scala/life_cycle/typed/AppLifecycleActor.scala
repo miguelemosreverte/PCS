@@ -3,12 +3,11 @@ package life_cycle.typed
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior, SupervisorStrategy}
 import akka.cluster.typed.{ClusterSingleton, SingletonActor}
-import life_cycle.AppLifecycleActorState
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.duration._
 
-object AppLifecycleActorTyped {
+private[life_cycle] object AppLifecycleActor {
   sealed trait Command
   case object Shutdown extends Command
   case class IsAppReady(replyTo: ActorRef[Boolean]) extends Command
@@ -37,14 +36,14 @@ object AppLifecycleActorTyped {
       }
     }
 
-  def init(system: ActorSystem[_]): ActorRef[AppLifecycleActorTyped.Command] = {
+  def init(system: ActorSystem[_]): ActorRef[AppLifecycleActor.Command] = {
     val singletonManager = ClusterSingleton(system)
     // Start if needed and provide a proxy to a named singleton
     singletonManager.init(
       SingletonActor(
         Behaviors
           .supervise(
-            AppLifecycleActorTyped()
+            AppLifecycleActor()
           )
           .onFailure[Exception](SupervisorStrategy.restart),
         "AppLifecycleActorTyped"

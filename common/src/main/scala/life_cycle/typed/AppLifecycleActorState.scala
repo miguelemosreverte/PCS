@@ -1,6 +1,6 @@
-package life_cycle
+package life_cycle.typed
 
-case class AppLifecycleActorState(
+private[life_cycle] case class AppLifecycleActorState(
     isAppShuttingDown: Boolean = false
 ) {
   def shutdown(): AppLifecycleActorState = copy(isAppShuttingDown = true)

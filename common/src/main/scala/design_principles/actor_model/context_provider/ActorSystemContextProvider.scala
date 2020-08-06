@@ -1,19 +1,23 @@
+package design_principles.actor_model.context_provider
+
 import akka.Done
-import akka.actor.typed.scaladsl.adapter._
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorSystem, Behavior, Terminated}
 import akka.cluster.ClusterEvent.MemberUp
 import akka.cluster.typed.{Cluster, Subscribe}
 import akka.management.cluster.bootstrap.ClusterBootstrap
 import akka.management.scaladsl.AkkaManagement
-import akka.stream.Materializer
-import com.typesafe.config.Config
+import design_principles.dependency_injection.ContextProvider2
 
-class AkkaSystemFactory(actorSystemName: String, config: Config) {
+object ActorSystemContextProvider
+    extends ContextProvider2[ActorSystemRequirements, ActorContext[MemberUp], Behavior[Done], ActorSystem[MemberUp]] {
 
-  def isReady(start: ActorContext[MemberUp] => Behavior[Done]): Unit = {
+  override def getContext(
+      requirements: ActorSystemRequirements
+  )(start: ActorContext[MemberUp] => Behavior[Done]): ActorSystem[MemberUp] = {
+
     ActorSystem(
-      Behaviors.setup[MemberUp] { ctx =>
+      Behaviors.setup[MemberUp] { ctx: ActorContext[MemberUp] =>
         //implicit val mat = Materializer.createMaterializer(ctx.system.toClassic)
         val cluster = Cluster(ctx.system)
         cluster.subscriptions.tell(Subscribe(ctx.self, classOf[MemberUp]))
@@ -37,10 +41,8 @@ class AkkaSystemFactory(actorSystemName: String, config: Config) {
               Behaviors.stopped
           }
       },
-      actorSystemName,
-      config
+      requirements.actorSystemName,
+      requirements.config
     )
-
   }
-
 }

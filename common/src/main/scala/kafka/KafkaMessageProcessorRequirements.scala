@@ -18,23 +18,24 @@ object KafkaMessageProcessorRequirements {
   private val appConfig = new KafkaConfig(config)
   private val bootstrapServers = appConfig.KAFKA_BROKER
 
-  private implicit def consumerSettings(implicit system: akka.actor.ActorSystem): ConsumerSettings[String, String] =
+  private implicit def consumerSettings(system: akka.actor.ActorSystem): ConsumerSettings[String, String] =
     ConsumerSettings(system, new StringDeserializer, new StringDeserializer)
       .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
       .withGroupId(appConfig.CONSUMER_GROUP)
       .withBootstrapServers(bootstrapServers)
 
-  private implicit def producerSettings(implicit system: akka.actor.ActorSystem): ProducerSettings[String, String] =
+  private implicit def producerSettings(system: akka.actor.ActorSystem): ProducerSettings[String, String] =
     ProducerSettings(system, new StringSerializer, new StringSerializer)
       .withBootstrapServers(bootstrapServers)
 
   def productionSettings(rebalanceListener: Option[akka.actor.ActorRef],
-                         monitoring: Monitoring)(implicit system: akka.actor.ActorSystem) =
+                         monitoring: Monitoring,
+                         system: akka.actor.ActorSystem) =
     KafkaMessageProcessorRequirements(
       system,
       rebalanceListener,
       monitoring,
-      consumerSettings,
-      producerSettings
+      consumerSettings(system),
+      producerSettings(system)
     )
 }

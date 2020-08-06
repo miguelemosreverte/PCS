@@ -50,7 +50,7 @@ object KafkaMessageProducer {
   def apply(monitoring: Monitoring,
             rebalancerListener: ActorRef)(implicit system: ActorSystem): KafkaMessageProducer = {
     implicit def kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements =
-      KafkaMessageProcessorRequirements.productionSettings(Some(rebalancerListener), monitoring)
+      KafkaMessageProcessorRequirements.productionSettings(Some(rebalancerListener), monitoring, system)
     implicit def producerSettings = kafkaMessageProcessorRequirements.producer
     new KafkaMessageProducer()
   }

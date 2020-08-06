@@ -22,7 +22,9 @@ trait NoRegistralesTestSuiteAcceptance extends NoRegistralesTestSuite {
     val monitoring: Monitoring = new DummyMonitoring
     lazy val sujeto: ActorRef = SujetoActor.startWithRequirements(monitoring)
     lazy val cotitularidadActor: ActorRef =
-      CotitularidadActor.startWithRequirements(KafkaMessageProcessorRequirements.productionSettings(None, monitoring))
+      CotitularidadActor.startWithRequirements(
+        KafkaMessageProcessorRequirements.productionSettings(None, monitoring, system)
+      )
 
     lazy val cassandraTestkit: CassandraTestkitProduction = CassandraTestkitProduction()
     lazy val kafka = new KafkaTestkit()

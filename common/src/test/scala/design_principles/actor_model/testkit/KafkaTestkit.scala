@@ -11,9 +11,9 @@ import monitoring.DummyMonitoring
 
 class KafkaTestkit(implicit system: ActorSystem) {
   private implicit def kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements =
-    KafkaMessageProcessorRequirements.productionSettings(None, new DummyMonitoring)
+    KafkaMessageProcessorRequirements.productionSettings(None, new DummyMonitoring, system)
   private implicit def producerSettings: ProducerSettings[String, String] =
-    KafkaMessageProcessorRequirements.productionSettings(None, new DummyMonitoring).producer
+    KafkaMessageProcessorRequirements.productionSettings(None, new DummyMonitoring, system).producer
   def messageProducer: KafkaMessageProducer = new KafkaMessageProducer()
 
   def messageProcessor: KafkaTransactionalMessageProcessor with MessageProcessorLogging =

@@ -10,6 +10,8 @@ import design_principles.projection.infrastructure.CassandraTestkitProduction
 import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
+import akka.actor.typed.scaladsl.adapter._
+import readside.proyectionists.registrales.parametrica_recargo.ParametricaRecargoProjectionHandler
 
 class ParametricaRecargoProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
     extends ProjectionTestkit[ParametricaRecargoEvents, ParametricaRecargoMessageRoots]
@@ -25,5 +27,8 @@ class ParametricaRecargoProjectionAcceptanceTestKit(c: CassandraTestkitProductio
   }
 
   def projectionHandler =
-    new readside.proyectionists.registrales.parametrica_recargo.ParametricaRecargoProjectionHandler(new DummyMonitoring)
+    new readside.proyectionists.registrales.parametrica_recargo.ParametricaRecargoProjectionHandler(
+      ParametricaRecargoProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    )
 }

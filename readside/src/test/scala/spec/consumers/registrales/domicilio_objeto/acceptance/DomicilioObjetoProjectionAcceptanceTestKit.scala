@@ -10,6 +10,8 @@ import design_principles.projection.infrastructure.CassandraTestkitProduction
 import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
+import akka.actor.typed.scaladsl.adapter._
+import readside.proyectionists.registrales.domicilio_objeto.DomicilioObjetoProjectionHandler
 
 class DomicilioObjetoProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
     extends ProjectionTestkit[DomicilioObjetoEvents, DomicilioObjetoMessageRoots]
@@ -36,5 +38,8 @@ class DomicilioObjetoProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(
   }
 
   def projectionHandler =
-    new readside.proyectionists.registrales.domicilio_objeto.DomicilioObjetoProjectionHandler(new DummyMonitoring)
+    new readside.proyectionists.registrales.domicilio_objeto.DomicilioObjetoProjectionHandler(
+      DomicilioObjetoProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    )
 }

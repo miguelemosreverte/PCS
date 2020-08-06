@@ -10,6 +10,8 @@ import design_principles.projection.infrastructure.CassandraTestkitProduction
 import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
+import akka.actor.typed.scaladsl.adapter._
+import readside.proyectionists.registrales.exencion.ExencionProjectionHandler
 
 class ExencionProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
     extends ProjectionTestkit[ObjetoAddedExencion, ExencionMessageRoot]
@@ -35,5 +37,8 @@ class ExencionProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implici
   }
 
   def projectionHandler =
-    new readside.proyectionists.registrales.exencion.ExencionProjectionHandler(new DummyMonitoring)
+    new readside.proyectionists.registrales.exencion.ExencionProjectionHandler(
+      ExencionProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    )
 }

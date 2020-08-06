@@ -14,14 +14,13 @@ import kafka.{MessageProcessor, MessageProducer}
 import monitoring.{DummyMonitoring, Monitoring}
 import readside.proyectionists.registrales.exencion.ExencionProjectionHandler
 import registrales.exencion.testkit.query.ExencionQueryTestkitAgainstActors
+import akka.actor.typed.scaladsl.adapter._
 
 trait ExencionTestSuiteMock extends ExencionSpec {
 
   def testContext()(implicit system: ActorSystem): TestContext = new ExencionMockE2ETestContext()
 
   class ExencionMockE2ETestContext(implicit system: ActorSystem) extends BaseE2ETestContext {
-
-    import system.dispatcher
 
     val cassandraTestkit: CassandraTestkitMock = new CassandraTestkitMock({
       case e: ObjetoEvents.ObjetoAddedExencion =>
@@ -46,7 +45,10 @@ trait ExencionTestSuiteMock extends ExencionSpec {
     override def messageProcessor: MessageProcessor with MessageProcessorLogging = kafkaMock
 
     lazy val exencionProyectionist: ExencionProjectionHandler =
-      new readside.proyectionists.registrales.exencion.ExencionProjectionHandler(new DummyMonitoring) {
+      new readside.proyectionists.registrales.exencion.ExencionProjectionHandler(
+        ExencionProjectionHandler.defaultProjectionSettings(monitoring),
+        system.toTyped
+      ) {
         override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
       }
 

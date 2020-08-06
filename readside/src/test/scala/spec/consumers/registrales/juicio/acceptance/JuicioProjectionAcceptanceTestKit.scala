@@ -9,7 +9,9 @@ import consumers.registral.juicio.domain.JuicioEvents
 import design_principles.projection.infrastructure.CassandraTestkitProduction
 import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
+import readside.proyectionists.registrales.juicio.JuicioProjectionHandler
 import spec.testkit.ProjectionTestkit
+import akka.actor.typed.scaladsl.adapter._
 
 class JuicioProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
     extends ProjectionTestkit[JuicioEvents, JuicioMessageRoots]
@@ -35,5 +37,8 @@ class JuicioProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit 
   }
 
   def projectionHandler =
-    new readside.proyectionists.registrales.juicio.JuicioProjectionHandler(new DummyMonitoring)
+    new readside.proyectionists.registrales.juicio.JuicioProjectionHandler(
+      JuicioProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    )
 }

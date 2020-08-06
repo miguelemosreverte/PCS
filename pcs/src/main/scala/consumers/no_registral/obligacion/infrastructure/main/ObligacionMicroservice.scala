@@ -1,11 +1,9 @@
 package consumers.no_registral.obligacion.infrastructure.main
 
 import scala.concurrent.ExecutionContext
-
 import akka.actor.{typed, ActorRef, ActorSystem}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-
 import consumers.no_registral.obligacion.infrastructure.consumer.{
   ObligacionNoTributariaTransaction,
   ObligacionTributariaTransaction
@@ -29,6 +27,7 @@ object ObligacionMicroservice extends KafkaConsumerMicroservice {
     implicit val system: ActorSystem = ctx.system.toClassic
     implicit val kafkaProcesorRequirements: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
     implicit val actor: ActorRef = SujetoActor.startWithRequirements(monitoring)
+
     Seq(
       ObligacionStateAPI(actor, monitoring).route,
       ObligacionTributariaTransaction(actor, monitoring).route,

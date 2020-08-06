@@ -13,6 +13,7 @@ import readside.proyectionists.registrales.actividad_sujeto.projections.Activida
 import spec.testkit.ProjectionTestkitMock
 import consumers.registral.actividad_sujeto.infrastructure.json._
 import monitoring.DummyMonitoring
+import akka.actor.typed.scaladsl.adapter._
 
 class ActividadSujetoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
     extends ProjectionTestkitMock[ActividadSujetoEvents, ActividadSujetoMessageRoots] {
@@ -28,7 +29,10 @@ class ActividadSujetoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit sys
     actividad_sujetoProyectionist process envelope
 
   def actividad_sujetoProyectionist: ActividadSujetoProjectionHandler =
-    new readside.proyectionists.registrales.actividad_sujeto.ActividadSujetoProjectionHandler(new DummyMonitoring) {
+    new readside.proyectionists.registrales.actividad_sujeto.ActividadSujetoProjectionHandler(
+      ActividadSujetoProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    ) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 }

@@ -13,6 +13,7 @@ import monitoring.DummyMonitoring
 import readside.proyectionists.registrales.etapas_procesales.EtapasProcesalesProjectionHandler
 import readside.proyectionists.registrales.etapas_procesales.projections.EtapasProcesalesUpdatedFromDtoProjection
 import spec.testkit.ProjectionTestkitMock
+import akka.actor.typed.scaladsl.adapter._
 
 class EtapasProcesalesProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
     extends ProjectionTestkitMock[EtapasProcesalesEvents, EtapasProcesalesMessageRoots] {
@@ -28,7 +29,10 @@ class EtapasProcesalesProjectionUnitTestKit(c: CassandraTestkitMock)(implicit sy
     etapas_procesalesProyectionist process envelope
 
   def etapas_procesalesProyectionist: EtapasProcesalesProjectionHandler =
-    new readside.proyectionists.registrales.etapas_procesales.EtapasProcesalesProjectionHandler(new DummyMonitoring) {
+    new readside.proyectionists.registrales.etapas_procesales.EtapasProcesalesProjectionHandler(
+      EtapasProcesalesProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    ) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 }

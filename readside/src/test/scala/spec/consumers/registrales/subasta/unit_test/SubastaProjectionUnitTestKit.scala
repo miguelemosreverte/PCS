@@ -13,6 +13,7 @@ import monitoring.DummyMonitoring
 import readside.proyectionists.registrales.subasta.SubastaProjectionHandler
 import readside.proyectionists.registrales.subasta.projections.SubastaUpdatedFromDtoProjection
 import spec.testkit.ProjectionTestkitMock
+import akka.actor.typed.scaladsl.adapter._
 
 class SubastaProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
     extends ProjectionTestkitMock[SubastaEvents, SubastaMessageRoots] {
@@ -28,7 +29,10 @@ class SubastaProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: Act
     subastaProyectionist process envelope
 
   def subastaProyectionist: SubastaProjectionHandler =
-    new readside.proyectionists.registrales.subasta.SubastaProjectionHandler(new DummyMonitoring) {
+    new readside.proyectionists.registrales.subasta.SubastaProjectionHandler(
+      SubastaProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    ) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 }

@@ -13,6 +13,7 @@ import monitoring.DummyMonitoring
 import readside.proyectionists.registrales.juicio.JuicioProjectionHandler
 import readside.proyectionists.registrales.juicio.projections.JuicioUpdatedFromDtoProjection
 import spec.testkit.ProjectionTestkitMock
+import akka.actor.typed.scaladsl.adapter._
 
 class JuicioProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
     extends ProjectionTestkitMock[JuicioEvents, JuicioMessageRoots] {
@@ -28,7 +29,10 @@ class JuicioProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: Acto
     juicioProyectionist process envelope
 
   def juicioProyectionist: JuicioProjectionHandler =
-    new readside.proyectionists.registrales.juicio.JuicioProjectionHandler(new DummyMonitoring) {
+    new readside.proyectionists.registrales.juicio.JuicioProjectionHandler(
+      JuicioProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    ) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 }

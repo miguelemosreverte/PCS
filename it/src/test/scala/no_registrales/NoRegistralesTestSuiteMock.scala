@@ -26,6 +26,7 @@ import no_registrales.mocks.SujetoActorWithMockPersistence
 import readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler
 import readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler
 import readside.proyectionists.no_registrales.sujeto.SujetoProjectionHandler
+import akka.actor.typed.scaladsl.adapter._
 
 trait NoRegistralesTestSuiteMock extends BaseE2ESpec {
   def testContext()(implicit system: ActorSystem): TestContext = new MockE2ETestContext()
@@ -60,17 +61,26 @@ trait NoRegistralesTestSuiteMock extends BaseE2ESpec {
     override def messageProcessor: MessageProcessor with MessageProcessorLogging = kafkaMock
 
     val obligacionProyectionist: ObligacionProjectionHandler =
-      new readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler(new DummyMonitoring) {
+      new readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler(
+        ObligacionProjectionHandler.defaultProjectionSettings(monitoring),
+        system.toTyped
+      ) {
         override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
       }
 
     val objetoProyectionist: ObjetoProjectionHandler =
-      new readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler(new DummyMonitoring) {
+      new readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler(
+        ObjetoProjectionHandler.defaultProjectionSettings(monitoring),
+        system.toTyped
+      ) {
         override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
       }
 
     val sujetoProyectionist: SujetoProjectionHandler =
-      new readside.proyectionists.no_registrales.sujeto.SujetoProjectionHandler(new DummyMonitoring) {
+      new readside.proyectionists.no_registrales.sujeto.SujetoProjectionHandler(
+        SujetoProjectionHandler.defaultProjectionSettings(monitoring),
+        system.toTyped
+      ) {
         override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
       }
 

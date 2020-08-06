@@ -1,9 +1,9 @@
 package consumers.no_registral.objeto.infrastructure.event_processor
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
-
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter._
+import akka.http.scaladsl.server.Route
 import akka.kafka.ProducerSettings
 import akka.projection.eventsourced.EventEnvelope
 import akka.projections.ProjectionSettings
@@ -18,6 +18,7 @@ import consumers.no_registral.objeto.domain.ObjetoEvents
 import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoSnapshotPersisted
 import kafka.KafkaMessageProcessorRequirements
 import kafka.KafkaProducer.produce
+import monitoring.Monitoring
 import org.slf4j.LoggerFactory
 
 class ObjetoNovedadCotitularidadProjectionHandler(settings: ProjectionSettings, system: ActorSystem[_])
@@ -87,4 +88,11 @@ class ObjetoNovedadCotitularidadProjectionHandler(settings: ProjectionSettings, 
   def hasCotitulares(snapshot: ObjetoSnapshotPersisted): Boolean = snapshot.cotitulares.size > 1
   def shouldInformCotitulares(snapshot: ObjetoSnapshotPersisted): Boolean =
     isResponsible(snapshot) && hasCotitulares(snapshot)
+}
+
+object ObjetoNovedadCotitularidadProjectionHandler {
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): ObjetoNovedadCotitularidadProjectionHandler = {
+    val objetoSettings = ProjectionSettings("ObjetoNovedadCotitularidad", 1, monitoring)
+    new ObjetoNovedadCotitularidadProjectionHandler(objetoSettings, system)
+  }
 }

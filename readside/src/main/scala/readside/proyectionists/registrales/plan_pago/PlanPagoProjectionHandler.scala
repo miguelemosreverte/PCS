@@ -19,10 +19,6 @@ class PlanPagoProjectionHandler(settings: ProjectionSettings, system: ActorSyste
 
   private val tag = settings.tag
 
-  def this(monitoring: Monitoring)(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("ParametricaRecargo", 1, monitoring), classicSystem.toTyped)
-  }
-
   override def process(envelope: EventEnvelope[PlanPagoEvents]): Future[Done] = {
     envelope.event match {
       case evt: PlanPagoEvents.PlanPagoUpdatedFromDto =>
@@ -45,5 +41,16 @@ class PlanPagoProjectionHandler(settings: ProjectionSettings, system: ActorSyste
         )
         Future.successful(Done)
     }
+  }
+}
+
+object PlanPagoProjectionHandler {
+  val defaultTag = "PlanPago"
+  val defaultParallelism = 1
+  val defaultProjectionSettings: Monitoring => ProjectionSettings =
+    ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): PlanPagoProjectionHandler = {
+    val projectionSettings = defaultProjectionSettings(monitoring)
+    new PlanPagoProjectionHandler(projectionSettings, system)
   }
 }

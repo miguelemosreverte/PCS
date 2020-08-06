@@ -9,6 +9,8 @@ import akka.{Done, actor => classic}
 import consumers.no_registral.sujeto.domain.SujetoEvents
 import monitoring.Monitoring
 import org.slf4j.LoggerFactory
+import readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler
+import readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler.defaultProjectionSettings
 import readside.proyectionists.no_registrales.sujeto.projections.SujetoSnapshotPersistedProjection
 
 class SujetoProjectionHandler(settings: ProjectionSettings, system: ActorSystem[_])
@@ -46,5 +48,19 @@ class SujetoProjectionHandler(settings: ProjectionSettings, system: ActorSystem[
         )
         Future.successful(Done)
     }
+  }
+}
+
+object SujetoProjectionHandler {
+
+  val defaultTag = "Sujeto"
+  val defaultParallelism = 1
+  val defaultProjectionSettings: Monitoring => ProjectionSettings =
+    ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
+
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): SujetoProjectionHandler = {
+    val projectionSettings = defaultProjectionSettings(monitoring)
+    new SujetoProjectionHandler(projectionSettings, system)
+
   }
 }

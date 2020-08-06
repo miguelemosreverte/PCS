@@ -19,9 +19,6 @@ class SubastaProjectionHandler(settings: ProjectionSettings, system: ActorSystem
 
   private val tag = settings.tag
 
-  def this(monitoring: Monitoring)(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("Subasta", 1, monitoring), classicSystem.toTyped)
-  }
   override def process(envelope: EventEnvelope[SubastaEvents]): Future[Done] = {
     envelope.event match {
       case evt: SubastaEvents.SubastaUpdatedFromDto =>
@@ -44,5 +41,16 @@ class SubastaProjectionHandler(settings: ProjectionSettings, system: ActorSystem
         )
         Future.successful(Done)
     }
+  }
+}
+
+object SubastaProjectionHandler {
+  val defaultTag = "Subasta"
+  val defaultParallelism = 1
+  val defaultProjectionSettings: Monitoring => ProjectionSettings =
+    ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): SubastaProjectionHandler = {
+    val projectionSettings = defaultProjectionSettings(monitoring)
+    new SubastaProjectionHandler(projectionSettings, system)
   }
 }

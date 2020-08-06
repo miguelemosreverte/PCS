@@ -9,6 +9,8 @@ import akka.{Done, actor => classic}
 import consumers.registral.domicilio_objeto.domain.DomicilioObjetoEvents
 import monitoring.Monitoring
 import org.slf4j.LoggerFactory
+import readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler
+import readside.proyectionists.registrales.declaracion_jurada.DeclaracionJuradaProjectionHandler
 import readside.proyectionists.registrales.domicilio_objeto.projections.DomicilioObjetoUpdatedFromDtoProjection
 
 class DomicilioObjetoProjectionHandler(settings: ProjectionSettings, system: ActorSystem[_])
@@ -18,10 +20,6 @@ class DomicilioObjetoProjectionHandler(settings: ProjectionSettings, system: Act
   private val log = LoggerFactory.getLogger(getClass)
 
   private val tag = settings.tag
-
-  def this(monitoring: Monitoring)(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("DomicilioObjeto", 1, monitoring), classicSystem.toTyped)
-  }
 
   override def process(envelope: EventEnvelope[DomicilioObjetoEvents]): Future[Done] = {
     envelope.event match {
@@ -45,5 +43,16 @@ class DomicilioObjetoProjectionHandler(settings: ProjectionSettings, system: Act
         )
         Future.successful(Done)
     }
+  }
+}
+
+object DomicilioObjetoProjectionHandler {
+  val defaultTag = "DomicilioObjeto"
+  val defaultParallelism = 1
+  val defaultProjectionSettings: Monitoring => ProjectionSettings =
+    ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): DomicilioObjetoProjectionHandler = {
+    val projectionSettings = defaultProjectionSettings(monitoring)
+    new DomicilioObjetoProjectionHandler(projectionSettings, system)
   }
 }

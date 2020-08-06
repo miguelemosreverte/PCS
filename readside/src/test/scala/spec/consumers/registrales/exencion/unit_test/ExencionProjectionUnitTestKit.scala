@@ -12,6 +12,7 @@ import monitoring.DummyMonitoring
 import readside.proyectionists.registrales.exencion.ExencionProjectionHandler
 import readside.proyectionists.registrales.exencion.projections.ObjetoAddedExencionProjection
 import spec.testkit.ProjectionTestkitMock
+import akka.actor.typed.scaladsl.adapter._
 
 class ExencionProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
     extends ProjectionTestkitMock[ObjetoAddedExencion, ExencionMessageRoot] {
@@ -27,7 +28,10 @@ class ExencionProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: Ac
     exencionProyectionist process envelope
 
   def exencionProyectionist: ExencionProjectionHandler =
-    new readside.proyectionists.registrales.exencion.ExencionProjectionHandler(new DummyMonitoring) {
+    new readside.proyectionists.registrales.exencion.ExencionProjectionHandler(
+      ExencionProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    ) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 }

@@ -19,10 +19,6 @@ class ParametricaRecargoProjectionHandler(settings: ProjectionSettings, system: 
 
   private val tag = settings.tag
 
-  def this(monitoring: Monitoring)(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("ParametricaRecargo", 1, monitoring), classicSystem.toTyped)
-  }
-
   override def process(envelope: EventEnvelope[ParametricaRecargoEvents]): Future[Done] = {
     envelope.event match {
       case evt: ParametricaRecargoEvents.ParametricaRecargoUpdatedFromDto =>
@@ -45,5 +41,16 @@ class ParametricaRecargoProjectionHandler(settings: ProjectionSettings, system: 
         )
         Future.successful(Done)
     }
+  }
+}
+
+object ParametricaRecargoProjectionHandler {
+  val defaultTag = "ParametricaRecargo"
+  val defaultParallelism = 1
+  val defaultProjectionSettings: Monitoring => ProjectionSettings =
+    ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): ParametricaRecargoProjectionHandler = {
+    val projectionSettings = defaultProjectionSettings(monitoring)
+    new ParametricaRecargoProjectionHandler(projectionSettings, system)
   }
 }

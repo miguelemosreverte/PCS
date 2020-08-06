@@ -47,3 +47,14 @@ class JuicioProjectionHandler(settings: ProjectionSettings, system: ActorSystem[
     }
   }
 }
+
+object JuicioProjectionHandler {
+  val defaultTag = "Juicio"
+  val defaultParallelism = 1
+  val defaultProjectionSettings: Monitoring => ProjectionSettings =
+    ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): JuicioProjectionHandler = {
+    val projectionSettings = defaultProjectionSettings(monitoring)
+    new JuicioProjectionHandler(projectionSettings, system)
+  }
+}

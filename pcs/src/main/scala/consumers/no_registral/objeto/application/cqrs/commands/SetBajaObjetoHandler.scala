@@ -31,8 +31,9 @@ class SetBajaObjetoHandler(actor: ObjetoActor) extends SyncCommandHandler[Objeto
       actor.persistEvent(event) { () =>
         actor.state += event
         actor.informBajaToParent(command)
-        actor.persistSnapshot(event, actor.state)
-        replyTo ! Success(Response.SuccessProcessing())
+        actor.persistSnapshot(event, actor.state) { () =>
+          replyTo ! Success(Response.SuccessProcessing())
+        }
       }
     }
     Success(Response.SuccessProcessing())

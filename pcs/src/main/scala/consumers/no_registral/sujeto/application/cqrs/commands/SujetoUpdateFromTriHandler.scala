@@ -23,8 +23,9 @@ class SujetoUpdateFromTriHandler(actor: SujetoActor) extends SyncCommandHandler[
       actor.persistEvent(event) { () =>
         println("[SUJETO ACTOR] HERE THE MESSAGE ARRIVES: " + command)
         actor.state += event
-        actor.persistSnapshot()
-        replyTo ! Success(Response.SuccessProcessing())
+        actor.persistSnapshot() { () =>
+          actor.context.sender() ! Success(Response.SuccessProcessing())
+        }
       }
     }
     Success(Response.SuccessProcessing())

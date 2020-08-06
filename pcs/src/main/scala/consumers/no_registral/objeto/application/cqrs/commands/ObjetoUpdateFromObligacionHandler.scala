@@ -27,7 +27,7 @@ class ObjetoUpdateFromObligacionHandler(actor: ObjetoActor)
     actor.persistEvent(event) { () =>
       actor.state += event
       actor.informParent(command, actor.state)
-      actor.persistSnapshot(event, actor.state)
+      actor.persistSnapshot(event, actor.state)(() => ())
     }
     Success(Response.SuccessProcessing())
   }

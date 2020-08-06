@@ -22,7 +22,7 @@ class SujetoUpdateFromObjetoHandler(actor: SujetoActor) extends SyncCommandHandl
 
     actor.persistEvent(event) { () =>
       actor.state += event
-      actor.persistSnapshot()
+      actor.persistSnapshot()(() => ())
     }
     Success(Response.SuccessProcessing())
   }

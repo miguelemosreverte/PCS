@@ -22,8 +22,9 @@ class SujetoUpdateFromAntHandler(actor: SujetoActor) extends SyncCommandHandler[
     } else {
       actor.persistEvent(event) { () =>
         actor.state += event
-        actor.persistSnapshot()
-        replyTo ! Success(Response.SuccessProcessing())
+        actor.persistSnapshot() { () =>
+          actor.context.sender() ! Success(Response.SuccessProcessing())
+        }
       }
     }
     Success(Response.SuccessProcessing())

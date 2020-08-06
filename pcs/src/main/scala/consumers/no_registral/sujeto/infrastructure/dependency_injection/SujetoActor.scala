@@ -3,7 +3,6 @@ package consumers.no_registral.sujeto.infrastructure.dependency_injection
 import akka.ActorRefMap
 import akka.actor.{ActorRef, Props}
 import akka.entity.ShardedEntity
-import akka.entity.ShardedEntity.{NoRequirements, ShardedEntityNoRequirements}
 import consumers.no_registral.objeto.application.entities.ObjetoMessage
 import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMessageRoots
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
@@ -68,10 +67,10 @@ class SujetoActor(monitoring: Monitoring, objetoActorPropsOption: Option[Props] 
       objetos((evt.sujetoId, evt.objetoId, evt.tipoObjeto))
   }
 
-  def persistSnapshot(): Unit = {
+  def persistSnapshot()(handler: () => Unit): Unit = {
     val sujetoId = SujetoMessageRoots.extractor(persistenceId).sujetoId
     val event = SujetoSnapshotPersisted(state.registro.map(_.EV_ID).getOrElse(0), sujetoId, state.registro, state.saldo)
-    persistEvent(event, SujetoTags.SujetoReadside)(() => ())
+    persistEvent(event, SujetoTags.SujetoReadside)(handler)
   }
 
 }

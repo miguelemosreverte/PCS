@@ -3,7 +3,7 @@ package consumers.no_registral.obligacion.application.cqrs.commands
 import consumers.no_registral.obligacion.application.entities.ObligacionCommands.ObligacionUpdateFromDto
 import consumers.no_registral.obligacion.domain.ObligacionEvents.ObligacionUpdatedFromDto
 import consumers.no_registral.obligacion.infrastructure.dependency_injection.ObligacionActor
-import consumers.no_registral.obligacion.infrastructure.event_bus.ObligacionPersistedSnapshotHandler
+
 import cqrs.untyped.command.CommandHandler.SyncCommandHandler
 import design_principles.actor_model.Response
 
@@ -28,8 +28,9 @@ class ObligacionUpdateFromDtoHandler(actor: ObligacionActor) extends SyncCommand
         actor.state += event
         actor.lastDeliveryId = command.deliveryId
         actor.informParent(command)
-        replyTo ! Success(Response.SuccessProcessing())
-        actor.eventBus.publish(ObligacionPersistedSnapshotHandler.toEvent(command, actor))
+        actor.persistSnapshot() { () =>
+          actor.context.sender() ! Success(Response.SuccessProcessing())
+        }
       }
       Success(Response.SuccessProcessing())
     }

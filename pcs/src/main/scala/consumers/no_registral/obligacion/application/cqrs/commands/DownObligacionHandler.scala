@@ -12,6 +12,7 @@ import scala.util.{Success, Try}
 
 class DownObligacionHandler(actor: ObligacionActor) extends SyncCommandHandler[DownObligacion] {
   override def handle(command: DownObligacion): Try[Response.SuccessProcessing] = {
+    val replyTo = actor.context.sender()
     val event =
       ObligacionEvents.ObligacionRemoved(
         command.sujetoId,
@@ -22,6 +23,7 @@ class DownObligacionHandler(actor: ObligacionActor) extends SyncCommandHandler[D
     actor.persistEvent(event, ObligacionTags.ObligacionReadside) { () =>
       actor.state += event
       actor.informBajaToParent(command)
+      replyTo ! Success(Response.SuccessProcessing())
     }
     Success(Response.SuccessProcessing())
   }

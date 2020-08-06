@@ -12,6 +12,7 @@ import scala.util.{Success, Try}
 
 class ObligacionRemoveHandler(actor: ObligacionActor) extends SyncCommandHandler[ObligacionRemove] {
   override def handle(command: ObligacionRemove): Try[Response.SuccessProcessing] = {
+    val replyTo = actor.context.sender()
     val event =
       ObligacionEvents.ObligacionRemoved(
         command.sujetoId,
@@ -21,8 +22,7 @@ class ObligacionRemoveHandler(actor: ObligacionActor) extends SyncCommandHandler
       )
     actor.persistEvent(event, ObligacionTags.ObligacionReadside) { () =>
       actor.state += event
-      // this.deleteMessages(Long.MaxValue)
-      actor.context.stop(actor.self)
+      replyTo ! Success(Response.SuccessProcessing())
     }
     Success(Response.SuccessProcessing())
   }

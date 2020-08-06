@@ -111,7 +111,7 @@ class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Pro
   def persistSnapshotForSelf(event: ObjetoEvents, consolidatedState: ObjetoState)(handler: () => Unit): Unit =
     persistEvent(event, ObjetoTags.ObjetoReadside)(handler)
 
-  def persistSnapshot(evt: ObjetoEvents, consolidatedState: ObjetoState, handler: () => Unit = () => ()): Unit = {
+  def persistSnapshot(evt: ObjetoEvents, consolidatedState: ObjetoState)(handler: () => Unit): Unit = {
     val snapshot =
       ObjetoSnapshotPersisted(
         evt.deliveryId,

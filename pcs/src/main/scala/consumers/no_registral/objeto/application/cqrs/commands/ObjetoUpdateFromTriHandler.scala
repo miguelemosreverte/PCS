@@ -33,10 +33,11 @@ class ObjetoUpdateFromTriHandler(actor: ObjetoActor) extends SyncCommandHandler[
       actor.persistEvent(event, ObjetoTags.CotitularesReadside) { () =>
         actor.state += event
         actor.informParent(command, actor.state)
-        actor.persistSnapshot(event, actor.state)
-        if (!actor.state.isResponsable)
-          actor.removeObligaciones()
-        replyTo ! Success(Response.SuccessProcessing())
+        actor.persistSnapshot(event, actor.state) { () =>
+          if (!actor.state.isResponsable)
+            actor.removeObligaciones()
+          replyTo ! Success(Response.SuccessProcessing())
+        }
       }
     }
     Success(Response.SuccessProcessing())

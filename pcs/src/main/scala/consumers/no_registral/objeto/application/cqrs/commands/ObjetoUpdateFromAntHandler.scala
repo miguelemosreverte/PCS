@@ -29,8 +29,9 @@ class ObjetoUpdateFromAntHandler(actor: ObjetoActor) extends SyncCommandHandler[
       actor.persistEvent(event) { () =>
         actor.state += event
         actor.informParent(command, actor.state)
-        actor.persistSnapshot(event, actor.state)
-        replyTo ! Success(Response.SuccessProcessing())
+        actor.persistSnapshot(event, actor.state) { () =>
+          replyTo ! Success(Response.SuccessProcessing())
+        }
       }
     }
     Success(Response.SuccessProcessing())

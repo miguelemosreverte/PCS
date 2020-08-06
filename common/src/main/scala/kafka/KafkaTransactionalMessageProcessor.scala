@@ -47,10 +47,7 @@ class KafkaTransactionalMessageProcessor(
     val rebalancerListener = transactionRequirements.rebalancerListener
 
     import system.dispatcher
-    val subscription = rebalancerListener match {
-      case Some(rebalancerListener) => Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerListener)
-      case None => Subscriptions.topics(SOURCE_TOPIC)
-    }
+    val subscription = Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerListener)
 
     val stream = Transactional
       .source(consumer, subscription)

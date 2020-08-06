@@ -7,7 +7,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
 
 case class KafkaMessageProcessorRequirements(system: akka.actor.ActorSystem,
-                                             rebalancerListener: Option[akka.actor.ActorRef],
+                                             rebalancerListener: akka.actor.ActorRef,
                                              monitoring: Monitoring,
                                              consumer: ConsumerSettings[String, String],
                                              producer: ProducerSettings[String, String])
@@ -16,7 +16,7 @@ object KafkaMessageProcessorRequirements {
 
   private val config = ConfigFactory.load()
   private val appConfig = new KafkaConfig(config)
-  private val bootstrapServers = appConfig.KAFKA_BROKER
+  val bootstrapServers: String = appConfig.KAFKA_BROKER
 
   private implicit def consumerSettings(system: akka.actor.ActorSystem): ConsumerSettings[String, String] =
     ConsumerSettings(system, new StringDeserializer, new StringDeserializer)
@@ -28,7 +28,7 @@ object KafkaMessageProcessorRequirements {
     ProducerSettings(system, new StringSerializer, new StringSerializer)
       .withBootstrapServers(bootstrapServers)
 
-  def productionSettings(rebalanceListener: Option[akka.actor.ActorRef],
+  def productionSettings(rebalanceListener: akka.actor.ActorRef,
                          monitoring: Monitoring,
                          system: akka.actor.ActorSystem) =
     KafkaMessageProcessorRequirements(

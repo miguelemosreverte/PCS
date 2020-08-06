@@ -24,7 +24,7 @@ object ProductionMicroserviceContextProvider {
 
     val transactionRequirements: KafkaMessageProcessorRequirements =
       KafkaMessageProcessorRequirements.productionSettings(
-        Some(rebalancerListener.toClassic),
+        rebalancerListener.toClassic,
         monitoring,
         ctx.system.toClassic
       )

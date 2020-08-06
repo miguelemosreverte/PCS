@@ -16,7 +16,8 @@ object ProductionMicroserviceContextProvider {
     val rebalancerListener: ActorRef[ConsumerRebalanceEvent] =
       ctx.spawn(
         TopicListener(
-          typeKeyName = "rebalancerListener"
+          typeKeyName = "rebalancerListener",
+          monitoring
         ),
         name = "rebalancerListener"
       )

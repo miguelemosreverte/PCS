@@ -1,29 +1,16 @@
 package cqrs.base_actor.typed
 
-import java.nio.charset.StandardCharsets
+import scala.reflect.ClassTag
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.cluster.sharding.external.ExternalShardAllocationStrategy
-import akka.cluster.sharding.typed.{
-  ClusterShardingSettings,
-  HashCodeNoEnvelopeMessageExtractor,
-  Murmur2NoEnvelopeMessageExtractor,
-  ShardingMessageExtractor
-}
 import akka.cluster.sharding.typed.scaladsl.{ClusterSharding, Entity, EntityRef, EntityTypeKey}
+import akka.cluster.sharding.typed.{ClusterShardingSettings, HashCodeNoEnvelopeMessageExtractor}
 import akka.persistence.typed.PersistenceId
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
 import design_principles.actor_model.mechanism.AbstractOverReplyTo.MessageWithAutomaticReplyTo
-import design_principles.actor_model.{Command, Query, Response}
-import cqrs.typed.command.SyncEffectCommandBus
-import cqrs.typed.query.SyncEffectQueryBus
-import org.slf4j.LoggerFactory
-
-import scala.reflect.ClassTag
-import cqrs.typed.event.SyncEffectEventBus
 import design_principles.actor_model.mechanism.local_processing.LocalizedProcessingMessageExtractor
-import org.apache.kafka.common.utils.Utils
 
 abstract class BasePersistentShardedTypedActor[
     ActorMessages <: design_principles.actor_model.ShardedMessage: ClassTag,
@@ -37,13 +24,14 @@ abstract class BasePersistentShardedTypedActor[
   val TypeKey: EntityTypeKey[ActorMessages] = EntityTypeKey[ActorMessages](
     utils.Inference.getSimpleName(this.getClass.getName)
   )
+
   // define a message extractor that knows how to retrieve the entityId from a message
   // we plan on deploying on a 3-node cluster, as a rule of thumb there should be 10 times as many
   // shards as there are nodes, hence the numberOfShards value of 30
-  val messageExtractor: HashCodeNoEnvelopeMessageExtractor[ActorMessages] =
-    new HashCodeNoEnvelopeMessageExtractor[ActorMessages](numberOfShards = 30) {
-      override def entityId(message: ActorMessages): String = message.aggregateRoot.hashCode.toString
-    }
+  // val messageExtractor: HashCodeNoEnvelopeMessageExtractor[ActorMessages] =
+  //   new HashCodeNoEnvelopeMessageExtractor[ActorMessages](numberOfShards = 30) {
+  //     override def entityId(message: ActorMessages): String = message.aggregateRoot.hashCode.toString
+  //   }
 
   val shardActor: ActorRef[ActorMessages] = sharding.init(
     Entity(TypeKey) { context =>

@@ -3,11 +3,11 @@ package design_principles.microservice.cassandra_projectionist_microservice
 import akka.actor.typed.ActorSystem
 import akka.cluster.ClusterEvent
 import akka.http.AkkaHttpServer
+import akka.http.scaladsl.server.Directives._
 import com.typesafe.config.{Config, ConfigFactory}
-import design_principles.actor_model.context_provider.{ActorSystemRequirements, Guardian}
+import design_principles.actor_model.context_provider.{Guardian, GuardianRequirements}
 import life_cycle.AppLifecycleMicroservice
 import serialization.EventSerializer
-import akka.http.scaladsl.server.Directives._
 
 object MainApplication {
 
@@ -26,7 +26,7 @@ object MainApplication {
       extraConfigurations
     ).reduce(_ withFallback _)
 
-    Guardian.getContext(ActorSystemRequirements(actorSystemName, config)) { akkaNodeIsUp =>
+    Guardian.getContext(GuardianRequirements(actorSystemName, config)) { akkaNodeIsUp =>
       val routes = ProductionMicroserviceContextProvider.getContext(akkaNodeIsUp) { microserviceProvisioning =>
         val userRoutes = microservices.map(_.route(microserviceProvisioning)).reduce(_ ~ _)
         val systemRoutes = AppLifecycleMicroservice.route(microserviceProvisioning)
@@ -35,5 +35,4 @@ object MainApplication {
       AkkaHttpServer.start(routes, ip, port)(akkaNodeIsUp)
     }
   }
-
 }

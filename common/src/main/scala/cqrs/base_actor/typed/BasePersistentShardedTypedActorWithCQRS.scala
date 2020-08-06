@@ -1,16 +1,16 @@
 package cqrs.base_actor.typed
 
+import scala.reflect.ClassTag
+
 import akka.actor.Status.Success
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.persistence.typed.scaladsl.Effect
 import cqrs.typed.command.SyncEffectCommandBus
 import cqrs.typed.event.SyncEffectEventBus
 import cqrs.typed.query.SyncEffectQueryBus
-import design_principles.actor_model.{Command, Query, Response}
 import design_principles.actor_model.mechanism.AbstractOverReplyTo.MessageWithAutomaticReplyTo
-import org.slf4j.LoggerFactory
-
-import scala.reflect.ClassTag
+import design_principles.actor_model.{Command, Query}
+import org.slf4j.{Logger, LoggerFactory}
 
 abstract class BasePersistentShardedTypedActorWithCQRS[
     ActorMessages <: design_principles.actor_model.ShardedMessage: ClassTag,
@@ -21,8 +21,9 @@ abstract class BasePersistentShardedTypedActorWithCQRS[
                                             ActorEvents,
                                             State](s) {
 
-  val commandBus = new SyncEffectCommandBus[ActorEvents, State](LoggerFactory.getLogger(getClass))
-  val queryBus = new SyncEffectQueryBus[ActorEvents, State](LoggerFactory.getLogger(getClass))
+  val logger: Logger = LoggerFactory.getLogger(getClass)
+  val commandBus = new SyncEffectCommandBus[ActorEvents, State](logger)
+  val queryBus = new SyncEffectQueryBus[ActorEvents, State](logger)
   val eventBus = new SyncEffectEventBus[ActorEvents, State]()
 
   def commandHandler(

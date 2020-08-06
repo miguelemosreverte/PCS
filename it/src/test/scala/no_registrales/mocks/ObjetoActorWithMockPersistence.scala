@@ -1,4 +1,4 @@
-package no_registrales.testkit.mocks
+package no_registrales.mocks
 
 import akka.Done
 import akka.actor.typed.scaladsl.adapter._

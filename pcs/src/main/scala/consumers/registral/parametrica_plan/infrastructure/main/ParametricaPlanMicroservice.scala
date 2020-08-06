@@ -1,22 +1,15 @@
 package consumers.registral.parametrica_plan.infrastructure.main
 
-import akka.actor.ActorSystem
+import scala.concurrent.ExecutionContext
+
+import akka.actor.{ActorSystem, typed}
 import akka.http.scaladsl.server.Route
-import api.actor_transaction.ActorTransaction.Implicits._
+
 import consumers.registral.parametrica_plan.infrastructure.dependency_injection.ParametricaPlanActor
 import consumers.registral.parametrica_plan.infrastructure.http.ParametricaPlanStateAPI
-import consumers.registral.parametrica_plan.infrastructure.kafka.{
-  ParametricaPlanNoTributarioTransaction,
-  ParametricaPlanTributarioTransaction
-}
-import design_principles.microservice.kafka_consumer_microservice.{
-  KafkaConsumerMicroservice,
-  KafkaConsumerMicroserviceRequirements
-}
-import design_principles.microservice.{Microservice, MicroserviceRequirements}
+import consumers.registral.parametrica_plan.infrastructure.kafka.{ParametricaPlanNoTributarioTransaction, ParametricaPlanTributarioTransaction}
+import design_principles.microservice.kafka_consumer_microservice.{KafkaConsumerMicroservice, KafkaConsumerMicroserviceRequirements}
 import kafka.KafkaMessageProcessorRequirements
-
-import scala.concurrent.ExecutionContext
 
 object ParametricaPlanMicroservice extends KafkaConsumerMicroservice {
 
@@ -26,7 +19,7 @@ object ParametricaPlanMicroservice extends KafkaConsumerMicroservice {
     implicit val ec: ExecutionContext = m.executionContext
     val ctx = m.ctx
     import akka.actor.typed.scaladsl.adapter._
-    implicit val systemTyped = ctx.system
+    implicit val systemTyped: typed.ActorSystem[Nothing] = ctx.system
     implicit val system: ActorSystem = ctx.system.toClassic
     implicit val kafkaProcesorRequirements: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
 

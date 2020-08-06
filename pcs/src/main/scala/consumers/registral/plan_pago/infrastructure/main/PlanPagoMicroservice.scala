@@ -1,22 +1,15 @@
 package consumers.registral.plan_pago.infrastructure.main
 
-import akka.actor.ActorSystem
+import scala.concurrent.ExecutionContext
+
+import akka.actor.{ActorSystem, typed}
 import akka.http.scaladsl.server.Route
-import api.actor_transaction.ActorTransaction.Implicits._
+
 import consumers.registral.plan_pago.infrastructure.dependency_injection.PlanPagoActor
 import consumers.registral.plan_pago.infrastructure.http.PlanPagoStateAPI
-import consumers.registral.plan_pago.infrastructure.kafka.{
-  PlanPagoNoTributarioTransaction,
-  PlanPagoTributarioTransaction
-}
-import design_principles.microservice.kafka_consumer_microservice.{
-  KafkaConsumerMicroservice,
-  KafkaConsumerMicroserviceRequirements
-}
-import design_principles.microservice.{Microservice, MicroserviceRequirements}
+import consumers.registral.plan_pago.infrastructure.kafka.{PlanPagoNoTributarioTransaction, PlanPagoTributarioTransaction}
+import design_principles.microservice.kafka_consumer_microservice.{KafkaConsumerMicroservice, KafkaConsumerMicroserviceRequirements}
 import kafka.KafkaMessageProcessorRequirements
-
-import scala.concurrent.ExecutionContext
 
 object PlanPagoMicroservice extends KafkaConsumerMicroservice {
 
@@ -26,7 +19,7 @@ object PlanPagoMicroservice extends KafkaConsumerMicroservice {
     implicit val ec: ExecutionContext = m.executionContext
     val ctx = m.ctx
     import akka.actor.typed.scaladsl.adapter._
-    implicit val systemTyped = ctx.system
+    implicit val systemTyped: typed.ActorSystem[Nothing] = ctx.system
     implicit val system: ActorSystem = ctx.system.toClassic
     implicit val kafkaProcesorRequirements: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
 

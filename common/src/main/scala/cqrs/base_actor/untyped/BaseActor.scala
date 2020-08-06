@@ -5,20 +5,17 @@ import cqrs.untyped.command.{CommandBus, SyncCommandBus}
 import cqrs.untyped.query.{QueryBus, SyncQueryBus}
 import ddd.AbstractState
 import design_principles.actor_model.{Command, Event, Query}
-import monitoring.Monitoring
+import monitoring.{Counter, Monitoring}
 import org.slf4j.{Logger, LoggerFactory}
-
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.Try
 
 abstract class BaseActor[E <: Event, State <: AbstractState[E]](monitoring: Monitoring) extends Actor {
-  val name = utils.Inference.getSimpleName(this.getClass.getName)
+  val name: String = utils.Inference.getSimpleName(this.getClass.getName)
 
-  object BaseActorMonitoring {
-    val commands = monitoring.counter(s"$name-commands")
-    val queries = monitoring.counter(s"$name-queries")
-    val unexpected = monitoring.counter(s"$name-unexpected")
-  }
+  val commandsCounter: Counter = monitoring.counter(s"$name-commands")
+  val queriesCounter: Counter = monitoring.counter(s"$name-queries")
+  val unexpectedCounter: Counter = monitoring.counter(s"$name-unexpected")
 
   implicit private val ec: ExecutionContextExecutor = context.system.dispatcher
   implicit val logger: Logger = LoggerFactory.getLogger(this.getClass.getSimpleName)
@@ -32,14 +29,14 @@ abstract class BaseActor[E <: Event, State <: AbstractState[E]](monitoring: Moni
 
   def receive: Receive = {
     case cmd: Command =>
-      BaseActorMonitoring.commands.increment()
+      commandsCounter.increment()
       commandBus.publish(cmd)
     case query: Query =>
-      BaseActorMonitoring.queries.increment()
+      queriesCounter.increment()
       queryBus.ask(query)
-    case unexpected =>
-      BaseActorMonitoring.unexpected.increment()
-      logger.warn(s"[${persistenceId}]Unexpected message $unexpected")
+    case unexpectedMsg =>
+      unexpectedCounter.increment()
+      logger.warn(s"[$persistenceId]Unexpected message $unexpectedMsg")
   }
   override def preStart(): Unit = {
     super.preStart()

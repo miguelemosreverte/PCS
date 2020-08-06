@@ -15,7 +15,6 @@ import consumers.no_registral.obligacion.infrastructure.dependency_injection.Obl
 import consumers.no_registral.sujeto.application.entity.SujetoCommands
 import cqrs.base_actor.untyped.PersistentBaseActor
 import monitoring.Monitoring
-import utils.implicits.StringT._
 
 class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Props] = None)
     extends PersistentBaseActor[ObjetoEvents, ObjetoState](monitoring) {
@@ -41,7 +40,7 @@ class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Pro
     queryBus.subscribe[ObjetoQueries.GetStateExencion](new GetStateExencionHandler(this).handle)
   }
 
-  val obligaciones = {
+  val obligaciones: ObjetoActorRefMap = {
     val obligacionActorProps = obligacionActorPropsOption match {
       case Some(props) => props
       case None => ObligacionActor.props(monitoring)
@@ -99,11 +98,11 @@ class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Pro
                 exencion
               )
           }
-        case other => ()
+        case _ => ()
       }
   }
 
-  def shouldInformCotitulares(consolidatedState: ObjetoState) =
+  def shouldInformCotitulares(consolidatedState: ObjetoState): Boolean =
     consolidatedState.isResponsable && consolidatedState.sujetos.size > 1
 
   def persistSnapshotForAllCotitulares(event: ObjetoEvents, consolidatedState: ObjetoState)(handler: () => Unit): Unit =
@@ -177,12 +176,12 @@ object ObjetoActor {
   def props(monitoring: Monitoring): Props = Props(new ObjetoActor(monitoring))
 
   object ObjetoTags {
-    val ObjetoReadside = Set("Objeto")
-    val CotitularesReadside = Set("ObjetoNovedadCotitularidad")
-    val ReadsideAndCotitulares = Set("Objeto", "ObjetoNovedadCotitularidad")
+    val ObjetoReadside: Set[String] = Set("Objeto")
+    val CotitularesReadside: Set[String] = Set("ObjetoNovedadCotitularidad")
+    val ReadsideAndCotitulares: Set[String] = Set("Objeto", "ObjetoNovedadCotitularidad")
   }
 
   type ObligacionAgregateRoot = (String, String, String, String)
-  class ObjetoActorRefMap(newActor: (ObligacionAgregateRoot) => ActorRef)
+  class ObjetoActorRefMap(newActor: ObligacionAgregateRoot => ActorRef)
       extends ActorRefMap[ObligacionAgregateRoot](newActor)
 }

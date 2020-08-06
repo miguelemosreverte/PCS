@@ -1,5 +1,4 @@
-
-docker-compose -f assets/docker-compose/dev-lite/docker-compose.yml down -v
+# needed to rebuild provisioning
 docker-compose -f assets/docker-compose/dev-lite/docker-compose.yml build grafana
 docker-compose -f assets/docker-compose/dev-lite/docker-compose.yml up -d
 

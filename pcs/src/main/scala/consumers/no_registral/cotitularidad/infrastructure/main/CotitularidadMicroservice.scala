@@ -3,7 +3,7 @@ package consumers.no_registral.cotitularidad.infrastructure.main
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import api.actor_transaction.ActorTransaction.Implicits._
+
 import consumers.no_registral.cotitularidad.infrastructure.dependency_injection.CotitularidadActor
 import consumers.no_registral.cotitularidad.infrastructure.http.CotitularidadStateAPI
 import consumers.no_registral.cotitularidad.infrastructure.kafka.{

@@ -1,5 +1,7 @@
 package no_registrales
 
+import scala.concurrent.ExecutionContextExecutor
+
 import akka.actor.{ActorRef, ActorSystem}
 import cassandra.read.CassandraRead
 import cassandra.write.CassandraWrite
@@ -20,7 +22,7 @@ import design_principles.external_pub_sub.kafka.{KafkaMock, MessageProcessorLogg
 import design_principles.projection.mock.{CassandraTestkitMock, CassandraWriteMock}
 import kafka.{MessageProcessor, MessageProducer}
 import monitoring.{DummyMonitoring, Monitoring}
-import no_registrales.testkit.mocks.SujetoActorWithMockPersistence
+import no_registrales.mocks.SujetoActorWithMockPersistence
 import readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler
 import readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler
 import readside.proyectionists.no_registrales.sujeto.SujetoProjectionHandler
@@ -30,7 +32,7 @@ trait NoRegistralesTestSuiteMock extends BaseE2ESpec {
 
   class MockE2ETestContext(implicit system: ActorSystem) extends BaseE2ETestContext {
 
-    implicit val ec = system.dispatcher
+    implicit val ec: ExecutionContextExecutor = system.dispatcher
 
     val cassandraTestkit = new CassandraTestkitMock({
       case e: ObjetoSnapshotPersisted =>

@@ -1,7 +1,8 @@
 package kafka
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success}
+
 import akka.Done
 import akka.actor.{ActorRef, ActorSystem}
 import akka.kafka.ProducerSettings
@@ -9,7 +10,7 @@ import akka.kafka.scaladsl.Producer
 import akka.stream.scaladsl.Source
 import monitoring.Monitoring
 import org.apache.kafka.clients.producer.ProducerRecord
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 
 class KafkaMessageProducer()(
     implicit
@@ -17,9 +18,11 @@ class KafkaMessageProducer()(
     producerSettings: ProducerSettings[String, String]
 ) extends MessageProducer {
 
+  val log: Logger = LoggerFactory.getLogger(this.getClass)
+
   def produce(data: Seq[String], topic: String)(handler: Seq[String] => Unit): Future[Done] = {
 
-    implicit val ec = system.getDispatcher
+    implicit val ec: ExecutionContextExecutor = system.getDispatcher
 
     val publication: Future[Done] = Source(data)
     // NOTE: If no partition is specified but a key is present a partition will be chosen
@@ -41,8 +44,6 @@ class KafkaMessageProducer()(
     publication
 
   }
-  val log = LoggerFactory.getLogger(this.getClass)
-
 }
 
 object KafkaMessageProducer {
@@ -51,7 +52,7 @@ object KafkaMessageProducer {
             rebalancerListener: ActorRef)(implicit system: ActorSystem): KafkaMessageProducer = {
     implicit def kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements =
       KafkaMessageProcessorRequirements.productionSettings(Some(rebalancerListener), monitoring, system)
-    implicit def producerSettings = kafkaMessageProcessorRequirements.producer
+    implicit def producerSettings: ProducerSettings[String, String] = kafkaMessageProcessorRequirements.producer
     new KafkaMessageProducer()
   }
 }

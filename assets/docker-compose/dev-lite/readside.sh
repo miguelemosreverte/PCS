@@ -1,5 +1,3 @@
-
-kill -9 `lsof -t -i:2554`
 export SEED_NODES="akka://PersonClassificationServiceReadSide@0.0.0.0:2554"
 export CLUSTER_PORT=2554
 export MANAGEMENT_PORT=8554

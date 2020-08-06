@@ -31,5 +31,4 @@ object Main extends App {
     consumers.registral.subasta.infrastructure.main.SubastaMicroservice,
     consumers.registral.tramite.infrastructure.main.TramiteMicroservice
   )
-
 }

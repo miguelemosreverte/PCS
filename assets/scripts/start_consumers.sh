@@ -1,4 +1,4 @@
-
+# 8081
 curl -X POST http://0.0.0.0:8081/kafka/start/DGR-COP-ACTIVIDADES
 
 curl -X POST http://0.0.0.0:8081/kafka/start/DGR-COP-CALENDARIO
@@ -44,11 +44,9 @@ curl -X POST http://0.0.0.0:8081/kafka/start/CotitularidadPublishSnapshot
 curl -X POST http://0.0.0.0:8081/kafka/start/ObjetoReceiveSnapshot
 curl -X POST http://0.0.0.0:8081/kafka/start/ObjetoUpdatedCotitulares
 
-
 curl -X POST http://0.0.0.0:8081/kafka/start/DGR-COP-EXENCIONES
 
-
-
+# 8082
 curl -X POST http://0.0.0.0:8082/kafka/start/DGR-COP-ACTIVIDADES
 
 curl -X POST http://0.0.0.0:8082/kafka/start/DGR-COP-CALENDARIO
@@ -94,25 +92,9 @@ curl -X POST http://0.0.0.0:8082/kafka/start/CotitularidadPublishSnapshot
 curl -X POST http://0.0.0.0:8082/kafka/start/ObjetoReceiveSnapshot
 curl -X POST http://0.0.0.0:8082/kafka/start/ObjetoUpdatedCotitulares
 
-
 curl -X POST http://0.0.0.0:8082/kafka/start/DGR-COP-EXENCIONES
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# 8083
 curl -X POST http://0.0.0.0:8083/kafka/start/DGR-COP-ACTIVIDADES
 
 curl -X POST http://0.0.0.0:8083/kafka/start/DGR-COP-CALENDARIO
@@ -154,9 +136,10 @@ curl -X POST http://0.0.0.0:8083/kafka/start/DGR-COP-SUJETO-TRI
 curl -X POST http://0.0.0.0:8083/kafka/start/DGR-COP-TRAMITES
 
 curl -X POST http://0.0.0.0:8083/kafka/start/AddCotitularTransaction
+
 curl -X POST http://0.0.0.0:8083/kafka/start/CotitularidadPublishSnapshot
+
 curl -X POST http://0.0.0.0:8083/kafka/start/ObjetoReceiveSnapshot
 curl -X POST http://0.0.0.0:8083/kafka/start/ObjetoUpdatedCotitulares
-
 
 curl -X POST http://0.0.0.0:8083/kafka/start/DGR-COP-EXENCIONES

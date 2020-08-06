@@ -10,10 +10,12 @@ import kafka.{KafkaMessageProcessorRequirements, KafkaMessageProducer, KafkaTran
 import monitoring.DummyMonitoring
 
 class KafkaTestkit(implicit system: ActorSystem) {
+  val dummyMonitoring = new DummyMonitoring
+
   private implicit def kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements =
-    KafkaMessageProcessorRequirements.productionSettings(None, new DummyMonitoring, system)
+    KafkaMessageProcessorRequirements.productionSettings(None, dummyMonitoring, system)
   private implicit def producerSettings: ProducerSettings[String, String] =
-    KafkaMessageProcessorRequirements.productionSettings(None, new DummyMonitoring, system).producer
+    KafkaMessageProcessorRequirements.productionSettings(None, dummyMonitoring, system).producer
   def messageProducer: KafkaMessageProducer = new KafkaMessageProducer()
 
   def messageProcessor: KafkaTransactionalMessageProcessor with MessageProcessorLogging =

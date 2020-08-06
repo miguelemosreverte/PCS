@@ -21,7 +21,7 @@ object TopicListener {
       ctx.system.scheduler.scheduleAtFixedRate(10.seconds, 20.seconds) { () =>
         shardAllocationClient.shardLocations().onComplete {
           case Success(shardLocations) =>
-          //ctx.log.info("Current shard locations {}", shardLocations.locations)
+          // ctx.log.info("Current shard locations {}", shardLocations.locations)
           case Failure(t) =>
             ctx.log.error("failed to get shard locations", t)
         }
@@ -30,17 +30,17 @@ object TopicListener {
       Behaviors.receiveMessage[ConsumerRebalanceEvent] {
         case TopicPartitionsAssigned(_, partitions) =>
           partitions.foreach(partition => {
-            //ctx.log.info("Partition [{}] assigned to current node. Updating shard allocation", partition.partition())
+            // ctx.log.info("Partition [{}] assigned to current node. Updating shard allocation", partition.partition())
             // kafka partition becomes the akka shard
             val done = shardAllocationClient.updateShardLocation(partition.partition().toString, address)
             done.onComplete { result =>
-              //ctx.log.info("Result for updating shard {}: {}", partition, result)
+              // ctx.log.info("Result for updating shard {}: {}", partition, result)
             }
 
           })
           Behaviors.same
         case TopicPartitionsRevoked(_, topicPartitions) =>
-          //ctx.log.info("Partitions [{}] revoked from current node. New location will update shard allocation",
+          // ctx.log.info("Partitions [{}] revoked from current node. New location will update shard allocation",
           //             topicPartitions.mkString(","))
           Behaviors.same
       }

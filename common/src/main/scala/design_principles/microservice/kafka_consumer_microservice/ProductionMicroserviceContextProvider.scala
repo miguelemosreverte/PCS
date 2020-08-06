@@ -2,6 +2,7 @@ package design_principles.microservice.kafka_consumer_microservice
 
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
+import akka.actor.typed.scaladsl.adapter._
 import akka.cluster.ClusterEvent.MemberUp
 import akka.http.scaladsl.server.Route
 import akka.kafka.ConsumerRebalanceEvent
@@ -9,10 +10,7 @@ import kafka.{KafkaMessageProcessorRequirements, TopicListener}
 import monitoring.KamonMonitoring
 
 object ProductionMicroserviceContextProvider {
-
   def getContext(ctx: ActorContext[MemberUp])(visitor: KafkaConsumerMicroserviceRequirements => Route): Route = {
-    import akka.actor.typed.scaladsl.adapter._
-
     val monitoring = new KamonMonitoring
 
     val rebalancerListener: ActorRef[ConsumerRebalanceEvent] =

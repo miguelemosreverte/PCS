@@ -23,12 +23,14 @@ private[life_cycle] final class ReadinessController(appLifecycle: AppLifecycle, 
     path("api" / "system" / "ready") {
       handleErrors(exceptionHandler) {
         complete {
-          appLifecycle
-            .isAppReady()
-            .map {
-              case true => StatusCodes.OK
-              case false => StatusCodes.NotFound
-            }
+          latency.recordFuture {
+            appLifecycle
+              .isAppReady()
+              .map {
+                case true => StatusCodes.OK
+                case false => StatusCodes.NotFound
+              }
+          }
         }
       }
     }

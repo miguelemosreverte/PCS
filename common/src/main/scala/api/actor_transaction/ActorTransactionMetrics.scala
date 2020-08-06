@@ -1,15 +1,13 @@
 package api.actor_transaction
 
-import akka.Done
-import akka.http.scaladsl.server.Route
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
+
 import akka.pattern.AskTimeoutException
 import design_principles.actor_model.Response
 import monitoring.{Counter, Histogram, Monitoring}
 import org.slf4j.LoggerFactory
 import serialization.SerializationError
-
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success, Try}
 
 abstract class ActorTransactionMetrics(
     monitoring: Monitoring
@@ -43,5 +41,4 @@ abstract class ActorTransactionMetrics(
             log.error(unexpectedException.getMessage)
         }
     }
-
 }

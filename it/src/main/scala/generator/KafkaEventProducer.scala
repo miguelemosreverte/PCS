@@ -1,24 +1,22 @@
 package generator
 
+import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.util.{Failure, Success}
+
 import akka.Done
 import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.kafka.ProducerSettings
 import akka.kafka.scaladsl.Producer
 import com.typesafe.config.ConfigFactory
-import design_principles.actor_model.mechanism.local_processing.{
-  KafkaMessageProducer,
-  LocalizedProcessingMessageExtractor
-}
 import generator.Generator.KafkaKeyValue
-import generator.no_registrales.obligacion.{ObligacionesAntGenerator, ObligacionesTriGenerator}
-import generator.no_registrales.sujeto.{SujetoAntGenerator, SujetoTriGenerator}
+import no_registrales.obligacion.{ObligacionesAntGenerator, ObligacionesTriGenerator}
+import no_registrales.sujeto.{SujetoAntGenerator, SujetoTriGenerator}
+import kafka.KafkaMessageShardProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 
-import scala.concurrent.Future
-import scala.concurrent.duration._
-
-object UserEventProducer {
+object KafkaEventProducer {
 
   def main(args: Array[String]): Unit = {
 
@@ -35,13 +33,13 @@ object UserEventProducer {
   def produce(topic: String, From: Int, To: Int): Unit = {
 
     implicit val system: ActorSystem = ActorSystem(
-      "UserEventProducer",
+      "KafkaEventProducer",
       ConfigFactory.parseString("""
       akka.actor.provider = "local" 
      """.stripMargin).withFallback(ConfigFactory.load()).resolve()
     )
 
-    val log = Logging(system, "UserEventProducer")
+    val log = Logging(system, "KafkaEventProducer")
 
     val config = system.settings.config.getConfig("akka.kafka.producer")
 
@@ -57,7 +55,7 @@ object UserEventProducer {
     }
 
     def produce(keyValue: KafkaKeyValue) =
-      KafkaMessageProducer.producerRecord(topic, 120, keyValue.aggregateRoot, keyValue.json)
+      KafkaMessageShardProducerRecord.producerRecord(topic, 120, keyValue.aggregateRoot, keyValue.json)
 
     val done: Future[Done] =
       akka.stream.scaladsl.Source
@@ -67,5 +65,11 @@ object UserEventProducer {
         .map(produce)
         .runWith(Producer.plainSink(producerSettings))
 
+    done.onComplete {
+      case Success(value) =>
+        log.info(s"KakfaEventProducer finished with Success($value)")
+      case Failure(exception) =>
+        log.info(s"KakfaEventProducer finished with Failure($exception)")
+    }(system.dispatcher)
   }
 }

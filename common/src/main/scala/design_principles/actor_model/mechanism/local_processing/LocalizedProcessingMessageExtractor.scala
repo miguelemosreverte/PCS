@@ -18,7 +18,6 @@ class LocalizedProcessingMessageExtractor[ActorMessages <: design_principles.act
 }
 
 object LocalizedProcessingMessageExtractor {
-
   /*
 
         Keeping the processing local

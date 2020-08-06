@@ -1,5 +1,9 @@
 package kafka
 
+import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.util.{Failure, Success, Try}
+
 import akka.Done
 import akka.actor.ActorSystem
 import akka.kafka.scaladsl.Transactional
@@ -8,10 +12,6 @@ import akka.stream.KillSwitches
 import akka.stream.scaladsl.{Keep, Sink}
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.LoggerFactory
-
-import scala.concurrent.Future
-import scala.concurrent.duration._
-import scala.util.{Failure, Success, Try}
 
 class KafkaTransactionalMessageProcessor(
     transactionRequirements: KafkaMessageProcessorRequirements
@@ -23,7 +23,9 @@ class KafkaTransactionalMessageProcessor(
 
   val THROTTLE_ELEMENTS: Int = Try(System.getenv("THROTTLE_ELEMENTS")).map(_.toInt).getOrElse(10000)
   val THROTTLE_ELEMENTS_PER: Int = Try(System.getenv("THROTTLE_ELEMENTS_PER")).map(_.toInt).getOrElse(100)
-  val CONSUMER_PARALLELISM: Int = Try(System.getenv("CONSUMER_PARALLELISM")).map(_.toInt).getOrElse(100)
+  val CONSUMER_PARALLELISM: Int = Try(System.getenv("CONSUMER_PARALLELISM")).map(_.toInt).getOrElse(1)
+
+  def transactionalId: String = java.util.UUID.randomUUID().toString
 
   def run(
       SOURCE_TOPIC: String,
@@ -41,11 +43,11 @@ class KafkaTransactionalMessageProcessor(
     import system.dispatcher
     val subscription = rebalancerListener match {
       case Some(rebalancerListener) => Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerListener)
-
       case None => Subscriptions.topics(SOURCE_TOPIC)
     }
+
     val stream = Transactional
-      .source(consumer, subscription) //Subscriptions.topics(SOURCE_TOPIC))
+      .source(consumer, subscription)
       .throttle(THROTTLE_ELEMENTS, THROTTLE_ELEMENTS_PER millis)
       .mapAsync(CONSUMER_PARALLELISM) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
         val message = msg
@@ -108,21 +110,18 @@ class KafkaTransactionalMessageProcessor(
 
     done.onComplete {
       case Success(_) =>
-        log.debug(s"""
+        log.warn(s"""
              |     Stream completed with success 
              |     This is caused by the HTTP endpoint /kafka/stop/$SOURCE_TOPIC
              |     Because of this we will take no action to interfere: 
              |     The topic will not be restarted on it's own.
           """.stripMargin)
+        killSwitch.shutdown()
       case Failure(ex) =>
         log.error(s"Stream completed with failure -- ${ex.getMessage}")
         killSwitch.shutdown()
         run(SOURCE_TOPIC, SINK_TOPIC, algorithm)
     }
-
     (killSwitch, done)
   }
-
-  def transactionalId: String = java.util.UUID.randomUUID().toString
-
 }

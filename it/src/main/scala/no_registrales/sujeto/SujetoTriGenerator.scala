@@ -1,4 +1,4 @@
-package generator.no_registrales.sujeto
+package no_registrales.sujeto
 
 import consumers.no_registral.sujeto.application.entity.SujetoCommands.SujetoUpdateFromTri
 import consumers.no_registral.sujeto.application.entity.SujetoExternalDto.SujetoTri

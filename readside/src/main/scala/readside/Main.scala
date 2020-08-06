@@ -1,4 +1,5 @@
 package readside
+
 import com.typesafe.config.{Config, ConfigFactory}
 import design_principles.microservice.cassandra_projectionist_microservice.CassandraProjectionistMicroservice
 import design_principles.microservice.cassandra_projectionist_microservice.MainApplication.startMicroservices
@@ -29,5 +30,4 @@ object Main extends App {
     readside.proyectionists.registrales.subasta.infrastructure.main.SubastaProjectionistMicroservice,
     readside.proyectionists.registrales.tramite.infrastructure.main.TramiteProjectionistMicroservice
   )
-
 }

@@ -1,4 +1,4 @@
-package generator.no_registrales.obligacion
+package no_registrales.obligacion
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -13,16 +13,17 @@ import consumers.no_registral.obligacion.infrastructure.json.DetallesObligacionF
 import generator.Helper
 import play.api.libs.json.Reads
 import consumers.no_registral.obligacion.infrastructure.json._
-import consumers.no_registral.sujeto.application.entity.SujetoExternalDto.SujetoAnt
 import generator.Generator.{deliveryId, loadExample}
 import generator.{Generator, Helper}
+import play.api.libs.json.JsPath.\
 
-class ObligacionesAntGenerator extends Generator[ObligacionesAnt] {
-  import ObligacionesAntGenerator._
+import scala.util.Random
 
-  lazy val example: ObligacionesAnt = loadExample[ObligacionesAnt]("assets/examples/DGR-COP-OBLIGACIONES-ANT.json")
+class ObligacionesTriGenerator extends Generator[ObligacionesTri] {
+  import ObligacionesTriGenerator._
+  lazy val example: ObligacionesTri = loadExample[ObligacionesTri]("assets/examples/DGR-COP-OBLIGACIONES-TRI.json")
 
-  def next(id: Int): ObligacionesAnt =
+  def next(id: Int): ObligacionesTri =
     example.copy(
       EV_ID = id,
       BOB_SUJ_IDENTIFICADOR = id.toString,
@@ -30,24 +31,25 @@ class ObligacionesAntGenerator extends Generator[ObligacionesAnt] {
       BOB_OBN_ID = id.toString
     )
 
-  override def toJson(e: ObligacionesAnt): String = e.toJson
+  override def toJson(e: ObligacionesTri): String = e.toJson
 
-  override def aggregateRoot(e: ObligacionesAnt): String = e.aggregateRoot
+  override def aggregateRoot(e: ObligacionesTri): String = e.aggregateRoot
+
 }
 
-object ObligacionesAntGenerator {
-  implicit class ObligacionesAntGeneratorHelper(obligacionesAnt: ObligacionesAnt) extends Helper {
+object ObligacionesTriGenerator {
+  implicit class ObligacionesTriGeneratorHelper(obligacionesTri: ObligacionesTri) extends Helper {
 
     def toJson: String =
-      serialization.encode(obligacionesAnt)
+      serialization.encode(obligacionesTri)
 
     def toEvent: ObligacionUpdatedFromDto = {
       ObligacionUpdatedFromDto(
-        obligacionesAnt.BOB_SUJ_IDENTIFICADOR,
-        obligacionesAnt.BOB_SOJ_IDENTIFICADOR,
-        obligacionesAnt.BOB_SOJ_TIPO_OBJETO,
-        obligacionesAnt.BOB_OBN_ID,
-        obligacionesAnt,
+        obligacionesTri.BOB_SUJ_IDENTIFICADOR,
+        obligacionesTri.BOB_SOJ_IDENTIFICADOR,
+        obligacionesTri.BOB_SOJ_TIPO_OBJETO,
+        obligacionesTri.BOB_OBN_ID,
+        obligacionesTri,
         detallesObligaciones.getOrElse(Seq.empty)
       )
     }
@@ -58,12 +60,12 @@ object ObligacionesAntGenerator {
 
       def obligacionUpdatedFromDtoStub =
         ObligacionUpdateFromDto(
-          obligacionesAnt.BOB_SUJ_IDENTIFICADOR,
-          obligacionesAnt.BOB_SOJ_IDENTIFICADOR,
-          obligacionesAnt.BOB_SOJ_TIPO_OBJETO,
-          obligacionesAnt.BOB_OBN_ID,
+          obligacionesTri.BOB_SUJ_IDENTIFICADOR,
+          obligacionesTri.BOB_SOJ_IDENTIFICADOR,
+          obligacionesTri.BOB_SOJ_TIPO_OBJETO,
+          obligacionesTri.BOB_OBN_ID,
           deliveryId,
-          obligacionesAnt,
+          obligacionesTri,
           detallesObligaciones.getOrElse(Seq.empty)
         )
 
@@ -71,10 +73,11 @@ object ObligacionesAntGenerator {
     }
 
     val detallesObligaciones: Option[Seq[DetallesObligacion]] = for {
-      otrosAtributos <- obligacionesAnt.BOB_OTROS_ATRIBUTOS
+      otrosAtributos <- obligacionesTri.BOB_OTROS_ATRIBUTOS
       bjuDetalles <- (otrosAtributos \ "BOB_DETALLES").toOption
       detalles = serialization.decodeF[Seq[DetallesObligacion]](bjuDetalles.toString)
     } yield detalles
 
   }
+
 }

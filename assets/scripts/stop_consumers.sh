@@ -1,4 +1,4 @@
-
+# 8081
 curl -X POST http://0.0.0.0:8081/kafka/stop/DGR-COP-ACTIVIDADES
 
 curl -X POST http://0.0.0.0:8081/kafka/stop/DGR-COP-CALENDARIO
@@ -44,11 +44,9 @@ curl -X POST http://0.0.0.0:8081/kafka/stop/CotitularidadPublishSnapshot
 curl -X POST http://0.0.0.0:8081/kafka/stop/ObjetoReceiveSnapshot
 curl -X POST http://0.0.0.0:8081/kafka/stop/ObjetoUpdatedCotitulares
 
-
 curl -X POST http://0.0.0.0:8081/kafka/stop/DGR-COP-EXENCIONES
 
-
-
+# 8082
 curl -X POST http://0.0.0.0:8082/kafka/stop/DGR-COP-ACTIVIDADES
 
 curl -X POST http://0.0.0.0:8082/kafka/stop/DGR-COP-CALENDARIO
@@ -97,17 +95,7 @@ curl -X POST http://0.0.0.0:8082/kafka/stop/ObjetoUpdatedCotitulares
 
 curl -X POST http://0.0.0.0:8082/kafka/stop/DGR-COP-EXENCIONES
 
-
-
-
-
-
-
-
-
-
-
-
+# 8083
 curl -X POST http://0.0.0.0:8083/kafka/stop/DGR-COP-ACTIVIDADES
 
 curl -X POST http://0.0.0.0:8083/kafka/stop/DGR-COP-CALENDARIO

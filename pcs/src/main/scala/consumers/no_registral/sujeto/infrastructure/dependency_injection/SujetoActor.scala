@@ -7,12 +7,7 @@ import consumers.no_registral.objeto.application.entities.ObjetoMessage
 import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMessageRoots
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
 import consumers.no_registral.obligacion.application.entities.ObligacionMessage
-import consumers.no_registral.sujeto.application.cqrs.commands.{
-  SujetoSetBajaFromObjetoHandler,
-  SujetoUpdateFromAntHandler,
-  SujetoUpdateFromObjetoHandler,
-  SujetoUpdateFromTriHandler
-}
+import consumers.no_registral.sujeto.application.cqrs.commands.{SujetoSetBajaFromObjetoHandler, SujetoUpdateFromAntHandler, SujetoUpdateFromObjetoHandler, SujetoUpdateFromTriHandler}
 import consumers.no_registral.sujeto.application.cqrs.queries.GetStateSujetoHandler
 import consumers.no_registral.sujeto.application.entity.SujetoMessage.SujetoMessageRoots
 import consumers.no_registral.sujeto.application.entity.{SujetoCommands, SujetoQueries}
@@ -21,14 +16,13 @@ import consumers.no_registral.sujeto.domain.{SujetoEvents, SujetoState}
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor.{SujetoActorRefMap, SujetoTags}
 import cqrs.base_actor.untyped.PersistentBaseActor
 import monitoring.Monitoring
-import utils.implicits.StringT._
 
 class SujetoActor(monitoring: Monitoring, objetoActorPropsOption: Option[Props] = None)
     extends PersistentBaseActor[SujetoEvents, SujetoState](monitoring) {
 
   var state = SujetoState()
 
-  val objetos = {
+  val objetos: SujetoActorRefMap = {
     val objetoActorProps = objetoActorPropsOption match {
       case Some(props) => props
       case None => ObjetoActor.props(monitoring)
@@ -83,7 +77,7 @@ object SujetoActor extends ShardedEntity[Monitoring] {
   }
 
   type ObjetoAggregateRoot = (String, String, String)
-  class SujetoActorRefMap(newActor: (ObjetoAggregateRoot) => ActorRef)
+  class SujetoActorRefMap(newActor: ObjetoAggregateRoot => ActorRef)
       extends ActorRefMap[ObjetoAggregateRoot](newActor)
 
 }

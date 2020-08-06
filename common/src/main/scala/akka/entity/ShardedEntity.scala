@@ -38,7 +38,6 @@ object ShardedEntity {
   def extractShardId(numberOfShards: Int): ShardRegion.ExtractShardId = {
     case s: Sharded =>
       new LocalizedProcessingMessageExtractor(120).shardId(s.shardedId)
-
   }
 
   case class NoRequirements()

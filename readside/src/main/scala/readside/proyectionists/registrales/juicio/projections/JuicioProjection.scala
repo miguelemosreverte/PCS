@@ -2,7 +2,7 @@ package readside.proyectionists.registrales.juicio.projections
 
 import cassandra.CassandraTypesAdapter.int
 import consumers.registral.juicio.domain.JuicioEvents
-import readside.proyectionists.common.shared.UpdateReadSideProjection
+import cassandra.mechanism.UpdateReadSideProjection
 
 trait JuicioProjection extends UpdateReadSideProjection[JuicioEvents] {
   def collectionName: String = "read_side.buc_juicios"

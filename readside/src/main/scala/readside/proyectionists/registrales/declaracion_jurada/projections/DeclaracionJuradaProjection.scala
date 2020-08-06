@@ -1,7 +1,7 @@
 package readside.proyectionists.registrales.declaracion_jurada.projections
 
 import consumers.registral.declaracion_jurada.domain.DeclaracionJuradaEvents
-import readside.proyectionists.common.shared.UpdateReadSideProjection
+import cassandra.mechanism.UpdateReadSideProjection
 
 trait DeclaracionJuradaProjection extends UpdateReadSideProjection[DeclaracionJuradaEvents] {
   def collectionName: String = "read_side.buc_declaraciones_juradas"

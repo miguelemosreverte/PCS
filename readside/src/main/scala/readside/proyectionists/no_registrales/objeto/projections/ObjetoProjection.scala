@@ -1,7 +1,7 @@
 package readside.proyectionists.no_registrales.objeto.projections
 
+import cassandra.mechanism.UpdateReadSideProjection
 import consumers.no_registral.objeto.domain.ObjetoEvents
-import readside.proyectionists.common.shared.UpdateReadSideProjection
 
 trait ObjetoProjection extends UpdateReadSideProjection[ObjetoEvents] {
   def collectionName: String = "read_side.buc_sujeto_objeto"

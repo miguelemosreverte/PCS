@@ -1,4 +1,4 @@
-package readside.proyectionists.common.shared
+package cassandra.mechanism
 
 import scala.concurrent.{ExecutionContext, Future}
 

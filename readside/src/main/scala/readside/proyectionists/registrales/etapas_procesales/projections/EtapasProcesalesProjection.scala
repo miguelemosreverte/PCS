@@ -2,7 +2,7 @@ package readside.proyectionists.registrales.etapas_procesales.projections
 
 import cassandra.CassandraTypesAdapter.int
 import consumers.registral.etapas_procesales.domain.EtapasProcesalesEvents
-import readside.proyectionists.common.shared.UpdateReadSideProjection
+import cassandra.mechanism.UpdateReadSideProjection
 
 trait EtapasProcesalesProjection extends UpdateReadSideProjection[EtapasProcesalesEvents] {
   def collectionName: String = "read_side.buc_etapas_proc"

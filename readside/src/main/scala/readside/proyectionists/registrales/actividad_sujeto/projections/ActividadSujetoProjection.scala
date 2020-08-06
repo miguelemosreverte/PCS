@@ -1,7 +1,7 @@
 package readside.proyectionists.registrales.actividad_sujeto.projections
 
 import consumers.registral.actividad_sujeto.domain.ActividadSujetoEvents
-import readside.proyectionists.common.shared.UpdateReadSideProjection
+import cassandra.mechanism.UpdateReadSideProjection
 
 trait ActividadSujetoProjection extends UpdateReadSideProjection[ActividadSujetoEvents] {
   def collectionName: String = "read_side.buc_actividades_sujeto"

@@ -14,8 +14,8 @@ class ObligacionUpdateFromDtoHandler(actor: ObligacionActor) extends SyncCommand
     val replyTo = actor.context.sender()
     if (command.deliveryId <= actor.lastDeliveryId) {
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
-      replyTo ! Success(Response.SuccessProcessing())
-      Success(Response.SuccessProcessing())
+      replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
+      Success(Response.SuccessProcessing(command.deliveryId))
     } else {
       val event =
         ObligacionUpdatedFromDto(command.sujetoId,
@@ -29,10 +29,10 @@ class ObligacionUpdateFromDtoHandler(actor: ObligacionActor) extends SyncCommand
         actor.lastDeliveryId = command.deliveryId
         actor.informParent(command)
         actor.persistSnapshot() { () =>
-          actor.context.sender() ! Success(Response.SuccessProcessing())
+          actor.context.sender() ! Success(Response.SuccessProcessing(command.deliveryId))
         }
       }
-      Success(Response.SuccessProcessing())
+      Success(Response.SuccessProcessing(command.deliveryId))
     }
   }
 }

@@ -56,15 +56,15 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
         state.sujetoResponsable,
         state.fechaUltMod
       )
-    case cmd: CotitularidadCommands.CotitularidadAddSujetoCotitular =>
+    case command: CotitularidadCommands.CotitularidadAddSujetoCotitular =>
       val replyTo = sender()
       val event = CotitularidadEvents.CotitularidadAddedSujetoCotitular(
-        cmd.deliveryId,
-        cmd.sujetoId,
-        cmd.objetoId,
-        cmd.tipoObjeto,
-        cmd.isResponsable,
-        cmd.sujetoResponsable
+        command.deliveryId,
+        command.sujetoId,
+        command.objetoId,
+        command.tipoObjeto,
+        command.isResponsable,
+        command.sujetoResponsable
       )
       persist(event) { _ =>
         log.debug(s"[$persistenceId] Persist event | $event")
@@ -74,9 +74,9 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
         log.debug(s"[$persistenceId] Cotitulares: | ${state}")
 
         snapshot = snapshot.copy(
-          sujetoId = cmd.sujetoId,
-          objetoId = cmd.objetoId,
-          tipoObjeto = cmd.tipoObjeto,
+          sujetoId = command.sujetoId,
+          objetoId = command.objetoId,
+          tipoObjeto = command.tipoObjeto,
           sujetoResponsable = state.sujetoResponsable,
           cotitulares = state.sujetosCotitulares
         )
@@ -88,10 +88,10 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
             state.sujetosCotitulares.map { cotitular =>
               snapshot.copy(sujetoId = cotitular, cotitulares = state.sujetosCotitulares)
               ObjetoUpdateCotitulares(
-                deliveryId = cmd.deliveryId,
+                deliveryId = command.deliveryId,
                 sujetoId = cotitular,
-                objetoId = cmd.objetoId,
-                tipoObjeto = cmd.tipoObjeto,
+                objetoId = command.objetoId,
+                tipoObjeto = command.tipoObjeto,
                 cotitulares = state.sujetosCotitulares
               )
             }.toSeq
@@ -101,30 +101,30 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
         if (messages.nonEmpty)
           publishToKafka(messages, topic) { _ =>
             log.debug(
-              s"[$persistenceId] Published message | ObjetoSnapshot to Sujeto(${cmd.sujetoId})"
+              s"[$persistenceId] Published message | ObjetoSnapshot to Sujeto(${command.sujetoId})"
             )
-            replyTo ! Success(Response.SuccessProcessing())
+            replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
           }
 
-        replyTo ! Success(Response.SuccessProcessing())
+        replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
       }
 
-    case cmd: CotitularidadCommands.CotitularidadPublishSnapshot =>
+    case command: CotitularidadCommands.CotitularidadPublishSnapshot =>
       val replyTo = sender()
       val topic = "ObjetoReceiveSnapshot"
       val messages = state.sujetosCotitulares.filter(_ != state.sujetoResponsable).map { cotitular =>
           snapshot = ObjetoSnapshot(
-            deliveryId = cmd.deliveryId,
+            deliveryId = command.deliveryId,
             sujetoId = cotitular,
-            objetoId = cmd.objetoId,
-            tipoObjeto = cmd.tipoObjeto,
-            saldo = cmd.saldo,
+            objetoId = command.objetoId,
+            tipoObjeto = command.tipoObjeto,
+            saldo = command.saldo,
             cotitulares = state.sujetosCotitulares,
-            tags = cmd.tags,
-            vencimiento = cmd.vencimiento,
+            tags = command.tags,
+            vencimiento = command.vencimiento,
             sujetoResponsable = state.sujetoResponsable,
-            obligacionesSaldo = cmd.obligacionesSaldo,
-            obligacionesVencidasSaldo = cmd.obligacionesVencidasSaldo
+            obligacionesSaldo = command.obligacionesSaldo,
+            obligacionesVencidasSaldo = command.obligacionesVencidasSaldo
           )
 
           snapshot
@@ -135,7 +135,7 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
           log.debug(
             s"[$persistenceId] Published message | ObjetoSnapshot to Sujeto(${state.sujetosCotitulares.mkString(",")})"
           )
-          replyTo ! Success(Response.SuccessProcessing())
+          replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
         }
 
     case other => log.error(s"[$persistenceId] Unexpected message |  ${other}")

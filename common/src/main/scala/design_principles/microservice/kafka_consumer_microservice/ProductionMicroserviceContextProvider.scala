@@ -16,14 +16,15 @@ object ProductionMicroserviceContextProvider {
     val rebalancerListener: ActorRef[ConsumerRebalanceEvent] =
       ctx.spawn(
         TopicListener(
-          typeKeyName = "rebalancerListener"
+          typeKeyName = "rebalancerListener",
+          monitoring
         ),
         name = "rebalancerListener"
       )
 
     val transactionRequirements: KafkaMessageProcessorRequirements =
       KafkaMessageProcessorRequirements.productionSettings(
-        Some(rebalancerListener.toClassic),
+        rebalancerListener.toClassic,
         monitoring,
         ctx.system.toClassic
       )

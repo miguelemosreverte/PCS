@@ -21,10 +21,10 @@ class ObjetoTagRemoveHandler(actor: ObjetoActor) extends SyncCommandHandler[Obje
     actor.persistEvent(event) { () =>
       actor.state += event
       actor.persistSnapshot(event, actor.state) { () =>
-        replyTo ! Success(Response.SuccessProcessing())
+        replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
       }
     }
-    Success(Response.SuccessProcessing())
+    Success(Response.SuccessProcessing(command.deliveryId))
 
   }
 }

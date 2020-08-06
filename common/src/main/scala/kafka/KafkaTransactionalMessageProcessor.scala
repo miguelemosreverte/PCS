@@ -33,6 +33,12 @@ class KafkaTransactionalMessageProcessor(
       algorithm: String => Future[Seq[String]]
   ): (KillSwitch, Future[Done]) = {
 
+    val ProcessedMessagesCounter = transactionRequirements.monitoring.counter(
+      s"$SOURCE_TOPIC-ProcessedMessagesCounter"
+    )
+    val RejectedMessagesCounter = transactionRequirements.monitoring.counter(
+      s"$SOURCE_TOPIC-RejectedMessagesCounter"
+    )
     type Msg = ConsumerMessage.TransactionalMessage[String, String]
 
     implicit val system: ActorSystem = transactionRequirements.system
@@ -41,10 +47,7 @@ class KafkaTransactionalMessageProcessor(
     val rebalancerListener = transactionRequirements.rebalancerListener
 
     import system.dispatcher
-    val subscription = rebalancerListener match {
-      case Some(rebalancerListener) => Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerListener)
-      case None => Subscriptions.topics(SOURCE_TOPIC)
-    }
+    val subscription = Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerListener)
 
     val stream = Transactional
       .source(consumer, subscription)
@@ -74,6 +77,7 @@ class KafkaTransactionalMessageProcessor(
 
         case Left((message, cause)) =>
           log.error(cause)
+          RejectedMessagesCounter.increment()
           val output = Seq(message.record.value)
           ProducerMessage.multi(
             records = output.map { o =>
@@ -86,6 +90,7 @@ class KafkaTransactionalMessageProcessor(
             passThrough = message.partitionOffset
           )
         case Right((message, output)) =>
+          ProcessedMessagesCounter.increment()
           ProducerMessage.multi(
             records = output.map { o =>
               new ProducerRecord(

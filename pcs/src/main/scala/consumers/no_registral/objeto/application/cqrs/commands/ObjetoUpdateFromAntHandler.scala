@@ -24,16 +24,16 @@ class ObjetoUpdateFromAntHandler(actor: ObjetoActor) extends SyncCommandHandler[
     val lastDeliveryId = actor.state.lastDeliveryIdByEvents.getOrElse(documentName, BigInt(0))
     if (event.deliveryId <= lastDeliveryId) {
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
-      replyTo ! Success(Response.SuccessProcessing())
+      replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
     } else {
       actor.persistEvent(event) { () =>
         actor.state += event
         actor.informParent(command, actor.state)
         actor.persistSnapshot(event, actor.state) { () =>
-          replyTo ! Success(Response.SuccessProcessing())
+          replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
         }
       }
     }
-    Success(Response.SuccessProcessing())
+    Success(Response.SuccessProcessing(command.deliveryId))
   }
 }

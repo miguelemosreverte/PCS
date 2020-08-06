@@ -17,8 +17,10 @@ import consumers.no_registral.cotitularidad.infrastructure.json._
 import consumers.no_registral.objeto.domain.ObjetoEvents
 import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoSnapshotPersisted
 import kafka.KafkaMessageProcessorRequirements
+import kafka.KafkaMessageProcessorRequirements.bootstrapServers
 import kafka.KafkaProducer.produce
 import monitoring.Monitoring
+import org.apache.kafka.common.serialization.StringSerializer
 import org.slf4j.LoggerFactory
 
 class ObjetoNovedadCotitularidadProjectionHandler(settings: ProjectionSettings, system: ActorSystem[_])
@@ -78,7 +80,8 @@ class ObjetoNovedadCotitularidadProjectionHandler(settings: ProjectionSettings, 
 
   def publishMessageToKafka(messages: Seq[String], topic: String): Future[Done] = {
     implicit val producerSettings: ProducerSettings[String, String] =
-      KafkaMessageProcessorRequirements.productionSettings(None, settings.monitoring, system.toClassic).producer
+      ProducerSettings(system, new StringSerializer, new StringSerializer)
+        .withBootstrapServers(KafkaMessageProcessorRequirements.bootstrapServers)
     produce(messages, topic)(_ =>
       log.debug(s"[ObjetoNovedadCotitularidad] Published message | CotitularidadAddSujetoCotitular")
     )

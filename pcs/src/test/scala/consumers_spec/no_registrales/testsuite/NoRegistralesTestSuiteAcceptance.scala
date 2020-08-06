@@ -21,14 +21,14 @@ trait NoRegistralesTestSuiteAcceptance extends NoRegistralesTestSuite {
     import system.dispatcher
 
     val monitoring: Monitoring = new DummyMonitoring
+    lazy val cassandraTestkit: CassandraTestkitProduction = CassandraTestkitProduction()
+    lazy val kafka = new KafkaTestkit(monitoring)
+
     lazy val sujeto: ActorRef = SujetoActor.startWithRequirements(monitoring)
     lazy val cotitularidadActor: ActorRef =
       CotitularidadActor.startWithRequirements(
-        KafkaMessageProcessorRequirements.productionSettings(None, monitoring, system)
+        KafkaMessageProcessorRequirements.productionSettings(kafka.rebalancerListener.toClassic, monitoring, system)
       )
-
-    lazy val cassandraTestkit: CassandraTestkitProduction = CassandraTestkitProduction()
-    lazy val kafka = new KafkaTestkit()
 
     // start feedback loop
     ObjetoNovedadCotitularidadProjectionHandler(monitoring, system.toTyped).run()

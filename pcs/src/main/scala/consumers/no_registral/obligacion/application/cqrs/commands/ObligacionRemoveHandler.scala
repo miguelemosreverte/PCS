@@ -22,8 +22,8 @@ class ObligacionRemoveHandler(actor: ObligacionActor) extends SyncCommandHandler
       )
     actor.persistEvent(event, ObligacionTags.ObligacionReadside) { () =>
       actor.state += event
-      replyTo ! Success(Response.SuccessProcessing())
+      replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
     }
-    Success(Response.SuccessProcessing())
+    Success(Response.SuccessProcessing(command.deliveryId))
   }
 }

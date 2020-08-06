@@ -23,8 +23,8 @@ class DownObligacionHandler(actor: ObligacionActor) extends SyncCommandHandler[D
     actor.persistEvent(event, ObligacionTags.ObligacionReadside) { () =>
       actor.state += event
       actor.informBajaToParent(command)
-      replyTo ! Success(Response.SuccessProcessing())
+      replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
     }
-    Success(Response.SuccessProcessing())
+    Success(Response.SuccessProcessing(command.deliveryId))
   }
 }

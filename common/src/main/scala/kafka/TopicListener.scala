@@ -4,17 +4,18 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
 import akka.cluster.sharding.external._
 import akka.cluster.typed.Cluster
-import akka.kafka.ConsumerRebalanceEvent
-import akka.kafka.TopicPartitionsAssigned
-import akka.kafka.TopicPartitionsRevoked
+import akka.kafka.{ConsumerRebalanceEvent, TopicPartitionsAssigned, TopicPartitionsRevoked}
 import akka.cluster.sharding.typed.scaladsl.EntityTypeKey
+import monitoring.Monitoring
 
 import scala.concurrent.duration._
 import scala.util.Failure
 import scala.util.Success
 
 object TopicListener {
-  def apply(typeKeyName: String): Behavior[ConsumerRebalanceEvent] =
+  def apply(typeKeyName: String, monitoring: Monitoring): Behavior[ConsumerRebalanceEvent] = {
+    val TopicPartitionsRevokedCounter = monitoring.counter("TopicPartitionsRevoked")
+    val TopicPartitionsAssignedCounter = monitoring.counter("TopicPartitionsAssigned")
     Behaviors.setup { ctx =>
       import ctx.executionContext
       val shardAllocationClient = ExternalShardAllocation(ctx.system).clientFor(typeKeyName)
@@ -34,15 +35,18 @@ object TopicListener {
             // kafka partition becomes the akka shard
             val done = shardAllocationClient.updateShardLocation(partition.partition().toString, address)
             done.onComplete { result =>
-              // ctx.log.info("Result for updating shard {}: {}", partition, result)
+              TopicPartitionsAssignedCounter.increment()
+            // ctx.log.info("Result for updating shard {}: {}", partition, result)
             }
 
           })
           Behaviors.same
         case TopicPartitionsRevoked(_, topicPartitions) =>
-          // ctx.log.info("Partitions [{}] revoked from current node. New location will update shard allocation",
-          //             topicPartitions.mkString(","))
+          TopicPartitionsRevokedCounter.increment()
+          ctx.log.warn("Partitions [{}] revoked from current node. New location will update shard allocation",
+                       topicPartitions.mkString(","))
           Behaviors.same
       }
     }
+  }
 }

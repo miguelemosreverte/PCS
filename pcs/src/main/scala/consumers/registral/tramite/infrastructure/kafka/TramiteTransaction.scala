@@ -6,6 +6,7 @@ import consumers.registral.tramite.application.entities.TramiteExternalDto.Trami
 import consumers.registral.tramite.application.entities.{TramiteCommands, TramiteExternalDto}
 import consumers.registral.tramite.infrastructure.dependency_injection.TramiteActor
 import consumers.registral.tramite.infrastructure.json._
+import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
 import serialization.decodeF
@@ -19,7 +20,7 @@ case class TramiteTransaction(actor: TramiteActor, monitoring: Monitoring)(impli
 
   val topic = "DGR-COP-TRAMITES"
 
-  override def processCommand(registro: Tramite): Future[Done] = {
+  override def processCommand(registro: Tramite): Future[Response.SuccessProcessing] = {
     val command = TramiteCommands.TramiteUpdateFromDto(
       sujetoId = registro.BTR_SUJ_IDENTIFICADOR,
       tramiteId = registro.BTR_TRMID,

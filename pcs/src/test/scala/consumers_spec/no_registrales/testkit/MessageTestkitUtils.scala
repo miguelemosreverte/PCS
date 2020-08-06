@@ -20,6 +20,7 @@ import consumers.no_registral.sujeto.infrastructure.consumer.{
   SujetoNoTributarioTransaction,
   SujetoTributarioTransaction
 }
+import design_principles.actor_model.Response
 import design_principles.external_pub_sub.kafka.KafkaMock.MessageProcessorImplicits
 import kafka.{MessageProcessor, MessageProducer}
 import monitoring.DummyMonitoring
@@ -86,7 +87,7 @@ class MessageTestkitUtils(sujeto: ActorRef, cotitularidadActor: ActorRef, messag
 object MessageTestkitUtils {
   implicit class MessageProducerNoRegistrales(messageProducer: MessageProducer) {
     import consumers_spec.no_registrales.testsuite.ToJson._
-    def produceObligacion(obligacion: ObligacionExternalDto): Future[Done] = {
+    def produceObligacion(obligacion: ObligacionExternalDto): Future[akka.Done] = {
       val topic = obligacion match {
         case _: ObligacionExternalDto.ObligacionesAnt => "DGR-COP-OBLIGACIONES-ANT"
         case _: ObligacionExternalDto.ObligacionesTri => "DGR-COP-OBLIGACIONES-TRI"
@@ -94,7 +95,7 @@ object MessageTestkitUtils {
       messageProducer.produce(Seq(obligacion.toJson), topic)(_ => ())
     }
 
-    def produceObjeto(objeto: ObjetoExternalDto): Future[Done] = {
+    def produceObjeto(objeto: ObjetoExternalDto): Future[akka.Done] = {
       val topic = objeto match {
         case _: ObjetoExternalDto.ObjetosAnt => "DGR-COP-OBJETOS-ANT"
         case _: ObjetoExternalDto.ObjetosTri => "DGR-COP-OBJETOS-TRI"
@@ -102,7 +103,7 @@ object MessageTestkitUtils {
       messageProducer.produce(Seq(objeto.toJson), topic)(_ => ())
     }
 
-    def produceSujeto(sujeto: SujetoExternalDto): Future[Done] = {
+    def produceSujeto(sujeto: SujetoExternalDto): Future[akka.Done] = {
       val topic = sujeto match {
         case _: SujetoExternalDto.SujetoAnt => "DGR-COP-SUJETO-ANT"
         case _: SujetoExternalDto.SujetoTri => "DGR-COP-SUJETO-TRI"

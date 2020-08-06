@@ -6,7 +6,7 @@ import consumers.registral.parametrica_recargo.application.entities.ParametricaR
 import consumers.registral.parametrica_recargo.application.entities.ParametricaRecargoResponses.GetParametricaRecargoResponse
 import consumers.registral.parametrica_recargo.infrastructure.dependency_injection.ParametricaRecargoActor
 import consumers_spec.Metrics
-import design_principles.actor_model.TypedActorSpec
+import design_principles.actor_model.{Response, TypedActorSpec}
 
 class ParametricaRecargoSpec extends TypedActorSpec {
 
@@ -23,19 +23,19 @@ class ParametricaRecargoSpec extends TypedActorSpec {
       parametrica_recargoResponse3,
       parametrica_recargoResponse4
     ) = (for {
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(parametricaRecargoId = "1")
           .copy(registro = command.registro.asInstanceOf[ParametricaRecargoTri].copy(BPR_CONCEPTO = "FIRST REGISTRO"))
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(parametricaRecargoId = "2")
           .copy(
             registro = command.registro.asInstanceOf[ParametricaRecargoTri].copy(BPR_CONCEPTO = "SECOND REGISTRO")
           )
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(parametricaRecargoId = "3")
           .copy(registro = command.registro.asInstanceOf[ParametricaRecargoTri].copy(BPR_CONCEPTO = "THIRD REGISTRO"))

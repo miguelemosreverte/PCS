@@ -9,7 +9,7 @@ import consumers.registral.tramite.application.entities.TramiteQueries.GetStateT
 import consumers.registral.tramite.domain.TramiteEvents.TramiteUpdatedFromDto
 import consumers.registral.tramite.domain.events.TramiteUpdatedFromDtoHandler
 import consumers.registral.tramite.domain.{TramiteEvents, TramiteState}
-import cqrs.BasePersistentShardedTypedActor.CQRS.BasePersistentShardedTypedActorWithCQRS
+import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
 case class TramiteActor(state: TramiteState = TramiteState())(
     implicit system: ActorSystem[Nothing]

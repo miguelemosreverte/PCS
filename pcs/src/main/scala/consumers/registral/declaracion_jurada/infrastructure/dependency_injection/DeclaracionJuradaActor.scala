@@ -9,7 +9,7 @@ import consumers.registral.declaracion_jurada.application.entities.DeclaracionJu
 import consumers.registral.declaracion_jurada.domain.DeclaracionJuradaEvents.DeclaracionJuradaUpdatedFromDto
 import consumers.registral.declaracion_jurada.domain.events.DeclaracionJuradaUpdatedFromDtoHandler
 import consumers.registral.declaracion_jurada.domain.{DeclaracionJuradaEvents, DeclaracionJuradaState}
-import cqrs.BasePersistentShardedTypedActor.CQRS.BasePersistentShardedTypedActorWithCQRS
+import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
 case class DeclaracionJuradaActor(state: DeclaracionJuradaState = DeclaracionJuradaState())(
     implicit system: ActorSystem[Nothing]

@@ -5,7 +5,7 @@ import consumers.registral.declaracion_jurada.application.entities.DeclaracionJu
 import consumers.registral.declaracion_jurada.application.entities.DeclaracionJuradaResponses.GetDeclaracionJuradaResponse
 import consumers.registral.declaracion_jurada.infrastructure.dependency_injection.DeclaracionJuradaActor
 import consumers_spec.Metrics
-import design_principles.actor_model.TypedActorSpec
+import design_principles.actor_model.{Response, TypedActorSpec}
 
 class DeclaracionJuradaSpec extends TypedActorSpec {
 
@@ -22,13 +22,13 @@ class DeclaracionJuradaSpec extends TypedActorSpec {
       declaracionJuradaResponse3,
       declaracionJuradaResponse4
     ) = (for {
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command.copy(sujetoId = "1").copy(registro = command.registro.copy(BDJ_ESTADO = Some("FIRST REGISTRO")))
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command.copy(sujetoId = "2").copy(registro = command.registro.copy(BDJ_ESTADO = Some("SECOND REGISTRO")))
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command.copy(sujetoId = "3").copy(registro = command.registro.copy(BDJ_ESTADO = Some("THIRD REGISTRO")))
       )
       getDeclaracionJuradaResponse1: GetDeclaracionJuradaResponse <- actor.ask(

@@ -7,7 +7,6 @@ import akka.actor.typed.scaladsl.adapter._
 import akka.actor.{ActorPath, ActorSelection, ActorSystem, Identify}
 import infrastructure.cassandra.CassandraClient
 import infrastructure.cassandra.CassandraTestkit.RowValidation
-import readside.proyectionists.common.infrastructure.Guardian
 import spec.testkit.ProjectionTestkit
 import akka.pattern.ask
 import scala.concurrent.duration._

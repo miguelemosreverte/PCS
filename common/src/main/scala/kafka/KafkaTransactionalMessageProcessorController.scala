@@ -44,7 +44,7 @@ object KafkaTransactionalMessageProcessorController {
       log.debug(s"Starting ${actorTransaction.topic} transaction")
       val (killSwitch, done) = new KafkaTransactionalMessageProcessor(requirements)
         .run(topic, s"${topic}SINK", message => {
-          transaction(message).map { output: akka.Done =>
+          transaction(message).map { output =>
             Seq(output.toString)
           }
         })

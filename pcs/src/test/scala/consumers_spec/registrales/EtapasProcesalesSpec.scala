@@ -6,7 +6,7 @@ import consumers.registral.etapas_procesales.application.entities.EtapasProcesal
 import consumers.registral.etapas_procesales.application.entities.EtapasProcesalesResponses.GetEtapasProcesalesResponse
 import consumers.registral.etapas_procesales.infrastructure.dependency_injection.EtapasProcesalesActor
 import consumers_spec.Metrics
-import design_principles.actor_model.TypedActorSpec
+import design_principles.actor_model.{Response, TypedActorSpec}
 
 class EtapasProcesalesSpec extends TypedActorSpec {
 
@@ -23,14 +23,14 @@ class EtapasProcesalesSpec extends TypedActorSpec {
       etapas_procesalesResponse3,
       etapas_procesalesResponse4
     ) = (for {
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(juicioId = "1")
           .copy(
             registro = command.registro.asInstanceOf[EtapasProcesalesTri].copy(BEP_DESCRIPCION = Some("FIRST REGISTRO"))
           )
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(juicioId = "2")
           .copy(
@@ -38,7 +38,7 @@ class EtapasProcesalesSpec extends TypedActorSpec {
               command.registro.asInstanceOf[EtapasProcesalesTri].copy(BEP_DESCRIPCION = Some("SECOND REGISTRO"))
           )
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(juicioId = "3")
           .copy(

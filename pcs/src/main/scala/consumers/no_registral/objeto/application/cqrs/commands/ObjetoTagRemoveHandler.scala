@@ -4,13 +4,14 @@ import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.objeto.domain.ObjetoEvents
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
 import cqrs.untyped.command.CommandHandler.SyncCommandHandler
+import design_principles.actor_model.Response
 
 import scala.util.{Success, Try}
 
 class ObjetoTagRemoveHandler(actor: ObjetoActor) extends SyncCommandHandler[ObjetoCommands.ObjetoTagRemove] {
   override def handle(
       command: ObjetoCommands.ObjetoTagRemove
-  ): Try[akka.Done] = {
+  ): Try[Response.SuccessProcessing] = {
     val replyTo = actor.context.sender()
     val event = ObjetoEvents.ObjetoTagAdded(command.deliveryId,
                                             command.sujetoId,
@@ -20,9 +21,9 @@ class ObjetoTagRemoveHandler(actor: ObjetoActor) extends SyncCommandHandler[Obje
     actor.persistEvent(event) { () =>
       actor.state += event
       actor.persistSnapshot(event, actor.state)
-      replyTo ! akka.Done
+      replyTo ! Success(Response.SuccessProcessing())
     }
-    Success(akka.Done)
+    Success(Response.SuccessProcessing())
 
   }
 }

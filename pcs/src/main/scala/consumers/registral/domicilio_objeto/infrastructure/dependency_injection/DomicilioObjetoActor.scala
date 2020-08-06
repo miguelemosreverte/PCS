@@ -9,7 +9,7 @@ import consumers.registral.domicilio_objeto.application.entities.DomicilioObjeto
 import consumers.registral.domicilio_objeto.domain.DomicilioObjetoEvents.DomicilioObjetoUpdatedFromDto
 import consumers.registral.domicilio_objeto.domain.events.DomicilioObjetoUpdatedFromDtoHandler
 import consumers.registral.domicilio_objeto.domain.{DomicilioObjetoEvents, DomicilioObjetoState}
-import cqrs.BasePersistentShardedTypedActor.CQRS.BasePersistentShardedTypedActorWithCQRS
+import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
 case class DomicilioObjetoActor(state: DomicilioObjetoState = DomicilioObjetoState())(
     implicit system: ActorSystem[Nothing]

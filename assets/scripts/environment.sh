@@ -10,7 +10,7 @@ docker-compose -f assets/docker-compose/dev-lite/docker-compose.yml up -d
 
 sleep 30
 
-docker exec -i cassandra cqlsh < assets/scripts/setup_akka_tables.cql
+sh assets/scripts/cassandra/setup_cassandra.sh
 echo "== setup akka tables on Cassandra =="
 
 

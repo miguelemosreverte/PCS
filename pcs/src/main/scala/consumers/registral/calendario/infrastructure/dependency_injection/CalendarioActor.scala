@@ -9,7 +9,7 @@ import consumers.registral.calendario.application.entities.CalendarioQueries.Get
 import consumers.registral.calendario.domain.CalendarioEvents.CalendarioUpdatedFromDto
 import consumers.registral.calendario.domain.events.CalendarioUpdatedFromDtoHandler
 import consumers.registral.calendario.domain.{CalendarioEvents, CalendarioState}
-import cqrs.BasePersistentShardedTypedActor.CQRS.BasePersistentShardedTypedActorWithCQRS
+import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
 case class CalendarioActor(state: CalendarioState = CalendarioState())(
     implicit system: ActorSystem[Nothing]

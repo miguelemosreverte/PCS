@@ -9,6 +9,7 @@ import consumers.registral.etapas_procesales.application.entities.{
 }
 import consumers.registral.etapas_procesales.infrastructure.dependency_injection.EtapasProcesalesActor
 import consumers.registral.etapas_procesales.infrastructure.json._
+import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
 import serialization.decodeF
@@ -23,7 +24,7 @@ case class EtapasProcesalesTributarioTransaction(actor: EtapasProcesalesActor, m
 
   val topic = "DGR-COP-ETAPROCESALES-TRI"
 
-  override def processCommand(registro: EtapasProcesalesTri): Future[Done] = {
+  override def processCommand(registro: EtapasProcesalesTri): Future[Response.SuccessProcessing] = {
     val command = EtapasProcesalesCommands.EtapasProcesalesUpdateFromDto(
       juicioId = registro.BEP_JUI_ID,
       etapaId = registro.BPE_ETA_ID,

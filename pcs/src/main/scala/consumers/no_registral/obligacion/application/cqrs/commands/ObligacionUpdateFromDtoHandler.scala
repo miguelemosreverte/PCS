@@ -5,16 +5,17 @@ import consumers.no_registral.obligacion.domain.ObligacionEvents.ObligacionUpdat
 import consumers.no_registral.obligacion.infrastructure.dependency_injection.ObligacionActor
 import consumers.no_registral.obligacion.infrastructure.event_bus.ObligacionPersistedSnapshotHandler
 import cqrs.untyped.command.CommandHandler.SyncCommandHandler
+import design_principles.actor_model.Response
 
 import scala.util.{Success, Try}
 
 class ObligacionUpdateFromDtoHandler(actor: ObligacionActor) extends SyncCommandHandler[ObligacionUpdateFromDto] {
-  override def handle(command: ObligacionUpdateFromDto): Try[akka.Done] = {
+  override def handle(command: ObligacionUpdateFromDto): Try[Response.SuccessProcessing] = {
     val replyTo = actor.context.sender()
     if (command.deliveryId <= actor.lastDeliveryId) {
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
-      replyTo ! akka.Done
-      Success(akka.Done)
+      replyTo ! Success(Response.SuccessProcessing())
+      Success(Response.SuccessProcessing())
     } else {
       val event =
         ObligacionUpdatedFromDto(command.sujetoId,
@@ -27,10 +28,10 @@ class ObligacionUpdateFromDtoHandler(actor: ObligacionActor) extends SyncCommand
         actor.state += event
         actor.lastDeliveryId = command.deliveryId
         actor.informParent(command)
-        replyTo ! akka.Done
+        replyTo ! Success(Response.SuccessProcessing())
         actor.eventBus.publish(ObligacionPersistedSnapshotHandler.toEvent(command, actor))
       }
-      Success(akka.Done)
+      Success(Response.SuccessProcessing())
     }
   }
 }

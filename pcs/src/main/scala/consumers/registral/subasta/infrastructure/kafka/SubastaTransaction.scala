@@ -5,6 +5,7 @@ import api.actor_transaction.ActorTransaction
 import consumers.registral.subasta.application.entities.{SubastaCommands, SubastaExternalDto}
 import consumers.registral.subasta.infrastructure.dependency_injection.SubastaActor
 import consumers.registral.subasta.infrastructure.json._
+import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
 import serialization.decodeF
@@ -18,7 +19,7 @@ case class SubastaTransaction(actor: SubastaActor, monitoring: Monitoring)(impli
 
   val topic = "DGR-COP-SUBASTAS"
 
-  override def processCommand(registro: SubastaExternalDto): Future[Done] = {
+  override def processCommand(registro: SubastaExternalDto): Future[Response.SuccessProcessing] = {
     val command = SubastaCommands.SubastaUpdateFromDto(
       sujetoId = registro.BSB_SUJ_IDENTIFICADOR_ADQ,
       objetoId = registro.BSB_SOJ_IDENTIFICADOR,

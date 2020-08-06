@@ -20,7 +20,7 @@ import consumers.no_registral.sujeto.application.entity.{SujetoCommands, SujetoQ
 import consumers.no_registral.sujeto.domain.SujetoEvents.SujetoSnapshotPersisted
 import consumers.no_registral.sujeto.domain.{SujetoEvents, SujetoState}
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor.{SujetoActorRefMap, SujetoTags}
-import cqrs.PersistentBaseActor
+import cqrs.base_actor.untyped.PersistentBaseActor
 import monitoring.Monitoring
 import utils.implicits.StringT._
 

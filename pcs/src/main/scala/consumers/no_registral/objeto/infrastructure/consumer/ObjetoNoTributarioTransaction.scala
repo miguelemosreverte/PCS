@@ -7,6 +7,7 @@ import api.actor_transaction.ActorTransaction
 import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.objeto.application.entities.ObjetoExternalDto.ObjetosAnt
 import consumers.no_registral.objeto.infrastructure.json._
+import design_principles.actor_model.Response
 import monitoring.Monitoring
 import serialization.decodeF
 
@@ -15,7 +16,7 @@ case class ObjetoNoTributarioTransaction(actorRef: ActorRef, monitoring: Monitor
 
   val topic = "DGR-COP-OBJETOS-ANT"
 
-  def processCommand(registro: ObjetosAnt): Future[Done] = {
+  def processCommand(registro: ObjetosAnt): Future[Response.SuccessProcessing] = {
     val command: ObjetoCommands =
       if (registro.SOJ_ESTADO.contains("BAJA"))
         ObjetoCommands.SetBajaObjeto(
@@ -36,6 +37,6 @@ case class ObjetoNoTributarioTransaction(actorRef: ActorRef, monitoring: Monitor
           registro = registro
         )
 
-    actorRef.ask[akka.Done](command)
+    actorRef.ask[Response.SuccessProcessing](command)
   }
 }

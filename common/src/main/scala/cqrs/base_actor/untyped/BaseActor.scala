@@ -1,4 +1,4 @@
-package cqrs
+package cqrs.base_actor.untyped
 
 import akka.actor.Actor
 import cqrs.untyped.command.{CommandBus, SyncCommandBus}

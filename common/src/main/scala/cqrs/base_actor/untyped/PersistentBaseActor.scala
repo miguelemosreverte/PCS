@@ -1,13 +1,14 @@
-package cqrs
+package cqrs.base_actor.untyped
 
-import scala.reflect.ClassTag
-import scala.util.Try
 import akka.persistence.journal.Tagged
 import akka.persistence.{PersistentActor, RecoveryCompleted, SnapshotOffer}
 import cqrs.untyped.event.{EventBus, SyncEventBus}
 import ddd.AbstractState
 import design_principles.actor_model.{Command, Event, Query}
 import monitoring.Monitoring
+
+import scala.reflect.ClassTag
+import scala.util.Try
 
 abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[E]: ClassTag](monitoring: Monitoring)
     extends BaseActor[E, State](monitoring)

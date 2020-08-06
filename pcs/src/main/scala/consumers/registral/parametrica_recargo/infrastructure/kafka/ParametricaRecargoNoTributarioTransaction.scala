@@ -9,6 +9,7 @@ import consumers.registral.parametrica_recargo.application.entities.{
 }
 import consumers.registral.parametrica_recargo.infrastructure.dependency_injection.ParametricaRecargoActor
 import consumers.registral.parametrica_recargo.infrastructure.json._
+import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
 import serialization.decodeF
@@ -23,7 +24,7 @@ case class ParametricaRecargoNoTributarioTransaction(actor: ParametricaRecargoAc
 
   val topic = "DGR-COP-PARAMRECARGO-ANT"
 
-  override def processCommand(registro: ParametricaRecargoAnt): Future[Done] = {
+  override def processCommand(registro: ParametricaRecargoAnt): Future[Response.SuccessProcessing] = {
 
     val command = ParametricaRecargoCommands.ParametricaRecargoUpdateFromDto(
       parametricaRecargoId = registro.BPR_INDICE,

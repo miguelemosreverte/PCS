@@ -1,14 +1,16 @@
 package consumers.registral.parametrica_recargo.application.cqrs.commands
 
+import akka.actor.Status.Success
 import akka.actor.typed.ActorRef
 import akka.persistence.typed.scaladsl.Effect
 import consumers.registral.parametrica_recargo.application.entities.ParametricaRecargoCommands.ParametricaRecargoUpdateFromDto
 import consumers.registral.parametrica_recargo.domain.ParametricaRecargoEvents.ParametricaRecargoUpdatedFromDto
 import consumers.registral.parametrica_recargo.domain.{ParametricaRecargoEvents, ParametricaRecargoState}
+import design_principles.actor_model.Response
 
 class ParametricaRecargoUpdateFromDtoHandler() {
 
-  def handle(command: ParametricaRecargoUpdateFromDto)(replyTo: ActorRef[akka.Done]) = {
+  def handle(command: ParametricaRecargoUpdateFromDto)(replyTo: ActorRef[Success]) = {
     val registro = command.registro
     Effect
       .persist[
@@ -25,7 +27,7 @@ class ParametricaRecargoUpdateFromDtoHandler() {
           registro
         )
       )
-      .thenReply(replyTo)(state => akka.Done)
+      .thenReply(replyTo)(state => Success(Response.SuccessProcessing()))
   }
 
 }

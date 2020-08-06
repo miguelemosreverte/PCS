@@ -6,7 +6,7 @@ import consumers.registral.juicio.application.entities.JuicioQueries.GetStateJui
 import consumers.registral.juicio.application.entities.JuicioResponses.GetJuicioResponse
 import consumers.registral.juicio.infrastructure.dependency_injection.JuicioActor
 import consumers_spec.Metrics
-import design_principles.actor_model.TypedActorSpec
+import design_principles.actor_model.{Response, TypedActorSpec}
 
 class JuicioSpec extends TypedActorSpec {
 
@@ -22,17 +22,17 @@ class JuicioSpec extends TypedActorSpec {
       juicioResponse3,
       juicioResponse4
     ) = (for {
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(sujetoId = "1")
           .copy(registro = command.registro.asInstanceOf[JuicioTri].copy(BJU_ESTADO = Some("FIRST REGISTRO")))
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(sujetoId = "2")
           .copy(registro = command.registro.asInstanceOf[JuicioTri].copy(BJU_ESTADO = Some("SECOND REGISTRO")))
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(sujetoId = "3")
           .copy(registro = command.registro.asInstanceOf[JuicioTri].copy(BJU_ESTADO = Some("THIRD REGISTRO")))

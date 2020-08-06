@@ -9,7 +9,7 @@ import consumers.registral.etapas_procesales.application.entities.EtapasProcesal
 import consumers.registral.etapas_procesales.domain.EtapasProcesalesEvents.EtapasProcesalesUpdatedFromDto
 import consumers.registral.etapas_procesales.domain.events.EtapasProcesalesUpdatedFromDtoHandler
 import consumers.registral.etapas_procesales.domain.{EtapasProcesalesEvents, EtapasProcesalesState}
-import cqrs.BasePersistentShardedTypedActor.CQRS.BasePersistentShardedTypedActorWithCQRS
+import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
 case class EtapasProcesalesActor(state: EtapasProcesalesState = EtapasProcesalesState())(
     implicit system: ActorSystem[Nothing]

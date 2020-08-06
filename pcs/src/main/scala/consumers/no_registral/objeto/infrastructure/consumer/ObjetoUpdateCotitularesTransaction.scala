@@ -6,6 +6,7 @@ import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import consumers.no_registral.objeto.application.entities.ObjetoCommands.ObjetoUpdateCotitulares
 import consumers.no_registral.objeto.infrastructure.json._
+import design_principles.actor_model.Response
 import monitoring.Monitoring
 import serialization.decodeF
 
@@ -14,7 +15,7 @@ case class ObjetoUpdateCotitularesTransaction(actorRef: ActorRef, monitoring: Mo
 
   val topic = "ObjetoUpdatedCotitulares"
 
-  def processCommand(cmd: ObjetoUpdateCotitulares): Future[Done] = {
-    actorRef.ask[akka.Done](cmd)
+  def processCommand(cmd: ObjetoUpdateCotitulares): Future[Response.SuccessProcessing] = {
+    actorRef.ask[Response.SuccessProcessing](cmd)
   }
 }

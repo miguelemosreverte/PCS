@@ -13,7 +13,7 @@ import consumers.no_registral.obligacion.application.entities.ObligacionMessage.
 import consumers.no_registral.obligacion.application.entities.{ObligacionCommands, ObligacionMessage}
 import consumers.no_registral.obligacion.infrastructure.dependency_injection.ObligacionActor
 import consumers.no_registral.sujeto.application.entity.SujetoCommands
-import cqrs.PersistentBaseActor
+import cqrs.base_actor.untyped.PersistentBaseActor
 import monitoring.Monitoring
 import utils.implicits.StringT._
 

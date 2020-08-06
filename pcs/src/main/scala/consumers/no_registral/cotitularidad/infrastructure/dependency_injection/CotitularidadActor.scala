@@ -1,6 +1,7 @@
 package consumers.no_registral.cotitularidad.infrastructure.dependency_injection
 
 import akka.actor.Props
+import akka.actor.Status.Success
 import akka.entity.ShardedEntity
 import akka.persistence.{PersistentActor, RecoveryCompleted, SnapshotOffer}
 import consumers.no_registral.cotitularidad.application.entities.{
@@ -11,6 +12,7 @@ import consumers.no_registral.cotitularidad.application.entities.{
 import consumers.no_registral.cotitularidad.domain.{CotitularidadEvents, CotitularidadState}
 import consumers.no_registral.objeto.application.entities.ObjetoCommands.{ObjetoSnapshot, ObjetoUpdateCotitulares}
 import consumers.no_registral.objeto.infrastructure.json._
+import design_principles.actor_model.Response
 import kafka.{KafkaMessageProcessorRequirements, KafkaMessageProducer}
 import utils.implicits.StringT._
 
@@ -101,10 +103,10 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
             log.debug(
               s"[$persistenceId] Published message | ObjetoSnapshot to Sujeto(${cmd.sujetoId})"
             )
-            replyTo ! akka.Done
+            replyTo ! Success(Response.SuccessProcessing())
           }
 
-        replyTo ! akka.Done
+        replyTo ! Success(Response.SuccessProcessing())
       }
 
     case cmd: CotitularidadCommands.CotitularidadPublishSnapshot =>
@@ -133,7 +135,7 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
           log.debug(
             s"[$persistenceId] Published message | ObjetoSnapshot to Sujeto(${state.sujetosCotitulares.mkString(",")})"
           )
-          replyTo ! akka.Done
+          replyTo ! Success(Response.SuccessProcessing())
         }
 
     case other => log.error(s"[$persistenceId] Unexpected message |  ${other}")

@@ -5,7 +5,7 @@ import consumers.registral.calendario.application.entities.CalendarioQueries.Get
 import consumers.registral.calendario.application.entities.CalendarioResponses.GetCalendarioResponse
 import consumers.registral.calendario.infrastructure.dependency_injection.CalendarioActor
 import consumers_spec.Metrics
-import design_principles.actor_model.TypedActorSpec
+import design_principles.actor_model.{Response, TypedActorSpec}
 
 class CalendarioSpec extends TypedActorSpec {
 
@@ -21,17 +21,17 @@ class CalendarioSpec extends TypedActorSpec {
       calendarioResponse3,
       calendarioResponse4
     ) = (for {
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(calendarioId = "1")
           .copy(registro = command.registro.copy(BCL_DESCRIPCION = Some("FIRST REGISTRO")))
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(calendarioId = "2")
           .copy(registro = command.registro.copy(BCL_DESCRIPCION = Some("SECOND REGISTRO")))
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(calendarioId = "3")
           .copy(registro = command.registro.copy(BCL_DESCRIPCION = Some("THIRD REGISTRO")))

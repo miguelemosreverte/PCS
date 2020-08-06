@@ -5,7 +5,7 @@ import consumers.registral.actividad_sujeto.application.entities.ActividadSujeto
 import consumers.registral.actividad_sujeto.application.entities.ActividadSujetoResponses.GetActividadSujetoResponse
 import consumers.registral.actividad_sujeto.infrastructure.dependency_injection.ActividadSujetoActor
 import consumers_spec.Metrics
-import design_principles.actor_model.TypedActorSpec
+import design_principles.actor_model.{Response, TypedActorSpec}
 
 class ActividadSujetoSpec extends TypedActorSpec {
 
@@ -22,13 +22,13 @@ class ActividadSujetoSpec extends TypedActorSpec {
       actividadSujetoResponse3,
       actividadSujetoResponse4
     ) = (for {
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command.copy(sujetoId = "1").copy(registro = command.registro.copy(BAT_DESCRIPCION = Some("FIRST REGISTRO")))
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command.copy(sujetoId = "2").copy(registro = command.registro.copy(BAT_DESCRIPCION = Some("SECOND REGISTRO")))
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command.copy(sujetoId = "3").copy(registro = command.registro.copy(BAT_DESCRIPCION = Some("THIRD REGISTRO")))
       )
       actividadSujetoResponse1: GetActividadSujetoResponse <- actor.ask(

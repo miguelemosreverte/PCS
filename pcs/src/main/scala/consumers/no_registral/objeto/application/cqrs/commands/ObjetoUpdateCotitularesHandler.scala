@@ -4,6 +4,7 @@ import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoUpdatedCotitulares
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
 import cqrs.untyped.command.CommandHandler.SyncCommandHandler
+import design_principles.actor_model.Response
 
 import scala.util.{Success, Try}
 
@@ -11,7 +12,7 @@ class ObjetoUpdateCotitularesHandler(actor: ObjetoActor)
     extends SyncCommandHandler[ObjetoCommands.ObjetoUpdateCotitulares] {
   override def handle(
       command: ObjetoCommands.ObjetoUpdateCotitulares
-  ): Try[akka.Done] = {
+  ): Try[Response.SuccessProcessing] = {
     val replyTo = actor.sender()
     val event = ObjetoUpdatedCotitulares(
       command.deliveryId,
@@ -24,8 +25,8 @@ class ObjetoUpdateCotitularesHandler(actor: ObjetoActor)
       actor.state += event
       actor.informParent(command, actor.state)
       actor.persistSnapshot(event, actor.state)
-      replyTo ! akka.Done
+      replyTo ! Success(Response.SuccessProcessing())
     }
-    Success(akka.Done)
+    Success(Response.SuccessProcessing())
   }
 }

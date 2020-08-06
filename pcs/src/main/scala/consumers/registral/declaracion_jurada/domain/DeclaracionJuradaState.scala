@@ -6,7 +6,7 @@ import consumers.registral.declaracion_jurada.application.entities.{
   DeclaracionJuradaExternalDto,
   DeclaracionJuradaMessage
 }
-import cqrs.BasePersistentShardedTypedActor.CQRS.AbstractStateWithCQRS
+import cqrs.base_actor.typed.AbstractStateWithCQRS
 
 case class DeclaracionJuradaState(
     registro: Option[DeclaracionJuradaExternalDto] = None,

@@ -8,6 +8,7 @@ import consumers.registral.actividad_sujeto.application.entities.ActividadSujeto
 import consumers.registral.actividad_sujeto.application.entities.ActividadSujetoExternalDto.ActividadSujeto
 import consumers.registral.actividad_sujeto.infrastructure.dependency_injection.ActividadSujetoActor
 import consumers.registral.actividad_sujeto.infrastructure.json._
+import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
 import serialization.decodeF
@@ -21,7 +22,7 @@ case class ActividadSujetoTransaction(actor: ActividadSujetoActor, monitoring: M
 
   val topic = "DGR-COP-ACTIVIDADES"
 
-  override def processCommand(registro: ActividadSujeto): Future[Done] = {
+  override def processCommand(registro: ActividadSujeto): Future[Response.SuccessProcessing] = {
     val command =
       ActividadSujetoUpdateFromDto(
         sujetoId = registro.BAT_SUJ_IDENTIFICADOR,

@@ -6,6 +6,7 @@ import consumers.registral.juicio.application.entities.JuicioCommands
 import consumers.registral.juicio.application.entities.JuicioExternalDto.{DetallesJuicio, JuicioAnt}
 import consumers.registral.juicio.infrastructure.dependency_injection.JuicioActor
 import consumers.registral.juicio.infrastructure.json._
+import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
 import play.api.libs.json.Reads
@@ -21,7 +22,7 @@ case class JuicioNoTributarioTransaction(actorRef: JuicioActor, monitoring: Moni
 
   val topic = "DGR-COP-JUICIOS-ANT"
 
-  override def processCommand(registro: JuicioAnt): Future[Done] = {
+  override def processCommand(registro: JuicioAnt): Future[Response.SuccessProcessing] = {
 
     implicit val b: Reads[Seq[DetallesJuicio]] = Reads.seq(DetallesJuicioF.reads)
 

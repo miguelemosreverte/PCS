@@ -3,6 +3,7 @@ package api.actor_transaction
 import akka.Done
 import akka.http.scaladsl.server.Route
 import akka.stream.UniqueKillSwitch
+import design_principles.actor_model.Response
 import kafka.{KafkaMessageProcessorRequirements, KafkaTransactionalMessageProcessor}
 import monitoring.Monitoring
 import play.api.libs.json.Format
@@ -17,7 +18,7 @@ abstract class ActorTransaction[ExternalDto](
     extends ActorTransactionMetrics(monitoring) {
   val topic: String
 
-  final def transaction(input: String): Future[akka.Done] = {
+  final def transaction(input: String): Future[Response.SuccessProcessing] = {
     val future = for {
       cmd <- processInput(input)
       done <- processCommand(cmd)
@@ -32,7 +33,7 @@ abstract class ActorTransaction[ExternalDto](
   final def processInput(input: String): Future[ExternalDto] =
     Future(decodeF[ExternalDto](input))
 
-  def processCommand(registro: ExternalDto): Future[Done]
+  def processCommand(registro: ExternalDto): Future[Response.SuccessProcessing]
 
 }
 
@@ -60,7 +61,7 @@ object ActorTransaction {
         val transaction = actorTransaction.transaction _
         new KafkaTransactionalMessageProcessor(requirements)
           .run(topic, s"${topic}SINK", message => {
-            transaction(message).map { output: akka.Done =>
+            transaction(message).map { output =>
               Seq(output.toString)
             }
           })

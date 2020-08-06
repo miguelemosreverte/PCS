@@ -1,4 +1,4 @@
-package cqrs
+package cqrs.base_actor.typed
 
 import java.nio.charset.StandardCharsets
 
@@ -14,9 +14,8 @@ import akka.cluster.sharding.typed.{
 import akka.cluster.sharding.typed.scaladsl.{ClusterSharding, Entity, EntityRef, EntityTypeKey}
 import akka.persistence.typed.PersistenceId
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
-import cqrs.BasePersistentShardedTypedActor.AbstractState
 import design_principles.actor_model.mechanism.AbstractOverReplyTo.MessageWithAutomaticReplyTo
-import design_principles.actor_model.{Command, Query}
+import design_principles.actor_model.{Command, Query, Response}
 import cqrs.typed.command.SyncEffectCommandBus
 import cqrs.typed.query.SyncEffectQueryBus
 import org.slf4j.LoggerFactory
@@ -26,9 +25,11 @@ import cqrs.typed.event.SyncEffectEventBus
 import design_principles.actor_model.mechanism.local_processing.LocalizedProcessingMessageExtractor
 import org.apache.kafka.common.utils.Utils
 
-abstract class BasePersistentShardedTypedActor[ActorMessages <: design_principles.actor_model.ShardedMessage: ClassTag,
-                                               ActorEvents,
-                                               State <: AbstractState[ActorMessages, ActorEvents, State]](
+abstract class BasePersistentShardedTypedActor[
+    ActorMessages <: design_principles.actor_model.ShardedMessage: ClassTag,
+    ActorEvents,
+    State <: BasePersistentShardedTypedActorAbstractState[ActorMessages, ActorEvents, State]
+](
     state: State
 )(implicit system: ActorSystem[_]) {
 
@@ -84,56 +85,4 @@ abstract class BasePersistentShardedTypedActor[ActorMessages <: design_principle
   }
 }
 
-object BasePersistentShardedTypedActor {
-
-  def shardAndPartition(entityId: String): Int = {
-    // this logic MUST be replicated in the MessageExtractor entityId -> shardId function!
-    val shardAndPartition = (Utils.toPositive(Utils.murmur2(entityId.getBytes(StandardCharsets.UTF_8))) % 120)
-    shardAndPartition
-  }
-
-  trait AbstractState[Commands, Events, State <: AbstractState[Commands, Events, State]]
-
-  object CQRS {
-
-    trait AbstractStateWithCQRS[Commands <: design_principles.actor_model.ShardedMessage,
-                                Events,
-                                State <: AbstractStateWithCQRS[Commands, Events, State]]
-        extends AbstractState[MessageWithAutomaticReplyTo[Commands, Commands#ReturnType], Events, State] {}
-
-    abstract class BasePersistentShardedTypedActorWithCQRS[
-        ActorMessages <: design_principles.actor_model.ShardedMessage: ClassTag,
-        ActorEvents,
-        State <: AbstractStateWithCQRS[ActorMessages, ActorEvents, State]
-    ](s: State)(implicit system: ActorSystem[_])
-        extends BasePersistentShardedTypedActor[MessageWithAutomaticReplyTo[ActorMessages, ActorMessages#ReturnType],
-                                                ActorEvents,
-                                                State](s) {
-
-      val commandBus = new SyncEffectCommandBus[ActorEvents, State](LoggerFactory.getLogger(getClass))
-      val queryBus = new SyncEffectQueryBus[ActorEvents, State](LoggerFactory.getLogger(getClass))
-      val eventBus = new SyncEffectEventBus[ActorEvents, State]()
-
-      var NMessages = 0
-      def commandHandler(
-          state: State,
-          command: MessageWithAutomaticReplyTo[ActorMessages, ActorMessages#ReturnType]
-      ): Effect[ActorEvents, State] = {
-        command.payload match {
-          case query: Query =>
-            queryBus.ask(state, query)(command.replyTo.asInstanceOf[ActorRef[Query#ReturnType]])
-          case cmd: Command =>
-            NMessages += 1
-
-            println("NMessages: " + Console.GREEN + NMessages.toString + Console.RESET)
-            commandBus.publish(cmd)(command.replyTo.asInstanceOf[ActorRef[akka.Done]])
-        }
-      }
-
-      override def eventHandler(state: State, event: ActorEvents): State =
-        eventBus.publish(state, event)
-    }
-
-  }
-
-}
+object BasePersistentShardedTypedActor {}

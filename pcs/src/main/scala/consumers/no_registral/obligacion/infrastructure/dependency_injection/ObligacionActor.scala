@@ -8,7 +8,7 @@ import consumers.no_registral.obligacion.application.cqrs.queries.ObligacionGetS
 import consumers.no_registral.obligacion.application.entities.{ObligacionCommands, ObligacionQueries}
 import consumers.no_registral.obligacion.domain.{ObligacionEvents, ObligacionState}
 import consumers.no_registral.obligacion.infrastructure.event_bus.ObligacionPersistedSnapshotHandler
-import cqrs.PersistentBaseActor
+import cqrs.base_actor.untyped.PersistentBaseActor
 import monitoring.Monitoring
 
 class ObligacionActor(monitoring: Monitoring)

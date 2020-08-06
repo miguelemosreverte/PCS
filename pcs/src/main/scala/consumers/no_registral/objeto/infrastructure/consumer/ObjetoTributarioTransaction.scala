@@ -7,6 +7,7 @@ import api.actor_transaction.ActorTransaction
 import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.objeto.application.entities.ObjetoExternalDto.{ObjetosTri, ObjetosTriOtrosAtributos}
 import consumers.no_registral.objeto.infrastructure.json._
+import design_principles.actor_model.Response
 import monitoring.Monitoring
 import play.api.libs.json.Reads
 import serialization.decodeF
@@ -16,7 +17,7 @@ case class ObjetoTributarioTransaction(actorRef: ActorRef, monitoring: Monitorin
 
   val topic = "DGR-COP-OBJETOS-TRI"
 
-  def processCommand(registro: ObjetosTri): Future[Done] = {
+  def processCommand(registro: ObjetosTri): Future[Response.SuccessProcessing] = {
     implicit val a: Reads[Seq[ObjetosTri]] = Reads.seq(ObjetosTriF.reads)
     implicit val b: Reads[Seq[ObjetosTriOtrosAtributos]] = Reads.seq(ObjetosTriOtrosAtributosF.reads)
 
@@ -58,6 +59,6 @@ case class ObjetoTributarioTransaction(actorRef: ActorRef, monitoring: Monitorin
           sujetoResponsable = sujetoResponsable
         )
 
-    actorRef.ask[akka.Done](command)
+    actorRef.ask[Response.SuccessProcessing](command)
   }
 }

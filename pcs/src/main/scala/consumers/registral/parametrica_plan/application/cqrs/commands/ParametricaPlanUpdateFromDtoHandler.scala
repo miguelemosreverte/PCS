@@ -1,14 +1,16 @@
 package consumers.registral.parametrica_plan.application.cqrs.commands
 
+import akka.actor.Status.Success
 import akka.actor.typed.ActorRef
 import akka.persistence.typed.scaladsl.Effect
 import consumers.registral.parametrica_plan.application.entities.ParametricaPlanCommands.ParametricaPlanUpdateFromDto
 import consumers.registral.parametrica_plan.domain.ParametricaPlanEvents.ParametricaPlanUpdatedFromDto
 import consumers.registral.parametrica_plan.domain.{ParametricaPlanEvents, ParametricaPlanState}
+import design_principles.actor_model.Response
 
 class ParametricaPlanUpdateFromDtoHandler() {
 
-  def handle(command: ParametricaPlanUpdateFromDto)(replyTo: ActorRef[akka.Done]) =
+  def handle(command: ParametricaPlanUpdateFromDto)(replyTo: ActorRef[Success]) =
     Effect
       .persist[
         ParametricaPlanUpdatedFromDto,
@@ -36,6 +38,6 @@ class ParametricaPlanUpdateFromDtoHandler() {
           registro = command.registro
         )
       )
-      .thenReply(replyTo)(state => akka.Done)
+      .thenReply(replyTo)(state => Success(Response.SuccessProcessing()))
 
 }

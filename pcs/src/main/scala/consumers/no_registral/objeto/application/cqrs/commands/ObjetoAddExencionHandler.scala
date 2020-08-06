@@ -1,17 +1,17 @@
 package consumers.no_registral.objeto.application.cqrs.commands
 
 import scala.util.{Success, Try}
-
 import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.objeto.domain.ObjetoEvents
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
 import consumers.no_registral.obligacion.application.entities.ObligacionCommands
 import cqrs.untyped.command.CommandHandler.SyncCommandHandler
+import design_principles.actor_model.Response
 
 class ObjetoAddExencionHandler(actor: ObjetoActor) extends SyncCommandHandler[ObjetoCommands.ObjetoAddExencion] {
   override def handle(
       command: ObjetoCommands.ObjetoAddExencion
-  ): Try[akka.Done] = {
+  ): Try[Response.SuccessProcessing] = {
     val replyTo = actor.sender()
     val event = ObjetoEvents.ObjetoAddedExencion(
       command.deliveryId,
@@ -25,7 +25,7 @@ class ObjetoAddExencionHandler(actor: ObjetoActor) extends SyncCommandHandler[Ob
     val lastDeliveryId = actor.state.lastDeliveryIdByEvents.getOrElse(documentName, BigInt(0))
     if (event.deliveryId <= lastDeliveryId) {
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
-      replyTo ! akka.Done
+      replyTo ! Success(Response.SuccessProcessing())
     } else {
       actor.persistEvent(event, Set("Exencion")) { () =>
         actor.state += event
@@ -39,10 +39,10 @@ class ObjetoAddExencionHandler(actor: ObjetoActor) extends SyncCommandHandler[Ob
                                                                    command.exencion)
         }
         actor.informParent(command, actor.state)
-        replyTo ! akka.Done
+        replyTo ! Success(Response.SuccessProcessing())
       }
     }
-    Success(akka.Done)
+    Success(Response.SuccessProcessing())
   }
 
 }

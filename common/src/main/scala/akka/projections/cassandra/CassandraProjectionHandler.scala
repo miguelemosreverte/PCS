@@ -1,9 +1,9 @@
 package akka.projections.cassandra
 
 import akka.actor.typed.ActorSystem
-import akka.http.Controller
 import akka.http.scaladsl.model.StatusCodes.InternalServerError
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
+import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.projections.cassandra.CassandraProjectionist.CassandraProjectionistRequirements
 import akka.projections.{ProjectionHandler, ProjectionSettings}
@@ -11,7 +11,6 @@ import akka.stream.alpakka.cassandra.CassandraSessionSettings
 import akka.stream.alpakka.cassandra.scaladsl.{CassandraSession, CassandraSessionRegistry}
 import cassandra.write.{CassandraWrite, CassandraWriteProduction}
 import scalaz.concurrent.Task.Try
-import akka.http.scaladsl.server.Directives._
 
 abstract class CassandraProjectionHandler[T](settings: ProjectionSettings, system: ActorSystem[_])
     extends ProjectionHandler[T](settings, system) {

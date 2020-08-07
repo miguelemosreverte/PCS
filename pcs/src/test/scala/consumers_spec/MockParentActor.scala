@@ -17,15 +17,15 @@ class MockParentActor[ParentCommands <: Command: ClassTag, ParentResponses <: Co
   def receive: PartialFunction[Any, Unit] = {
     case (command: ParentCommands, replyTo: ActorRef) =>
       log.info(s"[MockParentActor-$typeName] We received a command from the child actor: $command")
-      replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
+      context.sender() ! Response.SuccessProcessing(command.deliveryId)
 
     case msg @ (command: ParentResponses, replyTo: ActorRef) =>
       log.info(s"[MockParentActor-$typeName] We received a response from the child actor: $msg")
-      replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
+      context.sender() ! Response.SuccessProcessing(command.deliveryId)
 
     case msg @ (command: Any, replyTo: ActorRef) =>
       log.info(s"[MockParentActor-$typeName] We received a Any msg from the child actor: $msg")
-      replyTo ! Success(Response.SuccessProcessing(0))
+      context.sender() ! Success(Response.SuccessProcessing(0))
 
     case command: Command =>
       log.info(s"[MockParentActor-$typeName] Sent message to child $command")

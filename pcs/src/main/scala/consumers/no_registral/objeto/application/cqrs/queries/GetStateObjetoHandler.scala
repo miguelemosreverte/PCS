@@ -9,7 +9,7 @@ import scala.util.{Success, Try}
 
 class GetStateObjetoHandler(actor: ObjetoActor) extends SyncQueryHandler[GetStateObjeto] {
   override def handle(query: GetStateObjeto): Try[GetStateObjeto#ReturnType] = {
-    val replyTo = actor.context.sender()
+
     val response = GetObjetoResponse(
       actor.state.saldo,
       actor.state.vencimiento,
@@ -22,7 +22,7 @@ class GetStateObjetoHandler(actor: ObjetoActor) extends SyncQueryHandler[GetStat
       actor.state.exenciones
     )
     log.info(s"[${actor.persistenceId}] GetState | $response")
-    replyTo ! response
+    actor.context.sender() ! response
     Success(response)
   }
 }

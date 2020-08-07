@@ -11,19 +11,19 @@ import scala.util.{Success, Try}
 
 class SujetoUpdateFromTriHandler(actor: SujetoActor) extends SyncCommandHandler[SujetoUpdateFromTri] {
   override def handle(command: SujetoUpdateFromTri): Try[Response.SuccessProcessing] = {
-    val replyTo = actor.context.sender()
+
     val event = SujetoUpdatedFromTri(command.deliveryId, command.sujetoId, command.registro)
     val documentName = utils.Inference.getSimpleName(event.getClass.getName)
     val lastDeliveryId = actor.state.lastDeliveryIdByEvents.getOrElse(documentName, BigInt(0))
 
     if (command.deliveryId <= lastDeliveryId) {
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
-      replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
+      actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
     } else {
       actor.persistEvent(event) { () =>
         actor.state += event
         actor.persistSnapshot() { () =>
-          actor.context.sender() ! Success(Response.SuccessProcessing(command.deliveryId))
+          actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
         }
       }
     }

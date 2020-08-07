@@ -54,8 +54,10 @@ object KafkaEventProducer {
       case "DGR-COP-SUJETO-ANT" => new SujetoAntGenerator()
     }
 
-    def produce(keyValue: KafkaKeyValue) =
+    def produce(keyValue: KafkaKeyValue) = {
+      println(keyValue.aggregateRoot)
       KafkaMessageShardProducerRecord.producerRecord(topic, 120, keyValue.aggregateRoot, keyValue.json)
+    }
 
     val done: Future[Done] =
       akka.stream.scaladsl.Source

@@ -13,7 +13,7 @@ class ObjetoUpdateFromTriHandler(actor: ObjetoActor) extends SyncCommandHandler[
   override def handle(
       command: ObjetoCommands.ObjetoUpdateFromTri
   ): Try[Response.SuccessProcessing] = {
-    val replyTo = actor.context.sender()
+
     val event = ObjetoEvents.ObjetoUpdatedFromTri(
       command.deliveryId,
       command.sujetoId,
@@ -27,7 +27,7 @@ class ObjetoUpdateFromTriHandler(actor: ObjetoActor) extends SyncCommandHandler[
     val lastDeliveryId = actor.state.lastDeliveryIdByEvents.getOrElse(documentName, BigInt(0))
     if (event.deliveryId <= lastDeliveryId) {
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
-      replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
+      actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
     } else {
       // because ObjetoNovedadCotitularidad, the event processor, needs this event to publish AddCotitular
       actor.persistEvent(event, ObjetoTags.CotitularesReadside) { () =>
@@ -36,7 +36,7 @@ class ObjetoUpdateFromTriHandler(actor: ObjetoActor) extends SyncCommandHandler[
         actor.persistSnapshot(event, actor.state) { () =>
           if (!actor.state.isResponsable)
             actor.removeObligaciones()
-          replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
+          actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
         }
       }
     }

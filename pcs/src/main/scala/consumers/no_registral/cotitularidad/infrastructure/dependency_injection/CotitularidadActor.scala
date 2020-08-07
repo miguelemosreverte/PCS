@@ -103,10 +103,10 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
             log.debug(
               s"[$persistenceId] Published message | ObjetoSnapshot to Sujeto(${command.sujetoId})"
             )
-            replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
+            context.sender() ! Response.SuccessProcessing(command.deliveryId)
           }
 
-        replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
+        context.sender() ! Response.SuccessProcessing(command.deliveryId)
       }
 
     case command: CotitularidadCommands.CotitularidadPublishSnapshot =>
@@ -135,7 +135,7 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
           log.debug(
             s"[$persistenceId] Published message | ObjetoSnapshot to Sujeto(${state.sujetosCotitulares.mkString(",")})"
           )
-          replyTo ! Success(Response.SuccessProcessing(command.deliveryId))
+          context.sender() ! Response.SuccessProcessing(command.deliveryId)
         }
 
     case other => log.error(s"[$persistenceId] Unexpected message |  ${other}")

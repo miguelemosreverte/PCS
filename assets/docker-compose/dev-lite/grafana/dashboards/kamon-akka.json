@@ -62,7 +62,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(rate(copernico_counters_total{entity=\"actor-transaction-_obligacion_tributaria_transaction-request\"} [1m]) )",
+          "expr": "sum(rate(copernico_counters_total{entity=\"actor-transaction-obligacion_tributaria_transaction-request\"} [1m]) )",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -156,7 +156,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum(rate(copernico_histograms_bucket{entity=\"actor-transaction-_obligacion_tributaria_transaction-latency\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(copernico_histograms_bucket{entity=\"actor-transaction-obligacion_tributaria_transaction-latency\"}[1m])) by (le))",
           "interval": "",
           "legendFormat": "actor-transaction-_obligacion_tributaria_transaction-latency",
           "refId": "A"
@@ -251,9 +251,11 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "copernico_counters_total{entity=\"actor-transaction-_obligacion_tributaria_transaction-request\"} \n",
+          "expr": "copernico_counters_total{entity=\"actor-transaction-obligacion_tributaria_transaction-request\"} \n",
           "format": "time_series",
+          "interval": "",
           "intervalFactor": 1,
+          "legendFormat": "",
           "refId": "A"
         }
       ],
@@ -277,6 +279,7 @@
       },
       "yaxes": [
         {
+          "$$hashKey": "object:80",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -285,6 +288,7 @@
           "show": true
         },
         {
+          "$$hashKey": "object:81",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -372,6 +376,7 @@
       },
       "yaxes": [
         {
+          "$$hashKey": "object:154",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -380,6 +385,7 @@
           "show": true
         },
         {
+          "$$hashKey": "object:155",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -402,8 +408,8 @@
     "list": []
   },
   "time": {
-    "from": "2020-08-06T01:50:56.375Z",
-    "to": "2020-08-06T03:35:38.423Z"
+    "from": "now-5m",
+    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [

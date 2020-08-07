@@ -11,16 +11,16 @@ import consumers_spec.no_registrales.testkit.mocks.CotitularidadActorWithMockPer
 import design_principles.external_pub_sub.kafka.{KafkaMock, MessageProcessorLogging}
 import design_principles.projection.mock.{CassandraTestkitMock, CassandraWriteMock}
 import kafka.{MessageProcessor, MessageProducer}
+import monitoring.{DummyMonitoring, Monitoring}
 import readside.proyectionists.registrales.exencion.ExencionProjectionHandler
 import registrales.exencion.testkit.query.ExencionQueryTestkitAgainstActors
+import akka.actor.typed.scaladsl.adapter._
 
 trait ExencionTestSuiteMock extends ExencionSpec {
 
   def testContext()(implicit system: ActorSystem): TestContext = new ExencionMockE2ETestContext()
 
   class ExencionMockE2ETestContext(implicit system: ActorSystem) extends BaseE2ETestContext {
-
-    import system.dispatcher
 
     val cassandraTestkit: CassandraTestkitMock = new CassandraTestkitMock({
       case e: ObjetoEvents.ObjetoAddedExencion =>
@@ -44,17 +44,22 @@ trait ExencionTestSuiteMock extends ExencionSpec {
 
     override def messageProcessor: MessageProcessor with MessageProcessorLogging = kafkaMock
 
+    val monitoring: Monitoring = new DummyMonitoring
+
     lazy val exencionProyectionist: ExencionProjectionHandler =
-      new readside.proyectionists.registrales.exencion.ExencionProjectionHandler() {
+      new readside.proyectionists.registrales.exencion.ExencionProjectionHandler(
+        ExencionProjectionHandler.defaultProjectionSettings(monitoring),
+        system.toTyped
+      ) {
         override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
       }
-
     lazy val sujeto: ActorRef =
       new registrales.exencion.testkit.mocks.SujetoActorWithMockPersistence(
         exencionProyectionist
-      ).start
+      ).startWithRequirements(monitoring)
 
-    lazy val cotitularidadActor: ActorRef = new CotitularidadActorWithMockPersistence(messageProducer).start
+    lazy val cotitularidadActor: ActorRef =
+      new CotitularidadActorWithMockPersistence(messageProducer).startWithRequirements(monitoring)
 
     lazy val Query = ExencionQueryTestkitAgainstActors(sujeto)
 

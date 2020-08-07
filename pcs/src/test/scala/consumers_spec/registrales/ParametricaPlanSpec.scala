@@ -6,7 +6,7 @@ import consumers.registral.parametrica_plan.application.entities.ParametricaPlan
 import consumers.registral.parametrica_plan.application.entities.ParametricaPlanResponses.GetParametricaPlanResponse
 import consumers.registral.parametrica_plan.infrastructure.dependency_injection.ParametricaPlanActor
 import consumers_spec.Metrics
-import design_principles.actor_model.TypedActorSpec
+import design_principles.actor_model.{Response, TypedActorSpec}
 
 class ParametricaPlanSpec extends TypedActorSpec {
 
@@ -23,21 +23,21 @@ class ParametricaPlanSpec extends TypedActorSpec {
       parametrica_planResponse3,
       parametrica_planResponse4
     ) = (for {
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(parametricaPlanId = "1")
           .copy(
             registro = command.registro.asInstanceOf[ParametricaPlanTri].copy(BPP_FPM_DESCRIPCION = "FIRST REGISTRO")
           )
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(parametricaPlanId = "2")
           .copy(
             registro = command.registro.asInstanceOf[ParametricaPlanTri].copy(BPP_FPM_DESCRIPCION = "SECOND REGISTRO")
           )
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(parametricaPlanId = "3")
           .copy(

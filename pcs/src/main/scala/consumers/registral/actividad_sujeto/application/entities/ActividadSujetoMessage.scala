@@ -12,6 +12,7 @@ trait ActividadSujetoMessage extends ShardedMessage with SujetoMessage {
       sujetoId,
       actividadSujetoId
     ).toString
+
 }
 
 object ActividadSujetoMessage {

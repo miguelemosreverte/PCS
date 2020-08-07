@@ -13,11 +13,11 @@ import consumers.no_registral.obligacion.application.entities.ObligacionMessage.
 import consumers.no_registral.obligacion.application.entities.{ObligacionCommands, ObligacionMessage}
 import consumers.no_registral.obligacion.infrastructure.dependency_injection.ObligacionActor
 import consumers.no_registral.sujeto.application.entity.SujetoCommands
-import cqrs.PersistentBaseActor
-import utils.implicits.StringT._
+import cqrs.base_actor.untyped.PersistentBaseActor
+import monitoring.Monitoring
 
-class ObjetoActor(obligacionActorProps: Props = ObligacionActor.props)
-    extends PersistentBaseActor[ObjetoEvents, ObjetoState] {
+class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Props] = None)
+    extends PersistentBaseActor[ObjetoEvents, ObjetoState](monitoring) {
   import ObjetoActor._
 
   var state = ObjetoState()
@@ -40,20 +40,26 @@ class ObjetoActor(obligacionActorProps: Props = ObligacionActor.props)
     queryBus.subscribe[ObjetoQueries.GetStateExencion](new GetStateExencionHandler(this).handle)
   }
 
-  val obligaciones = new ObjetoActorRefMap(
-    {
-      case (sujetoId, objetoId, tipoObjeto, obligacionId) =>
-        val obligacionAggregateRoot = ObligacionMessageRoots(
-          sujetoId,
-          objetoId,
-          tipoObjeto,
-          obligacionId
-        ).toString()
-        context.actorOf(obligacionActorProps, obligacionAggregateRoot)
-
-      case other => context.actorOf(obligacionActorProps, other toString)
+  val obligaciones: ObjetoActorRefMap = {
+    val obligacionActorProps = obligacionActorPropsOption match {
+      case Some(props) => props
+      case None => ObligacionActor.props(monitoring)
     }
-  )
+    new ObjetoActorRefMap(
+      {
+        case (sujetoId, objetoId, tipoObjeto, obligacionId) =>
+          val obligacionAggregateRoot = ObligacionMessageRoots(
+            sujetoId,
+            objetoId,
+            tipoObjeto,
+            obligacionId
+          ).toString()
+          context.actorOf(obligacionActorProps, obligacionAggregateRoot)
+
+        case other => context.actorOf(obligacionActorProps, other toString)
+      }
+    )
+  }
 
   override def receiveCommand: Receive = customReceiveCommand orElse super.receiveCommand
   override def receiveRecover: Receive = customReceiveRecover orElse super.receiveRecover
@@ -92,11 +98,11 @@ class ObjetoActor(obligacionActorProps: Props = ObligacionActor.props)
                 exencion
               )
           }
-        case other => ()
+        case _ => ()
       }
   }
 
-  def shouldInformCotitulares(consolidatedState: ObjetoState) =
+  def shouldInformCotitulares(consolidatedState: ObjetoState): Boolean =
     consolidatedState.isResponsable && consolidatedState.sujetos.size > 1
 
   def persistSnapshotForAllCotitulares(event: ObjetoEvents, consolidatedState: ObjetoState)(handler: () => Unit): Unit =
@@ -104,7 +110,7 @@ class ObjetoActor(obligacionActorProps: Props = ObligacionActor.props)
   def persistSnapshotForSelf(event: ObjetoEvents, consolidatedState: ObjetoState)(handler: () => Unit): Unit =
     persistEvent(event, ObjetoTags.ObjetoReadside)(handler)
 
-  def persistSnapshot(evt: ObjetoEvents, consolidatedState: ObjetoState, handler: () => Unit = () => ()): Unit = {
+  def persistSnapshot(evt: ObjetoEvents, consolidatedState: ObjetoState)(handler: () => Unit): Unit = {
     val snapshot =
       ObjetoSnapshotPersisted(
         evt.deliveryId,
@@ -167,15 +173,15 @@ class ObjetoActor(obligacionActorProps: Props = ObligacionActor.props)
 }
 
 object ObjetoActor {
-  def props: Props = Props(new ObjetoActor)
+  def props(monitoring: Monitoring): Props = Props(new ObjetoActor(monitoring))
 
   object ObjetoTags {
-    val ObjetoReadside = Set("Objeto")
-    val CotitularesReadside = Set("ObjetoNovedadCotitularidad")
-    val ReadsideAndCotitulares = Set("Objeto", "ObjetoNovedadCotitularidad")
+    val ObjetoReadside: Set[String] = Set("Objeto")
+    val CotitularesReadside: Set[String] = Set("ObjetoNovedadCotitularidad")
+    val ReadsideAndCotitulares: Set[String] = Set("Objeto", "ObjetoNovedadCotitularidad")
   }
 
   type ObligacionAgregateRoot = (String, String, String, String)
-  class ObjetoActorRefMap(newActor: (ObligacionAgregateRoot) => ActorRef)
+  class ObjetoActorRefMap(newActor: ObligacionAgregateRoot => ActorRef)
       extends ActorRefMap[ObligacionAgregateRoot](newActor)
 }

@@ -1,6 +1,5 @@
 package readside.proyectionists.registrales.subasta
 import scala.concurrent.Future
-
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter._
 import akka.projection.eventsourced.EventEnvelope
@@ -8,6 +7,7 @@ import akka.projections.ProjectionSettings
 import akka.projections.cassandra.CassandraProjectionHandler
 import akka.{Done, actor => classic}
 import consumers.registral.subasta.domain.SubastaEvents
+import monitoring.Monitoring
 import org.slf4j.LoggerFactory
 import readside.proyectionists.registrales.subasta.projections.SubastaUpdatedFromDtoProjection
 
@@ -15,13 +15,8 @@ class SubastaProjectionHandler(settings: ProjectionSettings, system: ActorSystem
     extends CassandraProjectionHandler[SubastaEvents](settings, system) {
   implicit val classicSystem: classic.ActorSystem = system.toClassic
   import classicSystem.dispatcher
-  private val log = LoggerFactory.getLogger(getClass)
-
   private val tag = settings.tag
 
-  def this()(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("Subasta", 1), classicSystem.toTyped)
-  }
   override def process(envelope: EventEnvelope[SubastaEvents]): Future[Done] = {
     envelope.event match {
       case evt: SubastaEvents.SubastaUpdatedFromDto =>
@@ -44,5 +39,16 @@ class SubastaProjectionHandler(settings: ProjectionSettings, system: ActorSystem
         )
         Future.successful(Done)
     }
+  }
+}
+
+object SubastaProjectionHandler {
+  val defaultTag = "Subasta"
+  val defaultParallelism = 1
+  val defaultProjectionSettings: Monitoring => ProjectionSettings =
+    ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): SubastaProjectionHandler = {
+    val projectionSettings = defaultProjectionSettings(monitoring)
+    new SubastaProjectionHandler(projectionSettings, system)
   }
 }

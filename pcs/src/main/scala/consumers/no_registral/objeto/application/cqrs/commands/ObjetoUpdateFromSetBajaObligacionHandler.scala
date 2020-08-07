@@ -4,12 +4,15 @@ import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoUpdatedFromObligacionBajaSet
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
 import cqrs.untyped.command.CommandHandler.SyncCommandHandler
+import design_principles.actor_model.Response
 
 import scala.util.{Success, Try}
 
 class ObjetoUpdateFromSetBajaObligacionHandler(actor: ObjetoActor)
     extends SyncCommandHandler[ObjetoCommands.ObjetoUpdateFromSetBajaObligacion] {
-  override def handle(command: ObjetoCommands.ObjetoUpdateFromSetBajaObligacion): Try[akka.Done] = {
+  override def handle(
+      command: ObjetoCommands.ObjetoUpdateFromSetBajaObligacion
+  ): Try[Response.SuccessProcessing] = {
     val event = ObjetoUpdatedFromObligacionBajaSet(
       command.deliveryId,
       command.sujetoId,
@@ -19,8 +22,8 @@ class ObjetoUpdateFromSetBajaObligacionHandler(actor: ObjetoActor)
     )
     actor.persistEvent(event) { () =>
       actor.state += event
-      actor.persistSnapshot(event, actor.state)
+      actor.persistSnapshot(event, actor.state)(() => ())
     }
-    Success(akka.Done)
+    Success(Response.SuccessProcessing(command.deliveryId))
   }
 }

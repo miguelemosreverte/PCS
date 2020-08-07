@@ -6,7 +6,7 @@ import consumers.registral.parametrica_recargo.application.entities.{
   ParametricaRecargoExternalDto,
   ParametricaRecargoMessage
 }
-import cqrs.BasePersistentShardedTypedActor.CQRS.AbstractStateWithCQRS
+import cqrs.base_actor.typed.AbstractStateWithCQRS
 
 case class ParametricaRecargoState(
     registro: Option[ParametricaRecargoExternalDto] = None,

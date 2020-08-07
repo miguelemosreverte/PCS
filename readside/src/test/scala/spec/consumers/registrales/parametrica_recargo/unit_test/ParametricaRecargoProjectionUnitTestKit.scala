@@ -1,7 +1,6 @@
 package spec.consumers.registrales.parametrica_recargo.unit_test
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
@@ -10,9 +9,11 @@ import consumers.registral.parametrica_recargo.domain.ParametricaRecargoEvents
 import consumers.registral.parametrica_recargo.domain.ParametricaRecargoEvents.ParametricaRecargoUpdatedFromDto
 import consumers.registral.parametrica_recargo.infrastructure.json._
 import design_principles.projection.mock.{CassandraTestkitMock, CassandraWriteMock}
+import monitoring.DummyMonitoring
 import readside.proyectionists.registrales.parametrica_recargo.ParametricaRecargoProjectionHandler
 import readside.proyectionists.registrales.parametrica_recargo.projections.ParametricaRecargoUpdatedFromDtoProjection
 import spec.testkit.ProjectionTestkitMock
+import akka.actor.typed.scaladsl.adapter._
 
 class ParametricaRecargoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
     extends ProjectionTestkitMock[ParametricaRecargoEvents, ParametricaRecargoMessageRoots] {
@@ -28,7 +29,10 @@ class ParametricaRecargoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit 
     parametrica_recargoProyectionist process envelope
 
   def parametrica_recargoProyectionist: ParametricaRecargoProjectionHandler =
-    new readside.proyectionists.registrales.parametrica_recargo.ParametricaRecargoProjectionHandler() {
+    new readside.proyectionists.registrales.parametrica_recargo.ParametricaRecargoProjectionHandler(
+      ParametricaRecargoProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    ) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 }

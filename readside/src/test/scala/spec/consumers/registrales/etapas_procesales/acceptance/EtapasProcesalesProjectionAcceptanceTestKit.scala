@@ -1,15 +1,17 @@
 package spec.consumers.registrales.etapas_procesales.acceptance
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
 import consumers.registral.etapas_procesales.application.entities.EtapasProcesalesMessage.EtapasProcesalesMessageRoots
 import consumers.registral.etapas_procesales.domain.EtapasProcesalesEvents
 import design_principles.projection.infrastructure.CassandraTestkitProduction
+import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
+import akka.actor.typed.scaladsl.adapter._
+import readside.proyectionists.registrales.etapas_procesales.EtapasProcesalesProjectionHandler
 
 class EtapasProcesalesProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
     extends ProjectionTestkit[EtapasProcesalesEvents, EtapasProcesalesMessageRoots]
@@ -31,5 +33,8 @@ class EtapasProcesalesProjectionAcceptanceTestKit(c: CassandraTestkitProduction)
   }
 
   def projectionHandler =
-    new readside.proyectionists.registrales.etapas_procesales.EtapasProcesalesProjectionHandler()
+    new readside.proyectionists.registrales.etapas_procesales.EtapasProcesalesProjectionHandler(
+      EtapasProcesalesProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    )
 }

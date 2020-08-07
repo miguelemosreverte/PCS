@@ -10,6 +10,7 @@ import consumers.no_registral.obligacion.application.entities.ObligacionExternal
   ObligacionesTri
 }
 import consumers.no_registral.obligacion.infrastructure.json._
+import design_principles.actor_model.Response
 import monitoring.Monitoring
 import play.api.libs.json.Reads
 import serialization.decodeF
@@ -19,7 +20,7 @@ case class ObligacionTributariaTransaction(actorRef: ActorRef, monitoring: Monit
 
   val topic = "DGR-COP-OBLIGACIONES-TRI"
 
-  def processCommand(registro: ObligacionesTri): Future[Done] = {
+  def processCommand(registro: ObligacionesTri): Future[Response.SuccessProcessing] = {
     implicit val b: Reads[Seq[DetallesObligacion]] = Reads.seq(DetallesObligacionF.reads)
 
     val detalles: Option[Seq[DetallesObligacion]] = for {
@@ -47,6 +48,6 @@ case class ObligacionTributariaTransaction(actorRef: ActorRef, monitoring: Monit
           registro = registro,
           detallesObligacion = detalles.getOrElse(Seq.empty)
         )
-    actorRef.ask[akka.Done](command)
+    actorRef.ask[Response.SuccessProcessing](command)
   }
 }

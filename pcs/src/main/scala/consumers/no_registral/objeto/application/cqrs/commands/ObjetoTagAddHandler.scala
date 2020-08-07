@@ -4,13 +4,14 @@ import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.objeto.domain.ObjetoEvents
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
 import cqrs.untyped.command.CommandHandler.SyncCommandHandler
+import design_principles.actor_model.Response
 
 import scala.util.{Success, Try}
 
 class ObjetoTagAddHandler(actor: ObjetoActor) extends SyncCommandHandler[ObjetoCommands.ObjetoTagAdd] {
   override def handle(
       command: ObjetoCommands.ObjetoTagAdd
-  ): Try[akka.Done] = {
+  ): Try[Response.SuccessProcessing] = {
     val replyTo = actor.sender()
     val event = ObjetoEvents.ObjetoTagAdded(command.deliveryId,
                                             command.sujetoId,
@@ -19,9 +20,10 @@ class ObjetoTagAddHandler(actor: ObjetoActor) extends SyncCommandHandler[ObjetoC
                                             command.tag)
     actor.persistEvent(event) { () =>
       actor.state += event
-      actor.persistSnapshot(event, actor.state)
-      replyTo ! akka.Done
+      actor.persistSnapshot(event, actor.state) { () =>
+        actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
+      }
     }
-    Success(akka.Done)
+    Success(Response.SuccessProcessing(command.deliveryId))
   }
 }

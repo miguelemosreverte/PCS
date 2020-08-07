@@ -2,11 +2,10 @@ package design_principles.actor_model
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.reflect.ClassTag
-
 import akka.actor.testkit.typed.scaladsl.ScalaTestWithActorTestKit
 import akka.cluster.typed.{Cluster, Join}
 import com.typesafe.config.{Config, ConfigFactory}
-import cqrs.BasePersistentShardedTypedActor.CQRS.{AbstractStateWithCQRS, BasePersistentShardedTypedActorWithCQRS}
+import cqrs.base_actor.typed.{AbstractStateWithCQRS, BasePersistentShardedTypedActorWithCQRS}
 import design_principles.actor_model.mechanism.TypedAsk
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import org.scalatest.flatspec.AnyFlatSpecLike

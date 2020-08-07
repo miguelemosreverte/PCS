@@ -9,7 +9,7 @@ import consumers.registral.plan_pago.application.entities.PlanPagoQueries.GetSta
 import consumers.registral.plan_pago.domain.PlanPagoEvents.PlanPagoUpdatedFromDto
 import consumers.registral.plan_pago.domain.events.PlanPagoUpdatedFromDtoHandler
 import consumers.registral.plan_pago.domain.{PlanPagoEvents, PlanPagoState}
-import cqrs.BasePersistentShardedTypedActor.CQRS.BasePersistentShardedTypedActorWithCQRS
+import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
 case class PlanPagoActor(state: PlanPagoState = PlanPagoState())(
     implicit system: ActorSystem[Nothing]

@@ -5,12 +5,20 @@ import akka.persistence._
 import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.obligacion.application.cqrs.commands._
 import consumers.no_registral.obligacion.application.cqrs.queries.ObligacionGetStateHandler
-import consumers.no_registral.obligacion.application.entities.{ObligacionCommands, ObligacionQueries}
+import consumers.no_registral.obligacion.application.entities.ObligacionMessage.ObligacionMessageRoots
+import consumers.no_registral.obligacion.application.entities.{
+  ObligacionCommands,
+  ObligacionExternalDto,
+  ObligacionQueries
+}
+import consumers.no_registral.obligacion.domain.ObligacionEvents.ObligacionPersistedSnapshot
 import consumers.no_registral.obligacion.domain.{ObligacionEvents, ObligacionState}
-import consumers.no_registral.obligacion.infrastructure.event_bus.ObligacionPersistedSnapshotHandler
-import cqrs.PersistentBaseActor
+import consumers.no_registral.obligacion.infrastructure.dependency_injection.ObligacionActor.ObligacionTags
+import cqrs.base_actor.untyped.PersistentBaseActor
+import monitoring.Monitoring
 
-class ObligacionActor() extends PersistentBaseActor[ObligacionEvents, ObligacionState] {
+class ObligacionActor(monitoring: Monitoring)
+    extends PersistentBaseActor[ObligacionEvents, ObligacionState](monitoring) {
 
   var state = ObligacionState()
 
@@ -32,9 +40,7 @@ class ObligacionActor() extends PersistentBaseActor[ObligacionEvents, Obligacion
     commandBus.subscribe[ObligacionCommands.ObligacionUpdateExencion](new ObligacionUpdateExencionHandler(this).handle)
     commandBus.subscribe[ObligacionCommands.ObligacionRemove](new ObligacionRemoveHandler(this).handle)
     commandBus.subscribe[ObligacionCommands.DownObligacion](new DownObligacionHandler(this).handle)
-    eventBus.subscribe[ObligacionEvents.ObligacionPersistedSnapshot](
-      new ObligacionPersistedSnapshotHandler(this).handle
-    )
+
   }
 
   def informParent(cmd: ObligacionCommands): Unit = {
@@ -61,10 +67,26 @@ class ObligacionActor() extends PersistentBaseActor[ObligacionEvents, Obligacion
     )
   }
 
+  def persistSnapshot()(handler: () => Unit): Unit = {
+    val ids = ObligacionMessageRoots.extractor(persistenceId)
+
+    val event = ObligacionPersistedSnapshot(
+      sujetoId = ids.sujetoId,
+      objetoId = ids.objetoId,
+      tipoObjeto = ids.tipoObjeto,
+      obligacionId = ids.obligacionId,
+      registro = state.registro,
+      exenta = state.exenta,
+      porcentajeExencion = state.porcentajeExencion.getOrElse(0),
+      vencida = state.vencida,
+      saldo = state.saldo
+    )
+    persistEvent(event, ObligacionTags.ObligacionReadside)(handler)
+  }
 }
 
 object ObligacionActor {
-  def props: Props = Props(new ObligacionActor)
+  def props(monitoring: Monitoring): Props = Props(new ObligacionActor(monitoring))
 
   object ObligacionTags {
     val ObligacionReadside: Set[String] = Set("Obligacion")

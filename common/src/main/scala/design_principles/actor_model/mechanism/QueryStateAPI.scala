@@ -8,7 +8,7 @@ import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.model.StatusCodes.{InternalServerError, NotFound, OK}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{Directive, Route}
-import cqrs.BasePersistentShardedTypedActor.CQRS.BasePersistentShardedTypedActorWithCQRS
+import cqrs.base_actor.typed.{AbstractStateWithCQRS, BasePersistentShardedTypedActorWithCQRS}
 import design_principles.actor_model.mechanism.TypedAsk.{AkkaClassicTypedAsk, AkkaTypedTypedAsk}
 import design_principles.actor_model.{Query, Response}
 import monitoring.Monitoring
@@ -51,9 +51,7 @@ abstract class QueryStateAPI(monitoring: Monitoring) extends Controller(monitori
 
   def queryState[ActorMessages <: design_principles.actor_model.ShardedMessage: ClassTag,
                  ActorEvents,
-                 ActorState <: cqrs.BasePersistentShardedTypedActor.CQRS.AbstractStateWithCQRS[ActorMessages,
-                                                                                               ActorEvents,
-                                                                                               ActorState],
+                 ActorState <: AbstractStateWithCQRS[ActorMessages, ActorEvents, ActorState],
                  Actor <: BasePersistentShardedTypedActorWithCQRS[ActorMessages, ActorEvents, ActorState],
                  QueryMessage <: ActorMessages](
       actor: BasePersistentShardedTypedActorWithCQRS[ActorMessages, ActorEvents, ActorState],

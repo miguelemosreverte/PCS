@@ -6,6 +6,7 @@ import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import consumers.no_registral.cotitularidad.application.entities.CotitularidadCommands.CotitularidadPublishSnapshot
 import consumers.no_registral.cotitularidad.infrastructure.json._
+import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaClassicTypedAsk
 import monitoring.Monitoring
 import play.api.libs.json.Json
@@ -16,7 +17,7 @@ case class CotitularPublishSnapshotTransaction(actorRef: ActorRef, monitoring: M
 
   val topic = "CotitularidadPublishSnapshot"
 
-  def processCommand(cmd: CotitularidadPublishSnapshot): Future[Done] = {
-    actorRef.ask[akka.Done](cmd)
+  def processCommand(cmd: CotitularidadPublishSnapshot): Future[Response.SuccessProcessing] = {
+    actorRef.ask[Response.SuccessProcessing](cmd)
   }
 }

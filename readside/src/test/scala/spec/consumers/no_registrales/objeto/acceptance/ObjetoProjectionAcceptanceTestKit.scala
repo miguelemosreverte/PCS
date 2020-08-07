@@ -1,7 +1,6 @@
 package spec.consumers.no_registrales.objeto.acceptance
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
@@ -9,8 +8,10 @@ import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMe
 import consumers.no_registral.objeto.domain.ObjetoEvents
 import design_principles.projection.CassandraTestkit
 import design_principles.projection.infrastructure.CassandraTestkitProduction
+import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
+import akka.actor.typed.scaladsl.adapter._
 
 class ObjetoProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
     extends ProjectionTestkit[ObjetoEvents, ObjetoMessageRoots]
@@ -34,5 +35,5 @@ class ObjetoProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit 
   }
 
   def objetoProyectionist =
-    new readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler()
+    readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler(new DummyMonitoring, system.toTyped)
 }

@@ -8,6 +8,7 @@ import akka.projections.ProjectionSettings
 import akka.projections.cassandra.CassandraProjectionHandler
 import akka.{Done, actor => classic}
 import consumers.no_registral.objeto.domain.ObjetoEvents
+import monitoring.Monitoring
 import org.slf4j.LoggerFactory
 import readside.proyectionists.no_registrales.objeto.projections.ObjetoSnapshotPersistedProjection
 
@@ -15,13 +16,8 @@ class ObjetoProjectionHandler(settings: ProjectionSettings, system: ActorSystem[
     extends CassandraProjectionHandler[ObjetoEvents](settings, system) {
   implicit val classicSystem: classic.ActorSystem = system.toClassic
   import classicSystem.dispatcher
-  private val log = LoggerFactory.getLogger(getClass)
 
   private val tag = settings.tag
-
-  def this()(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("Objeto", 1), classicSystem.toTyped)
-  }
 
   override def process(envelope: EventEnvelope[ObjetoEvents]): Future[Done] = {
     envelope.event match {
@@ -45,5 +41,19 @@ class ObjetoProjectionHandler(settings: ProjectionSettings, system: ActorSystem[
         )
         Future.successful(Done)
     }
+  }
+}
+
+object ObjetoProjectionHandler {
+
+  val defaultTag = "Objeto"
+  val defaultParallelism = 1
+  val defaultProjectionSettings: Monitoring => ProjectionSettings =
+    ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
+
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): ObjetoProjectionHandler = {
+    val projectionSettings = defaultProjectionSettings(monitoring)
+    new ObjetoProjectionHandler(projectionSettings, system)
+
   }
 }

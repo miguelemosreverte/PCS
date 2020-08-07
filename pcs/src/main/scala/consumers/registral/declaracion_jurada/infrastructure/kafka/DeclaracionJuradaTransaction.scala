@@ -7,6 +7,7 @@ import consumers.registral.declaracion_jurada.application.entities.DeclaracionJu
 import consumers.registral.declaracion_jurada.application.entities.DeclaracionJuradaExternalDto.DeclaracionJurada
 import consumers.registral.declaracion_jurada.infrastructure.dependency_injection.DeclaracionJuradaActor
 import consumers.registral.declaracion_jurada.infrastructure.json._
+import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
 import serialization.decodeF
@@ -19,7 +20,7 @@ case class DeclaracionJuradaTransaction(actor: DeclaracionJuradaActor, monitorin
     extends ActorTransaction[DeclaracionJurada](monitoring) {
   val topic = "DGR-COP-DECJURADAS"
 
-  override def processCommand(registro: DeclaracionJurada): Future[Done] = {
+  override def processCommand(registro: DeclaracionJurada): Future[Response.SuccessProcessing] = {
     val command = DeclaracionJuradaCommands.DeclaracionJuradaUpdateFromDto(
       sujetoId = registro.BDJ_SUJ_IDENTIFICADOR,
       objetoId = registro.BDJ_SOJ_IDENTIFICADOR,

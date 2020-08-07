@@ -1,6 +1,5 @@
 import Settings._
 
-
 lazy val common = project
   .in(file("."))
   .settings(
@@ -15,5 +14,3 @@ lazy val common = project
   .settings(CommandAliases.aliases)
   .enablePlugins(ScoverageSbtPlugin)
   .enablePlugins(JavaServerAppPackaging, DockerPlugin)
-  .enablePlugins(Scripts)
-

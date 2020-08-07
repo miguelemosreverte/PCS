@@ -5,11 +5,12 @@ import consumers.no_registral.sujeto.application.entity.SujetoCommands.SujetoSet
 import consumers.no_registral.sujeto.domain.SujetoEvents
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor
 import cqrs.untyped.command.CommandHandler.SyncCommandHandler
+import design_principles.actor_model.Response
 
 import scala.util.{Success, Try}
 
 class SujetoSetBajaFromObjetoHandler(actor: SujetoActor) extends SyncCommandHandler[SujetoSetBajaFromObjeto] {
-  override def handle(command: SujetoSetBajaFromObjeto): Try[Done] = {
+  override def handle(command: SujetoSetBajaFromObjeto): Try[Response.SuccessProcessing] = {
     val event = SujetoEvents.SujetoBajaFromObjetoSet(
       command.deliveryId,
       command.sujetoId,
@@ -19,8 +20,8 @@ class SujetoSetBajaFromObjetoHandler(actor: SujetoActor) extends SyncCommandHand
 
     actor.persistEvent(event) { () =>
       actor.state += event
-      actor.persistSnapshot()
+      actor.persistSnapshot()(() => ())
     }
-    Success(akka.Done)
+    Success(Response.SuccessProcessing(command.deliveryId))
   }
 }

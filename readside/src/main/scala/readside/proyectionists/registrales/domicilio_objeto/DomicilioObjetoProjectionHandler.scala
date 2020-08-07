@@ -1,6 +1,5 @@
 package readside.proyectionists.registrales.domicilio_objeto
 import scala.concurrent.Future
-
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter._
 import akka.projection.eventsourced.EventEnvelope
@@ -8,20 +7,17 @@ import akka.projections.ProjectionSettings
 import akka.projections.cassandra.CassandraProjectionHandler
 import akka.{Done, actor => classic}
 import consumers.registral.domicilio_objeto.domain.DomicilioObjetoEvents
+import monitoring.Monitoring
 import org.slf4j.LoggerFactory
+import readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler
+import readside.proyectionists.registrales.declaracion_jurada.DeclaracionJuradaProjectionHandler
 import readside.proyectionists.registrales.domicilio_objeto.projections.DomicilioObjetoUpdatedFromDtoProjection
 
 class DomicilioObjetoProjectionHandler(settings: ProjectionSettings, system: ActorSystem[_])
     extends CassandraProjectionHandler[DomicilioObjetoEvents](settings, system) {
   implicit val classicSystem: classic.ActorSystem = system.toClassic
   import classicSystem.dispatcher
-  private val log = LoggerFactory.getLogger(getClass)
-
   private val tag = settings.tag
-
-  def this()(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("DomicilioObjeto", 1), classicSystem.toTyped)
-  }
 
   override def process(envelope: EventEnvelope[DomicilioObjetoEvents]): Future[Done] = {
     envelope.event match {
@@ -45,5 +41,16 @@ class DomicilioObjetoProjectionHandler(settings: ProjectionSettings, system: Act
         )
         Future.successful(Done)
     }
+  }
+}
+
+object DomicilioObjetoProjectionHandler {
+  val defaultTag = "DomicilioObjeto"
+  val defaultParallelism = 1
+  val defaultProjectionSettings: Monitoring => ProjectionSettings =
+    ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): DomicilioObjetoProjectionHandler = {
+    val projectionSettings = defaultProjectionSettings(monitoring)
+    new DomicilioObjetoProjectionHandler(projectionSettings, system)
   }
 }

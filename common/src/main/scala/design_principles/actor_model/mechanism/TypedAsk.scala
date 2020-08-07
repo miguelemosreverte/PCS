@@ -1,7 +1,7 @@
 package design_principles.actor_model.mechanism
 
 import akka.util.Timeout
-import cqrs.BasePersistentShardedTypedActor.CQRS.{AbstractStateWithCQRS, BasePersistentShardedTypedActorWithCQRS}
+import cqrs.base_actor.typed.{AbstractStateWithCQRS, BasePersistentShardedTypedActorWithCQRS}
 import design_principles.actor_model.mechanism.AbstractOverReplyTo.MessageWithAutomaticReplyTo
 
 import scala.concurrent.Future
@@ -16,13 +16,13 @@ There are two implementations, one for AkkaClassic and one for AkkaTyped.
 1. AkkaClassic:
   import design_principles.actor_model.TypedAsk.AkkaClassicTypedAsk
   for {
-      _: Done <- actorRef.Ask[Done](command)
+      _: Response.SuccessProcessing <- actorRef.Ask[Done](command)
   }
 
 2. AkkaTyped:
   import design_principles.actor_model.TypedAsk.AkkaTypedTypedAsk
   for {
-    _: Done <- actorRef.Ask(command)
+    _: Response.SuccessProcessing <- actorRef.Ask(command)
   }
 -------------------------------------------------------------------------
 The second one provides much stronger guarantees, and it does so at compile time.
@@ -36,7 +36,7 @@ object TypedAsk {
   This mechanism allows the user to express in the following manner:
 
   for {
-    _: Done <- actorRef.Ask[Done](command)
+    _: Response.SuccessProcessing <- actorRef.Ask[Done](command)
   }
 
   However AkkaClassic does not provide type guarantees, so if the Actor
@@ -55,7 +55,7 @@ object TypedAsk {
   This mechanism allows the user to express in the following manner:
 
   for {
-    _: Done <- actorRef.Ask(command)
+    _: Response.SuccessProcessing <- actorRef.Ask(command)
   }
 
   Because AkkaTyped does provide type guarantees:

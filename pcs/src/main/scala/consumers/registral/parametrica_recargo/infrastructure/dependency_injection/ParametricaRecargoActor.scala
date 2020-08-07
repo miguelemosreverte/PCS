@@ -9,7 +9,7 @@ import consumers.registral.parametrica_recargo.application.entities.ParametricaR
 import consumers.registral.parametrica_recargo.domain.ParametricaRecargoEvents.ParametricaRecargoUpdatedFromDto
 import consumers.registral.parametrica_recargo.domain.events.ParametricaRecargoUpdatedFromDtoHandler
 import consumers.registral.parametrica_recargo.domain.{ParametricaRecargoEvents, ParametricaRecargoState}
-import cqrs.BasePersistentShardedTypedActor.CQRS.BasePersistentShardedTypedActorWithCQRS
+import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
 case class ParametricaRecargoActor(state: ParametricaRecargoState = ParametricaRecargoState())(
     implicit system: ActorSystem[Nothing]

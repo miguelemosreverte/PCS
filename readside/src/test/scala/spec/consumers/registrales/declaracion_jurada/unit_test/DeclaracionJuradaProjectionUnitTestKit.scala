@@ -1,7 +1,6 @@
 package spec.consumers.registrales.declaracion_jurada.unit_test
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
@@ -13,6 +12,8 @@ import readside.proyectionists.registrales.declaracion_jurada.DeclaracionJuradaP
 import readside.proyectionists.registrales.declaracion_jurada.projections.DeclaracionJuradaUpdatedFromDtoProjection
 import spec.testkit.ProjectionTestkitMock
 import consumers.registral.declaracion_jurada.infrastructure.json._
+import monitoring.DummyMonitoring
+import akka.actor.typed.scaladsl.adapter._
 
 class DeclaracionJuradaProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: ActorSystem)
     extends ProjectionTestkitMock[DeclaracionJuradaEvents, DeclaracionJuradaMessageRoots] {
@@ -28,7 +29,10 @@ class DeclaracionJuradaProjectionUnitTestKit(c: CassandraTestkitMock)(implicit s
     declaracion_juradaProyectionist process envelope
 
   def declaracion_juradaProyectionist: DeclaracionJuradaProjectionHandler =
-    new readside.proyectionists.registrales.declaracion_jurada.DeclaracionJuradaProjectionHandler() {
+    new readside.proyectionists.registrales.declaracion_jurada.DeclaracionJuradaProjectionHandler(
+      DeclaracionJuradaProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    ) {
       override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
     }
 }

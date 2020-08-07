@@ -4,13 +4,14 @@ import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoSnapshotPersisted
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
 import cqrs.untyped.command.CommandHandler.SyncCommandHandler
+import design_principles.actor_model.Response
 
 import scala.util.{Success, Try}
 
 class ObjetoSnapshotHandler(actor: ObjetoActor) extends SyncCommandHandler[ObjetoCommands.ObjetoSnapshot] {
   override def handle(
       command: ObjetoCommands.ObjetoSnapshot
-  ): Try[akka.Done] = {
+  ): Try[Response.SuccessProcessing] = {
     val replyTo = actor.sender()
     val event = ObjetoSnapshotPersisted(
       command.deliveryId,
@@ -28,11 +29,11 @@ class ObjetoSnapshotHandler(actor: ObjetoActor) extends SyncCommandHandler[Objet
       command.obligacionesVencidasSaldo
     )
     val consolidatedState = actor.state + event
-    actor.persistSnapshot(event, consolidatedState, { () =>
+    actor.persistSnapshot(event, consolidatedState) { () =>
       actor.state = consolidatedState
       actor.informParent(command, actor.state)
-      replyTo ! akka.Done
-    })
-    Success(akka.Done)
+      actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
+    }
+    Success(Response.SuccessProcessing(command.deliveryId))
   }
 }

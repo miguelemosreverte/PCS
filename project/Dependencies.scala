@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
   // Versions
   lazy val scalaVersion = "2.13.1"
-  private lazy val akkaVersion = "2.6.6"
+  private lazy val akkaVersion = "2.6.5"
 
   // Resolvers
   lazy val commonResolvers = Seq(
@@ -60,7 +60,7 @@ object Dependencies {
     private def akkaHttpModule(name: String) = "com.typesafe.akka" %% name % akkaHttpVersion
     private def akkaManagmentModule(name: String) = "com.lightbend.akka.management" %% name % akkaManagementVersion
     private lazy val SBR = "com.github.TanUkkii007" %% "akka-cluster-custom-downing" % "0.0.13"
-    private lazy val akkaStreamKafka = "com.typesafe.akka" %% "akka-stream-kafka" % "1.0.4"
+    private lazy val akkaStreamKafka = "com.typesafe.akka" %% "akka-stream-kafka" % "2.0.4"
 
     override def modules: Seq[ModuleID] =
       akkaModule("akka-cluster-tools") ::
@@ -83,6 +83,7 @@ object Dependencies {
       "com.lightbend.akka.management" %% "akka-management" % akkaManagementVersion ::
       "com.lightbend.akka.management" %% "akka-management-cluster-http" % akkaManagementVersion ::
       "com.lightbend.akka.management" %% "akka-management-cluster-bootstrap" % akkaManagementVersion ::
+      //"com.typesafe.akka" %% "akka-stream-kafka-cluster-sharding" % "2.0.4" ::
       SBR :: akkaStreamKafka ::
       Nil
   }
@@ -151,7 +152,7 @@ object Dependencies {
 
   // Projects
   lazy val mainDeps
-    : Seq[sbt.ModuleID] = Akka.modules ++ ScalaZ.modules ++ Cassandra.modules ++ Utils.modules ++ Kamon.modules
+      : Seq[sbt.ModuleID] = Akka.modules ++ ScalaZ.modules ++ Cassandra.modules ++ Utils.modules ++ Kamon.modules
   lazy val testDeps: Seq[sbt.ModuleID] = Test.modules ++ TestDB.modules
 }
 

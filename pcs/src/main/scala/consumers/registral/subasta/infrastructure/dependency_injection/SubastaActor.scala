@@ -9,7 +9,7 @@ import consumers.registral.subasta.application.entities.SubastaQueries.GetStateS
 import consumers.registral.subasta.domain.SubastaEvents.SubastaUpdatedFromDto
 import consumers.registral.subasta.domain.events.SubastaUpdatedFromDtoHandler
 import consumers.registral.subasta.domain.{SubastaEvents, SubastaState}
-import cqrs.BasePersistentShardedTypedActor.CQRS.BasePersistentShardedTypedActorWithCQRS
+import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
 case class SubastaActor(state: SubastaState = SubastaState())(
     implicit system: ActorSystem[Nothing]

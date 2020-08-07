@@ -1,7 +1,7 @@
 package readside.proyectionists.no_registrales.obligacion.projectionists
 
 import consumers.no_registral.obligacion.domain.ObligacionEvents
-import readside.proyectionists.common.shared.UpdateReadSideProjection
+import cassandra.mechanism.UpdateReadSideProjection
 
 trait ObligacionProjection extends UpdateReadSideProjection[ObligacionEvents] {
   def collectionName: String = "read_side.buc_obligaciones"

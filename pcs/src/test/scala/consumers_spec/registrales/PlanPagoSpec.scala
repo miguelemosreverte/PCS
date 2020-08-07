@@ -6,7 +6,7 @@ import consumers.registral.plan_pago.application.entities.PlanPagoQueries.GetSta
 import consumers.registral.plan_pago.application.entities.PlanPagoResponses.GetPlanPagoResponse
 import consumers.registral.plan_pago.infrastructure.dependency_injection.PlanPagoActor
 import consumers_spec.Metrics
-import design_principles.actor_model.TypedActorSpec
+import design_principles.actor_model.{Response, TypedActorSpec}
 
 class PlanPagoSpec extends TypedActorSpec {
 
@@ -22,17 +22,17 @@ class PlanPagoSpec extends TypedActorSpec {
       plan_pagoResponse3,
       plan_pagoResponse4
     ) = (for {
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(sujetoId = "1")
           .copy(registro = command.registro.asInstanceOf[PlanPagoTri].copy(BPL_ESTADO = Some("FIRST REGISTRO")))
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(sujetoId = "2")
           .copy(registro = command.registro.asInstanceOf[PlanPagoTri].copy(BPL_ESTADO = Some("SECOND REGISTRO")))
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(sujetoId = "3")
           .copy(registro = command.registro.asInstanceOf[PlanPagoTri].copy(BPL_ESTADO = Some("THIRD REGISTRO")))

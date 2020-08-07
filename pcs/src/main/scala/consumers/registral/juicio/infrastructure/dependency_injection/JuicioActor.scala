@@ -9,7 +9,7 @@ import consumers.registral.juicio.application.entities.JuicioQueries.GetStateJui
 import consumers.registral.juicio.domain.JuicioEvents.JuicioUpdatedFromDto
 import consumers.registral.juicio.domain.events.JuicioUpdatedFromDtoHandler
 import consumers.registral.juicio.domain.{JuicioEvents, JuicioState}
-import cqrs.BasePersistentShardedTypedActor.CQRS.BasePersistentShardedTypedActorWithCQRS
+import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
 case class JuicioActor(state: JuicioState = JuicioState())(
     implicit system: ActorSystem[Nothing]

@@ -3,7 +3,7 @@ package consumers.registral.actividad_sujeto.domain
 import java.time.LocalDateTime
 
 import consumers.registral.actividad_sujeto.application.entities.{ActividadSujetoExternalDto, ActividadSujetoMessage}
-import cqrs.BasePersistentShardedTypedActor.CQRS.AbstractStateWithCQRS
+import cqrs.base_actor.typed.AbstractStateWithCQRS
 
 case class ActividadSujetoState(
     registro: Option[ActividadSujetoExternalDto] = None,

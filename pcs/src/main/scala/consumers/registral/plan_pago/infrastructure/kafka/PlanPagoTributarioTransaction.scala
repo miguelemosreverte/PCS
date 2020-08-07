@@ -6,6 +6,7 @@ import consumers.registral.plan_pago.application.entities.PlanPagoExternalDto.Pl
 import consumers.registral.plan_pago.application.entities.{PlanPagoCommands, PlanPagoExternalDto}
 import consumers.registral.plan_pago.infrastructure.dependency_injection.PlanPagoActor
 import consumers.registral.plan_pago.infrastructure.json._
+import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
 import serialization.decodeF
@@ -20,7 +21,7 @@ case class PlanPagoTributarioTransaction(actor: PlanPagoActor, monitoring: Monit
 
   val topic = "DGR-COP-PLANES-TRI"
 
-  override def processCommand(registro: PlanPagoTri): Future[Done] = {
+  override def processCommand(registro: PlanPagoTri): Future[Response.SuccessProcessing] = {
     val command = PlanPagoCommands.PlanPagoUpdateFromDto(
       sujetoId = registro.BPL_SUJ_IDENTIFICADOR,
       objetoId = registro.BPL_SOJ_IDENTIFICADOR,

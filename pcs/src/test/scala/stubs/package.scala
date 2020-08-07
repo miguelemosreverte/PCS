@@ -7,7 +7,9 @@ import scala.reflect.ClassTag
 package object stubs {
 
   def loadExample[A <: ddd.ExternalDto: ClassTag](path: String)(implicit format: Format[A]): A = {
-    val text = Source.fromFile(path).getLines mkString "\n"
+    val source = Source.fromFile(path)
+    val text = source.getLines mkString "\n"
+    source.close()
     decode[A](text) match {
       case Left(explanation) =>
         // log.error(explanation)

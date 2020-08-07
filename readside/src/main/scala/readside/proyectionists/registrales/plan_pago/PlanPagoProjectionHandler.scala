@@ -1,6 +1,5 @@
 package readside.proyectionists.registrales.plan_pago
 import scala.concurrent.Future
-
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter._
 import akka.projection.eventsourced.EventEnvelope
@@ -8,6 +7,7 @@ import akka.projections.ProjectionSettings
 import akka.projections.cassandra.CassandraProjectionHandler
 import akka.{Done, actor => classic}
 import consumers.registral.plan_pago.domain.PlanPagoEvents
+import monitoring.Monitoring
 import org.slf4j.LoggerFactory
 import readside.proyectionists.registrales.plan_pago.projections.PlanPagoUpdatedFromDtoProjection
 
@@ -15,13 +15,7 @@ class PlanPagoProjectionHandler(settings: ProjectionSettings, system: ActorSyste
     extends CassandraProjectionHandler[PlanPagoEvents](settings, system) {
   implicit val classicSystem: classic.ActorSystem = system.toClassic
   import classicSystem.dispatcher
-  private val log = LoggerFactory.getLogger(getClass)
-
   private val tag = settings.tag
-
-  def this()(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("ParametricaRecargo", 1), classicSystem.toTyped)
-  }
 
   override def process(envelope: EventEnvelope[PlanPagoEvents]): Future[Done] = {
     envelope.event match {
@@ -45,5 +39,16 @@ class PlanPagoProjectionHandler(settings: ProjectionSettings, system: ActorSyste
         )
         Future.successful(Done)
     }
+  }
+}
+
+object PlanPagoProjectionHandler {
+  val defaultTag = "PlanPago"
+  val defaultParallelism = 1
+  val defaultProjectionSettings: Monitoring => ProjectionSettings =
+    ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): PlanPagoProjectionHandler = {
+    val projectionSettings = defaultProjectionSettings(monitoring)
+    new PlanPagoProjectionHandler(projectionSettings, system)
   }
 }

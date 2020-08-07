@@ -7,6 +7,7 @@ import consumers.registral.domicilio_objeto.application.entities.DomicilioObjeto
 import consumers.registral.domicilio_objeto.application.entities.DomicilioObjetoExternalDto.DomicilioObjetoAnt
 import consumers.registral.domicilio_objeto.infrastructure.dependency_injection.DomicilioObjetoActor
 import consumers.registral.domicilio_objeto.infrastructure.json._
+import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
 import serialization.decodeF
@@ -21,7 +22,7 @@ case class DomicilioObjetoNoTributarioTransaction(actor: DomicilioObjetoActor, m
 
   val topic = "DGR-COP-DOMICILIO-OBJ-ANT"
 
-  override def processCommand(registro: DomicilioObjetoAnt): Future[Done] = {
+  override def processCommand(registro: DomicilioObjetoAnt): Future[Response.SuccessProcessing] = {
     val command = DomicilioObjetoCommands.DomicilioObjetoUpdateFromDto(
       sujetoId = registro.BDO_SUJ_IDENTIFICADOR,
       objetoId = registro.BDO_SOJ_IDENTIFICADOR,

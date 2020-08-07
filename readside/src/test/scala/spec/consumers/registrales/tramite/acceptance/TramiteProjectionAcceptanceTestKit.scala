@@ -1,15 +1,17 @@
 package spec.consumers.registrales.tramite.acceptance
 
 import scala.concurrent.Future
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.projection.eventsourced.EventEnvelope
 import consumers.registral.tramite.application.entities.TramiteMessage.TramiteMessageRoots
 import consumers.registral.tramite.domain.TramiteEvents
 import design_principles.projection.infrastructure.CassandraTestkitProduction
+import monitoring.DummyMonitoring
 import org.scalatest.concurrent.ScalaFutures
 import spec.testkit.ProjectionTestkit
+import akka.actor.typed.scaladsl.adapter._
+import readside.proyectionists.registrales.tramite.TramiteProjectionHandler
 
 class TramiteProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit system: ActorSystem)
     extends ProjectionTestkit[TramiteEvents, TramiteMessageRoots]
@@ -34,5 +36,8 @@ class TramiteProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit
   }
 
   def projectionHandler =
-    new readside.proyectionists.registrales.tramite.TramiteProjectionHandler()
+    new readside.proyectionists.registrales.tramite.TramiteProjectionHandler(
+      TramiteProjectionHandler.defaultProjectionSettings(monitoring),
+      system.toTyped
+    )
 }

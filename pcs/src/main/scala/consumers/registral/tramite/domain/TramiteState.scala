@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 import consumers.registral.tramite.application.entities.TramiteExternalDto.Tramite
 import consumers.registral.tramite.application.entities.TramiteMessage
-import cqrs.BasePersistentShardedTypedActor.CQRS.AbstractStateWithCQRS
+import cqrs.base_actor.typed.AbstractStateWithCQRS
 
 case class TramiteState(
     registro: Option[Tramite] = None,

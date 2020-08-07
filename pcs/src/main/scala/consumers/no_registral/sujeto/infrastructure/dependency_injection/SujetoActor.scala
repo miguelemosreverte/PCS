@@ -2,7 +2,7 @@ package consumers.no_registral.sujeto.infrastructure.dependency_injection
 
 import akka.ActorRefMap
 import akka.actor.{ActorRef, Props}
-import akka.entity.ShardedEntity.{NoRequirements, ShardedEntityNoRequirements}
+import akka.entity.ShardedEntity
 import consumers.no_registral.objeto.application.entities.ObjetoMessage
 import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMessageRoots
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
@@ -19,22 +19,29 @@ import consumers.no_registral.sujeto.application.entity.{SujetoCommands, SujetoQ
 import consumers.no_registral.sujeto.domain.SujetoEvents.SujetoSnapshotPersisted
 import consumers.no_registral.sujeto.domain.{SujetoEvents, SujetoState}
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor.{SujetoActorRefMap, SujetoTags}
-import cqrs.PersistentBaseActor
-import utils.implicits.StringT._
+import cqrs.base_actor.untyped.PersistentBaseActor
+import monitoring.Monitoring
 
-class SujetoActor(objetoActorProps: Props = ObjetoActor.props) extends PersistentBaseActor[SujetoEvents, SujetoState] {
+class SujetoActor(monitoring: Monitoring, objetoActorPropsOption: Option[Props] = None)
+    extends PersistentBaseActor[SujetoEvents, SujetoState](monitoring) {
 
   var state = SujetoState()
 
-  val objetos = new SujetoActorRefMap(
-    {
-      case (sujetoId, objetoId, tipoObjeto) =>
-        val objetoAggregateRoot = ObjetoMessageRoots(sujetoId, objetoId, tipoObjeto).toString
-        context.actorOf(objetoActorProps, objetoAggregateRoot)
-      case other =>
-        context.actorOf(objetoActorProps, other toString)
+  val objetos: SujetoActorRefMap = {
+    val objetoActorProps = objetoActorPropsOption match {
+      case Some(props) => props
+      case None => ObjetoActor.props(monitoring)
     }
-  )
+    new SujetoActorRefMap(
+      {
+        case (sujetoId, objetoId, tipoObjeto) =>
+          val objetoAggregateRoot = ObjetoMessageRoots(sujetoId, objetoId, tipoObjeto).toString
+          context.actorOf(objetoActorProps, objetoAggregateRoot)
+        case other =>
+          context.actorOf(objetoActorProps, other toString)
+      }
+    )
+  }
 
   override def setupHandlers(): Unit = {
     commandBus.subscribe[SujetoCommands.SujetoUpdateFromAnt](new SujetoUpdateFromAntHandler(this).handle)
@@ -59,23 +66,22 @@ class SujetoActor(objetoActorProps: Props = ObjetoActor.props) extends Persisten
       objetos((evt.sujetoId, evt.objetoId, evt.tipoObjeto))
   }
 
-  def persistSnapshot(): Unit = {
+  def persistSnapshot()(handler: () => Unit): Unit = {
     val sujetoId = SujetoMessageRoots.extractor(persistenceId).sujetoId
     val event = SujetoSnapshotPersisted(state.registro.map(_.EV_ID).getOrElse(0), sujetoId, state.registro, state.saldo)
-    persistEvent(event, SujetoTags.SujetoReadside)(() => ())
+    persistEvent(event, SujetoTags.SujetoReadside)(handler)
   }
 
 }
 
-object SujetoActor extends ShardedEntityNoRequirements {
-  def props(noRequirements: NoRequirements = NoRequirements()): Props = Props(new SujetoActor)
+object SujetoActor extends ShardedEntity[Monitoring] {
+  def props(monitoring: Monitoring): Props = Props(new SujetoActor(monitoring))
 
   object SujetoTags {
     val SujetoReadside: Set[String] = Set("Sujeto")
   }
 
   type ObjetoAggregateRoot = (String, String, String)
-  class SujetoActorRefMap(newActor: (ObjetoAggregateRoot) => ActorRef)
-      extends ActorRefMap[ObjetoAggregateRoot](newActor)
+  class SujetoActorRefMap(newActor: ObjetoAggregateRoot => ActorRef) extends ActorRefMap[ObjetoAggregateRoot](newActor)
 
 }

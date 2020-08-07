@@ -1,6 +1,5 @@
 package readside.proyectionists.registrales.actividad_sujeto
 import scala.concurrent.Future
-
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter._
 import akka.projection.eventsourced.EventEnvelope
@@ -8,6 +7,7 @@ import akka.projections.ProjectionSettings
 import akka.projections.cassandra.CassandraProjectionHandler
 import akka.{Done, actor => classic}
 import consumers.registral.actividad_sujeto.domain.ActividadSujetoEvents
+import monitoring.Monitoring
 import org.slf4j.LoggerFactory
 import readside.proyectionists.registrales.actividad_sujeto.projections.ActividadSujetoUpdatedFromDtoProjection
 
@@ -15,13 +15,7 @@ class ActividadSujetoProjectionHandler(settings: ProjectionSettings, system: Act
     extends CassandraProjectionHandler[ActividadSujetoEvents](settings, system) {
   implicit val classicSystem: classic.ActorSystem = system.toClassic
   import classicSystem.dispatcher
-  private val log = LoggerFactory.getLogger(getClass)
-
   private val tag = settings.tag
-
-  def this()(implicit classicSystem: akka.actor.ActorSystem) {
-    this(ProjectionSettings("ActividadSujeto", 1), classicSystem.toTyped)
-  }
 
   override def process(envelope: EventEnvelope[ActividadSujetoEvents]): Future[Done] = {
     envelope.event match {
@@ -45,5 +39,17 @@ class ActividadSujetoProjectionHandler(settings: ProjectionSettings, system: Act
         )
         Future.successful(Done)
     }
+  }
+}
+
+object ActividadSujetoProjectionHandler {
+  val defaultTag = "ActividadSujeto"
+  val defaultParallelism = 1
+  val defaultProjectionSettings: Monitoring => ProjectionSettings =
+    ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): ActividadSujetoProjectionHandler = {
+    val projectionSettings = defaultProjectionSettings(monitoring)
+    new ActividadSujetoProjectionHandler(projectionSettings, system)
+
   }
 }

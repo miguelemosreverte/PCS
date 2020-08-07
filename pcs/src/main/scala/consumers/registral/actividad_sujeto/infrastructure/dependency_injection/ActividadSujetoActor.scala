@@ -9,7 +9,7 @@ import consumers.registral.actividad_sujeto.application.entities.ActividadSujeto
 import consumers.registral.actividad_sujeto.domain.ActividadSujetoEvents.ActividadSujetoUpdatedFromDto
 import consumers.registral.actividad_sujeto.domain.events.ActividadSujetoUpdatedFromDtoHandler
 import consumers.registral.actividad_sujeto.domain.{ActividadSujetoEvents, ActividadSujetoState}
-import cqrs.BasePersistentShardedTypedActor.CQRS.BasePersistentShardedTypedActorWithCQRS
+import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
 case class ActividadSujetoActor(state: ActividadSujetoState = ActividadSujetoState())(
     implicit system: ActorSystem[Nothing]

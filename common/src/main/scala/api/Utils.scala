@@ -10,14 +10,31 @@ object Utils {
      */
     def to_underscore(property: String): String = {
       def camelToUnderscores(name: String) =
-        "[A-Z\\d]".r.replaceAllIn(name, { m =>
+        "[A-Z\\d]+".r.replaceAllIn(name, { m =>
           "_" + m.group(0).toLowerCase()
         })
-      val proposedUnderscore = camelToUnderscores(property).toLowerCase
-      // in this case the string was already correct
-      // and now looked like this _s_u_j__t_i_p_o
-      if (proposedUnderscore contains "__") property.toLowerCase
-      else proposedUnderscore
+
+      def removeUndesiredUnderscore(property: String) =
+        property match {
+          case s"_$beginsWithUnderscore" => beginsWithUnderscore
+          case everythingIsGood => everythingIsGood
+        }
+
+      def toLowercase(property: String) = property.toLowerCase
+      def maybeItWasAlreadyUnderscore(p: String) = {
+        // in this case the string was already correct
+        // and now looked like this _s_u_j__t_i_p_o
+        if (p contains "__") property.toLowerCase
+        else p
+      }
+
+      (
+        camelToUnderscores _
+        andThen toLowercase
+        andThen maybeItWasAlreadyUnderscore
+        andThen removeUndesiredUnderscore
+      )(property)
+
     }
 
     def toCamelCase(json: String): String =

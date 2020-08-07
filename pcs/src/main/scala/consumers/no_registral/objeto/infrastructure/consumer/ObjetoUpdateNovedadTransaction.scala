@@ -6,6 +6,7 @@ import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import consumers.no_registral.objeto.application.entities.ObjetoCommands.ObjetoSnapshot
 import consumers.no_registral.objeto.infrastructure.json._
+import design_principles.actor_model.Response
 import monitoring.Monitoring
 import serialization.decodeF
 
@@ -14,7 +15,7 @@ case class ObjetoUpdateNovedadTransaction(actorRef: ActorRef, monitoring: Monito
 
   val topic = "ObjetoReceiveSnapshot"
 
-  def processCommand(cmd: ObjetoSnapshot): Future[Done] = {
-    actorRef.ask[akka.Done](cmd)
+  def processCommand(cmd: ObjetoSnapshot): Future[Response.SuccessProcessing] = {
+    actorRef.ask[Response.SuccessProcessing](cmd)
   }
 }

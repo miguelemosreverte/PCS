@@ -2,6 +2,7 @@ package akka.entity
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
+import design_principles.actor_model.mechanism.local_processing.LocalizedProcessingMessageExtractor
 
 trait ShardedEntity[Requirements] extends ClusterEntity[Requirements] {
 
@@ -36,10 +37,7 @@ object ShardedEntity {
 
   def extractShardId(numberOfShards: Int): ShardRegion.ExtractShardId = {
     case s: Sharded =>
-      val result = EntityIdOps.fromEncodedToBigInt(EntityIdOps.encode(s.shardedId)) // s.shardedId.hashCode.abs
-      val sharded = (result % numberOfShards).toString
-      sharded
-
+      new LocalizedProcessingMessageExtractor(120).shardId(s.shardedId)
   }
 
   case class NoRequirements()

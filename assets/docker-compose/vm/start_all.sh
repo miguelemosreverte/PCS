@@ -27,7 +27,7 @@ echo "== akka cassandra setup =="
 sh assets/scripts/cassandra/setup_cassandra.sh
 
 echo "== starting up actores =="
-docker-compose -f assets/docker-compose/vm/docker-compose.yml up -d seed # node1 node2
+docker-compose -f assets/docker-compose/vm/docker-compose.yml up -d seed  node1 node2
 echo "== actores started up =="
 
 echo "== starting up readside =="

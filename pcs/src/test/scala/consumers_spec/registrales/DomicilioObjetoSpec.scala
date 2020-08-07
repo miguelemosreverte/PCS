@@ -6,7 +6,7 @@ import consumers.registral.domicilio_objeto.application.entities.DomicilioObjeto
 import consumers.registral.domicilio_objeto.application.entities.DomicilioObjetoResponses.GetDomicilioObjetoResponse
 import consumers.registral.domicilio_objeto.infrastructure.dependency_injection.DomicilioObjetoActor
 import consumers_spec.Metrics
-import design_principles.actor_model.TypedActorSpec
+import design_principles.actor_model.{Response, TypedActorSpec}
 
 class DomicilioObjetoSpec extends TypedActorSpec {
 
@@ -23,7 +23,7 @@ class DomicilioObjetoSpec extends TypedActorSpec {
       domicilio_objetoResponse3,
       domicilio_objetoResponse4
     ) = (for {
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(sujetoId = "1")
           .copy(
@@ -31,7 +31,7 @@ class DomicilioObjetoSpec extends TypedActorSpec {
               command.registro.asInstanceOf[DomicilioObjetoTri].copy(BDO_OBSERVACIONES = Some("FIRST REGISTRO"))
           )
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(sujetoId = "2")
           .copy(
@@ -39,7 +39,7 @@ class DomicilioObjetoSpec extends TypedActorSpec {
               command.registro.asInstanceOf[DomicilioObjetoTri].copy(BDO_OBSERVACIONES = Some("SECOND REGISTRO"))
           )
       )
-      _: Done <- actor.ask(
+      _: Response.SuccessProcessing <- actor.ask(
         command
           .copy(sujetoId = "3")
           .copy(

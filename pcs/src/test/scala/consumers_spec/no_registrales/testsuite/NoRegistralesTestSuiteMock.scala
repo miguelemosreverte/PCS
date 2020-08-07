@@ -20,6 +20,7 @@ import design_principles.actor_model.testkit.QueryTestkit.AgainstActors
 import design_principles.external_pub_sub.kafka.{KafkaMock, MessageProcessorLogging}
 import design_principles.projection.mock.CassandraTestkitMock
 import kafka.{MessageProcessor, MessageProducer}
+import monitoring.DummyMonitoring
 
 trait NoRegistralesTestSuiteMock extends NoRegistralesTestSuite {
   def testContext()(implicit system: ActorSystem): TestContext = new MockTestContext()
@@ -27,8 +28,10 @@ trait NoRegistralesTestSuiteMock extends NoRegistralesTestSuite {
   class MockTestContext(implicit system: ActorSystem) extends TestContext {
     import system.dispatcher
 
+    val monitoring = new DummyMonitoring
     val sujeto: ActorRef = new SujetoActorWithMockPersistence(messageProducer).start
-    val cotitularidadActor: ActorRef = new CotitularidadActorWithMockPersistence(messageProducer).start
+    val cotitularidadActor: ActorRef =
+      new CotitularidadActorWithMockPersistence(messageProducer).startWithRequirements(monitoring)
 
     val cassandraTestkit = new CassandraTestkitMock({
       case e: ObjetoSnapshotPersisted =>

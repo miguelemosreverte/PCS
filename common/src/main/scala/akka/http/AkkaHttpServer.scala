@@ -1,30 +1,43 @@
 package akka.http
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.server.Directives.{complete, _}
-import akka.http.scaladsl.server._
-import de.heikoseeberger.akkahttpplayjson.PlayJsonSupport
-import monitoring.{Counter, Histogram, Monitoring}
-import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsArray, JsObject, JsString}
+import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success}
 
-import scala.concurrent.Future
+import akka.actor.ActorSystem
+import akka.actor.typed.Behavior
+import akka.actor.typed.scaladsl.adapter._
+import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import akka.cluster.ClusterEvent.MemberUp
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.server._
 
 object AkkaHttpServer {
-  def start(route: Route, host: String = "0.0.0.0", port: Int = 8081)(implicit system: ActorSystem): Future[Unit] = {
-    import system.dispatcher
-    Http()
-      .bindAndHandle(route, host, port)
-      .map { binding =>
-        log.info(s"Starting ${this.getClass.getSimpleName} on $host:$port")
-      }
-      .recover {
-        case ex =>
-          log.error(s"Models observer could not bind to $host:$port/ ${ex.getMessage}")
-      }
-  }
-  val log = LoggerFactory.getLogger(this.getClass)
 
+  case class StopAkkaHttpServer()
+
+  def start(routes: Route, host: String, port: Int)(ctx: ActorContext[MemberUp]): Behavior[StopAkkaHttpServer] = {
+
+    implicit val system: ActorSystem = ctx.system.toClassic
+    implicit val ec: ExecutionContext = system.dispatcher
+
+    Behaviors.setup[StopAkkaHttpServer] { ee =>
+      Http()(system)
+        .bindAndHandle(routes, host, port)
+        .onComplete {
+          case Success(bound) =>
+            ctx.log.info(
+              s"Server online at http://${bound.localAddress.getHostString}:${bound.localAddress.getPort}/"
+            )
+          case Failure(e) =>
+            ctx.log.error("Server could not start!")
+            e.printStackTrace()
+            ee.self ! StopAkkaHttpServer()
+        }
+
+      Behaviors.receiveMessage[StopAkkaHttpServer] { _ =>
+        ctx.log.info("AkkaHttpServer gracefully terminated.")
+        Behaviors.stopped
+      }
+    }
+  }
 }

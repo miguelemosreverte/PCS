@@ -1,7 +1,7 @@
 package readside.proyectionists.registrales.plan_pago.projections
 import cassandra.CassandraTypesAdapter.int
 import consumers.registral.plan_pago.domain.PlanPagoEvents
-import readside.proyectionists.common.shared.UpdateReadSideProjection
+import cassandra.mechanism.UpdateReadSideProjection
 
 trait PlanPagoProjection extends UpdateReadSideProjection[PlanPagoEvents] {
   def collectionName: String = "read_side.buc_planes_pago"

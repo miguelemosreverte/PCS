@@ -1,101 +1,106 @@
-﻿# Project structure
-* /  
-  *  documentation/
-      *   ...
-  * assets/  
-      * CI/    
-      * docker-compose/    
-      * examples/    
-      * k8s/   
-      * scripts/  
-  * common/  
-      * src/  
-      * test/  
-  * pcs/  
-      * src/  
-      * test/  
-  * project/  
-      * build.properties  
-      * plugins.sbt  
-  * readside/  
-      * src/  
-      * test/  
-  * build.sbt  
-  
-**documentation** stores any document that explains the project.
-**assets** stores any document useful to the project.
-**common** stores any useful abstraction shared between two projects.
-**writeside or pcs** is where the event database is written.
-It hears kafka topics and saves to the event database anything important.
-**readside** is where the event database is read, and then some human readable view can be created on top. 
-It hears raw events and transforms them into human readable presentations.
+﻿
+# How to run  
+## in development mode  
+**Run the following commands on different consoles**
 
-## Run test  
-Sometimes the best way to understand a project is to run the tests-
-```bash 
+Console [1] Start infrastructure (Cassandra, Kafka)
+
+`sh assets/docker-compose/dev-lite/infrastructure.sh `
+
+Console [2] Start first node of writeside
+
+`sh assets/docker-compose/dev-lite/seed.sh`
+
+Console [3] Start second node of writeside
+
+`sh assets/docker-compose/dev-lite/node1.sh`
+
+Console [4] Start third node of writeside
+
+`sh assets/docker-compose/dev-lite/node2.sh`
+
+Console [5] Start first node of readside
+
+`sh assets/docker-compose/dev-lite/readside.sh `
+
+Console [1] After all nodes have been started, start consumers
+
+`sh assets/scripts/start_consumers.sh `
+
+
+## in docker-compose
+sh assets/docker-compose/vm/stop_all.sh 
+sh assets/docker-compose/vm/start_all.sh 
+
+## in kubernetes  
+sh assets/k8s/stop_all.sh 
+sh assets/k8s/start_all.sh 
+
+# How to use  
+## How to use: 1. publish a message to Kafka
+This will publish a message to the **DGR-COP-OBLIGACIONES-TRI** topic, 
+
+using the JSON file at **assets/examples/DGR-COP-OBLIGACIONES-TRI.json**.
+```bash
+kafkacat -P -b 0.0.0.0:9092 -t DGR-COP-OBLIGACIONES-TRI assets/examples/DGR-COP-OBLIGACIONES-TRI.json 
+```
+## How to use: 2. query the actors using HTTP
+```bash
+curl 0.0.0.0:8081/state/sujeto/1
+```
+```bash
+curl 0.0.0.0:8081/state/sujeto/1/objeto/1/tipo/I
+```
+```bash
+curl 0.0.0.0:8081/state/sujeto/1/objeto/1/tipo/I/obligacion/1
+```
+This would hit the seed node, which is exposed at the port 8081.
+
+Other nodes like node1 and node2, you can find them at 8082 and 8082, respectively.
+![enter image description here](https://i.imgur.com/sNi7miF.png)
+## How to use: 3. explore the readside projections at Cassandra
+#### on Docker
+``
+docker exec -it cassandra bash -c 'cqlsh -u cassandra -p cassandra'
+``
+#### on Kubernetes
+``
+kubectl exec -i $pod_name bash -c 'cqlsh -u cassandra -p cassandra'
+``
+
+This will get you _inside_ Cassandra, where you can run queries like the followings:
+```bash
+select * from read_side.buc_sujeto;
+```
+```bash
+select * from read_side.buc_sujeto_objeto;
+```
+```bash
+select * from read_side.buc_obligaciones;
+```
+![enter image description here](https://i.imgur.com/jaiksfn.png)
+## How to use: 4. explore the dashboards at Grafana
+### [0.0.0.0:3000](0.0.0.0:3000)  || user: _admin_ || password: _admin_
+
+
+![enter image description here](https://i.imgur.com/W4E5dMj.png)
+
+
+# Testing  
+_writeside, readside, and integration_
+```bash
 sbt test
- ```
- 
-# How to run
-## bash
-Using **bash** is useful when you want _performance_. You want the result _now_.
-So you make all the effort of typing the path of the script.
+```
 
-#### A complete project demonstration
-```bash 
-sh assets/docker-compose/vm/start_all.sh
- ```
-This demo is very resource demanding. It will start the following containers:
-- 3 cassandra 
--  1 kafka|zookeper
--  1 logstash|kibana|elasticsearch.
-
-#### A basic project demonstration
-This will start Kafka and Cassandra
-```bash 
-sh it/src/main/resources/infrastructure.sh
- ```
-This will hit Kafka with some topics like ObligacionesTri
-```bash 
-sh it/src/main/resources/examples.sh
- ```
- This will start the writeside
-```bash 
-sh it/src/main/resources/writeside.sh
- ```
- This will start the readside
-```bash 
-sh it/src/main/resources/readside.sh
- ```
-This demo runs the fastest. Everything about it is made to run _at speed_ for your advantage as a developer. Use it for when you want to test changes on your application but don't want to bother documenting this piece of behaviour via tests -- example: _When you are proving serialization works as intended._
-
-You can just run the _infrastructure_ script alonside with the _writeside_ script in order to do so.
-
-## sbt  
-Using **sbt** is useful when you want _to write nothing_.  And you have all the time in the world.
-So you make no effort in typing the path of the script.
-
-This will start Kafka and Cassandra
-```bash 
- sbt infrastructure  
- ```
- 
-  This will create the tables needed by readside  inside the Cassandra
-```bash 
- sbt createTables  
- ```
- 
-  This will start the readside
-```bash 
- sbt readside
- ```
-
-  This will start the writeside
-```bash 
- sbt writeside
- ```
-
-This will hit Kafka with some topics like ObligacionesTri
-```bash 
- sbt kafkacat  
- ```
+_writeside only_
+```bash
+sbt pcs/test
+```
+_readside only_
+```bash
+sbt readside/test
+```
+_integration only_
+```bash
+sbt it/test
+```

@@ -4,14 +4,15 @@ import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.objeto.domain.ObjetoEvents
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
 import cqrs.untyped.command.CommandHandler.SyncCommandHandler
+import design_principles.actor_model.Response
 
 import scala.util.{Success, Try}
 
 class SetBajaObjetoHandler(actor: ObjetoActor) extends SyncCommandHandler[ObjetoCommands.SetBajaObjeto] {
   override def handle(
       command: ObjetoCommands.SetBajaObjeto
-  ): Try[akka.Done] = {
-    val replyTo = actor.context.sender()
+  ): Try[Response.SuccessProcessing] = {
+
     val event = ObjetoEvents.ObjetoBajaSet(
       command.deliveryId,
       command.sujetoId,
@@ -25,15 +26,16 @@ class SetBajaObjetoHandler(actor: ObjetoActor) extends SyncCommandHandler[Objeto
     val lastDeliveryId = actor.state.lastDeliveryIdByEvents.getOrElse(documentName, BigInt(0))
     if (event.deliveryId <= lastDeliveryId) {
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
-      replyTo ! akka.Done
+      actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
     } else {
       actor.persistEvent(event) { () =>
         actor.state += event
         actor.informBajaToParent(command)
-        actor.persistSnapshot(event, actor.state)
-        replyTo ! akka.Done
+        actor.persistSnapshot(event, actor.state) { () =>
+          actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
+        }
       }
     }
-    Success(akka.Done)
+    Success(Response.SuccessProcessing(command.deliveryId))
   }
 }

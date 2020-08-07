@@ -9,22 +9,20 @@ import akka.projection.eventsourced.EventEnvelope
 import akka.projections.ProjectionSettings
 import akka.projections.cassandra.CassandraProjectionHandler
 import akka.{Done, actor => classic}
-import consumers.no_registral.cotitularidad.application.entities.CotitularidadCommands.{
-  CotitularidadAddSujetoCotitular,
-  CotitularidadPublishSnapshot
-}
+import consumers.no_registral.cotitularidad.application.entities.CotitularidadCommands.{CotitularidadAddSujetoCotitular, CotitularidadPublishSnapshot}
 import consumers.no_registral.cotitularidad.infrastructure.json._
 import consumers.no_registral.objeto.domain.ObjetoEvents
 import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoSnapshotPersisted
 import kafka.KafkaMessageProcessorRequirements
 import kafka.KafkaProducer.produce
+import monitoring.Monitoring
+import org.apache.kafka.common.serialization.StringSerializer
 import org.slf4j.LoggerFactory
 
 class ObjetoNovedadCotitularidadProjectionHandler(settings: ProjectionSettings, system: ActorSystem[_])
     extends CassandraProjectionHandler[ObjetoEvents](settings, system) {
   implicit val classicSystem: classic.ActorSystem = system.toClassic
   implicit val ec: ExecutionContextExecutor = classicSystem.dispatcher
-  private val log = LoggerFactory.getLogger(getClass)
 
   override def process(envelope: EventEnvelope[ObjetoEvents]): Future[Done] =
     processEvent(envelope.event)
@@ -77,7 +75,8 @@ class ObjetoNovedadCotitularidadProjectionHandler(settings: ProjectionSettings, 
 
   def publishMessageToKafka(messages: Seq[String], topic: String): Future[Done] = {
     implicit val producerSettings: ProducerSettings[String, String] =
-      KafkaMessageProcessorRequirements.productionSettings().producer
+      ProducerSettings(system, new StringSerializer, new StringSerializer)
+        .withBootstrapServers(KafkaMessageProcessorRequirements.bootstrapServers)
     produce(messages, topic)(_ =>
       log.debug(s"[ObjetoNovedadCotitularidad] Published message | CotitularidadAddSujetoCotitular")
     )
@@ -87,4 +86,11 @@ class ObjetoNovedadCotitularidadProjectionHandler(settings: ProjectionSettings, 
   def hasCotitulares(snapshot: ObjetoSnapshotPersisted): Boolean = snapshot.cotitulares.size > 1
   def shouldInformCotitulares(snapshot: ObjetoSnapshotPersisted): Boolean =
     isResponsible(snapshot) && hasCotitulares(snapshot)
+}
+
+object ObjetoNovedadCotitularidadProjectionHandler {
+  def apply(monitoring: Monitoring, system: ActorSystem[_]): ObjetoNovedadCotitularidadProjectionHandler = {
+    val objetoSettings = ProjectionSettings("ObjetoNovedadCotitularidad", 1, monitoring)
+    new ObjetoNovedadCotitularidadProjectionHandler(objetoSettings, system)
+  }
 }

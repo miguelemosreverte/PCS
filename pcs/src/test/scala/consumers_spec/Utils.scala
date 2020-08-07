@@ -3,7 +3,7 @@ package consumers_spec
 import akka.actor.ActorRef
 import consumers.no_registral.objeto.application.entities.ObjetoResponses.GetObjetoResponse
 import design_principles.actor_model.mechanism.TypedAsk.AkkaClassicTypedAsk
-import design_principles.actor_model.{Command, Query}
+import design_principles.actor_model.{Command, Query, Response}
 import org.scalatest.Assertion
 import utils.generators.Model.deliveryId
 
@@ -16,7 +16,7 @@ object Utils {
       assertion: Response => Assertion
   )(implicit actorRef: ActorRef, ec: ExecutionContext): Future[Assertion] =
     for {
-      _ <- actorRef.ask[akka.Done](command)
+      _ <- actorRef.ask[Response.SuccessProcessing](command)
       response <- actorRef.ask[Response](query)
     } yield assertion(response)
 

@@ -1,22 +1,25 @@
 package api.actor_transaction
 
-import akka.Done
-import akka.actor.ActorRef
+import scala.concurrent.{ExecutionContext, Future}
+import scala.reflect.ClassTag
+
 import akka.http.scaladsl.server.Route
+import design_principles.actor_model.Response
+import kafka.KafkaMessageProcessorRequirements
 import monitoring.Monitoring
 import play.api.libs.json.Format
 import serialization.decodeF
-
-import scala.concurrent.{ExecutionContext, Future}
-import scala.reflect.ClassTag
 
 abstract class ActorTransaction[ExternalDto](
     monitoring: Monitoring
 )(implicit ec: ExecutionContext, format: Format[ExternalDto], c: ClassTag[ExternalDto])
     extends ActorTransactionMetrics(monitoring) {
+
   val topic: String
 
-  final def transaction(input: String): Future[akka.Done] = {
+  def processCommand(registro: ExternalDto): Future[Response.SuccessProcessing]
+
+  final def transaction(input: String): Future[Response.SuccessProcessing] = {
     val future = for {
       cmd <- processInput(input)
       done <- processCommand(cmd)
@@ -31,12 +34,6 @@ abstract class ActorTransaction[ExternalDto](
   final def processInput(input: String): Future[ExternalDto] =
     Future(decodeF[ExternalDto](input))
 
-  def processCommand(registro: ExternalDto): Future[Done]
-
-  final def routeClassic(implicit system: akka.actor.ActorSystem): Route = {
-    kafka.AtomicKafkaController(this, monitoring)(system).route
-  }
-  final def route(implicit system: akka.actor.typed.ActorSystem[_]): Route = {
-    kafka.AtomicKafkaController.fromTyped(this, monitoring)(system).route
-  }
+  final def route(implicit system: akka.actor.ActorSystem, requirements: KafkaMessageProcessorRequirements): Route =
+    new ActorTransactionController(this, requirements)(system).route
 }

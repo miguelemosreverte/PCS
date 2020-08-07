@@ -1,14 +1,16 @@
 package consumers.registral.plan_pago.application.cqrs.commands
 
+import akka.actor.Status.Success
 import akka.actor.typed.ActorRef
 import akka.persistence.typed.scaladsl.Effect
 import consumers.registral.plan_pago.application.entities.PlanPagoCommands.PlanPagoUpdateFromDto
 import consumers.registral.plan_pago.domain.PlanPagoEvents.PlanPagoUpdatedFromDto
 import consumers.registral.plan_pago.domain.PlanPagoState
+import design_principles.actor_model.Response
 
 class PlanPagoUpdateFromDtoHandler() {
 
-  def handle(command: PlanPagoUpdateFromDto)(replyTo: ActorRef[akka.Done]) =
+  def handle(command: PlanPagoUpdateFromDto)(replyTo: ActorRef[Success]) =
     Effect
       .persist[
         PlanPagoUpdatedFromDto,
@@ -22,6 +24,6 @@ class PlanPagoUpdateFromDtoHandler() {
           command.registro
         )
       )
-      .thenReply(replyTo)(state => akka.Done)
+      .thenReply(replyTo)(state => Success(Response.SuccessProcessing(command.deliveryId)))
 
 }

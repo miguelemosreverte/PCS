@@ -7,6 +7,7 @@ import api.actor_transaction.ActorTransaction
 import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.objeto.application.entities.ObjetoExternalDto.Exencion
 import consumers.no_registral.objeto.infrastructure.json._
+import design_principles.actor_model.Response
 import monitoring.Monitoring
 import serialization.decodeF
 
@@ -15,7 +16,7 @@ case class ObjetoExencionTransaction(actorRef: ActorRef, monitoring: Monitoring)
 
   val topic = "DGR-COP-EXENCIONES"
 
-  def processCommand(exencion: Exencion): Future[Done] = {
+  def processCommand(exencion: Exencion): Future[Response.SuccessProcessing] = {
     val command = ObjetoCommands.ObjetoAddExencion(
       deliveryId = exencion.EV_ID,
       sujetoId = exencion.BEX_SUJ_IDENTIFICADOR,
@@ -24,6 +25,6 @@ case class ObjetoExencionTransaction(actorRef: ActorRef, monitoring: Monitoring)
       exencion = exencion
     )
 
-    actorRef.ask[akka.Done](command)
+    actorRef.ask[Response.SuccessProcessing](command)
   }
 }

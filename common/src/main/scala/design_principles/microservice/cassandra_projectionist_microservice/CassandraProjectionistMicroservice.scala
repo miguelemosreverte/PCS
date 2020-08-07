@@ -1,0 +1,5 @@
+package design_principles.microservice.cassandra_projectionist_microservice
+
+import design_principles.microservice.Microservice
+
+trait CassandraProjectionistMicroservice extends Microservice[CassandraProjectionistMicroserviceRequirements]

@@ -1,0 +1,5 @@
+package design_principles.microservice.kafka_consumer_microservice
+
+import design_principles.microservice.Microservice
+
+trait KafkaConsumerMicroservice extends Microservice[KafkaConsumerMicroserviceRequirements]

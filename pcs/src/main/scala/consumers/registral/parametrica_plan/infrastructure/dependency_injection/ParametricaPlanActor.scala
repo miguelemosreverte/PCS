@@ -9,7 +9,7 @@ import consumers.registral.parametrica_plan.application.entities.ParametricaPlan
 import consumers.registral.parametrica_plan.domain.ParametricaPlanEvents.ParametricaPlanUpdatedFromDto
 import consumers.registral.parametrica_plan.domain.events.ParametricaPlanUpdatedFromDtoHandler
 import consumers.registral.parametrica_plan.domain.{ParametricaPlanEvents, ParametricaPlanState}
-import cqrs.BasePersistentShardedTypedActor.CQRS.BasePersistentShardedTypedActorWithCQRS
+import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
 case class ParametricaPlanActor(state: ParametricaPlanState = ParametricaPlanState())(
     implicit system: ActorSystem[Nothing]

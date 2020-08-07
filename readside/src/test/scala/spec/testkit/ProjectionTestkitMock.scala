@@ -2,7 +2,7 @@ package spec.testkit
 
 import design_principles.actor_model.Event
 import design_principles.projection.mock.CassandraTestkitMock
-import readside.proyectionists.common.shared.UpdateReadSideProjection
+import cassandra.mechanism.UpdateReadSideProjection
 
 trait ProjectionTestkitMock[E <: Event, AggregateRoot] extends ProjectionTestkit[E, AggregateRoot] {
 

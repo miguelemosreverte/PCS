@@ -2,17 +2,29 @@
 # How to run  
 ## in development mode  
 **Run the following commands on different consoles**
+
 Console [1] Start infrastructure (Cassandra, Kafka)
+
 `sh assets/docker-compose/dev-lite/infrastructure.sh `
+
 Console [2] Start first node of writeside
+
 `sh assets/docker-compose/dev-lite/seed.sh`
+
 Console [3] Start second node of writeside
+
 `sh assets/docker-compose/dev-lite/node1.sh`
+
 Console [4] Start third node of writeside
+
 `sh assets/docker-compose/dev-lite/node2.sh`
+
 Console [5] Start first node of readside
+
 `sh assets/docker-compose/dev-lite/readside.sh `
+
 Console [1] After all nodes have been started, start consumers
+
 `sh assets/scripts/start_consumers.sh `
 
 
@@ -26,7 +38,9 @@ sh assets/k8s/start_all.sh
 
 # How to use  
 ## How to use: 1. publish a message to Kafka
-This will publish a message to the **DGR-COP-OBLIGACIONES-TRI** topic, using the JSON file at **assets/examples/DGR-COP-OBLIGACIONES-TRI.json**.
+This will publish a message to the **DGR-COP-OBLIGACIONES-TRI** topic, 
+
+using the JSON file at **assets/examples/DGR-COP-OBLIGACIONES-TRI.json**.
 ```bash
 kafkacat -P -b 0.0.0.0:9092 -t DGR-COP-OBLIGACIONES-TRI assets/examples/DGR-COP-OBLIGACIONES-TRI.json 
 ```
@@ -41,6 +55,7 @@ curl 0.0.0.0:8081/state/sujeto/1/objeto/1/tipo/I
 curl 0.0.0.0:8081/state/sujeto/1/objeto/1/tipo/I/obligacion/1
 ```
 This would hit the seed node, which is exposed at the port 8081.
+
 Other nodes like node1 and node2, you can find them at 8082 and 8082, respectively.
 ![enter image description here](https://i.imgur.com/sNi7miF.png)
 ## How to use: 3. explore the readside projections at Cassandra

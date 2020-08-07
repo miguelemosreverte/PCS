@@ -19,21 +19,35 @@
   "panels": [
     {
       "aliasColors": {},
-      "bars": false,
+      "bars": true,
       "dashLength": 10,
       "dashes": false,
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
         },
         "overrides": []
       },
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 7,
-        "w": 24,
+        "h": 5,
+        "w": 8,
         "x": 0,
         "y": 0
       },
@@ -48,7 +62,7 @@
         "total": false,
         "values": false
       },
-      "lines": true,
+      "lines": false,
       "linewidth": 1,
       "nullPointMode": "null",
       "percentage": false,
@@ -62,7 +76,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(rate(copernico_counters_total{entity=\"actor-transaction-obligacion_tributaria_transaction-request\"} [1m]) )",
+          "expr": "\nsum(\nincrease(copernico_counters_total{entity=\"actor-transaction-obligacion_tributaria_transaction-request\"}[1m])\n)\n",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -88,7 +102,7 @@
       },
       "yaxes": [
         {
-          "$$hashKey": "object:442",
+          "$$hashKey": "object:920",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -97,7 +111,7 @@
           "show": true
         },
         {
-          "$$hashKey": "object:443",
+          "$$hashKey": "object:921",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -112,98 +126,62 @@
       }
     },
     {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
       "datasource": null,
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
         },
         "overrides": []
       },
-      "fill": 1,
-      "fillGradient": 0,
       "gridPos": {
-        "h": 6,
-        "w": 24,
-        "x": 0,
-        "y": 7
+        "h": 5,
+        "w": 5,
+        "x": 8,
+        "y": 0
       },
-      "hiddenSeries": false,
       "id": 8,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "last"
+          ],
+          "fields": "/^actor\\-transaction-_obligacion_tributaria_transaction-latency$/",
+          "values": false
+        },
+        "textMode": "auto"
       },
-      "lines": true,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "percentage": false,
       "pluginVersion": "7.1.1",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum(rate(copernico_histograms_bucket{entity=\"actor-transaction-obligacion_tributaria_transaction-latency\"}[1m])) by (le))",
+          "expr": "avg(\nhistogram_quantile(0.9, \n  rate(copernico_histograms_bucket{entity=\"actor-transaction-obligacion_tributaria_transaction-latency\"}[5m])\n)\n)",
           "interval": "",
           "legendFormat": "actor-transaction-_obligacion_tributaria_transaction-latency",
           "refId": "A"
         }
       ],
-      "thresholds": [],
       "timeFrom": null,
-      "timeRegions": [],
       "timeShift": null,
       "title": "LATENCIA",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "$$hashKey": "object:136",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "$$hashKey": "object:137",
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
+      "type": "stat"
     },
     {
       "aliasColors": {},
@@ -223,7 +201,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 13
+        "y": 5
       },
       "hiddenSeries": false,
       "id": 2,
@@ -320,15 +298,17 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 13
+        "y": 5
       },
       "hiddenSeries": false,
       "id": 4,
       "legend": {
+        "alignAsTable": true,
         "avg": false,
         "current": false,
         "max": false,
         "min": false,
+        "rightSide": false,
         "show": true,
         "total": false,
         "values": false
@@ -408,7 +388,7 @@
     "list": []
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {

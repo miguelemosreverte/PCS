@@ -9,8 +9,6 @@ object CommandAliases {
     addCommandAlias("cd", "project"),
     addCommandAlias("ls", "projects"),
     addCommandAlias("to", "testOnly *"),
-    addCommandAlias("produce", "runMain transaction.ProducerApp"),
-    addCommandAlias("main", "run -Dakka.cluster.seed-nodes.0=akka://PersonClassificationService@0.0.0.0:2551"),
     addCommandAlias("ft", "scalafmt"),
     addCommandAlias("tft", "test:scalafmt"),
     addCommandAlias("fmt", ";ft;tft"),

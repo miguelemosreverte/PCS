@@ -21,7 +21,6 @@ lazy val global = project
     .settings(CommandAliases.aliases)
     .enablePlugins(ScoverageSbtPlugin)
     .enablePlugins(JavaServerAppPackaging, DockerPlugin)
-    .enablePlugins(Scripts)
     .aggregate(
       common,
       pcs,

@@ -44,6 +44,8 @@ trait ExencionTestSuiteMock extends ExencionSpec {
 
     override def messageProcessor: MessageProcessor with MessageProcessorLogging = kafkaMock
 
+    val monitoring: Monitoring = new DummyMonitoring
+
     lazy val exencionProyectionist: ExencionProjectionHandler =
       new readside.proyectionists.registrales.exencion.ExencionProjectionHandler(
         ExencionProjectionHandler.defaultProjectionSettings(monitoring),
@@ -51,8 +53,6 @@ trait ExencionTestSuiteMock extends ExencionSpec {
       ) {
         override val cassandra: CassandraWriteMock = cassandraTestkit.cassandraWrite
       }
-
-    val monitoring: Monitoring = new DummyMonitoring
     lazy val sujeto: ActorRef =
       new registrales.exencion.testkit.mocks.SujetoActorWithMockPersistence(
         exencionProyectionist

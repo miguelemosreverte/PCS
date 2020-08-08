@@ -25,7 +25,7 @@ class SubastaProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: Act
   type Projection = SubastaUpdatedFromDtoProjection
   val project: Snapshot => Projection = SubastaUpdatedFromDtoProjection.apply
 
-  override def process(envelope: EventEnvelope[SubastaEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[SubastaEvents]): Future[Done] =
     subastaProyectionist process envelope
 
   def subastaProyectionist: SubastaProjectionHandler =

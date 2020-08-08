@@ -74,7 +74,7 @@ trait ObligacionProjectionSpec extends ProjectionTestSuite[ObligacionEvents, Obl
       tipoObjeto = tipoObjeto,
       obligacionId = obligacionId
     )
-    projectionTestkit process projectionTestkit.eventEnvelope(snapshot)
+    projectionTestkit processEnvelope projectionTestkit.eventEnvelope(snapshot)
     val mappedEvent: Map[String, String] =
       projectionTestkit read ObligacionMessageRoots(
         snapshot.sujetoId,
@@ -117,9 +117,9 @@ trait ObligacionProjectionSpec extends ProjectionTestSuite[ObligacionEvents, Obl
       snapshot.obligacionId
     )
 
-    projectionTestkit process projectionTestkit.eventEnvelope(snapshot)
+    projectionTestkit processEnvelope projectionTestkit.eventEnvelope(snapshot)
     validateObligacionReadside(context)(snapshot)
-    projectionTestkit process projectionTestkit.eventEnvelope(remove)
+    projectionTestkit processEnvelope projectionTestkit.eventEnvelope(remove)
     (projectionTestkit read rowId) ========================= Map.empty
     context.close()
   }

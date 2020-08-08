@@ -17,7 +17,7 @@ class ExencionProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implici
     extends ProjectionTestkit[ObjetoAddedExencion, ExencionMessageRoot]
     with ScalaFutures {
   override val cassandraTestkit: CassandraTestkitProduction = c
-  override def process(envelope: EventEnvelope[ObjetoAddedExencion]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[ObjetoAddedExencion]): Future[Done] =
     projectionHandler process envelope
 
   override def read(e: ExencionMessageRoot): Map[String, String] = {

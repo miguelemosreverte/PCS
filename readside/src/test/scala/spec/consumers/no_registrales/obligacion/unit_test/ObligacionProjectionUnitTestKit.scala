@@ -25,7 +25,7 @@ class ObligacionProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: 
   type Projection = ObligacionSnapshotProjection
   val project: Snapshot => Projection = ObligacionSnapshotProjection.apply
 
-  override def process(envelope: EventEnvelope[ObligacionEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[ObligacionEvents]): Future[Done] =
     envelope.event match {
       case e: ObligacionRemoved =>
         cassandraTestkit.rowsAsMap.remove(

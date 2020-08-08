@@ -25,7 +25,7 @@ class TramiteProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: Act
   type Projection = TramiteUpdatedFromDtoProjection
   val project: Snapshot => Projection = TramiteUpdatedFromDtoProjection.apply
 
-  override def process(envelope: EventEnvelope[TramiteEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[TramiteEvents]): Future[Done] =
     tramiteProyectionist process envelope
 
   def tramiteProyectionist: TramiteProjectionHandler =

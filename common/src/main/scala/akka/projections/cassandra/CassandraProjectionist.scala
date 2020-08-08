@@ -25,10 +25,11 @@ object CassandraProjectionist {
     ShardedDaemonProcess(system).init(
       projectionSettings.name,
       projectionSettings.parallelism,
-      _ =>
+      (shardingId: Int) =>
         ProjectionBehavior(
           CassandraProjectionFactory.createProjectionFor(
             system,
+            shardingId,
             projectionSettings.projectionId,
             projectionHandler
           )

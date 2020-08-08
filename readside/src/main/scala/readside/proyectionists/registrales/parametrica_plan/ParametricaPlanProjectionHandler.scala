@@ -17,7 +17,7 @@ class ParametricaPlanProjectionHandler(settings: ProjectionSettings, system: Act
   import classicSystem.dispatcher
   private val tag = settings.tag
 
-  override def process(envelope: EventEnvelope[ParametricaPlanEvents]): Future[Done] = {
+  override def processEnvelope(envelope: EventEnvelope[ParametricaPlanEvents]): Future[Done] = {
     envelope.event match {
       case evt: ParametricaPlanEvents.ParametricaPlanUpdatedFromDto =>
         log.debug(
@@ -44,7 +44,7 @@ class ParametricaPlanProjectionHandler(settings: ProjectionSettings, system: Act
 
 object ParametricaPlanProjectionHandler {
   val defaultTag = "ParametricaPlan"
-  val defaultParallelism = 1
+  val defaultParallelism = 3
   val defaultProjectionSettings: Monitoring => ProjectionSettings =
     ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
   def apply(monitoring: Monitoring, system: ActorSystem[_]): ParametricaPlanProjectionHandler = {

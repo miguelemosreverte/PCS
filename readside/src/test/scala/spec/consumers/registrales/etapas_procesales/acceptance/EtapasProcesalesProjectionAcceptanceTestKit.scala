@@ -17,7 +17,7 @@ class EtapasProcesalesProjectionAcceptanceTestKit(c: CassandraTestkitProduction)
     extends ProjectionTestkit[EtapasProcesalesEvents, EtapasProcesalesMessageRoots]
     with ScalaFutures {
   override val cassandraTestkit: CassandraTestkitProduction = c
-  override def process(envelope: EventEnvelope[EtapasProcesalesEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[EtapasProcesalesEvents]): Future[Done] =
     projectionHandler process envelope
 
   override def read(e: EtapasProcesalesMessageRoots): Map[String, String] = {

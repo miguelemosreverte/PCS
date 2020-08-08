@@ -9,7 +9,10 @@ import akka.projection.eventsourced.EventEnvelope
 import akka.projections.ProjectionSettings
 import akka.projections.cassandra.CassandraProjectionHandler
 import akka.{Done, actor => classic}
-import consumers.no_registral.cotitularidad.application.entities.CotitularidadCommands.{CotitularidadAddSujetoCotitular, CotitularidadPublishSnapshot}
+import consumers.no_registral.cotitularidad.application.entities.CotitularidadCommands.{
+  CotitularidadAddSujetoCotitular,
+  CotitularidadPublishSnapshot
+}
 import consumers.no_registral.cotitularidad.infrastructure.json._
 import consumers.no_registral.objeto.domain.ObjetoEvents
 import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoSnapshotPersisted
@@ -24,7 +27,7 @@ class ObjetoNovedadCotitularidadProjectionHandler(settings: ProjectionSettings, 
   implicit val classicSystem: classic.ActorSystem = system.toClassic
   implicit val ec: ExecutionContextExecutor = classicSystem.dispatcher
 
-  override def process(envelope: EventEnvelope[ObjetoEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[ObjetoEvents]): Future[Done] =
     processEvent(envelope.event)
 
   def processEvent(event: ObjetoEvents): Future[Done] = {

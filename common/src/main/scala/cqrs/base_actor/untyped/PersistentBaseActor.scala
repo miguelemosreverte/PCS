@@ -2,11 +2,11 @@ package cqrs.base_actor.untyped
 
 import scala.reflect.ClassTag
 import scala.util.Try
-
 import akka.persistence.journal.Tagged
 import akka.persistence.{PersistentActor, RecoveryCompleted, SnapshotOffer}
 import cqrs.untyped.event.{EventBus, SyncEventBus}
 import ddd.AbstractState
+import design_principles.actor_model.mechanism.local_processing.LocalizedProcessingMessageExtractor
 import design_principles.actor_model.{Command, Event, Query}
 import monitoring.{Counter, Monitoring}
 
@@ -48,11 +48,16 @@ abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[
       logger.warn(s"[$persistenceId] Unexpected event $other")
   }
 
-  def persistEvent(event: E, tags: Set[String] = Set.empty)(handler: () => Unit = () => ()): Unit =
-    persist(if (tags.nonEmpty) Tagged(event, tags) else event) { _ =>
+  def persistEvent(event: E, tags: Set[String] = Set.empty)(handler: () => Unit = () => ()): Unit = {
+    val shardId = persistenceId.hashCode.abs % 3
+    val tagsWithShardId = tags map { tag =>
+      s"$tag-$shardId"
+    }
+    persist(if (tags.nonEmpty) Tagged(event, tagsWithShardId) else event) { _ =>
       logger.debug(s"[$persistenceId] Persist event | $event")
       persistedCounter.increment()
       monitoring.counter(s"$name-persisted-${utils.Inference.getSimpleName(event.getClass.getName)}").increment()
       handler()
     }
+  }
 }

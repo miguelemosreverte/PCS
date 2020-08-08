@@ -17,7 +17,7 @@ trait DomicilioObjetoProyectionistSpec extends ProjectionTestSuite[DomicilioObje
     val evento =
       stubs.consumers.registrales.domicilio_objeto.DomicilioObjetoEvents.domicilioObjetoUpdatedFromDtoAntStub
 
-    projectionTestkit process projectionTestkit.eventEnvelope(evento)
+    projectionTestkit processEnvelope projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
       projectionTestkit read DomicilioObjetoMessageRoots(

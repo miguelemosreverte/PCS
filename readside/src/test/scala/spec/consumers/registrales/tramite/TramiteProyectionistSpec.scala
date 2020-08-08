@@ -17,7 +17,7 @@ trait TramiteProyectionistSpec extends ProjectionTestSuite[TramiteEvents, Tramit
     val evento =
       stubs.consumers.registrales.tramite.TramiteEvents.tramiteUpdatedFromDtoStub
 
-    projectionTestkit process projectionTestkit.eventEnvelope(evento)
+    projectionTestkit processEnvelope projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
       projectionTestkit read TramiteMessageRoots(

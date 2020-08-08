@@ -17,7 +17,7 @@ trait PlanPagoProyectionistSpec extends ProjectionTestSuite[PlanPagoEvents, Plan
     val evento =
       stubs.consumers.registrales.plan_pago.PlanPagoEvents.PlanPagoUpdatedFromDtoAntStub
 
-    projectionTestkit process projectionTestkit.eventEnvelope(evento)
+    projectionTestkit processEnvelope projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
       projectionTestkit read PlanPagoMessageRoots(

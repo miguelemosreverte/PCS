@@ -18,7 +18,7 @@ trait ParametricaRecargoProyectionistSpec
     val evento =
       stubs.consumers.registrales.parametrica_recargo.ParametricaRecargoEvents.parametricaPlanUpdatedFromDtoAntStub
 
-    projectionTestkit process projectionTestkit.eventEnvelope(evento)
+    projectionTestkit processEnvelope projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
       projectionTestkit read ParametricaRecargoMessageRoots(

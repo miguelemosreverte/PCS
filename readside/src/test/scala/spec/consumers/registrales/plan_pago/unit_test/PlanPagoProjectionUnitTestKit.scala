@@ -25,7 +25,7 @@ class PlanPagoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: Ac
   type Projection = PlanPagoUpdatedFromDtoProjection
   val project: Snapshot => Projection = PlanPagoUpdatedFromDtoProjection.apply
 
-  override def process(envelope: EventEnvelope[PlanPagoEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[PlanPagoEvents]): Future[Done] =
     plan_pagoProyectionist process envelope
 
   def plan_pagoProyectionist: PlanPagoProjectionHandler =

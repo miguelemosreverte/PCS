@@ -17,7 +17,7 @@ class DeclaracionJuradaProjectionHandler(settings: ProjectionSettings, system: A
   import classicSystem.dispatcher
   private val tag = settings.tag
 
-  override def process(envelope: EventEnvelope[DeclaracionJuradaEvents]): Future[Done] = {
+  override def processEnvelope(envelope: EventEnvelope[DeclaracionJuradaEvents]): Future[Done] = {
     envelope.event match {
       case evt: DeclaracionJuradaEvents.DeclaracionJuradaUpdatedFromDto =>
         log.debug(
@@ -44,7 +44,7 @@ class DeclaracionJuradaProjectionHandler(settings: ProjectionSettings, system: A
 
 object DeclaracionJuradaProjectionHandler {
   val defaultTag = "DeclaracionJurada"
-  val defaultParallelism = 1
+  val defaultParallelism = 3
   val defaultProjectionSettings: Monitoring => ProjectionSettings =
     ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
   def apply(monitoring: Monitoring, system: ActorSystem[_]): DeclaracionJuradaProjectionHandler = {

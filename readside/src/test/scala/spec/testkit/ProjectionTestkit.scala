@@ -13,7 +13,7 @@ abstract class ProjectionTestkit[Events, AggregateRoot] {
   val monitoring: Monitoring = new DummyMonitoring
   val cassandraTestkit: CassandraTestkit
 
-  def process(envelope: EventEnvelope[Events]): Future[Done]
+  def processEnvelope(envelope: EventEnvelope[Events]): Future[Done]
 
   def eventEnvelope(event: Events): EventEnvelope[Events] =
     EventEnvelope[Events](NoOffset, "", 1L, event, deliveryId)

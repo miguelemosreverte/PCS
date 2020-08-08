@@ -19,7 +19,7 @@ class ObjetoProjectionHandler(settings: ProjectionSettings, system: ActorSystem[
 
   private val tag = settings.tag
 
-  override def process(envelope: EventEnvelope[ObjetoEvents]): Future[Done] = {
+  override def processEnvelope(envelope: EventEnvelope[ObjetoEvents]): Future[Done] = {
     envelope.event match {
       case evt: ObjetoEvents.ObjetoSnapshotPersisted =>
         log.debug(
@@ -47,7 +47,7 @@ class ObjetoProjectionHandler(settings: ProjectionSettings, system: ActorSystem[
 object ObjetoProjectionHandler {
 
   val defaultTag = "Objeto"
-  val defaultParallelism = 1
+  val defaultParallelism = 3
   val defaultProjectionSettings: Monitoring => ProjectionSettings =
     ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
 

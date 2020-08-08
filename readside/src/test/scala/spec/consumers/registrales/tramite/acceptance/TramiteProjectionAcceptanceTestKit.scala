@@ -17,7 +17,7 @@ class TramiteProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit
     extends ProjectionTestkit[TramiteEvents, TramiteMessageRoots]
     with ScalaFutures {
   override val cassandraTestkit: CassandraTestkitProduction = c
-  override def process(envelope: EventEnvelope[TramiteEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[TramiteEvents]): Future[Done] =
     projectionHandler process envelope
 
   def collectionName: String = "read_side.buc_tramites"

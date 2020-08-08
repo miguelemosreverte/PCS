@@ -25,7 +25,7 @@ class EtapasProcesalesProjectionUnitTestKit(c: CassandraTestkitMock)(implicit sy
   type Projection = EtapasProcesalesUpdatedFromDtoProjection
   val project: Snapshot => Projection = EtapasProcesalesUpdatedFromDtoProjection.apply
 
-  override def process(envelope: EventEnvelope[EtapasProcesalesEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[EtapasProcesalesEvents]): Future[Done] =
     etapas_procesalesProyectionist process envelope
 
   def etapas_procesalesProyectionist: EtapasProcesalesProjectionHandler =

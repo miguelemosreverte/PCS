@@ -17,7 +17,7 @@ class PlanPagoProjectionHandler(settings: ProjectionSettings, system: ActorSyste
   import classicSystem.dispatcher
   private val tag = settings.tag
 
-  override def process(envelope: EventEnvelope[PlanPagoEvents]): Future[Done] = {
+  override def processEnvelope(envelope: EventEnvelope[PlanPagoEvents]): Future[Done] = {
     envelope.event match {
       case evt: PlanPagoEvents.PlanPagoUpdatedFromDto =>
         log.debug(
@@ -44,7 +44,7 @@ class PlanPagoProjectionHandler(settings: ProjectionSettings, system: ActorSyste
 
 object PlanPagoProjectionHandler {
   val defaultTag = "PlanPago"
-  val defaultParallelism = 1
+  val defaultParallelism = 3
   val defaultProjectionSettings: Monitoring => ProjectionSettings =
     ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
   def apply(monitoring: Monitoring, system: ActorSystem[_]): PlanPagoProjectionHandler = {

@@ -17,7 +17,7 @@ trait ActividadSujetoProyectionistSpec extends ProjectionTestSuite[ActividadSuje
     val evento =
       stubs.consumers.registrales.actividad_sujeto.ActividadSujetoEvents.actividadSujetoUpdatedFromDtoStub
 
-    projectionTestkit process projectionTestkit.eventEnvelope(evento)
+    projectionTestkit processEnvelope projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
       projectionTestkit read ActividadSujetoMessageRoots(evento.sujetoId, evento.actividadSujetoId)

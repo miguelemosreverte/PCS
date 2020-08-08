@@ -17,7 +17,7 @@ trait ExencionProyectionistSpec extends ProjectionTestSuite[ObjetoAddedExencion,
     val evento: ObjetoAddedExencion =
       stubs.consumers.no_registrales.objeto.ObjetoEvents.objetoAddedExencionStub
 
-    projectionTestkit process projectionTestkit.eventEnvelope(evento)
+    projectionTestkit processEnvelope projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
       projectionTestkit read ExencionMessageRoot(

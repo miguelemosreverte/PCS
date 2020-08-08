@@ -17,7 +17,7 @@ trait JuicioProyectionistSpec extends ProjectionTestSuite[JuicioEvents, JuicioMe
     val evento =
       stubs.consumers.registrales.juicio.JuicioEvents.juicioUpdatedFromDtoTriStub
 
-    projectionTestkit process projectionTestkit.eventEnvelope(evento)
+    projectionTestkit processEnvelope projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
       projectionTestkit read JuicioMessageRoots(

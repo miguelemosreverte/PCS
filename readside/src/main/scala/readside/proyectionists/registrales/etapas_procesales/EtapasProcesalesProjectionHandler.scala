@@ -17,7 +17,7 @@ class EtapasProcesalesProjectionHandler(settings: ProjectionSettings, system: Ac
   import classicSystem.dispatcher
   private val tag = settings.tag
 
-  override def process(envelope: EventEnvelope[EtapasProcesalesEvents]): Future[Done] = {
+  override def processEnvelope(envelope: EventEnvelope[EtapasProcesalesEvents]): Future[Done] = {
     envelope.event match {
       case evt: EtapasProcesalesEvents.EtapasProcesalesUpdatedFromDto =>
         log.debug(
@@ -44,7 +44,7 @@ class EtapasProcesalesProjectionHandler(settings: ProjectionSettings, system: Ac
 
 object EtapasProcesalesProjectionHandler {
   val defaultTag = "EtapasProcesales"
-  val defaultParallelism = 1
+  val defaultParallelism = 3
   val defaultProjectionSettings: Monitoring => ProjectionSettings =
     ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
   def apply(monitoring: Monitoring, system: ActorSystem[_]): EtapasProcesalesProjectionHandler = {

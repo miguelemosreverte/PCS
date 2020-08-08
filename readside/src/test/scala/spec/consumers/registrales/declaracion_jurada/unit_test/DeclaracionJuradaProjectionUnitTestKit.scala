@@ -25,7 +25,7 @@ class DeclaracionJuradaProjectionUnitTestKit(c: CassandraTestkitMock)(implicit s
   type Projection = DeclaracionJuradaUpdatedFromDtoProjection
   val project: Snapshot => Projection = DeclaracionJuradaUpdatedFromDtoProjection.apply
 
-  override def process(envelope: EventEnvelope[DeclaracionJuradaEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[DeclaracionJuradaEvents]): Future[Done] =
     declaracion_juradaProyectionist process envelope
 
   def declaracion_juradaProyectionist: DeclaracionJuradaProjectionHandler =

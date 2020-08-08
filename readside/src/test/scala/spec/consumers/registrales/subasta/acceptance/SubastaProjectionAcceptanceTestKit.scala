@@ -17,7 +17,7 @@ class SubastaProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit
     extends ProjectionTestkit[SubastaEvents, SubastaMessageRoots]
     with ScalaFutures {
   override val cassandraTestkit: CassandraTestkitProduction = c
-  override def process(envelope: EventEnvelope[SubastaEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[SubastaEvents]): Future[Done] =
     projectionHandler process envelope
 
   override def read(e: SubastaMessageRoots): Map[String, String] = {

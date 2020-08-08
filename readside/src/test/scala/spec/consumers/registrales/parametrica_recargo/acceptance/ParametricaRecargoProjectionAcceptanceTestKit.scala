@@ -17,7 +17,7 @@ class ParametricaRecargoProjectionAcceptanceTestKit(c: CassandraTestkitProductio
     extends ProjectionTestkit[ParametricaRecargoEvents, ParametricaRecargoMessageRoots]
     with ScalaFutures {
   override val cassandraTestkit: CassandraTestkitProduction = c
-  override def process(envelope: EventEnvelope[ParametricaRecargoEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[ParametricaRecargoEvents]): Future[Done] =
     projectionHandler process envelope
 
   override def read(e: ParametricaRecargoMessageRoots): Map[String, String] = {

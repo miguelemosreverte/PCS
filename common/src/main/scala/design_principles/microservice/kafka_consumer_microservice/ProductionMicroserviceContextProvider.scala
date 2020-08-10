@@ -14,18 +14,18 @@ object ProductionMicroserviceContextProvider {
   def getContext(ctx: ActorSystem)(visitor: KafkaConsumerMicroserviceRequirements => Route): Route = {
     val monitoring = new KamonMonitoring
 
-    /*val rebalancerListener: ActorRef[ConsumerRebalanceEvent] =
+    val rebalancerListener: ActorRef[ConsumerRebalanceEvent] =
       ctx.spawn(
         TopicListener(
           typeKeyName = "rebalancerListener",
           monitoring
         ),
         name = "rebalancerListener"
-      )*/
+      )
 
     val transactionRequirements: KafkaMessageProcessorRequirements =
       KafkaMessageProcessorRequirements.productionSettings(
-        null, //rebalancerListener.toClassic,
+        rebalancerListener.toClassic,
         monitoring,
         ctx
       )

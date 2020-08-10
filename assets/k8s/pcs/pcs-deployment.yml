@@ -21,6 +21,7 @@ spec:
       targetPort: 9095
       name: monitoring
 
+
 ---
 
 apiVersion: apps/v1
@@ -120,4 +121,3 @@ spec:
           #   maxUnavailable: 25%
           #   # specifies the maximum number of Pods that can be created over the desired number of Pods. The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
           #   maxSurge: 25%
-

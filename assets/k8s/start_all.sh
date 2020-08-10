@@ -9,6 +9,9 @@ message() {
 
 message "Setting up kubernetes context and namespace..."
 kubectl config use-context docker-for-desktop
+eval $(minikube docker-env)
+sbt pcs/docker:publishLocal
+
 kubectl apply -f assets/k8s/namespace.yml
 kubectl config set-context --current --namespace=copernico
 message "Kubernetes setup completed."
@@ -62,11 +65,25 @@ kubectl exec -i $pod_name bash -c 'cqlsh -u cassandra -p cassandra' < assets/scr
 kubectl exec -i $pod_name bash -c 'cqlsh -u cassandra -p cassandra' < assets/scripts/cassandra/domain/read_side/tables/buc_param_recargo.cql
 message "cassandra setup completed."
 
+sbt pcs/docker:publishLocal
+
 message "Starting up write side"
 kubectl apply -f assets/k8s/pcs/pcs-rbac.yml
 kubectl apply -f assets/k8s/pcs/pcs-service.yml
 kubectl apply -f assets/k8s/pcs/pcs-deployment.yml
+
+minikube tunnel
+
+helm install prometheus stable/prometheus-operator --namespace copernico
+# grafana password is prom-operator
+
+kubectl apply -f assets/k8s/pcs/pcs-service-monitor.yml
+
+
 message "write side started"
+
+# to bind external IP
+# minikube tunnel
 
 message "Starting up read side"
 kubectl apply -f assets/k8s/readside/readside-rbac.yml

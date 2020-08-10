@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: couchbase-metrics
+  namespace: default
+  labels:
+    app: couchbase
+spec:
+  ports:
+    - name: metrics
+      port: 9091
+      protocol: TCP
+  selector:
+    app: couchbase
+    couchbase_cluster: cb-example
+
+---
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: couchbase
+  namespace: default
+  labels:
+    app: couchbase
+spec:
+  endpoints:
+    - port: metrics
+      interval: 5s
+      bearerTokenSecret:
+        key: token
+        name: cb-metrics-token
+  namespaceSelector:
+    matchNames:
+      - default
+  selector:
+    matchLabels:
+      app: couchbase

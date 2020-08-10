@@ -16,10 +16,6 @@ spec:
       port: 8082
       targetPort: 8082
       name: api
-    - protocol: TCP
-      port: 9095
-      targetPort: 9095
-      name: monitoring
 
 ---
 

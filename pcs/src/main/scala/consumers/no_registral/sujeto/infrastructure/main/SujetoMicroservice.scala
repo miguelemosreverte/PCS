@@ -24,8 +24,7 @@ object SujetoMicroservice extends KafkaConsumerMicroservice {
     implicit val ec: ExecutionContext = m.executionContext
     val ctx = m.ctx
     import akka.actor.typed.scaladsl.adapter._
-    implicit val systemTyped: typed.ActorSystem[Nothing] = ctx.system
-    implicit val system: ActorSystem = ctx.system.toClassic
+    implicit val system: ActorSystem = ctx
     implicit val kafkaProcesorRequirements: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
     implicit val actor: ActorRef = SujetoActor.startWithRequirements(monitoring)
 

@@ -17,7 +17,7 @@ class DomicilioSujetoProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(
     extends ProjectionTestkit[DomicilioSujetoEvents, DomicilioSujetoMessageRoots]
     with ScalaFutures {
   override val cassandraTestkit: CassandraTestkitProduction = c
-  override def process(envelope: EventEnvelope[DomicilioSujetoEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[DomicilioSujetoEvents]): Future[Done] =
     projectionHandler process envelope
 
   override def read(e: DomicilioSujetoMessageRoots): Map[String, String] = {

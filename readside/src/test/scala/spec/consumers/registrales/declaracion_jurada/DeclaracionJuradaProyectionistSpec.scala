@@ -18,7 +18,7 @@ trait DeclaracionJuradaProyectionistSpec
     val evento =
       stubs.consumers.registrales.declaracion_jurada.DeclaracionJuradaEvents.declaracionJuradaUpdatedFromDtoStub
 
-    projectionTestkit process projectionTestkit.eventEnvelope(evento)
+    projectionTestkit processEnvelope projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
       projectionTestkit read DeclaracionJuradaMessageRoots(evento.sujetoId,

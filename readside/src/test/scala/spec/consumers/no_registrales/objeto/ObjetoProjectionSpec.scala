@@ -67,7 +67,7 @@ trait ObjetoProjectionSpec extends ProjectionTestSuite[ObjetoEvents, ObjetoMessa
       registro = Some(objetoDto.registro)
     )
 
-    projectionTestkit process projectionTestkit.eventEnvelope(snapshot)
+    projectionTestkit processEnvelope projectionTestkit.eventEnvelope(snapshot)
     validateObjetoReadside(context)(snapshot)
     context.close()
   }
@@ -93,7 +93,7 @@ trait ObjetoProjectionSpec extends ProjectionTestSuite[ObjetoEvents, ObjetoMessa
       objetoId = objetoDto.objetoId,
       registro = Some(objetoDto.registro)
     )
-    projectionTestkit process projectionTestkit.eventEnvelope(snapshot)
+    projectionTestkit processEnvelope projectionTestkit.eventEnvelope(snapshot)
     validateObjetoReadside(context)(snapshot)
     context.close()
   }

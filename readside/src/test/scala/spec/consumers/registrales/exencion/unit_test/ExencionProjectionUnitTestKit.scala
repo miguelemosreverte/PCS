@@ -24,7 +24,7 @@ class ExencionProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: Ac
   type Projection = ObjetoAddedExencionProjection
   val project: Snapshot => Projection = ObjetoAddedExencionProjection.apply
 
-  override def process(envelope: EventEnvelope[ObjetoAddedExencion]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[ObjetoAddedExencion]): Future[Done] =
     exencionProyectionist process envelope
 
   def exencionProyectionist: ExencionProjectionHandler =

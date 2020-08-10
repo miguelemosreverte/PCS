@@ -25,7 +25,7 @@ class ParametricaRecargoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit 
   type Projection = ParametricaRecargoUpdatedFromDtoProjection
   val project: Snapshot => Projection = ParametricaRecargoUpdatedFromDtoProjection.apply
 
-  override def process(envelope: EventEnvelope[ParametricaRecargoEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[ParametricaRecargoEvents]): Future[Done] =
     parametrica_recargoProyectionist process envelope
 
   def parametrica_recargoProyectionist: ParametricaRecargoProjectionHandler =

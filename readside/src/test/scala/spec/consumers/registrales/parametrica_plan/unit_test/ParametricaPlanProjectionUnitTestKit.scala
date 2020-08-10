@@ -25,7 +25,7 @@ class ParametricaPlanProjectionUnitTestKit(c: CassandraTestkitMock)(implicit sys
   type Projection = ParametricaPlanUpdatedFromDtoProjection
   val project: Snapshot => Projection = ParametricaPlanUpdatedFromDtoProjection.apply
 
-  override def process(envelope: EventEnvelope[ParametricaPlanEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[ParametricaPlanEvents]): Future[Done] =
     parametrica_planProyectionist process envelope
 
   def parametrica_planProyectionist: ParametricaPlanProjectionHandler =

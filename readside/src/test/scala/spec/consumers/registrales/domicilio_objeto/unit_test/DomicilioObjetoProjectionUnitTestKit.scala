@@ -25,7 +25,7 @@ class DomicilioObjetoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit sys
   type Projection = DomicilioObjetoUpdatedFromDtoProjection
   val project: Snapshot => Projection = DomicilioObjetoUpdatedFromDtoProjection.apply
 
-  override def process(envelope: EventEnvelope[DomicilioObjetoEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[DomicilioObjetoEvents]): Future[Done] =
     domicilio_objetoProyectionist process envelope
 
   def domicilio_objetoProyectionist: DomicilioObjetoProjectionHandler =

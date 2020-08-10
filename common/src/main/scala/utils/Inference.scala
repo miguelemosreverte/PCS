@@ -2,10 +2,56 @@ package utils
 
 import org.reflections.Reflections
 
+import scala.collection.Set
 import scala.jdk.CollectionConverters._
 import scala.reflect._
 
 object Inference {
+
+  /*
+   *
+   * Given a Superclass, say, a Microservice
+   *   and a Subclass, say, an ActorTransaction
+   * What this function will return is a map like this:
+   *
+   * Map(
+   *   SuperclassA -> Set[SubclassA, SubclassB],
+   *   SuperclassB -> Set[SubclassC, SubclassD]
+   * )
+   *
+   * It does do by assuming a standarized packaging pattern,
+   * This relation is Inferrable by a standarized packaging pattern:
+   *
+   * com.project.superclassA.subclass_A
+   * com.project.superclassA.subclass_B
+   * com.project.superclassB.subclass_C
+   * com.project.superclassB.subclass_D
+   *
+   * */
+  def resolveClassHierarchy[Superclasses: ClassTag, Subclasses: ClassTag]: Map[Class[_], Set[Class[_]]] = {
+    val superclasses =
+      utils.Inference.getSubtypesOf[Superclasses]()
+
+    val subclasses = utils.Inference
+      .getSubtypesOf[Subclasses]()
+
+    subclasses
+      .map { subclass =>
+        val superclass: Class[_] = superclasses
+          .map { superclass: Class[_] =>
+            (superclass.getCanonicalName.split('.').count { packageName =>
+              subclass.getCanonicalName.contains(packageName)
+            }, superclass)
+          }
+          .maxBy { a =>
+            a._1
+          }
+          ._2
+        superclass -> subclass
+      }
+      .groupMap(_._1)(a => a._2)
+  }
+
   // https://github.com/mockito/mockito-scala/issues/117#issuecomment-499654664
   def getSimpleName(name: String): String = {
     val withoutDollar = name.split("\\$").lastOption.getOrElse(name)

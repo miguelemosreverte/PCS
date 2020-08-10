@@ -17,7 +17,8 @@ class ObjetoProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implicit 
     extends ProjectionTestkit[ObjetoEvents, ObjetoMessageRoots]
     with ScalaFutures {
   override val cassandraTestkit: CassandraTestkit = c
-  override def process(envelope: EventEnvelope[ObjetoEvents]): Future[Done] = objetoProyectionist process envelope
+  override def processEnvelope(envelope: EventEnvelope[ObjetoEvents]): Future[Done] =
+    objetoProyectionist process envelope
 
   override def read(e: ObjetoMessageRoots): Map[String, String] = {
 

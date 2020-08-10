@@ -25,7 +25,7 @@ class JuicioProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: Acto
   type Projection = JuicioUpdatedFromDtoProjection
   val project: Snapshot => Projection = JuicioUpdatedFromDtoProjection.apply
 
-  override def process(envelope: EventEnvelope[JuicioEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[JuicioEvents]): Future[Done] =
     juicioProyectionist process envelope
 
   def juicioProyectionist: JuicioProjectionHandler =

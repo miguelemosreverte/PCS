@@ -16,6 +16,11 @@ spec:
       port: 8081
       targetPort: 8081
       name: api
+    - protocol: TCP
+      port: 9095
+      targetPort: 9095
+      name: monitoring
+
 
 ---
 
@@ -77,6 +82,8 @@ spec:
               containerPort: 8081
             - name: management
               containerPort: 8558
+            - name: monitoring
+              containerPort: 9095
           #health
           readinessProbe:
             httpGet:

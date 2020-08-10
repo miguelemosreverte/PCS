@@ -25,7 +25,8 @@ class ObjetoProjectionUnitTestKit(c: CassandraTestkitMock)(implicit system: Acto
   type Projection = ObjetoSnapshotPersistedProjection
   val project: Snapshot => Projection = ObjetoSnapshotPersistedProjection.apply
 
-  override def process(envelope: EventEnvelope[ObjetoEvents]): Future[Done] = objetoProyectionist process envelope
+  override def processEnvelope(envelope: EventEnvelope[ObjetoEvents]): Future[Done] =
+    objetoProyectionist process envelope
 
   def objetoProyectionist: ObjetoProjectionHandler =
     new readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler(

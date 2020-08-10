@@ -17,7 +17,7 @@ class DeclaracionJuradaProjectionAcceptanceTestKit(c: CassandraTestkitProduction
     extends ProjectionTestkit[DeclaracionJuradaEvents, DeclaracionJuradaMessageRoots]
     with ScalaFutures {
   override val cassandraTestkit: CassandraTestkitProduction = c
-  override def process(envelope: EventEnvelope[DeclaracionJuradaEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[DeclaracionJuradaEvents]): Future[Done] =
     projectionHandler process envelope
 
   override def read(e: DeclaracionJuradaMessageRoots): Map[String, String] = {

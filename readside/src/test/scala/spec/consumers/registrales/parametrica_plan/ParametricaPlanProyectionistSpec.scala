@@ -17,7 +17,7 @@ trait ParametricaPlanProyectionistSpec extends ProjectionTestSuite[ParametricaPl
     val evento =
       stubs.consumers.registrales.parametrica_plan.ParametricaPlanEvents.parametricaPlanUpdatedFromDtoAntStub
 
-    projectionTestkit process projectionTestkit.eventEnvelope(evento)
+    projectionTestkit processEnvelope projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
       projectionTestkit read ParametricaPlanMessageRoots(

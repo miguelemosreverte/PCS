@@ -18,7 +18,7 @@ class ExencionProjectionHandler(settings: ProjectionSettings, system: ActorSyste
   import classicSystem.dispatcher
   private val tag = settings.tag
 
-  override def process(envelope: EventEnvelope[ObjetoAddedExencion]): Future[Done] = {
+  override def processEnvelope(envelope: EventEnvelope[ObjetoAddedExencion]): Future[Done] = {
     envelope.event match {
       case evt: ObjetoEvents.ObjetoAddedExencion =>
         log.debug(
@@ -45,7 +45,7 @@ class ExencionProjectionHandler(settings: ProjectionSettings, system: ActorSyste
 
 object ExencionProjectionHandler {
   val defaultTag = "Exencion"
-  val defaultParallelism = 1
+  val defaultParallelism = 3
   val defaultProjectionSettings: Monitoring => ProjectionSettings =
     ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
   def apply(monitoring: Monitoring, system: ActorSystem[_]): ExencionProjectionHandler = {

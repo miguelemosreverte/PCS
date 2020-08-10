@@ -6,8 +6,12 @@ import akka.http.AkkaHttpServer
 import akka.http.scaladsl.server.Directives._
 import com.typesafe.config.{Config, ConfigFactory}
 import design_principles.actor_model.context_provider.{Guardian, GuardianRequirements}
+import design_principles.application.Application
 import life_cycle.AppLifecycleMicroservice
 import serialization.EventSerializer
+
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 
 object MainApplication {
 
@@ -17,7 +21,7 @@ object MainApplication {
       port: Int,
       actorSystemName: String,
       extraConfigurations: Config = ConfigFactory.empty
-  ): ActorSystem[ClusterEvent.MemberUp] = {
+  ): Unit = {
 
     lazy val config = Seq(
       ConfigFactory.load(),
@@ -26,13 +30,14 @@ object MainApplication {
       extraConfigurations
     ).reduce(_ withFallback _)
 
-    Guardian.getContext(GuardianRequirements(actorSystemName, config)) { akkaNodeIsUp =>
-      val routes = ProductionMicroserviceContextProvider.getContext(akkaNodeIsUp) { microserviceProvisioning =>
-        val userRoutes = microservices.map(_.route(microserviceProvisioning)).reduce(_ ~ _)
-        val systemRoutes = AppLifecycleMicroservice.route(microserviceProvisioning)
-        userRoutes ~ systemRoutes
-      }
-      AkkaHttpServer.start(routes, ip, port)(akkaNodeIsUp)
+    val system = Guardian.getContext(GuardianRequirements(actorSystemName, config))
+    val routes = ProductionMicroserviceContextProvider.getContext(system) { microserviceProvisioning =>
+      val userRoutes = microservices.map(_.route(microserviceProvisioning)).reduce(_ ~ _)
+      val systemRoutes = AppLifecycleMicroservice.route(microserviceProvisioning)
+      userRoutes ~ systemRoutes
     }
+    AkkaHttpServer.start(routes, ip, port)(system)
+
+    Await.result(system.whenTerminated, Duration.Inf)
   }
 }

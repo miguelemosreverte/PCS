@@ -17,7 +17,7 @@ class ParametricaPlanProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(
     extends ProjectionTestkit[ParametricaPlanEvents, ParametricaPlanMessageRoots]
     with ScalaFutures {
   override val cassandraTestkit: CassandraTestkitProduction = c
-  override def process(envelope: EventEnvelope[ParametricaPlanEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[ParametricaPlanEvents]): Future[Done] =
     projectionHandler process envelope
 
   override def read(e: ParametricaPlanMessageRoots): Map[String, String] = {

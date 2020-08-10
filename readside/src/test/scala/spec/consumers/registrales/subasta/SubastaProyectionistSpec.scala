@@ -17,7 +17,7 @@ trait SubastaProyectionistSpec extends ProjectionTestSuite[SubastaEvents, Subast
     val evento =
       stubs.consumers.registrales.subasta.SubastaEvents.subastaUpdatedFromDtoStub
 
-    projectionTestkit process projectionTestkit.eventEnvelope(evento)
+    projectionTestkit processEnvelope projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
       projectionTestkit read SubastaMessageRoots(

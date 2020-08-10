@@ -1,5 +1,6 @@
 package design_principles.microservice.cassandra_projectionist_microservice
 
+import akka.actor.ActorSystem
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter._
 import akka.cluster.ClusterEvent.MemberUp
@@ -9,14 +10,14 @@ import monitoring.KamonMonitoring
 object ProductionMicroserviceContextProvider {
 
   def getContext(
-      ctx: ActorContext[MemberUp]
+      ctx: ActorSystem
   )(visitor: CassandraProjectionistMicroserviceRequirements => Route): Route = {
     val monitoring = new KamonMonitoring
 
     visitor(
       CassandraProjectionistMicroserviceRequirements(
         monitoring = monitoring,
-        executionContext = ctx.system.toClassic.dispatcher,
+        executionContext = ctx.dispatcher,
         ctx = ctx
       )
     )

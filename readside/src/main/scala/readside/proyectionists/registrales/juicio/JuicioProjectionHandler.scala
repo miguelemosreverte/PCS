@@ -21,7 +21,7 @@ class JuicioProjectionHandler(settings: ProjectionSettings, system: ActorSystem[
   def this(monitoring: Monitoring)(implicit classicSystem: akka.actor.ActorSystem) {
     this(ProjectionSettings("Juicio", 1, monitoring), classicSystem.toTyped)
   }
-  override def process(envelope: EventEnvelope[JuicioEvents]): Future[Done] = {
+  override def processEnvelope(envelope: EventEnvelope[JuicioEvents]): Future[Done] = {
     envelope.event match {
       case evt: JuicioEvents.JuicioUpdatedFromDto =>
         log.debug(
@@ -48,7 +48,7 @@ class JuicioProjectionHandler(settings: ProjectionSettings, system: ActorSystem[
 
 object JuicioProjectionHandler {
   val defaultTag = "Juicio"
-  val defaultParallelism = 1
+  val defaultParallelism = 3
   val defaultProjectionSettings: Monitoring => ProjectionSettings =
     ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
   def apply(monitoring: Monitoring, system: ActorSystem[_]): JuicioProjectionHandler = {

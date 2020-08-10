@@ -17,7 +17,7 @@ class SubastaProjectionHandler(settings: ProjectionSettings, system: ActorSystem
   import classicSystem.dispatcher
   private val tag = settings.tag
 
-  override def process(envelope: EventEnvelope[SubastaEvents]): Future[Done] = {
+  override def processEnvelope(envelope: EventEnvelope[SubastaEvents]): Future[Done] = {
     envelope.event match {
       case evt: SubastaEvents.SubastaUpdatedFromDto =>
         log.debug(
@@ -44,7 +44,7 @@ class SubastaProjectionHandler(settings: ProjectionSettings, system: ActorSystem
 
 object SubastaProjectionHandler {
   val defaultTag = "Subasta"
-  val defaultParallelism = 1
+  val defaultParallelism = 3
   val defaultProjectionSettings: Monitoring => ProjectionSettings =
     ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
   def apply(monitoring: Monitoring, system: ActorSystem[_]): SubastaProjectionHandler = {

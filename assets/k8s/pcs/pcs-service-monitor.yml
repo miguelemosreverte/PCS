@@ -1,0 +1,41 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: prometheus--here
+spec:
+  serviceMonitorSelector:
+    matchLabels:
+      app: pcs-cluster
+  enableAdminAPI: true
+
+---
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: servicemonitor-pcs-cluster
+  labels:
+    app: pcs-cluster
+spec:
+  selector:
+    matchLabels:
+      app: pcs-cluster
+  endpoints:
+    - port: monitoring
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pcs-cluster-svc
+  labels:
+    app: pcs-cluster
+spec:
+  ports:
+    - name: monitoring
+      port: 9095
+      targetPort: 9095
+      protocol: TCP
+  selector:
+    app: pcs-cluster

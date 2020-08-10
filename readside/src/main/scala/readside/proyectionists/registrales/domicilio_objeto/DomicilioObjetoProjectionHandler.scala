@@ -19,7 +19,7 @@ class DomicilioObjetoProjectionHandler(settings: ProjectionSettings, system: Act
   import classicSystem.dispatcher
   private val tag = settings.tag
 
-  override def process(envelope: EventEnvelope[DomicilioObjetoEvents]): Future[Done] = {
+  override def processEnvelope(envelope: EventEnvelope[DomicilioObjetoEvents]): Future[Done] = {
     envelope.event match {
       case evt: DomicilioObjetoEvents.DomicilioObjetoUpdatedFromDto =>
         log.debug(
@@ -46,7 +46,7 @@ class DomicilioObjetoProjectionHandler(settings: ProjectionSettings, system: Act
 
 object DomicilioObjetoProjectionHandler {
   val defaultTag = "DomicilioObjeto"
-  val defaultParallelism = 1
+  val defaultParallelism = 3
   val defaultProjectionSettings: Monitoring => ProjectionSettings =
     ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
   def apply(monitoring: Monitoring, system: ActorSystem[_]): DomicilioObjetoProjectionHandler = {

@@ -2,14 +2,22 @@ package consumers.no_registral.objeto.infrastructure.main
 
 import scala.concurrent.ExecutionContext
 
-import akka.actor.{ActorRef, ActorSystem, typed}
+import akka.actor.{typed, ActorRef, ActorSystem}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import consumers.no_registral.objeto.infrastructure.consumer.{ObjetoExencionTransaction, ObjetoNoTributarioTransaction, ObjetoTributarioTransaction, ObjetoUpdateNovedadTransaction}
+import consumers.no_registral.objeto.infrastructure.consumer.{
+  ObjetoExencionTransaction,
+  ObjetoNoTributarioTransaction,
+  ObjetoTributarioTransaction,
+  ObjetoUpdateNovedadTransaction
+}
 import consumers.no_registral.objeto.infrastructure.event_processor.ObjetoNovedadCotitularidadProjectionHandler
 import consumers.no_registral.objeto.infrastructure.http._
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor
-import design_principles.microservice.kafka_consumer_microservice.{KafkaConsumerMicroservice, KafkaConsumerMicroserviceRequirements}
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
+}
 import kafka.KafkaMessageProcessorRequirements
 object ObjetoMicroservice extends KafkaConsumerMicroservice {
 
@@ -18,12 +26,14 @@ object ObjetoMicroservice extends KafkaConsumerMicroservice {
     implicit val ec: ExecutionContext = m.executionContext
     val ctx = m.ctx
     import akka.actor.typed.scaladsl.adapter._
-    implicit val systemTyped: typed.ActorSystem[Nothing] = ctx.system
-    implicit val system: ActorSystem = ctx.system.toClassic
+
+    implicit val system: akka.actor.typed.ActorSystem[Nothing] = ctx.toTyped
+    implicit val classicSystem: akka.actor.ActorSystem = ctx
+
     implicit val kafkaProcesorRequirements: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
     implicit val actor: ActorRef = SujetoActor.startWithRequirements(monitoring)
 
-    val feedbackLoop = ObjetoNovedadCotitularidadProjectionHandler(monitoring, systemTyped)
+    val feedbackLoop = ObjetoNovedadCotitularidadProjectionHandler(monitoring, system)
     feedbackLoop.run()
 
     Seq(

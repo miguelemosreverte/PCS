@@ -18,7 +18,7 @@ trait EtapasProcesalesProyectionistSpec
     val evento =
       stubs.consumers.registrales.etapas_procesales.EtapasProcesalesEvents.etapasProcesalesUpdatedFromDtoAntStub
 
-    projectionTestkit process projectionTestkit.eventEnvelope(evento)
+    projectionTestkit processEnvelope projectionTestkit.eventEnvelope(evento)
 
     val mappedEvent: Map[String, String] =
       projectionTestkit read EtapasProcesalesMessageRoots(

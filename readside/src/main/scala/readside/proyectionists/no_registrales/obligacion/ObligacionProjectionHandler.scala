@@ -29,7 +29,7 @@ class ObligacionProjectionHandler(settings: ProjectionSettings, system: ActorSys
   }
 
   // val message = EventProcessorPrinter.prettifyEventProcessorLog(eventEnvelope.toString)
-  override def process(envelope: EventEnvelope[ObligacionEvents]): Future[Done] = {
+  override def processEnvelope(envelope: EventEnvelope[ObligacionEvents]): Future[Done] = {
     envelope.event match {
       case evt: ObligacionEvents.ObligacionPersistedSnapshot =>
         log.debug(
@@ -70,7 +70,7 @@ class ObligacionProjectionHandler(settings: ProjectionSettings, system: ActorSys
 
 object ObligacionProjectionHandler {
   val defaultTag = "Obligacion"
-  val defaultParallelism = 1
+  val defaultParallelism = 3
   val defaultProjectionSettings: Monitoring => ProjectionSettings =
     ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
   def apply(monitoring: Monitoring, system: ActorSystem[_]): ObligacionProjectionHandler = {

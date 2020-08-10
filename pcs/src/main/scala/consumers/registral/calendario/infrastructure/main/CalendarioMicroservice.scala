@@ -1,10 +1,10 @@
 package consumers.registral.calendario.infrastructure.main
 
-import scala.concurrent.ExecutionContext
+import akka.actor.typed.ActorSystem
 
+import scala.concurrent.ExecutionContext
 import akka.actor.{typed, ActorSystem}
 import akka.http.scaladsl.server.Route
-
 import consumers.registral.calendario.infrastructure.dependency_injection.CalendarioActor
 import consumers.registral.calendario.infrastructure.http.CalendarioStateAPI
 import consumers.registral.calendario.infrastructure.kafka.CalendarioTransaction
@@ -21,8 +21,9 @@ object CalendarioMicroservice extends KafkaConsumerMicroservice {
     implicit val ec: ExecutionContext = m.executionContext
     val ctx = m.ctx
     import akka.actor.typed.scaladsl.adapter._
-    implicit val systemTyped: typed.ActorSystem[Nothing] = ctx.system
-    implicit val system: ActorSystem = ctx.system.toClassic
+
+    implicit val system: akka.actor.typed.ActorSystem[Nothing] = ctx.toTyped
+    implicit val classicSystem: akka.actor.ActorSystem = ctx
     implicit val kafkaProcesorRequirements: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
 
     implicit val actor: CalendarioActor = CalendarioActor()

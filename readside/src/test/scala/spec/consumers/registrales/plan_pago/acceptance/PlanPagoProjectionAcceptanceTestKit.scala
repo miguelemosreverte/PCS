@@ -17,7 +17,7 @@ class PlanPagoProjectionAcceptanceTestKit(c: CassandraTestkitProduction)(implici
     extends ProjectionTestkit[PlanPagoEvents, PlanPagoMessageRoots]
     with ScalaFutures {
   override val cassandraTestkit: CassandraTestkitProduction = c
-  override def process(envelope: EventEnvelope[PlanPagoEvents]): Future[Done] =
+  override def processEnvelope(envelope: EventEnvelope[PlanPagoEvents]): Future[Done] =
     projectionHandler process envelope
 
   override def read(e: PlanPagoMessageRoots): Map[String, String] = {

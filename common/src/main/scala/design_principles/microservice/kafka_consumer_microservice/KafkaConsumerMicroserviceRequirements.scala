@@ -1,5 +1,6 @@
 package design_principles.microservice.kafka_consumer_microservice
 
+import akka.actor.ActorSystem
 import akka.actor.typed.scaladsl.ActorContext
 import akka.cluster.ClusterEvent.MemberUp
 import design_principles.microservice.MicroserviceRequirements
@@ -11,6 +12,6 @@ import scala.concurrent.ExecutionContext
 case class KafkaConsumerMicroserviceRequirements(
     monitoring: Monitoring,
     executionContext: ExecutionContext,
-    ctx: ActorContext[MemberUp],
+    ctx: ActorSystem,
     kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements
 ) extends MicroserviceRequirements

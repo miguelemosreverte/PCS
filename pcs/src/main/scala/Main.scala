@@ -10,6 +10,7 @@ object Main extends App {
   val port = config.getInt("http.port")
   val actorSystemName = "PersonClassificationService"
 
+  println("ABOUT TO START MICROSERVICES")
   startMicroservices(microservices, ip, port, actorSystemName)
 
   def microservices: Seq[KafkaConsumerMicroservice] = Seq(

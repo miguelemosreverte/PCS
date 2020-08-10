@@ -8,7 +8,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: pcs-cluster
+      app: readside-cluster
   namespaceSelector:
     matchNames:
       - copernico

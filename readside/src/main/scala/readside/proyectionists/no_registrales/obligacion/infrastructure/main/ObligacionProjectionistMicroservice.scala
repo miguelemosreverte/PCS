@@ -23,3 +23,9 @@ object ObligacionProjectionistMicroservice extends CassandraProjectionistMicrose
     projectionist.route
   }
 }
+
+/*
+application
+  - handler -- seria como el controller HTTP (estamos haciendo todo en el controller )
+dominio
+  - persistentSnapshot*/

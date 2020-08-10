@@ -16,6 +16,10 @@ spec:
       port: 8081
       targetPort: 8081
       name: api
+    - protocol: TCP
+      port: 9095
+      targetPort: 9095
+      name: monitoring
 
 ---
 
@@ -77,6 +81,8 @@ spec:
               containerPort: 8081
             - name: management
               containerPort: 8558
+            - name: monitoring
+              containerPort: 9095
           #health
           readinessProbe:
             httpGet:
@@ -114,3 +120,4 @@ spec:
           #   maxUnavailable: 25%
           #   # specifies the maximum number of Pods that can be created over the desired number of Pods. The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
           #   maxSurge: 25%
+

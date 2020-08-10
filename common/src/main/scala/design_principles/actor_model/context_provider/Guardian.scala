@@ -21,6 +21,7 @@ object Guardian {
         Behaviors
           .receiveMessage[MemberUp] {
             case MemberUp(member) if member.uniqueAddress == cluster.selfMember.uniqueAddress =>
+              println("RECEIVED MEMBER UP")
               AkkaManagement(ctx.system).start()
               ClusterBootstrap(ctx.system).start()
               ctx.log.info("Joined the cluster. Starting sharding and kafka processor")

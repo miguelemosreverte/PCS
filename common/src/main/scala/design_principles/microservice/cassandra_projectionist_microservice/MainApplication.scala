@@ -6,10 +6,12 @@ import akka.http.AkkaHttpServer
 import akka.http.scaladsl.server.Directives._
 import com.typesafe.config.{Config, ConfigFactory}
 import design_principles.actor_model.context_provider.{Guardian, GuardianRequirements}
+import design_principles.application.Application
 import life_cycle.AppLifecycleMicroservice
 import serialization.EventSerializer
 
-object MainApplication {
+object MainApplication
+    extends Application[CassandraProjectionistMicroserviceRequirements, CassandraProjectionistMicroservice] {
 
   def startMicroservices(
       microservices: Seq[CassandraProjectionistMicroservice],

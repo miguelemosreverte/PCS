@@ -66,7 +66,7 @@ lazy val pcs = project
     dockerUsername := Some("pcs"),
     dockerEntrypoint := Seq("/opt/docker/bin/pcs"),
     dockerExposedPorts := Seq(
-        2551, 2552, 2553, 8081, 8083, 8084, 8558
+        2551, 2552, 2553, 8081, 8083, 8084, 8558, 9095, 5266
       )
   )
   .settings(
@@ -100,7 +100,9 @@ lazy val readside = project
     dockerExposedPorts := Seq(
         2554,
         8559,
-        8081
+        8081,
+        9095,
+        5266
       )
   )
 

@@ -39,8 +39,6 @@ spec:
       labels:
         app: readside-cluster
     spec:
-      terminationGracePeriodSeconds: 30
-      restartPolicy: Always
       serviceAccountName: readside-cluster
       containers:
         - image: readside/readside:1.0
@@ -60,10 +58,10 @@ spec:
             - name: MANAGEMENT_PORT
               value: "8559"
             - name: CLUSTER_IP
-                valueFrom:
-                  fieldRef:
-                    apiVersion: v1
-                    fieldPath: status.podIP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
             - name: CLUSTER_PORT
               value: "2554"
             - name: HTTP_PORT

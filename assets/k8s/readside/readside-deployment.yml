@@ -25,7 +25,7 @@ metadata:
   name: readside
   namespace: copernico
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: readside-cluster
@@ -47,6 +47,8 @@ spec:
           imagePullPolicy: Never
           name: readside-cluster
           env:
+            - name: REQUIRED_CONTACT_POINTS
+              value: "3"
             - name: KAFKA_BROKERS_LIST
               value: "kafka-internal:29092"
             - name: CASSANDRA_CONTACT_POINTS
@@ -58,11 +60,12 @@ spec:
             - name: MANAGEMENT_PORT
               value: "8559"
             - name: CLUSTER_IP
-              value: "127.0.0.1"
+                valueFrom:
+                  fieldRef:
+                    apiVersion: v1
+                    fieldPath: status.podIP
             - name: CLUSTER_PORT
               value: "2554"
-            - name: SEED_NODES
-              value: "akka://PersonClassificationServiceReadSide@127.0.0.1:2554"
             - name: HTTP_PORT
               value: "8082"
             - name: POD_APP_NAME

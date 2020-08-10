@@ -10,7 +10,9 @@ object Main extends App {
   val port = config.getInt("http.port")
   val actorSystemName = "PersonClassificationService"
 
-  println("ABOUT TO START MICROSERVICES")
+  println(s"ABOUT TO START MICROSERVICES ${ip} ${port}")
+
+  println(config.getStringList("akka.cluster.seed-nodes"))
   startMicroservices(microservices, ip, port, actorSystemName)
 
   def microservices: Seq[KafkaConsumerMicroservice] = Seq(

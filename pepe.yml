@@ -1,0 +1,16 @@
+#helm install prometheus-operator stable/prometheus-operator --values pepe.yml  --namespace copernico --dry-run
+prometheus:
+  prometheusSpec:
+    additionalServiceMonitors:
+      - name: pcs-cluster
+        additionalLabels:
+          - app: pcs-cluster
+        endpoints:
+          - port: monitoring
+            interval: 5s
+        namespaceSelector:
+          matchNames:
+            - copernico
+        selector:
+          matchLabels:
+            app: pcs-cluster

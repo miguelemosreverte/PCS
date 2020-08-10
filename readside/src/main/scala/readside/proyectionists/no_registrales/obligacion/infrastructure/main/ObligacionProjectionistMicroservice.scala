@@ -17,7 +17,9 @@ import readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHan
 object ObligacionProjectionistMicroservice extends CassandraProjectionistMicroservice {
   override def route(context: CassandraProjectionistMicroserviceRequirements): Route = {
     val monitoring = context.monitoring
-    val system = context.ctx.system
+
+    import akka.actor.typed.scaladsl.adapter._
+    val system = context.ctx.toTyped
     val projectionist = ObligacionProjectionHandler(monitoring, system)
     projectionist.run()
     projectionist.route

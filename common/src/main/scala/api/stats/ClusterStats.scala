@@ -19,11 +19,11 @@ import utils.Inference.{getSimpleName, getSubtypesOf, resolveClassHierarchy}
 import scala.collection.Set
 import scala.reflect.ClassTag
 
-class ClusterStats(implicit ctx: ActorContext[MemberUp]) {
+class ClusterStats(implicit ctx: ActorSystem) {
 
   //val memberListener: ActorRef = ctx.spawn()
 
-  implicit val ec = ctx.system.toClassic.dispatcher
+  implicit val ec = ctx
 
   val members =
     get {

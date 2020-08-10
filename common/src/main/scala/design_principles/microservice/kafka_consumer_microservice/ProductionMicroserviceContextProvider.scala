@@ -1,5 +1,6 @@
 package design_principles.microservice.kafka_consumer_microservice
 
+import akka.actor.ActorSystem
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter._
@@ -10,29 +11,29 @@ import kafka.{KafkaMessageProcessorRequirements, TopicListener}
 import monitoring.KamonMonitoring
 
 object ProductionMicroserviceContextProvider {
-  def getContext(ctx: ActorContext[MemberUp])(visitor: KafkaConsumerMicroserviceRequirements => Route): Route = {
+  def getContext(ctx: ActorSystem)(visitor: KafkaConsumerMicroserviceRequirements => Route): Route = {
     val monitoring = new KamonMonitoring
 
-    val rebalancerListener: ActorRef[ConsumerRebalanceEvent] =
+    /*val rebalancerListener: ActorRef[ConsumerRebalanceEvent] =
       ctx.spawn(
         TopicListener(
           typeKeyName = "rebalancerListener",
           monitoring
         ),
         name = "rebalancerListener"
-      )
+      )*/
 
     val transactionRequirements: KafkaMessageProcessorRequirements =
       KafkaMessageProcessorRequirements.productionSettings(
-        rebalancerListener.toClassic,
+        null, //rebalancerListener.toClassic,
         monitoring,
-        ctx.system.toClassic
+        ctx
       )
 
     visitor(
       KafkaConsumerMicroserviceRequirements(
         monitoring = monitoring,
-        executionContext = ctx.system.toClassic.dispatcher,
+        executionContext = ctx.dispatcher,
         ctx = ctx,
         kafkaMessageProcessorRequirements = transactionRequirements
       )

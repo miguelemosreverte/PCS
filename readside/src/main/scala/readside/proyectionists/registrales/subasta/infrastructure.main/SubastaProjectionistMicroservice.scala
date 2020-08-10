@@ -17,7 +17,9 @@ import readside.proyectionists.registrales.subasta.SubastaProjectionHandler
 object SubastaProjectionistMicroservice extends CassandraProjectionistMicroservice {
   override def route(context: CassandraProjectionistMicroserviceRequirements): Route = {
     val monitoring = context.monitoring
-    val system = context.ctx.system
+    import akka.actor.typed.scaladsl.adapter._
+    val system = context.ctx.toTyped
+
     val projectionist = SubastaProjectionHandler(monitoring, system)
     projectionist.run()
     projectionist.route

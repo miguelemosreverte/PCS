@@ -26,8 +26,6 @@ metadata:
   namespace: copernico
 spec:
   replicas: 3
-  terminationGracePeriodSeconds: 30
-  restartPolicy: Always
   selector:
     matchLabels:
       app: readside-cluster
@@ -41,6 +39,8 @@ spec:
       labels:
         app: readside-cluster
     spec:
+      terminationGracePeriodSeconds: 30
+      restartPolicy: Always
       serviceAccountName: readside-cluster
       containers:
         - image: readside/readside:1.0

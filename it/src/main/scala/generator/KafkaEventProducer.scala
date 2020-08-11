@@ -48,10 +48,10 @@ object KafkaEventProducer {
         .withBootstrapServers("0.0.0.0:9092")
 
     val generator: Generator[_] = topic match {
-      case "DGR-COP-OBLIGACIONES-TRI" => new ObligacionesTriGenerator()
-      case "DGR-COP-OBLIGACIONES-ANT" => new ObligacionesAntGenerator()
+      // case "DGR-COP-OBLIGACIONES-TRI" => new ObligacionesTriGenerator()
+      // case "DGR-COP-OBLIGACIONES-ANT" => new ObligacionesAntGenerator()
       case "DGR-COP-SUJETO-TRI" => new SujetoTriGenerator()
-      case "DGR-COP-SUJETO-ANT" => new SujetoAntGenerator()
+      // case "DGR-COP-SUJETO-ANT" => new SujetoAntGenerator()
     }
 
     def produce(keyValue: KafkaKeyValue) = {
@@ -62,7 +62,7 @@ object KafkaEventProducer {
     val done: Future[Done] =
       akka.stream.scaladsl.Source
         .fromIterator[Int](() => (From to To).iterator)
-        .throttle(1, 0.1 seconds)
+        // .throttle(1, 0.1 seconds)
         .map(i => generator.nextKafkaKeyValue(i))
         .map(produce)
         .runWith(Producer.plainSink(producerSettings))

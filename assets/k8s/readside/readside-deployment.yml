@@ -16,6 +16,10 @@ spec:
       port: 8082
       targetPort: 8082
       name: api
+    - protocol: TCP
+      port: 9095
+      targetPort: 9095
+      name: monitoring
 
 ---
 
@@ -25,7 +29,7 @@ metadata:
   name: readside
   namespace: copernico
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: readside-cluster
@@ -47,6 +51,8 @@ spec:
           imagePullPolicy: Never
           name: readside-cluster
           env:
+            - name: REQUIRED_CONTACT_POINTS
+              value: "3"
             - name: KAFKA_BROKERS_LIST
               value: "kafka-internal:29092"
             - name: CASSANDRA_CONTACT_POINTS
@@ -58,11 +64,12 @@ spec:
             - name: MANAGEMENT_PORT
               value: "8559"
             - name: CLUSTER_IP
-              value: "127.0.0.1"
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
             - name: CLUSTER_PORT
               value: "2554"
-            - name: SEED_NODES
-              value: "akka://PersonClassificationServiceReadSide@127.0.0.1:2554"
             - name: HTTP_PORT
               value: "8082"
             - name: POD_APP_NAME
@@ -78,6 +85,8 @@ spec:
               containerPort: 8082
             - name: management
               containerPort: 8559
+            - name: monitoring
+              containerPort: 9095
           #health
           readinessProbe:
             httpGet:

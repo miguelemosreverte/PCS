@@ -7,8 +7,7 @@ import scala.util.{Failure, Success}
 
 import akka.Done
 import akka.actor.ActorSystem
-import akka.stream.alpakka.cassandra.CassandraSessionSettings
-import akka.stream.alpakka.cassandra.scaladsl.{CassandraSession, CassandraSessionRegistry}
+import akka.stream.alpakka.cassandra.scaladsl.CassandraSession
 import ddd.ReadSideProjection
 import design_principles.actor_model.Event
 import org.slf4j.LoggerFactory
@@ -19,10 +18,6 @@ class CassandraWriteProduction(implicit session: CassandraSession) extends Cassa
   def writeState[E <: Event](
       state: ReadSideProjection[E]
   )(implicit system: ActorSystem, ec: ExecutionContext): Future[Done] = {
-
-    val sessionSettings = CassandraSessionSettings.create()
-    val session = CassandraSessionRegistry.get(system).sessionFor(sessionSettings)
-
     val result = for {
       boundStmt <- state.prepareStatement(session)
       done <- session.executeWrite(boundStmt.setTimeout(Duration.ofSeconds(5)))

@@ -1,8 +1,6 @@
 package akka.projections.cassandra
 
 import akka.actor.typed.ActorSystem
-import akka.actor.typed.scaladsl.ActorContext
-import akka.cluster.ClusterEvent.MemberUp
 import akka.cluster.sharding.typed.scaladsl.ShardedDaemonProcess
 import akka.cluster.sharding.typed.{ClusterShardingSettings, ShardedDaemonProcessSettings}
 import akka.projection.ProjectionBehavior

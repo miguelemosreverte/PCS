@@ -1,11 +1,9 @@
 package design_principles.microservice
 
-import akka.actor.ActorSystem
-import akka.actor.typed.scaladsl.ActorContext
-import akka.cluster.ClusterEvent.MemberUp
-import monitoring.Monitoring
-
 import scala.concurrent.ExecutionContext
+
+import akka.actor.ActorSystem
+import monitoring.Monitoring
 
 trait MicroserviceRequirements {
   def monitoring: Monitoring

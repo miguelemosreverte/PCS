@@ -1,17 +1,16 @@
-
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: k8s-apps-http
+  name: servicemonitor-readside-cluster
   labels:
-    k8s-apps: http
+    release: prometheus
+    app: readside-cluster
 spec:
   selector:
     matchLabels:
       app: readside-cluster
-  namespaceSelector:
-    matchNames:
-      - copernico
+  # namespaceSelector:
+  #   matchNames:
+  #     - copernico
   endpoints:
     - port: monitoring
-      interval: 15s

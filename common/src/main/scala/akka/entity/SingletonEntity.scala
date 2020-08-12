@@ -15,9 +15,10 @@ trait SingletonEntity[Requirements] extends ClusterEntity[Requirements] {
 
   def props(requirements: Requirements): Props
 
-  def startWithRequirements(requirements: Requirements)(implicit system: ActorSystem): ActorRef = {
+  def startWithRequirements(requirements: Requirements,
+                            dispatcher: Option[String] = None)(implicit system: ActorSystem): ActorRef = {
 
-    import system.dispatcher
+    implicit val ec = system.dispatcher
 
     import scala.concurrent.duration._
     implicit val timeout: Timeout = Timeout(10 seconds)

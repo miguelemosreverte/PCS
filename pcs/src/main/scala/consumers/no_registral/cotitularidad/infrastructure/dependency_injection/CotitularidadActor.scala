@@ -1,6 +1,6 @@
 package consumers.no_registral.cotitularidad.infrastructure.dependency_injection
 
-import akka.actor.Props
+import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.actor.Status.Success
 import akka.entity.ShardedEntity
 import akka.persistence.{PersistentActor, RecoveryCompleted, SnapshotOffer}
@@ -157,4 +157,5 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
 
 object CotitularidadActor extends ShardedEntity[KafkaMessageProcessorRequirements] {
   def props(requirements: KafkaMessageProcessorRequirements): Props = Props(new CotitularidadActor(requirements))
+
 }

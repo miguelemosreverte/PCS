@@ -10,12 +10,17 @@ trait ShardedEntity[Requirements] extends ClusterEntity[Requirements] {
 
   def props(requirements: Requirements): Props
 
-  def startWithRequirements(requirements: Requirements)(
+  def startWithRequirements(requirements: Requirements, dispatcher: Option[String] = None)(
       implicit
       system: ActorSystem
   ): ActorRef = ClusterSharding(system).start(
     typeName = typeName,
-    entityProps = props(requirements),
+    entityProps = {
+      dispatcher match {
+        case Some(value) => props(requirements).withDispatcher(value)
+        case None => props(requirements)
+      }
+    },
     settings = ClusterShardingSettings(system),
     extractEntityId = extractEntityId,
     extractShardId = extractShardId(3)

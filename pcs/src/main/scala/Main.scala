@@ -1,3 +1,5 @@
+import java.util.concurrent.{ExecutorService, Executors}
+
 import com.typesafe.config.ConfigFactory
 import design_principles.microservice.Microservice
 import design_principles.microservice.kafka_consumer_microservice.KafkaConsumerMicroservice
@@ -9,6 +11,9 @@ object Main extends App {
   val ip = config.getString("http.ip")
   val port = config.getInt("http.port")
   val actorSystemName = "PersonClassificationService"
+
+  val cores = 8
+  val pool: ExecutorService = Executors.newFixedThreadPool(cores)
 
   startMicroservices(microservices, ip, port, actorSystemName)
 

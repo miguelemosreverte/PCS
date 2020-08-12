@@ -2,7 +2,7 @@
 docker-compose -f assets/docker-compose/dev-lite/docker-compose.yml build grafana
 docker-compose -f assets/docker-compose/dev-lite/docker-compose.yml up -d
 
-sleep 30
+sleep 60
 
 sh assets/scripts/cassandra/setup_cassandra.sh
 

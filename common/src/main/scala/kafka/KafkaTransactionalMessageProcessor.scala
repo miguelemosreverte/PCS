@@ -47,10 +47,11 @@ class KafkaTransactionalMessageProcessor(
     val rebalancerListener = transactionRequirements.rebalancerListener
 
     import system.dispatcher
-    val subscription = Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerListener)
+      val subscription = Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerListener)
 
     val stream = Transactional
-      .source(consumer, subscription) //.throttle(THROTTLE_ELEMENTS, THROTTLE_ELEMENTS_PER millis)
+      .source(consumer, subscription)
+      .throttle(THROTTLE_ELEMENTS, THROTTLE_ELEMENTS_PER millis)
       .mapAsync(CONSUMER_PARALLELISM) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
         val message = msg
 

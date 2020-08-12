@@ -8,5 +8,7 @@ trait ClusterEntity[Requirements] {
 
   def props(requirements: Requirements): Props
 
-  def startWithRequirements(requirements: Requirements)(implicit system: ActorSystem): ActorRef
+  def startWithRequirements(requirements: Requirements, dispatcher: Option[String])(
+      implicit system: ActorSystem
+  ): ActorRef
 }

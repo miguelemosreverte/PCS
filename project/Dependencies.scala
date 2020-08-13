@@ -85,6 +85,8 @@ object Dependencies {
       "com.lightbend.akka.management" %% "akka-management-cluster-bootstrap" % akkaManagementVersion ::
       //"com.typesafe.akka" %% "akka-stream-kafka-cluster-sharding" % "2.0.4" ::
       SBR :: akkaStreamKafka ::
+      "io.aeron" % "aeron-driver" % "1.27.0" ::
+      "io.aeron" % "aeron-client" % "1.27.0" ::
       Nil
   }
 

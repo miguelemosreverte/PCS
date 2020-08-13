@@ -53,7 +53,7 @@ abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[
     val tagsWithShardId = tags map { tag =>
       s"$tag-$shardId"
     }
-    persist(if (tags.nonEmpty) Tagged(event, tagsWithShardId) else event) { _ =>
+    persistAsync(if (tags.nonEmpty) Tagged(event, tagsWithShardId) else event) { _ =>
       logger.debug(s"[$persistenceId] Persist event | $event")
       persistedCounter.increment()
       monitoring.counter(s"$name-persisted-${utils.Inference.getSimpleName(event.getClass.getName)}").increment()

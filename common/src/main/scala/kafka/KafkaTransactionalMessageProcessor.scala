@@ -1,15 +1,15 @@
 package kafka
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.kafka.scaladsl.Transactional
 import akka.kafka.{ConsumerMessage, ProducerMessage, Subscriptions}
 import akka.stream.KillSwitches
 import akka.stream.scaladsl.{Keep, Sink}
+import design_principles.threading.bulkhead_pattern.bulkheads.TransactionBulkhead
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.LoggerFactory
 
@@ -33,6 +33,7 @@ class KafkaTransactionalMessageProcessor(
       algorithm: String => Future[Seq[String]]
   ): (KillSwitch, Future[Done]) = {
 
+    // TODO maybe remove because redundant?
     val ProcessedMessagesCounter = transactionRequirements.monitoring.counter(
       s"$SOURCE_TOPIC-ProcessedMessagesCounter"
     )
@@ -46,18 +47,21 @@ class KafkaTransactionalMessageProcessor(
     val producer = transactionRequirements.producer
     val rebalancerListener = transactionRequirements.rebalancerListener
 
-    import system.dispatcher
     val subscription = Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerListener)
+
+    implicit val executionContext: ExecutionContext =
+      design_principles.threading.bulkhead_pattern.bulkheads.TransactionBulkhead.executionContext
 
     val stream = Transactional
       .source(consumer, subscription) //.throttle(THROTTLE_ELEMENTS, THROTTLE_ELEMENTS_PER millis)
-      .mapAsync(CONSUMER_PARALLELISM) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
+      .mapAsync(1) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
         val message = msg
 
         val input: String = message.record.value
 
         log.debug(message.record.value)
 
+        // TODO que el algoritmo no devuelva future sino future de either
         algorithm(input)
           .map { a: Seq[String] =>
             Right(message -> a)
@@ -75,7 +79,7 @@ class KafkaTransactionalMessageProcessor(
       .map {
 
         case Left((message, cause)) =>
-          log.error(cause)
+          //log.error(cause)
           RejectedMessagesCounter.increment()
           val output = Seq(message.record.value)
           ProducerMessage.multi(

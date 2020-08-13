@@ -6,6 +6,11 @@ metadata:
     release: prometheus
     app: pcs-cluster
 spec:
+
+  namespaceSelector:
+    matchNames:
+      - copernico
+      - default
   selector:
     matchLabels:
       app: pcs-cluster

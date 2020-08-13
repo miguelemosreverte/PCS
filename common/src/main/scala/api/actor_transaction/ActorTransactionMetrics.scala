@@ -11,7 +11,7 @@ import serialization.SerializationError
 
 abstract class ActorTransactionMetrics(
     monitoring: Monitoring
-)(implicit ec: ExecutionContext) {
+) {
 
   final private val metricPrefix = "actor-transaction"
   final private val controllerId = api.Utils.Transformation.to_underscore(this.getClass.getSimpleName)
@@ -21,24 +21,21 @@ abstract class ActorTransactionMetrics(
 
   private final val log = LoggerFactory.getLogger(this.getClass)
 
-  final protected def recordRequests(future: Future[Response.SuccessProcessing]): Unit =
+  final protected def recordRequests(): Unit =
     requests.increment()
-  final protected def recordLatency(future: Future[Response.SuccessProcessing]): Unit =
-    latency.recordFuture(future)
-  final protected def recordErrors(future: Future[Response.SuccessProcessing]): Unit =
-    future onComplete {
-      case Success(_) => ()
-      case Failure(e) =>
-        e match {
-          case e: SerializationError =>
-            errors.increment()
-            log.error(e.getMessage)
-          case e: AskTimeoutException =>
-            errors.increment()
-            log.error(e.getMessage)
-          case unexpectedException: Throwable =>
-            errors.increment()
-            log.error(unexpectedException.getMessage)
-        }
+  final protected def recordLatency(milliseconds: Long): Unit =
+    latency.record(milliseconds)
+  final protected def recordErrors(throwable: Throwable): Unit =
+    throwable match {
+      case e: SerializationError =>
+        errors.increment()
+        log.error(e.getMessage)
+      case e: AskTimeoutException =>
+        errors.increment()
+        log.error(e.getMessage)
+      case unexpectedException: Throwable =>
+        errors.increment()
+        log.error(unexpectedException.getMessage)
     }
+
 }

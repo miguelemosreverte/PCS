@@ -1,4 +1,4 @@
-import java.util.concurrent.{ExecutorService, Executors}
+import java.util.concurrent.{ExecutorService, Executors, ForkJoinPool}
 
 import com.typesafe.config.ConfigFactory
 import design_principles.microservice.Microservice
@@ -14,6 +14,8 @@ object Main extends App {
 
   val cores = 8
   val pool: ExecutorService = Executors.newFixedThreadPool(cores)
+
+  val forkJoinPool = new ForkJoinPool(2)
 
   startMicroservices(microservices, ip, port, actorSystemName)
 

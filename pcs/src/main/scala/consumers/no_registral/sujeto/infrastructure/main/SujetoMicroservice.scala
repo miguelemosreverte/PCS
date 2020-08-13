@@ -26,7 +26,7 @@ object SujetoMicroservice extends KafkaConsumerMicroservice {
     import akka.actor.typed.scaladsl.adapter._
     implicit val system: ActorSystem = ctx
     implicit val kafkaProcesorRequirements: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
-    implicit val actor: ActorRef = SujetoActor.startWithRequirements(monitoring) //, Some("sujeto-actor-dispatcher"))
+    implicit val actor: ActorRef = SujetoActor.startWithRequirements(monitoring, Some("sujeto-actor-dispatcher"))
 
     Seq(
       SujetoStateAPI(actor, monitoring).route,

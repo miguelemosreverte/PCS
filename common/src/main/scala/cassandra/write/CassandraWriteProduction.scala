@@ -1,7 +1,5 @@
 package cassandra.write
 
-import java.time.Duration
-
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
@@ -20,7 +18,7 @@ class CassandraWriteProduction(implicit session: CassandraSession) extends Cassa
   )(implicit system: ActorSystem, ec: ExecutionContext): Future[Done] = {
     val result = for {
       boundStmt <- state.prepareStatement(session)
-      done <- session.executeWrite(boundStmt.setTimeout(Duration.ofSeconds(5)))
+      done <- session.executeWrite(boundStmt)
     } yield done
     result.onComplete {
       case Failure(throwable) =>

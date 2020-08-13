@@ -46,15 +46,14 @@ class KafkaTransactionalMessageProcessor(
     val consumer = transactionRequirements.consumer
     val producer = transactionRequirements.producer
     val rebalancerListener = transactionRequirements.rebalancerListener
-
     val subscription = Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerListener)
-
     implicit val executionContext: ExecutionContext =
       design_principles.threading.bulkhead_pattern.bulkheads.TransactionBulkhead.executionContext
 
     val stream = Transactional
-      .source(consumer, subscription) //.throttle(THROTTLE_ELEMENTS, THROTTLE_ELEMENTS_PER millis)
-      .mapAsync(1) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
+      .source(consumer, subscription)
+      .throttle(THROTTLE_ELEMENTS, THROTTLE_ELEMENTS_PER millis)
+      .mapAsync(CONSUMER_PARALLELISM) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
         val message = msg
 
         val input: String = message.record.value

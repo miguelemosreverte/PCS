@@ -31,3 +31,5 @@ target
 assets/docker-compose/dev-lite/cassandra/config/cassandra.yaml
 # archivos referenciados por la documentación
 assets/examples/DGR-COP-OBLIGACIONES-TRI.json
+
+./pulumi

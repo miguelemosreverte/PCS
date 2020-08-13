@@ -29,7 +29,7 @@ abstract class BasePersistentShardedTypedActor[
     Entity(TypeKey) { context =>
       persistentEntity(context.entityId, context.shard)
     }.withAllocationStrategy(new ExternalShardAllocationStrategy(system, TypeKey.name))
-      .withMessageExtractor(new LocalizedProcessingMessageExtractor[ActorMessages](120))
+      .withMessageExtractor(new LocalizedProcessingMessageExtractor[ActorMessages](30))
       .withSettings(ClusterShardingSettings(system))
   )
 

@@ -17,7 +17,7 @@ import scala.util.{Failure, Success}
 abstract class ActorTransaction[ExternalDto](
     monitoring: Monitoring
 )(implicit format: Format[ExternalDto], c: ClassTag[ExternalDto])
-    extends ActorTransactionMetrics(monitoring) {
+    extends ActorTransactionMetrics(monitoring)(ActorBulkhead.executionContext) {
 
   val topic: String
   final implicit val executionContext = ActorBulkhead.executionContext
@@ -26,7 +26,6 @@ abstract class ActorTransaction[ExternalDto](
 
   final def transaction(input: String): Future[Response.SuccessProcessing] = {
     recordRequests()
-    val now = LocalDateTime.now().getNano
     processInput(input) match {
       case Left(serializationError) =>
         recordErrors(serializationError)
@@ -38,10 +37,9 @@ abstract class ActorTransaction[ExternalDto](
           case Failure(exception) =>
             recordErrors(exception)
           case Success(value) =>
-            val after = LocalDateTime.now().getNano
-            recordLatency(after - now)
             value
         }
+        recordLatency(future)
         future
     }
 

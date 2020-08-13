@@ -11,7 +11,7 @@ import serialization.SerializationError
 
 abstract class ActorTransactionMetrics(
     monitoring: Monitoring
-) {
+)(implicit ec: ExecutionContext) {
 
   final private val metricPrefix = "actor-transaction"
   final private val controllerId = api.Utils.Transformation.to_underscore(this.getClass.getSimpleName)
@@ -23,8 +23,8 @@ abstract class ActorTransactionMetrics(
 
   final protected def recordRequests(): Unit =
     requests.increment()
-  final protected def recordLatency(milliseconds: Long): Unit =
-    latency.record(milliseconds)
+  final protected def recordLatency(future: Future[Response.SuccessProcessing]): Unit =
+    latency.recordFuture(future)
   final protected def recordErrors(throwable: Throwable): Unit =
     throwable match {
       case e: SerializationError =>

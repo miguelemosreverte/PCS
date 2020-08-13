@@ -72,7 +72,7 @@ class MessageTestkitUtils(sujeto: ActorRef, cotitularidadActor: ActorRef, messag
       // SUJETO CONSUMERS
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-SUJETO-TRI",
-        SujetoTributarioTransaction(sujeto, monitoring)(ec)
+        SujetoTributarioTransaction(sujeto, monitoring)
       )
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-SUJETO-ANT",

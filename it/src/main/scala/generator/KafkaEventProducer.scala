@@ -16,8 +16,7 @@ import no_registrales.sujeto.{SujetoAntGenerator, SujetoTriGenerator}
 import kafka.KafkaMessageShardProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 
-object KafkaEventProducer {
-
+object KafkaEventProducer
   def main(args: Array[String]): Unit = {
 
     def isInt(s: String): Boolean = s.matches("""\d+""")
@@ -56,7 +55,7 @@ object KafkaEventProducer {
 
     def produce(keyValue: KafkaKeyValue) = {
       println(keyValue.aggregateRoot)
-      KafkaMessageShardProducerRecord.producerRecord(topic, 120, keyValue.aggregateRoot, keyValue.json)
+      KafkaMessageShardProducerRecord.producerRecord(topic, 30, keyValue.aggregateRoot, keyValue.json)
     }
 
     val done: Future[Done] =

@@ -16,7 +16,7 @@ import serialization.decode
 import scala.io.Source
 import scala.reflect.ClassTag
 
-case class SujetoTributarioTransaction(actorRef: ActorRef, monitoring: Monitoring) //(implicit ec: ExecutionContext)
+case class SujetoTributarioTransaction(actorRef: ActorRef, monitoring: Monitoring)(implicit ec: ExecutionContext)
     extends ActorTransaction[SujetoTri](monitoring) {
 
   val topic = "DGR-COP-SUJETO-TRI"

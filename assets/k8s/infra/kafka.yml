@@ -32,6 +32,7 @@ spec:
       port: 29092
       targetPort: 29092
 
+
 ---
 apiVersion: apps/v1
 kind: Deployment

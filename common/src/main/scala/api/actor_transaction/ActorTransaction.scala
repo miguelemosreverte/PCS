@@ -16,12 +16,10 @@ import scala.util.{Failure, Success}
 
 abstract class ActorTransaction[ExternalDto](
     monitoring: Monitoring
-)(implicit format: Format[ExternalDto], c: ClassTag[ExternalDto])
-    extends ActorTransactionMetrics(monitoring)(ActorBulkhead.executionContext) {
+)(implicit executionContext: ExecutionContext, format: Format[ExternalDto], c: ClassTag[ExternalDto])
+    extends ActorTransactionMetrics(monitoring)(executionContext) {
 
   val topic: String
-  final implicit val executionContext = ActorBulkhead.executionContext
-
   def processCommand(registro: ExternalDto): Future[Response.SuccessProcessing]
 
   final def transaction(input: String): Future[Response.SuccessProcessing] = {

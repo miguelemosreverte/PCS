@@ -1,39 +1,39 @@
-#!/bin/bash
 
-CYAN="\033[36m"
-NORMAL="\033[0m"
 
-message() {
-  echo -e "${CYAN}[$1]${NORMAL}"
-}
 
-message "Setting up kubernetes context and namespace..."
-# kubectl config use-context docker-for-desktop
-#eval $(minikube docker-env)
-# sbt pcs/docker:publishLocal
-# sbt readside/docker:publishLocal
-# docker save pcs/pcs:1.0 > pcs.tar
-# microk8s ctr image import pcs.tar
-# docker save readside/readside:1.0 > readside.tar
-# microk8s ctr image import readside.tar
 
-kubectl apply -f assets/k8s/namespace.yml
-kubectl config set-context --current --namespace=copernico
-message "Kubernetes setup completed."
+aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 099925565557.dkr.ecr.us-west-2.amazonaws.com
 
-message "Starting up kafka"
-kubectl apply -f assets/k8s/infra/kafka.yml
-message "kafka started up"
 
-helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com
-helm install kafka --namespace copernico incubator/kafka --set external.enabled=true
 
-message "Starting up cassandra"
+git clone https://miguelemosreverte:Alatriste007@github.com/miguelemosreverte/PCS
+cd PCS
+sbt compile
+
+
+sbt pcs/docker:publishLocal
+docker tag pcs/pcs:1.0 099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest
+docker push 099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest
+
+kubectl apply assets/k8s/infra/kafka.yml
 kubectl apply -f assets/k8s/infra/cassandra.yml
-message "cassandra started up"
 
-message "awainting for cassandra to be ready"
-sleep 30
+$(kubectl get pod -l "app=kafka" -o jsonpath='{.items[0].metadata.name}')
+
+
+export kafkaPod=$(kubectl get pod -l "app=kafka" -o jsonpath='{.items[0].metadata.name}')
+export createSujetoTri='kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 120 --topic DGR-COP-SUJETO-TRI'
+
+kubectl exec $kafkaPod -- $createSujetoTri
+
+export kafka_cluster_ip=$(kubectl get svc kafka-internal -ojsonpath='{.spec.clusterIP}')
+
+sbt 'it/runMain generator.KafkaEventProducer $(kafka_cluster_ip):29092 DGR-COP-SUJETO-TRI 1 150000 '
+
+curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+helm repo add stable https://kubernetes-charts.storage.googleapis.com
+helm install prometheus stable/prometheus-operator --namespace copernico
+
 
 message "Setting up cassandra"
 export pod_name=$(kubectl get pod --selector app=cassandra | grep cassandra | cut -d' ' -f 1)
@@ -71,25 +71,9 @@ kubectl exec -i $pod_name cqlsh < assets/scripts/cassandra/domain/read_side/tabl
 kubectl exec -i $pod_name cqlsh < assets/scripts/cassandra/domain/read_side/tables/buc_etapas_procesales.cql
 kubectl exec -i $pod_name cqlsh < assets/scripts/cassandra/domain/read_side/tables/buc_param_plan.cql
 kubectl exec -i $pod_name cqlsh < assets/scripts/cassandra/domain/read_side/tables/buc_param_recargo.cql
-message "cassandra setup completed."
 
 
-message "Starting up write side"
+envsubst < assets/k8s/pcs/pcs-deployment.yml | kubectl apply -f -
 kubectl apply -f assets/k8s/pcs/pcs-rbac.yml
 kubectl apply -f assets/k8s/pcs/pcs-service.yml
-kubectl apply -f assets/k8s/pcs/pcs-deployment.yml
 kubectl apply -f assets/k8s/pcs/pcs-service-monitor.yml
-
-#helm install prometheus stable/prometheus-operator --namespace copernico
-# grafana password is prom-operator
-#kubectl apply -f assets/k8s/pcs/pcs-service-monitor.yml
-
-
-message "write side started"
-
-message "Starting up read side"
-kubectl apply -f assets/k8s/readside/readside-rbac.yml
-kubectl apply -f assets/k8s/readside/readside-service.yml
-kubectl apply -f assets/k8s/readside/readside-deployment.yml
-kubectl apply -f assets/k8s/readside/readside-service-monitor.yml
-message "read side started"

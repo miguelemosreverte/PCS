@@ -10,16 +10,12 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app: pcs-cluster
+    - pod: kafka-0
   ports:
     - protocol: TCP
       port: 8081
       targetPort: 8081
       name: api
-    - protocol: TCP
-      port: 9095
-      targetPort: 9095
-      name: monitoring
 
 
 ---
@@ -48,8 +44,8 @@ spec:
       restartPolicy: Always
       serviceAccountName: pcs-cluster
       containers:
-        - image: pcs/pcs:1.0
-          imagePullPolicy: Never
+        - image: $IMAGE # 099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest
+          imagePullPolicy: Always
           name: pcs-cluster
           env:
             - name: REQUIRED_CONTACT_POINTS

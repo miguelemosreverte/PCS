@@ -4,6 +4,6 @@ import design_principles.threading.bulkhead_pattern.BulkheadPattern
 
 import scala.concurrent.ExecutionContext
 
-case object ActorBulkhead extends BulkheadPattern {
+case class ActorBulkhead() extends BulkheadPattern {
   def executionContext: ExecutionContext = BulkheadPattern(BulkheadPattern.halfOfTheAvailableThreads)
 }

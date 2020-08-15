@@ -16,20 +16,20 @@ import no_registrales.sujeto.{SujetoAntGenerator, SujetoTriGenerator}
 import kafka.KafkaMessageShardProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 
-object KafkaEventProducer
+object KafkaEventProducer {
   def main(args: Array[String]): Unit = {
 
     def isInt(s: String): Boolean = s.matches("""\d+""")
 
     args.toList match {
-      case topic :: from :: to :: Nil if isInt(from) && isInt(to) =>
-        produce(topic, from.toInt, to.toInt)
+      case bootstrapServer :: topic :: from :: to :: Nil if isInt(from) && isInt(to) =>
+        produce(topic, from.toInt, to.toInt, bootstrapServer)
       case _ =>
         throw new IllegalArgumentException("usage: <topic> <from> <to> -- example: DGR-COP-ACTIVIDADES 1 1000")
     }
   }
 
-  def produce(topic: String, From: Int, To: Int): Unit = {
+  def produce(topic: String, From: Int, To: Int, bootstrapServer: String = "0.0.0.0:9092"): Unit = {
 
     implicit val system: ActorSystem = ActorSystem(
       "KafkaEventProducer",
@@ -44,7 +44,7 @@ object KafkaEventProducer
 
     val producerSettings: ProducerSettings[String, String] =
       ProducerSettings(config, new StringSerializer, new StringSerializer)
-        .withBootstrapServers("0.0.0.0:9092")
+        .withBootstrapServers(bootstrapServer)
 
     val generator: Generator[_] = topic match {
       // case "DGR-COP-OBLIGACIONES-TRI" => new ObligacionesTriGenerator()

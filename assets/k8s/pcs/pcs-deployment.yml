@@ -51,7 +51,7 @@ spec:
         kind: akka
       containers:
         - image: $IMAGE
-          imagePullPolicy: Never
+          imagePullPolicy: Always
           name: pcs-cluster
           env:
             - name: REQUIRED_CONTACT_POINTS

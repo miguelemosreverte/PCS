@@ -27,10 +27,11 @@ object SujetoMicroservice extends KafkaConsumerMicroservice {
     implicit val system: ActorSystem = ctx
     implicit val kafkaProcesorRequirements: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
     implicit val actor: ActorRef = SujetoActor.startWithRequirements(monitoring) //, Some("sujeto-actor-dispatcher"))
-
+    val sujetoTri = SujetoTributarioTransaction(actor, monitoring)
+    sujetoTri.startAnyways()
     Seq(
       SujetoStateAPI(actor, monitoring).route,
-      SujetoTributarioTransaction(actor, monitoring).route,
+      sujetoTri.route,
       SujetoNoTributarioTransaction(actor, monitoring).route
     ) reduce (_ ~ _)
   }

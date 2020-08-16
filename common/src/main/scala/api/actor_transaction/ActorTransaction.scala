@@ -7,7 +7,7 @@ import scala.reflect.ClassTag
 import akka.http.scaladsl.server.Route
 import design_principles.actor_model.Response
 import design_principles.threading.bulkhead_pattern.bulkheads.ActorBulkhead
-import kafka.KafkaMessageProcessorRequirements
+import kafka.{KafkaMessageProcessorRequirements, KafkaTransactionalMessageProcessor}
 import monitoring.Monitoring
 import play.api.libs.json.Format
 import serialization.{decode, decode2}
@@ -48,4 +48,14 @@ abstract class ActorTransaction[ExternalDto](
 
   final def route(implicit system: akka.actor.ActorSystem, requirements: KafkaMessageProcessorRequirements): Route =
     new ActorTransactionController(this, requirements)(system).route
+
+  final def startAnyways()(implicit system: akka.actor.ActorSystem,
+                           requirements: KafkaMessageProcessorRequirements): Unit = {
+    new KafkaTransactionalMessageProcessor(requirements)
+      .run(topic, s"${topic}SINK", message => {
+        transaction(message).map { output =>
+          Seq(output.toString)
+        }
+      })
+  }
 }

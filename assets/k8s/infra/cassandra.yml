@@ -33,6 +33,8 @@ spec:
       labels:
         app: cassandra
     spec:
+      nodeSelector:
+        kind: cassandra
       containers:
         - name: cassandra
           image: cassandra

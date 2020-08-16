@@ -26,7 +26,7 @@ helm repo add stable https://kubernetes-charts.storage.googleapis.com
 helm install prometheus stable/prometheus-operator --namespace copernico
 
 
-sleep 20
+sleep 60
 
 export kafkaPod=$(kubectl get pod -l "app=kafka" -o jsonpath='{.items[0].metadata.name}')
 export createSujetoTri='kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 120 --topic DGR-COP-SUJETO-TRI'
@@ -70,11 +70,12 @@ kubectl exec -i $pod_name cqlsh < assets/scripts/cassandra/domain/read_side/tabl
 kubectl exec -i $pod_name cqlsh < assets/scripts/cassandra/domain/read_side/tables/buc_param_recargo.cql
 
 export REPLICAS=3
+export IMAGE=099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest
 kubectl apply -f assets/k8s/pcs/pcs-rbac.yml
 envsubst < assets/k8s/pcs/pcs-deployment.yml | kubectl apply -f -
 kubectl apply -f assets/k8s/pcs/pcs-service.yml
 kubectl apply -f assets/k8s/pcs/pcs-service-monitor.yml
 
 export kafka_cluster_ip=$(kubectl get svc kafka-internal -ojsonpath='{.spec.clusterIP}')
-sbt 'it/runMain generator.KafkaEventProducer $(kafka_cluster_ip):29092 DGR-COP-SUJETO-TRI 1 150000 '
+sbt 'it/runMain generator.KafkaEventProducer '"$(kafka_cluster_ip)"':29092 DGR-COP-SUJETO-TRI 1 150000 '
 

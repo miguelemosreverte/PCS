@@ -51,6 +51,8 @@ spec:
       labels:
         app: kafka
     spec:
+      nodeSelector:
+        kind: kafka
       containers:
         - name: kafka
           image: confluentinc/cp-enterprise-kafka:5.4.0

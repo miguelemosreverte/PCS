@@ -47,6 +47,8 @@ spec:
       terminationGracePeriodSeconds: 30
       restartPolicy: Always
       serviceAccountName: pcs-cluster
+      nodeSelector:
+        kind: akka
       containers:
         - image: $IMAGE
           imagePullPolicy: Never

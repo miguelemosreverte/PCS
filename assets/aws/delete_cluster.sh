@@ -1,1 +1,1 @@
-eksctl delete cluster --name prod
+eksctl delete cluster --name prod2

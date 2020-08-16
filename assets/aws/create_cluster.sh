@@ -7,9 +7,9 @@ eksctl create cluster \
 --region us-west-2  \
 --nodegroup-name linux-nodes  \
 --node-type t2.large  \
---nodes 2  \
---nodes-min 1  \
---nodes-max 4  \
+--nodes 5  \
+--nodes-min 5  \
+--nodes-max 5  \
 --ssh-access  \
 --ssh-public-key my-public-key.pub  \
 --managed

@@ -53,7 +53,7 @@ class KafkaTransactionalMessageProcessor(
     val stream = Transactional
       .source(consumer, subscription)
       .throttle(THROTTLE_ELEMENTS, THROTTLE_ELEMENTS_PER millis)
-      .mapAsync(8) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
+      .mapAsync(1024) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
         val message = msg
 
         val input: String = message.record.value

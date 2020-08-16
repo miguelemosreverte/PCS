@@ -2,11 +2,11 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: servicemonitor-pcs-cluster
+  namespace: copernico
   labels:
     release: prometheus
     app: pcs-cluster
 spec:
-
   namespaceSelector:
     matchNames:
       - copernico

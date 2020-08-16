@@ -33,6 +33,7 @@ class KafkaTransactionalMessageProcessor(
       algorithm: String => Future[Seq[String]]
   ): (KillSwitch, Future[Done]) = {
 
+    println(s"STARTED TRANSACTION FOR ${SOURCE_TOPIC}")
     // TODO maybe remove because redundant?
     val ProcessedMessagesCounter = transactionRequirements.monitoring.counter(
       s"$SOURCE_TOPIC-ProcessedMessagesCounter"
@@ -116,6 +117,8 @@ class KafkaTransactionalMessageProcessor(
 
     done.onComplete {
       case Success(_) =>
+        println(s"FINISHED TRANSACTION FOR ${SOURCE_TOPIC} | SUCCESS")
+
         log.warn(s"""
              |     Stream completed with success 
              |     This is caused by the HTTP endpoint /kafka/stop/$SOURCE_TOPIC
@@ -124,6 +127,7 @@ class KafkaTransactionalMessageProcessor(
           """.stripMargin)
         killSwitch.shutdown()
       case Failure(ex) =>
+        println(s"FINISHED TRANSACTION FOR ${SOURCE_TOPIC} | FAILURE")
         log.error(s"Stream completed with failure -- ${ex.getMessage}")
         killSwitch.shutdown()
         run(SOURCE_TOPIC, SINK_TOPIC, algorithm)

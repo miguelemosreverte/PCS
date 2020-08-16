@@ -2,9 +2,12 @@ package api.actor_transaction
 
 import java.time.LocalDateTime
 
+import akka.Done
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 import akka.http.scaladsl.server.Route
+import akka.stream.UniqueKillSwitch
 import design_principles.actor_model.Response
 import design_principles.threading.bulkhead_pattern.bulkheads.ActorBulkhead
 import kafka.{KafkaMessageProcessorRequirements, KafkaTransactionalMessageProcessor}
@@ -50,12 +53,11 @@ abstract class ActorTransaction[ExternalDto](
     new ActorTransactionController(this, requirements)(system).route
 
   final def startAnyways()(implicit system: akka.actor.ActorSystem,
-                           requirements: KafkaMessageProcessorRequirements): Unit = {
+                           requirements: KafkaMessageProcessorRequirements): (UniqueKillSwitch, Future[Done]) =
     new KafkaTransactionalMessageProcessor(requirements)
       .run(topic, s"${topic}SINK", message => {
         transaction(message).map { output =>
           Seq(output.toString)
         }
       })
-  }
 }

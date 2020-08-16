@@ -47,8 +47,7 @@ class KafkaTransactionalMessageProcessor(
     val producer = transactionRequirements.producer
     val rebalancerListener = transactionRequirements.rebalancerListener
     val subscription = Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerListener)
-    implicit val executionContext: ExecutionContext =
-      design_principles.threading.bulkhead_pattern.bulkheads.TransactionBulkhead.executionContext
+    import system.dispatcher
 
     val stream = Transactional
       .source(consumer, subscription)

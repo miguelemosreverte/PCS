@@ -75,10 +75,13 @@ message "cassandra setup completed."
 
 
 message "Starting up write side"
+export IMAGE=pcs/pcs:1.0
+export REPLICAS=2
+envsubst < assets/k8s/pcs/pcs-deployment.yml | kubectl apply -f -
 kubectl apply -f assets/k8s/pcs/pcs-rbac.yml
 kubectl apply -f assets/k8s/pcs/pcs-service.yml
-kubectl apply -f assets/k8s/pcs/pcs-deployment.yml
 kubectl apply -f assets/k8s/pcs/pcs-service-monitor.yml
+
 
 #helm install prometheus stable/prometheus-operator --namespace copernico
 # grafana password is prom-operator

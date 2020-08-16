@@ -3,6 +3,8 @@ package api.actor_transaction
 import java.time.LocalDateTime
 
 import akka.Done
+import akka.actor.Props
+import akka.cluster.Cluster
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
@@ -10,7 +12,7 @@ import akka.http.scaladsl.server.Route
 import akka.stream.UniqueKillSwitch
 import design_principles.actor_model.Response
 import design_principles.threading.bulkhead_pattern.bulkheads.ActorBulkhead
-import kafka.{KafkaMessageProcessorRequirements, KafkaTransactionalMessageProcessor}
+import kafka.{KafkaMessageProcessorRequirements, KafkaTransactionalMessageProcessor, TopicListener}
 import monitoring.Monitoring
 import play.api.libs.json.Format
 import serialization.{decode, decode2}
@@ -52,12 +54,23 @@ abstract class ActorTransaction[ExternalDto](
   final def route(implicit system: akka.actor.ActorSystem, requirements: KafkaMessageProcessorRequirements): Route =
     new ActorTransactionController(this, requirements)(system).route
 
-  final def startAnyways()(implicit system: akka.actor.ActorSystem,
-                           requirements: KafkaMessageProcessorRequirements): (UniqueKillSwitch, Future[Done]) =
-    new KafkaTransactionalMessageProcessor(requirements)
-      .run(topic, s"${topic}SINK", message => {
-        transaction(message).map { output =>
-          Seq(output.toString)
-        }
-      })
+  final def startAnyways()(implicit system: akka.actor.ActorSystem, requirements: KafkaMessageProcessorRequirements) = {
+    Cluster(system).registerOnMemberUp { () =>
+      val rebalancerListener =
+        system.actorOf(Props(
+                         new TopicListener(
+                           typeKeyName = "rebalancerListener",
+                           monitoring
+                         )
+                       ),
+                       name = "rebalancerListener")
+      new KafkaTransactionalMessageProcessor(requirements.copy(rebalancerListener = rebalancerListener))
+        .run(topic, s"${topic}SINK", message => {
+          transaction(message).map { output =>
+            Seq(output.toString)
+          }
+        })
+    }
+
+  }
 }

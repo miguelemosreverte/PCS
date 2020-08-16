@@ -56,6 +56,9 @@ abstract class ActorTransaction[ExternalDto](
 
   final def startAnyways()(implicit system: akka.actor.ActorSystem, requirements: KafkaMessageProcessorRequirements) = {
     Cluster(system).registerOnMemberUp { () =>
+      (1 to 10) foreach { _ =>
+        println(s"HEREEE! MEMBER UP! STARTING TRANSACTION for ${topic}!")
+      }
       val rebalancerListener =
         system.actorOf(Props(
                          new TopicListener(

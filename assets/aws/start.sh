@@ -20,14 +20,17 @@ kubectl apply -f assets/k8s/infra/kafka.yml
 kubectl apply -f assets/k8s/infra/cassandra.yml
 
 
-export kafkaPod=$(kubectl get pod -l "app=kafka" -o jsonpath='{.items[0].metadata.name}')
-export createSujetoTri='kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 120 --topic DGR-COP-SUJETO-TRI'
-kubectl exec $kafkaPod -- $createSujetoTri
 
 curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
 helm install prometheus stable/prometheus-operator --namespace copernico
 
+
+sleep 20
+
+export kafkaPod=$(kubectl get pod -l "app=kafka" -o jsonpath='{.items[0].metadata.name}')
+export createSujetoTri='kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 120 --topic DGR-COP-SUJETO-TRI'
+kubectl exec $kafkaPod -- $createSujetoTri
 
 message "Setting up cassandra"
 export pod_name=$(kubectl get pod --selector app=cassandra | grep cassandra | cut -d' ' -f 1)
@@ -66,9 +69,9 @@ kubectl exec -i $pod_name cqlsh < assets/scripts/cassandra/domain/read_side/tabl
 kubectl exec -i $pod_name cqlsh < assets/scripts/cassandra/domain/read_side/tables/buc_param_plan.cql
 kubectl exec -i $pod_name cqlsh < assets/scripts/cassandra/domain/read_side/tables/buc_param_recargo.cql
 
-export REPLICAS=7
-envsubst < assets/k8s/pcs/pcs-deployment.yml | kubectl apply -f -
+export REPLICAS=3
 kubectl apply -f assets/k8s/pcs/pcs-rbac.yml
+envsubst < assets/k8s/pcs/pcs-deployment.yml | kubectl apply -f -
 kubectl apply -f assets/k8s/pcs/pcs-service.yml
 kubectl apply -f assets/k8s/pcs/pcs-service-monitor.yml
 

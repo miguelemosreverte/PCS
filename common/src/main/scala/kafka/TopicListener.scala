@@ -1,9 +1,11 @@
 package kafka
 
+import akka.actor.{Actor, ActorLogging}
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
 import akka.cluster.sharding.external._
 import akka.cluster.typed.Cluster
+import akka.cluster.{Cluster => ClassicCluster}
 import akka.kafka.{ConsumerRebalanceEvent, TopicPartitionsAssigned, TopicPartitionsRevoked}
 import akka.cluster.sharding.typed.scaladsl.EntityTypeKey
 import monitoring.Monitoring
@@ -11,7 +13,32 @@ import monitoring.Monitoring
 import scala.concurrent.duration._
 import scala.util.Failure
 import scala.util.Success
+class TopicListener(typeKeyName: String, monitoring: Monitoring) extends Actor with ActorLogging {
+  val shardAllocationClient = ExternalShardAllocation(context.system).clientFor(typeKeyName)
 
+  val TopicPartitionsRevokedCounter = monitoring.counter("TopicPartitionsRevoked")
+  val TopicPartitionsAssignedCounter = monitoring.counter("TopicPartitionsAssigned")
+
+  val address = ClassicCluster(context.system).selfMember.address
+  implicit val ec = context.system.dispatcher
+  override def receive: Receive = {
+    case TopicPartitionsAssigned(_, partitions) =>
+      partitions.foreach(partition => {
+        // ctx.log.info("Partition [{}] assigned to current node. Updating shard allocation", partition.partition())
+        // kafka partition becomes the akka shard
+        val done = shardAllocationClient.updateShardLocation(partition.partition().toString, address)
+        done.onComplete { result =>
+          TopicPartitionsAssignedCounter.increment()
+        // ctx.log.info("Result for updating shard {}: {}", partition, result)
+        }
+
+      })
+    case TopicPartitionsRevoked(_, topicPartitions) =>
+      TopicPartitionsRevokedCounter.increment()
+      log.warning("Partitions [{}] revoked from current node. New location will update shard allocation",
+                  topicPartitions.mkString(","))
+  }
+}
 object TopicListener {
   def apply(typeKeyName: String, monitoring: Monitoring): Behavior[ConsumerRebalanceEvent] = {
     val TopicPartitionsRevokedCounter = monitoring.counter("TopicPartitionsRevoked")

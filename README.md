@@ -23,10 +23,13 @@ Console [5] Start first node of readside
 
 `sh assets/docker-compose/dev-lite/readside.sh `
 
-Console [1] After all nodes have been started, start consumers
+Console [6] After all nodes have been started, start consumers
 
 `sh assets/scripts/start_consumers.sh `
 
+Console [7] To stop the local environment
+
+`sh assets/docker-compose/vm/stop_all.sh` 
 
 ## in docker-compose
 sh assets/docker-compose/vm/stop_all.sh 

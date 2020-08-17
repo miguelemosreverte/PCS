@@ -39,15 +39,15 @@ services:
 
   grafana:
     build: './grafana'
-    container_name: 'grafana'
-    network_mode: host
+    container_name: grafana
+    # network_mode: host
     ports:
-      - '3000:3000'
+      - 3000:3000
 
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
-    network_mode: host
+    # network_mode: host
     ports:
       - 9090:9090
     command:

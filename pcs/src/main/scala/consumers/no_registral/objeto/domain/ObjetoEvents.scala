@@ -30,12 +30,10 @@ object ObjetoEvents {
       saldo: BigDecimal,
       cotitulares: Set[String],
       tags: Set[String],
-      vencimiento: Boolean,
       sujetoResponsable: String,
       porcentajeResponsabilidad: BigDecimal,
       registro: Option[ObjetoExternalDto],
-      obligacionesSaldo: Map[String, BigDecimal] = Map.empty,
-      obligacionesVencidasSaldo: Map[String, BigDecimal] = Map.empty
+      obligacionesSaldo: Map[String, BigDecimal] = Map.empty
   ) extends ObjetoEvents
 
   case class ObjetoUpdatedFromTri(
@@ -78,7 +76,6 @@ object ObjetoEvents {
       objetoId: String,
       tipoObjeto: String,
       obligacionId: String,
-      obligacionVencida: Boolean,
       saldoObligacion: BigDecimal,
       obligacionExenta: Boolean,
       porcentajeExencion: Option[BigDecimal]

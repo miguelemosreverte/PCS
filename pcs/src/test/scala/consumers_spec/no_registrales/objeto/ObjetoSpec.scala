@@ -17,14 +17,12 @@ trait ObjetoSpec extends NoRegistralesTestSuite {
       eventually {
         val response = context.Query getStateObjeto examples.obligacionWithSaldo200
         response.saldo should be(examples.obligacionWithSaldo200.BOB_SALDO)
-        response.vencimiento should be(false)
       }
 
       context.messageProducer produceObligacion examples.obligacionWithSaldo50
       eventually {
         val response = context.Query getStateObjeto examples.obligacionWithSaldo50
         response.saldo should be(examples.obligacionWithSaldo50.BOB_SALDO)
-        response.vencimiento should be(false)
       }
       context.close()
   }
@@ -42,18 +40,6 @@ trait ObjetoSpec extends NoRegistralesTestSuite {
     eventually {
       val response = context.Query getStateObjeto examples.obligacionWithSaldo50
       response.saldo should be(examples.obligacionWithSaldo50.BOB_SALDO + anotherOne.BOB_SALDO)
-    }
-    context.close()
-  }
-
-  "un objeto" should
-  "declararse vencido si una de sus obligaciones se declara vencida" in parallelActorSystemRunner { implicit s =>
-    val context = testContext()
-
-    context.messageProducer produceObligacion examples.obligacionVencida
-    eventually {
-      val response = context.Query getStateObjeto examples.obligacionVencida
-      response.vencimiento should be(true)
     }
     context.close()
   }

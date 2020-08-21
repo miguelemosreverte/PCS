@@ -36,7 +36,7 @@ object SujetoEvents {
       objetoId: String,
       tipoObjeto: String,
       saldoObjeto: BigDecimal,
-      saldoObligacionesVencidas: BigDecimal
+      saldoObligaciones: BigDecimal
   ) extends SujetoEvents
 
   case class SujetoBajaFromObjetoSet(

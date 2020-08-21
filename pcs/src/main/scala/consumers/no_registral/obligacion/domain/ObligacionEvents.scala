@@ -22,11 +22,11 @@ object ObligacionEvents {
       registro: Option[ObligacionExternalDto],
       exenta: Boolean,
       porcentajeExencion: BigDecimal,
-      vencida: Boolean,
       saldo: BigDecimal
   ) extends ObligacionEvents
 
   case class ObligacionUpdatedFromDto(
+      deliveryId: BigInt,
       sujetoId: String,
       objetoId: String,
       tipoObjeto: String,
@@ -36,6 +36,7 @@ object ObligacionEvents {
   ) extends ObligacionEvents
 
   case class ObligacionRemoved(
+      deliveryId: BigInt,
       sujetoId: String,
       objetoId: String,
       tipoObjeto: String,

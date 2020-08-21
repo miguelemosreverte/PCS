@@ -45,6 +45,7 @@ object ObligacionesTriGenerator {
 
     def toEvent: ObligacionUpdatedFromDto = {
       ObligacionUpdatedFromDto(
+        deliveryId,
         obligacionesTri.BOB_SUJ_IDENTIFICADOR,
         obligacionesTri.BOB_SOJ_IDENTIFICADOR,
         obligacionesTri.BOB_SOJ_TIPO_OBJETO,

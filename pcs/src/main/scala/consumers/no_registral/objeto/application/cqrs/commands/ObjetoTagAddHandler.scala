@@ -12,7 +12,6 @@ class ObjetoTagAddHandler(actor: ObjetoActor) extends SyncCommandHandler[ObjetoC
   override def handle(
       command: ObjetoCommands.ObjetoTagAdd
   ): Try[Response.SuccessProcessing] = {
-    val replyTo = actor.sender()
     val event = ObjetoEvents.ObjetoTagAdded(command.deliveryId,
                                             command.sujetoId,
                                             command.objetoId,

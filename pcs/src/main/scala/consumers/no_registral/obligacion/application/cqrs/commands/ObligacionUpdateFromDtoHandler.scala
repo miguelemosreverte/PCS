@@ -1,5 +1,6 @@
 package consumers.no_registral.obligacion.application.cqrs.commands
 
+import design_principles.actor_model.mechanism.DeliveryIdManagement._
 import consumers.no_registral.obligacion.application.entities.ObligacionCommands.ObligacionUpdateFromDto
 import consumers.no_registral.obligacion.domain.ObligacionEvents.ObligacionUpdatedFromDto
 import consumers.no_registral.obligacion.infrastructure.dependency_injection.ObligacionActor
@@ -11,28 +12,28 @@ import scala.util.{Success, Try}
 
 class ObligacionUpdateFromDtoHandler(actor: ObligacionActor) extends SyncCommandHandler[ObligacionUpdateFromDto] {
   override def handle(command: ObligacionUpdateFromDto): Try[Response.SuccessProcessing] = {
-
-    if (command.deliveryId <= actor.lastDeliveryId) {
+    val event = ObligacionUpdatedFromDto(
+      command.deliveryId,
+      command.sujetoId,
+      command.objetoId,
+      command.tipoObjeto,
+      command.obligacionId,
+      command.registro,
+      command.detallesObligacion
+    )
+    if (validateCommand(event, command, actor.state.lastDeliveryIdByEvents)) {
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
       actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
       Success(Response.SuccessProcessing(command.deliveryId))
     } else {
-      val event =
-        ObligacionUpdatedFromDto(command.sujetoId,
-                                 command.objetoId,
-                                 command.tipoObjeto,
-                                 command.obligacionId,
-                                 command.registro,
-                                 command.detallesObligacion)
       actor.persistEvent(event) { () =>
         actor.state += event
-        actor.lastDeliveryId = command.deliveryId
         actor.informParent(command)
         actor.persistSnapshot() { () =>
           actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
         }
       }
-      Success(Response.SuccessProcessing(command.deliveryId))
     }
+    Success(Response.SuccessProcessing(command.deliveryId))
   }
 }

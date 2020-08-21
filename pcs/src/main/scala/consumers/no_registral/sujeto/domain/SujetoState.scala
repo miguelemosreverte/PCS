@@ -8,7 +8,7 @@ import ddd.AbstractState
 final case class SujetoState(
     saldo: BigDecimal = 0,
     saldoObjetos: Map[String, BigDecimal] = Map.empty,
-    saldoObjetosVencidos: Map[String, BigDecimal] = Map.empty,
+    saldoObligaciones: Map[String, BigDecimal] = Map.empty,
     objetos: Set[(String, String)] = Set.empty,
     fechaUltMod: LocalDateTime = LocalDateTime.MIN,
     registro: Option[SujetoExternalDto] = None,
@@ -30,14 +30,14 @@ final case class SujetoState(
         copy(
           registro = Some(registro)
         )
-      case SujetoEvents.SujetoUpdatedFromObjeto(_, _, objetoId, tipoObjeto, saldoObjeto, saldoObligacionesVencidas) =>
+      case SujetoEvents.SujetoUpdatedFromObjeto(_, _, objetoId, tipoObjeto, saldoObjeto, _saldoObligaciones) =>
         val objetoKey = s"$objetoId|$tipoObjeto"
         val _saldoObjetos = saldoObjetos + (objetoKey -> saldoObjeto)
         copy(
           objetos = objetos + ((objetoId, tipoObjeto)),
           saldoObjetos = _saldoObjetos,
           saldo = _saldoObjetos.values.sum,
-          saldoObjetosVencidos = saldoObjetosVencidos + (objetoKey -> saldoObligacionesVencidas)
+          saldoObligaciones = saldoObligaciones + (objetoKey -> _saldoObligaciones)
         )
       case SujetoEvents.SujetoBajaFromObjetoSet(_, _, objetoId, tipoObjeto) =>
         val objetoKey = s"$objetoId|$tipoObjeto"
@@ -46,7 +46,7 @@ final case class SujetoState(
           objetos = objetos - ((objetoId, tipoObjeto)),
           saldoObjetos = _saldoObjetos,
           saldo = _saldoObjetos.values.sum,
-          saldoObjetosVencidos = saldoObjetosVencidos - objetoKey
+          saldoObligaciones = saldoObligaciones - objetoKey
         )
       case evt: SujetoEvents.SujetoSnapshotPersisted =>
         copy(

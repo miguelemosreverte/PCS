@@ -1,6 +1,7 @@
 package consumers.no_registral.sujeto.application.cqrs.commands
 
 import akka.Done
+import design_principles.actor_model.mechanism.DeliveryIdManagement._
 import consumers.no_registral.sujeto.application.entity.SujetoCommands.SujetoUpdateFromAnt
 import consumers.no_registral.sujeto.domain.SujetoEvents.SujetoUpdatedFromAnt
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor
@@ -13,10 +14,8 @@ class SujetoUpdateFromAntHandler(actor: SujetoActor) extends SyncCommandHandler[
   override def handle(command: SujetoUpdateFromAnt): Try[Response.SuccessProcessing] = {
 
     val event = SujetoUpdatedFromAnt(command.deliveryId, command.sujetoId, command.registro)
-    val documentName = utils.Inference.getSimpleName(event.getClass.getName)
-    val lastDeliveryId = actor.state.lastDeliveryIdByEvents.getOrElse(documentName, BigInt(0))
 
-    if (command.deliveryId <= lastDeliveryId) {
+    if (validateCommand(event, command, actor.state.lastDeliveryIdByEvents)) {
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
       actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
     } else {

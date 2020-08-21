@@ -1,5 +1,7 @@
 package consumers.no_registral.objeto.application.cqrs.commands
 
+import design_principles.actor_model.mechanism.DeliveryIdManagement._
+
 import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.objeto.domain.ObjetoEvents
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
@@ -20,9 +22,7 @@ class ObjetoUpdateFromAntHandler(actor: ObjetoActor) extends SyncCommandHandler[
       command.tipoObjeto,
       command.registro
     )
-    val documentName = utils.Inference.getSimpleName(event.getClass.getName)
-    val lastDeliveryId = actor.state.lastDeliveryIdByEvents.getOrElse(documentName, BigInt(0))
-    if (event.deliveryId <= lastDeliveryId) {
+    if (validateCommand(event, command, actor.state.lastDeliveryIdByEvents)) {
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
       actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
     } else {

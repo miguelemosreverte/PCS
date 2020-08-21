@@ -43,6 +43,7 @@ object ObligacionesAntGenerator {
 
     def toEvent: ObligacionUpdatedFromDto = {
       ObligacionUpdatedFromDto(
+        deliveryId,
         obligacionesAnt.BOB_SUJ_IDENTIFICADOR,
         obligacionesAnt.BOB_SOJ_IDENTIFICADOR,
         obligacionesAnt.BOB_SOJ_TIPO_OBJETO,

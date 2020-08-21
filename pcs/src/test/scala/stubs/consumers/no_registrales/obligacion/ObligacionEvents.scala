@@ -3,6 +3,7 @@ package stubs.consumers.no_registrales.obligacion
 import consumers.no_registral.obligacion.domain.ObligacionEvents._
 import stubs.consumers.no_registrales.obligacion.ObligacionCommands.detallesObligaciones
 import stubs.consumers.no_registrales.obligacion.ObligacionExternalDtoStub._
+import utils.generators.Model.deliveryId
 
 object ObligacionEvents {
   def obligacionPersistedSnapshot = ObligacionPersistedSnapshot(
@@ -13,11 +14,11 @@ object ObligacionEvents {
     registro = Some(stubs.consumers.no_registrales.obligacion.ObligacionExternalDtoStub.obligacionesTri),
     exenta = false,
     porcentajeExencion = 0,
-    vencida = false,
     saldo = 0
   )
   def obligacionUpdatedFromDtoTriStub =
     ObligacionUpdatedFromDto(
+      deliveryId = deliveryId,
       obligacionesTri.BOB_SUJ_IDENTIFICADOR,
       obligacionesTri.BOB_SOJ_IDENTIFICADOR,
       obligacionesTri.BOB_SOJ_TIPO_OBJETO,
@@ -27,6 +28,7 @@ object ObligacionEvents {
     )
   def obligacionUpdatedFromDtoAntStub =
     ObligacionUpdatedFromDto(
+      deliveryId = deliveryId,
       obligacionesTri.BOB_SUJ_IDENTIFICADOR,
       obligacionesTri.BOB_SOJ_IDENTIFICADOR,
       obligacionesTri.BOB_SOJ_TIPO_OBJETO,
@@ -35,6 +37,7 @@ object ObligacionEvents {
       detallesObligaciones.getOrElse(Seq.empty)
     )
   def obligacionRemovedStub = ObligacionRemoved(
+    deliveryId = deliveryId,
     obligacionesTri.BOB_SUJ_IDENTIFICADOR,
     obligacionesTri.BOB_SOJ_IDENTIFICADOR,
     obligacionesTri.BOB_SOJ_TIPO_OBJETO,

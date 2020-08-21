@@ -64,6 +64,5 @@ object ObligacionProjectionHandler {
   def apply(monitoring: Monitoring, system: ActorSystem[_]): ObligacionProjectionHandler = {
     val projectionSettings = defaultProjectionSettings(monitoring)
     new ObligacionProjectionHandler(projectionSettings, system)
-
   }
 }

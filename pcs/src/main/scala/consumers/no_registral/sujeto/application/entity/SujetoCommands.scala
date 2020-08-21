@@ -26,7 +26,7 @@ object SujetoCommands {
       objetoId: String,
       tipoObjeto: String,
       saldoObjeto: BigDecimal,
-      saldoObligacionesVencidas: BigDecimal
+      saldoObligaciones: BigDecimal
   ) extends SujetoCommands
 
   case class SujetoSetBajaFromObjeto(

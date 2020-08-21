@@ -23,9 +23,7 @@ object CotitularidadCommands {
       objetoId: String,
       tipoObjeto: String,
       saldo: BigDecimal,
-      vencimiento: Boolean,
       tags: Set[String],
-      obligacionesSaldo: Map[String, BigDecimal] = Map.empty,
-      obligacionesVencidasSaldo: Map[String, BigDecimal] = Map.empty
+      obligacionesSaldo: Map[String, BigDecimal] = Map.empty
   ) extends CotitularidadCommands
 }

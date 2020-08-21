@@ -14,7 +14,6 @@ object ObjetoEvents {
       tipoObjeto = obligacionesTri.BOB_SOJ_TIPO_OBJETO,
       obligacionId = obligacionesTri.BOB_OBN_ID,
       saldoObligacion = 0,
-      obligacionVencida = false,
       obligacionExenta = false,
       porcentajeExencion = None,
       deliveryId = deliveryId
@@ -26,7 +25,6 @@ object ObjetoEvents {
       objetoId = obligacionesTri.BOB_SOJ_IDENTIFICADOR,
       tipoObjeto = obligacionesTri.BOB_SOJ_TIPO_OBJETO,
       obligacionId = obligacionesTri.BOB_OBN_ID,
-      obligacionVencida = false,
       saldoObligacion = 0,
       obligacionExenta = false,
       porcentajeExencion = None,
@@ -43,11 +41,9 @@ object ObjetoEvents {
       saldo = 0,
       cotitulares = Set.empty,
       tags = Set.empty,
-      vencimiento = false,
       sujetoResponsable = objetoTriStub.SOJ_SUJ_IDENTIFICADOR,
       porcentajeResponsabilidad = 0,
       obligacionesSaldo = Map.empty,
-      obligacionesVencidasSaldo = Map.empty
     )
 
   def objetoUpdatedFromDtoTriStub =
@@ -113,4 +109,5 @@ object ObjetoEvents {
     None,
     None
   )
+
 }

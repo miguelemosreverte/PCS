@@ -8,47 +8,38 @@ import ddd._
 
 case class ObligacionState(
     saldo: BigDecimal = 0,
-    vencida: Boolean = false,
     fechaUltMod: LocalDateTime = LocalDateTime.MIN,
-    fechaVencimiento: Option[LocalDateTime] = None,
     exenta: Boolean = false,
     porcentajeExencion: Option[BigDecimal] = None,
     registro: Option[ObligacionExternalDto] = None,
+    lastDeliveryIdByEvents: Map[String, BigInt] = Map.empty,
     detallesObligacion: Seq[DetallesObligacion] = Seq.empty,
     juicioId: Option[BigInt] = None
 ) extends AbstractState[ObligacionEvents] {
 
   override def +(event: ObligacionEvents): ObligacionState =
-    (event match {
+    changeState(event).copy(fechaUltMod = LocalDateTime.now)
+
+  private def changeState(event: ObligacionEvents): ObligacionState =
+    event match {
       case e: ObligacionEvents.ObligacionAddedExencion =>
         copy(
           exenta = true,
-          porcentajeExencion = e.exencion.BEX_PORCENTAJE
+          porcentajeExencion = e.exencion.BEX_PORCENTAJE,
+          lastDeliveryIdByEvents = lastDeliveryIdByEvents + ((event.getClass.getSimpleName, e.deliveryId))
         )
       case e: ObligacionEvents.ObligacionRemoved =>
         empty
       case e: ObligacionEvents.ObligacionUpdatedFromDto =>
         copy(
           saldo = e.registro.BOB_SALDO,
-          vencida = isVencida(e.registro),
-          fechaVencimiento = e.registro.BOB_VENCIMIENTO,
           registro = Some(e.registro),
           detallesObligacion = e.detallesObligacion,
-          juicioId = e.registro.BOB_JUI_ID
+          juicioId = e.registro.BOB_JUI_ID,
+          lastDeliveryIdByEvents = lastDeliveryIdByEvents + ((event.getClass.getSimpleName, e.deliveryId))
         )
-
       case _ => this
-    }).copy(
-      fechaUltMod = LocalDateTime.now
-    )
+    }
 
   def empty = ObligacionState()
-
-  private def isVencida(dto: ObligacionExternalDto): Boolean = {
-    dto.BOB_VENCIMIENTO
-      .exists { fechaVencimiento =>
-        fechaVencimiento isBefore LocalDateTime.now
-      }
-  }
-
-}
+ }

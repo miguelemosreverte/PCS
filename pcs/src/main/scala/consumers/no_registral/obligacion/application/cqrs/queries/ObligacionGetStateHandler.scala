@@ -15,13 +15,11 @@ class ObligacionGetStateHandler(actor: ObligacionActor) extends SyncQueryHandler
 
     val response = GetObligacionResponse(
       actor.state.saldo,
-      actor.state.vencida,
       actor.state.fechaUltMod,
       actor.state.registro,
       actor.state.detallesObligacion,
       actor.state.exenta,
       actor.state.porcentajeExencion.getOrElse(0),
-      actor.state.fechaVencimiento,
       actor.state.juicioId
     )
     log.info(s"[${actor.persistenceId}] GetState | $response")

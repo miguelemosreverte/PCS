@@ -19,7 +19,6 @@ class ObjetoUpdateFromObligacionHandler(actor: ObjetoActor)
       command.objetoId,
       command.tipoObjeto,
       command.obligacionId,
-      command.obligacionVencida,
       command.saldoObligacion,
       command.obligacionExenta,
       command.porcentajeExencion

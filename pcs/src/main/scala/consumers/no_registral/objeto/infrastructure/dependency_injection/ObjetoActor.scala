@@ -23,7 +23,6 @@ class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Pro
   var state = ObjetoState()
 
   override def setupHandlers(): Unit = {
-    commandBus.subscribe[ObjetoCommands.ObjetoAddExencion](new ObjetoAddExencionHandler(this).handle)
     commandBus.subscribe[ObjetoCommands.ObjetoSnapshot](new ObjetoSnapshotHandler(this).handle)
     commandBus.subscribe[ObjetoCommands.ObjetoTagAdd](new ObjetoTagAddHandler(this).handle)
     commandBus.subscribe[ObjetoCommands.ObjetoTagRemove](new ObjetoTagRemoveHandler(this).handle)
@@ -120,12 +119,10 @@ class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Pro
         consolidatedState.saldo,
         consolidatedState.sujetos,
         consolidatedState.tags,
-        consolidatedState.vencimiento,
         consolidatedState.sujetoResponsable.getOrElse(evt.sujetoId),
         consolidatedState.porcentajeResponsabilidad,
         consolidatedState.registro,
-        consolidatedState.obligacionesSaldo,
-        consolidatedState.obligacionesVencidasSaldo
+        consolidatedState.obligacionesSaldo
       )
 
     if (this.shouldInformCotitulares(consolidatedState)) {
@@ -157,7 +154,7 @@ class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Pro
       cmd.objetoId,
       cmd.tipoObjeto,
       state.saldo,
-      state.obligacionesVencidasSaldo.values.sum
+      state.obligacionesSaldo.values.sum
     )
   }
 

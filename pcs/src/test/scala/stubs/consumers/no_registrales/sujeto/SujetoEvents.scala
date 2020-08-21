@@ -19,7 +19,7 @@ object SujetoEvents {
       objetoId = obligacionesTri.BOB_SOJ_IDENTIFICADOR,
       tipoObjeto = obligacionesTri.BOB_SOJ_TIPO_OBJETO,
       saldoObjeto = 0,
-      saldoObligacionesVencidas = 0
+      saldoObligaciones = 0
     )
 
   def sujetoUpdatedFromDtoAntStub =

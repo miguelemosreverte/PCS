@@ -16,7 +16,6 @@ trait ObligacionSpec extends NoRegistralesTestSuite {
       eventually {
         val response = context.Query getStateObligacion examples.obligacionWithSaldo200
         response.saldo should be(examples.obligacionWithSaldo200.BOB_SALDO)
-        response.vencida should be(false)
 
       }
 
@@ -24,21 +23,8 @@ trait ObligacionSpec extends NoRegistralesTestSuite {
       eventually {
         val response = context.Query getStateObligacion examples.obligacionWithSaldo50
         response.saldo should be(examples.obligacionWithSaldo50.BOB_SALDO)
-        response.vencida should be(false)
       }
       context.close()
-  }
-
-  "una obligacion" should "volverse vencida si se recibe un movimiento luego de la fecha de expiracion esperada" in
-  parallelActorSystemRunner { implicit s =>
-    val context = testContext()
-
-    context.messageProducer produceObligacion examples.obligacionVencida
-    eventually {
-      val response = context.Query getStateObligacion examples.obligacionVencida
-      response.vencida should be(true)
-    }
-    context.close()
   }
 
   "una obligacion" should "mostrar el id de juicio al recibir BOB_JUI_ID no nulo en el documento" in parallelActorSystemRunner {
@@ -66,9 +52,10 @@ trait ObligacionSpec extends NoRegistralesTestSuite {
       context.messageProducer produceObligacion examples.obligacionWithSaldo200.copy(
         BOB_ESTADO = Some("BAJA")
       )
+
+      Thread.sleep(200)
       eventually {
         val response = context.Query getStateObligacion examples.obligacionWithSaldo200
-        println(response)
         response.saldo should be(0)
       }
       Thread.sleep(200)

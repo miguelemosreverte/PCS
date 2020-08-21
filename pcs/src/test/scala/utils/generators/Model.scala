@@ -34,7 +34,6 @@ object Model {
       objetoId = objetoId.toString,
       tipoObjeto = "I",
       obligacionId = obligacionId,
-      obligacionVencida = vencida,
       saldoObligacion = saldo,
       obligacionExenta = false,
       porcentajeExencion = None,
@@ -54,7 +53,7 @@ object Model {
       objetoId = objetoId,
       tipoObjeto = "I",
       saldoObjeto = saldo,
-      saldoObligacionesVencidas = 0
+      saldoObligaciones = 0
     )
 
   def deliveryId: Int = utils.generators.Numbers.positiveNumber
@@ -72,7 +71,6 @@ object Model {
       deliveryId = deliveryId,
       obligacionId = obligacionId,
       saldoObligacion = saldoObligacion,
-      obligacionVencida = vencida,
       obligacionExenta = false,
       porcentajeExencion = None
     )

@@ -13,7 +13,6 @@ class ObjetoUpdateCotitularesHandler(actor: ObjetoActor)
   override def handle(
       command: ObjetoCommands.ObjetoUpdateCotitulares
   ): Try[Response.SuccessProcessing] = {
-    val replyTo = actor.sender()
     val event = ObjetoUpdatedCotitulares(
       command.deliveryId,
       command.sujetoId,

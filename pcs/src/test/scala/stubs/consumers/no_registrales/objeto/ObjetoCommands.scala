@@ -13,7 +13,6 @@ object ObjetoCommands {
       objetoId = obligacionesTri.BOB_SOJ_IDENTIFICADOR,
       tipoObjeto = obligacionesTri.BOB_SOJ_TIPO_OBJETO,
       obligacionId = obligacionesTri.BOB_OBN_ID,
-      obligacionVencida = false,
       saldoObligacion = 0,
       obligacionExenta = false,
       porcentajeExencion = None,

@@ -12,7 +12,6 @@ class ObjetoSnapshotHandler(actor: ObjetoActor) extends SyncCommandHandler[Objet
   override def handle(
       command: ObjetoCommands.ObjetoSnapshot
   ): Try[Response.SuccessProcessing] = {
-    val replyTo = actor.sender()
     val event = ObjetoSnapshotPersisted(
       command.deliveryId,
       command.sujetoId,
@@ -21,12 +20,10 @@ class ObjetoSnapshotHandler(actor: ObjetoActor) extends SyncCommandHandler[Objet
       command.saldo,
       command.cotitulares,
       command.tags,
-      command.vencimiento,
       command.sujetoResponsable,
       actor.state.porcentajeResponsabilidad,
       actor.state.registro,
-      command.obligacionesSaldo,
-      command.obligacionesVencidasSaldo
+      command.obligacionesSaldo
     )
     val consolidatedState = actor.state + event
     actor.persistSnapshot(event, consolidatedState) { () =>

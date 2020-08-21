@@ -12,7 +12,6 @@ class GetStateObjetoHandler(actor: ObjetoActor) extends SyncQueryHandler[GetStat
 
     val response = GetObjetoResponse(
       actor.state.saldo,
-      actor.state.vencimiento,
       actor.state.tags,
       actor.state.obligaciones,
       actor.state.sujetos,

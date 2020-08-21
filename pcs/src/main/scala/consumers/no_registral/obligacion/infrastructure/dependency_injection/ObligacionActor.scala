@@ -50,7 +50,6 @@ class ObligacionActor(monitoring: Monitoring)
       cmd.objetoId,
       cmd.tipoObjeto,
       cmd.obligacionId,
-      state.vencida,
       state.saldo,
       state.exenta,
       state.porcentajeExencion
@@ -78,7 +77,6 @@ class ObligacionActor(monitoring: Monitoring)
       registro = state.registro,
       exenta = state.exenta,
       porcentajeExencion = state.porcentajeExencion.getOrElse(0),
-      vencida = state.vencida,
       saldo = state.saldo
     )
     persistEvent(event, ObligacionTags.ObligacionReadside)(handler)

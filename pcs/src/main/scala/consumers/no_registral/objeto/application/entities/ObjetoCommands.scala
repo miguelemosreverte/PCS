@@ -23,10 +23,8 @@ object ObjetoCommands {
       saldo: BigDecimal,
       cotitulares: Set[String],
       tags: Set[String],
-      vencimiento: Boolean,
       sujetoResponsable: String,
-      obligacionesSaldo: Map[String, BigDecimal] = Map.empty,
-      obligacionesVencidasSaldo: Map[String, BigDecimal] = Map.empty
+      obligacionesSaldo: Map[String, BigDecimal] = Map.empty
   ) extends ObjetoCommands
 
   case class ObjetoUpdateFromTri(
@@ -53,7 +51,6 @@ object ObjetoCommands {
       objetoId: String,
       tipoObjeto: String,
       obligacionId: String,
-      obligacionVencida: Boolean,
       saldoObligacion: BigDecimal,
       obligacionExenta: Boolean,
       porcentajeExencion: Option[BigDecimal]

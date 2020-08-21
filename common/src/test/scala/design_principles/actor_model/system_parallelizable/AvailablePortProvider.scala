@@ -1,29 +1,13 @@
 package design_principles.actor_model.system_parallelizable
 
-import java.net.ServerSocket
-
-import scala.io.Source
-import scala.reflect.io.File
-import java.io.FileOutputStream
-import java.net.ServerSocket
+import java.util.concurrent.atomic.AtomicInteger
 
 object AvailablePortProvider {
-
-  val maxReasonableAmmountOfTests = 5500
-
-  // import ReservedPortRepository._
-
-  var givenPorts: Set[Int] = Set.empty
+  // expected ports to bind
+  // @TODO add to configuration
+  private val existingPorts = 55000 to 56000
+  private val lastIndexGiven = new AtomicInteger(0)
   def port: Int = synchronized {
-    val r = new scala.util.Random
-    val availablePort = new ServerSocket(0).getLocalPort //r.between(2600, 2601 + maxReasonableAmmountOfTests)
-
-    if (givenPorts contains availablePort)
-      port
-    else {
-      givenPorts = givenPorts + availablePort
-      availablePort
-    }
+    existingPorts(lastIndexGiven.getAndIncrement())
   }
-
 }

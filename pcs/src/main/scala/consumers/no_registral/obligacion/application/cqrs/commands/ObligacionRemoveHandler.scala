@@ -15,6 +15,7 @@ class ObligacionRemoveHandler(actor: ObligacionActor) extends SyncCommandHandler
 
     val event =
       ObligacionEvents.ObligacionRemoved(
+        command.deliveryId,
         command.sujetoId,
         command.objetoId,
         command.tipoObjeto,

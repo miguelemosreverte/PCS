@@ -17,7 +17,7 @@ class SujetoUpdateFromObjetoHandler(actor: SujetoActor) extends SyncCommandHandl
       command.objetoId,
       command.tipoObjeto,
       command.saldoObjeto,
-      command.saldoObligacionesVencidas
+      command.saldoObligaciones
     )
 
     actor.persistEvent(event) { () =>

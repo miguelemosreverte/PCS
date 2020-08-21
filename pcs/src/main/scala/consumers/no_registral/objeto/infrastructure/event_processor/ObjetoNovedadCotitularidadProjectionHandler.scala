@@ -58,10 +58,8 @@ class ObjetoNovedadCotitularidadProjectionHandler(settings: ProjectionSettings, 
               evt.tipoObjeto,
               evt.saldo,
               //evt.cotitulares,
-              evt.vencimiento,
               evt.tags,
-              evt.obligacionesSaldo,
-              evt.obligacionesVencidasSaldo
+              evt.obligacionesSaldo
             )
 
           val messages = Seq(message) map serialization.encode[CotitularidadPublishSnapshot]

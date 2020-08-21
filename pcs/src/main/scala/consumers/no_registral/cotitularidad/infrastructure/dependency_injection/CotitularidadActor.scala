@@ -34,10 +34,8 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
       saldo = 0,
       cotitulares = Set.empty,
       tags = Set.empty,
-      vencimiento = false,
       sujetoResponsable = "",
-      obligacionesSaldo = Map.empty,
-      obligacionesVencidasSaldo = Map.empty
+      obligacionesSaldo = Map.empty
     )
 
   def obligacionId = self.path.name
@@ -121,10 +119,8 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
             saldo = command.saldo,
             cotitulares = state.sujetosCotitulares,
             tags = command.tags,
-            vencimiento = command.vencimiento,
             sujetoResponsable = state.sujetoResponsable,
-            obligacionesSaldo = command.obligacionesSaldo,
-            obligacionesVencidasSaldo = command.obligacionesVencidasSaldo
+            obligacionesSaldo = command.obligacionesSaldo
           )
 
           snapshot

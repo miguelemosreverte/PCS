@@ -9,11 +9,9 @@ import ddd.AbstractState
 case class ObjetoState(
     saldo: BigDecimal = 0,
     obligacionesSaldo: Map[String, BigDecimal] = Map.empty,
-    obligacionesVencidasSaldo: Map[String, BigDecimal] = Map.empty,
     obligaciones: Set[String] = Set.empty,
     sujetos: Set[String] = Set.empty,
     sujetoResponsable: Option[String] = None,
-    vencimiento: Boolean = false,
     fechaUltMod: LocalDateTime = LocalDateTime.MIN,
     registro: Option[ObjetoExternalDto] = None,
     tags: Set[String] = Set.empty,
@@ -63,29 +61,19 @@ case class ObjetoState(
           obligacionesSaldo = obligacionesSaldo_
         )
       case evt: ObjetoEvents.ObjetoUpdatedFromObligacion =>
-        val _obligacionesVencidasSaldo =
-          if (evt.obligacionVencida) {
-            obligacionesVencidasSaldo + (evt.obligacionId -> evt.saldoObligacion)
-          } else {
-            obligacionesVencidasSaldo + (evt.obligacionId -> BigDecimal(0))
-          }
         val obligacionesSaldo_ = obligacionesSaldo + (evt.obligacionId -> evt.saldoObligacion)
         copy(
           saldo = obligacionesSaldo_.values.sum,
           obligaciones = obligaciones + evt.obligacionId,
           obligacionesSaldo = obligacionesSaldo_,
-          sujetos = sujetos + evt.sujetoId,
-          vencimiento = vencimiento || evt.obligacionVencida,
-          obligacionesVencidasSaldo = _obligacionesVencidasSaldo
+          sujetos = sujetos + evt.sujetoId
         )
       case evt: ObjetoEvents.ObjetoSnapshotPersisted =>
         copy(
           saldo = evt.saldo,
           sujetos = evt.cotitulares,
-          vencimiento = evt.vencimiento,
           sujetoResponsable = Some(evt.sujetoResponsable),
           obligacionesSaldo = evt.obligacionesSaldo,
-          obligacionesVencidasSaldo = evt.obligacionesVencidasSaldo,
           tags = evt.tags
         )
 

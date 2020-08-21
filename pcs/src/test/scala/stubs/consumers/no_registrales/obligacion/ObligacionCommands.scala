@@ -88,8 +88,7 @@ object ObligacionCommands {
     val objetoId = a.objetoId
     val obligacionId = a.obligacionId
     val saldo = a.saldoObligacion
-    val estado = a.obligacionVencida
-    updateMovimientoStub(sujetoId, objetoId, obligacionId, saldo.toInt, estado)
+    updateMovimientoStub(sujetoId, objetoId, obligacionId, saldo.toInt)
   }
 
   def updateExencionStub(obligacionId: String) = ObligacionUpdateExencion(

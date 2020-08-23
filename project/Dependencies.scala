@@ -3,13 +3,12 @@ import sbt._
 object Dependencies {
   // Versions
   lazy val scalaVersion = "2.13.1"
-  private lazy val akkaVersion = "2.6.5"
+  private lazy val akkaVersion = "2.6.6"
 
   // Resolvers
   lazy val commonResolvers = Seq(
     Resolver sonatypeRepo "public",
     Resolver typesafeRepo "releases",
-    Resolver.bintrayRepo("tanukkii007", "maven"),
     // for Embedded Kafka 2.4.0
     Resolver.bintrayRepo("seglo", "maven"),
     // the library is available in Bintray repository
@@ -59,7 +58,6 @@ object Dependencies {
     private def akkaModule(name: String) = "com.typesafe.akka" %% name % akkaVersion
     private def akkaHttpModule(name: String) = "com.typesafe.akka" %% name % akkaHttpVersion
     private def akkaManagmentModule(name: String) = "com.lightbend.akka.management" %% name % akkaManagementVersion
-    private lazy val SBR = "com.github.TanUkkii007" %% "akka-cluster-custom-downing" % "0.0.13"
     private lazy val akkaStreamKafka = "com.typesafe.akka" %% "akka-stream-kafka" % "2.0.4"
 
     override def modules: Seq[ModuleID] =
@@ -83,8 +81,7 @@ object Dependencies {
       "com.lightbend.akka.management" %% "akka-management" % akkaManagementVersion ::
       "com.lightbend.akka.management" %% "akka-management-cluster-http" % akkaManagementVersion ::
       "com.lightbend.akka.management" %% "akka-management-cluster-bootstrap" % akkaManagementVersion ::
-      //"com.typesafe.akka" %% "akka-stream-kafka-cluster-sharding" % "2.0.4" ::
-      SBR :: akkaStreamKafka ::
+      akkaStreamKafka ::
       Nil
   }
 

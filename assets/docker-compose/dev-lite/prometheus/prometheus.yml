@@ -3,6 +3,7 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
       - targets:
+          # MAC OSX
           - host.docker.internal:9095
           - host.docker.internal:5000
           - host.docker.internal:5001
@@ -11,3 +12,12 @@ scrape_configs:
           - host.docker.internal:5004
           - host.docker.internal:5005
           - host.docker.internal:5006
+          # LINUX
+          - 0.0.0.0:9095
+          - 0.0.0.0:5000
+          - 0.0.0.0:5001
+          - 0.0.0.0:5002
+          - 0.0.0.0:5003
+          - 0.0.0.0:5004
+          - 0.0.0.0:5005
+          - 0.0.0.0:5006

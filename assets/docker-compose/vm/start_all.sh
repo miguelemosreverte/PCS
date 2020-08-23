@@ -17,10 +17,9 @@ docker-compose -f assets/docker-compose/vm/docker-compose-kafka.yml up -d
 echo "== kafka started =="
 
 echo "== publishing the new docker images =="
-# sbt 'common/docker:publishLocal'
-# sbt 'pcs/docker:publishLocal'
-# sbt 'readside/docker:publishLocal'
-sbt docker:publishLocal
+sbt 'pcs/docker:publishLocal'
+sbt 'readside/docker:publishLocal'
+
 echo "== new docker images published =="
 
 echo "== akka cassandra setup =="

@@ -4,5 +4,6 @@ export MANAGEMENT_PORT=8552
 export HTTP_PORT=8082
 export PROMETHEUS_PORT=5002
 export KAMON_STATUS_PAGE=5267
+sleep 30
 sbt pcs/run
 

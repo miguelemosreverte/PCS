@@ -24,17 +24,6 @@ abstract class CassandraProjectionHandler[T](settings: ProjectionSettings, syste
   protected val log = LoggerFactory.getLogger(this.getClass)
 
   def run(): Unit = {
-    println(s"""
-        |
-        |
-        |Starting projection ${settings.name}
-        |
-        |        |      projectionSettings.name
-        |        |      ${settings.name}
-        |        |      projectionSettings.parallelism
-        |        |      ${settings.parallelism}
-        |        |
-        |""".stripMargin)
     Try(
       CassandraProjectionist.startProjection(
         CassandraProjectionistRequirements(

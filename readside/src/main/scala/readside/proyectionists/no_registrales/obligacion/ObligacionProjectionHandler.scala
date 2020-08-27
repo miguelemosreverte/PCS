@@ -30,6 +30,21 @@ class ObligacionProjectionHandler(settings: ProjectionSettings, system: ActorSys
         )
         val projection = ObligacionSnapshotProjection(evt)
         cassandra writeState projection
+
+      case evt: ObligacionEvents.ObligacionAddedExencion =>
+        cassandra
+          .cql(
+            s"""
+          DELETE FROM read_side.buc_obligaciones WHERE bob_suj_identificador = '${evt.sujetoId}' and bob_soj_tipo_objeto = '${evt.tipoObjeto}' and bob_soj_identificador = '${evt.objetoId}' and bob_obn_id = '${evt.obligacionId}'
+
+          """
+          )
+          .recover { ex: Throwable =>
+            log.error(ex.getMessage)
+            ex
+          }
+        Future.successful(Done)
+
       case evt: ObligacionEvents.ObligacionRemoved =>
         cassandra
           .cql(

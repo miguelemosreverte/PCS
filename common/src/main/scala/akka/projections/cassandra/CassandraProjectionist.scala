@@ -14,30 +14,12 @@ object CassandraProjectionist {
       projectionHandler: ProjectionHandler[T]
   )
   def startProjection[T](requirements: CassandraProjectionistRequirements[T]): Unit = {
-
-    println(s"""
-               |
-               |      projectionSettings.name
-               |      projectionSettings.parallelism
-               |
-               |
-               |""".stripMargin)
-
     val system = requirements.system
     val projectionSettings = requirements.projectionSettings
     val projectionHandler = requirements.projectionHandler
     val shardingSettings = ClusterShardingSettings(system)
     val shardedDaemonProcessSettings = ShardedDaemonProcessSettings(system).withShardingSettings(shardingSettings)
 
-    println(s"""
-        |
-        |      projectionSettings.name
-        |      $projectionSettings.name
-        |      projectionSettings.parallelism
-        |      $projectionSettings.parallelism
-        |
-        |
-        |""".stripMargin)
     ShardedDaemonProcess(system).init(
       projectionSettings.name,
       projectionSettings.parallelism,

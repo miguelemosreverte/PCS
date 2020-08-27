@@ -1,7 +1,6 @@
 package cqrs.base_actor.typed
 
 import scala.reflect.ClassTag
-
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.cluster.sharding.external.ExternalShardAllocationStrategy
@@ -9,8 +8,11 @@ import akka.cluster.sharding.typed.scaladsl.{ClusterSharding, Entity, EntityRef,
 import akka.cluster.sharding.typed.{ClusterShardingSettings, HashCodeNoEnvelopeMessageExtractor}
 import akka.persistence.typed.PersistenceId
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
+import com.typesafe.config.ConfigFactory
 import design_principles.actor_model.mechanism.AbstractOverReplyTo.MessageWithAutomaticReplyTo
 import design_principles.actor_model.mechanism.local_processing.LocalizedProcessingMessageExtractor
+
+import scala.util.Try
 
 abstract class BasePersistentShardedTypedActor[
     ActorMessages <: design_principles.actor_model.ShardedMessage: ClassTag,
@@ -49,7 +51,21 @@ abstract class BasePersistentShardedTypedActor[
         emptyState = state,
         commandHandler = (state, message) => commandHandler(state, message),
         eventHandler = (state, evt) => eventHandler(state, evt)
-      ).withTagger(tags)
+      ).withTagger({ event =>
+        val config = ConfigFactory.load()
+        val tagsWithShardId = tags(event) map { tag =>
+          val parallelism = Try {
+            config
+              .getString(
+                s"projectionist.$tag.paralellism"
+              )
+              .toInt
+          }.getOrElse(1)
+          val shardId = PersistenceId(TypeKey.name, entityId).hashCode.abs % parallelism
+          s"$tag-$shardId"
+        }
+        tagsWithShardId
+      })
     }
 
   def getEntityRef(entityId: String): EntityRef[ActorMessages] =

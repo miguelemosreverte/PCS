@@ -2,24 +2,27 @@ package consumers.registral.plan_pago.infrastructure.kafka
 
 import akka.Done
 import api.actor_transaction.ActorTransaction
-import consumers.registral.plan_pago.application.entities.PlanPagoExternalDto.PlanPagoTri
+import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import consumers.registral.plan_pago.application.entities.PlanPagoExternalDto.{PlanPagoAnt, PlanPagoTri}
 import consumers.registral.plan_pago.application.entities.{PlanPagoCommands, PlanPagoExternalDto}
 import consumers.registral.plan_pago.infrastructure.dependency_injection.PlanPagoActor
 import consumers.registral.plan_pago.infrastructure.json._
 import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
-import serialization.decodeF
+import serialization.{decode2, decodeF}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 case class PlanPagoTributarioTransaction(actor: PlanPagoActor, monitoring: Monitoring)(
     implicit
-    system: akka.actor.typed.ActorSystem[_],
-    ec: ExecutionContext
+    actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[PlanPagoTri](monitoring) {
 
   val topic = "DGR-COP-PLANES-TRI"
+
+  def processInput(input: String): Either[Throwable, PlanPagoTri] =
+    decode2[PlanPagoTri](input)
 
   override def processCommand(registro: PlanPagoTri): Future[Response.SuccessProcessing] = {
     val command = PlanPagoCommands.PlanPagoUpdateFromDto(

@@ -12,9 +12,18 @@ import consumers.no_registral.sujeto.application.entity.SujetoQueries.GetStateSu
 import consumers.no_registral.sujeto.application.entity.SujetoResponses.GetSujetoResponse
 import consumers.no_registral.sujeto.infrastructure.json._
 import design_principles.actor_model.mechanism.QueryStateAPI
+import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
 import monitoring.Monitoring
-case class SujetoStateAPI(actor: ActorRef, monitoring: Monitoring)(implicit system: ActorSystem)
-    extends QueryStateAPI(monitoring) {
+
+import scala.concurrent.ExecutionContext
+case class SujetoStateAPI(actor: ActorRef, monitoring: Monitoring)(
+    implicit
+    queryStateApiRequirements: QueryStateApiRequirements
+) extends QueryStateAPI(monitoring) {
+
+  implicit val system: ActorSystem = queryStateApiRequirements.system
+  implicit val ec: ExecutionContext = queryStateApiRequirements.executionContext
+
   def developerTools: Route =
     withSujeto { sujetoId =>
       withDeveloperTools { command =>

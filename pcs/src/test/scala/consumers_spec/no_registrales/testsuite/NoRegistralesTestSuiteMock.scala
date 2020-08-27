@@ -1,6 +1,7 @@
 package consumers_spec.no_registrales.testsuite
 
 import akka.actor.{ActorRef, ActorSystem}
+import akka.entity.ShardedEntity.ShardedEntityRequirements
 import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMessageRoots
 import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoSnapshotPersisted
 import consumers.no_registral.objeto.infrastructure.json._
@@ -26,7 +27,11 @@ trait NoRegistralesTestSuiteMock extends NoRegistralesTestSuite {
   def testContext()(implicit system: ActorSystem): TestContext = new MockTestContext()
 
   class MockTestContext(implicit system: ActorSystem) extends TestContext {
-    import system.dispatcher
+
+    implicit val shardedEntityRequirements: ShardedEntityRequirements = ShardedEntityRequirements(
+      system,
+      system.dispatcher
+    )
 
     val monitoring = new DummyMonitoring
     val sujeto: ActorRef = new SujetoActorWithMockPersistence(messageProducer).start

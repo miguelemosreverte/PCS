@@ -1,7 +1,6 @@
 package infrastructure.cassandra
 
-import scala.concurrent.Future
-
+import scala.concurrent.{ExecutionContext, Future}
 import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.alpakka.cassandra.CassandraSessionSettings
@@ -10,8 +9,7 @@ import akka.stream.scaladsl.Sink
 import com.datastax.oss.driver.api.core.cql.{Row, SimpleStatement}
 
 // @TODO session should be injected and managed (closed) from outside
-class CassandraClient(implicit system: ActorSystem) {
-  import system.dispatcher
+class CassandraClient(implicit system: ActorSystem, executionContext: ExecutionContext) {
 
   val sessionSettings = CassandraSessionSettings()
   implicit val cassandraSession: CassandraSession =

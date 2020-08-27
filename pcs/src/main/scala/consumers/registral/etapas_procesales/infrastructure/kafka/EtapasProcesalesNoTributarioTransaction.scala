@@ -2,6 +2,8 @@ package consumers.registral.etapas_procesales.infrastructure.kafka
 
 import akka.Done
 import api.actor_transaction.ActorTransaction
+import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import consumers.registral.domicilio_sujeto.application.entities.DomicilioSujetoExternalDto.DomicilioSujetoTri
 import consumers.registral.etapas_procesales.application.entities.EtapasProcesalesExternalDto.EtapasProcesalesAnt
 import consumers.registral.etapas_procesales.application.entities.{
   EtapasProcesalesCommands,
@@ -12,17 +14,19 @@ import consumers.registral.etapas_procesales.infrastructure.json._
 import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
-import serialization.decodeF
+import serialization.{decode2, decodeF}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 case class EtapasProcesalesNoTributarioTransaction(actor: EtapasProcesalesActor, monitoring: Monitoring)(
     implicit
-    system: akka.actor.typed.ActorSystem[_],
-    ec: ExecutionContext
+    actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[EtapasProcesalesAnt](monitoring) {
 
   val topic = "DGR-COP-ETAPROCESALES-ANT"
+
+  def processInput(input: String): Either[Throwable, EtapasProcesalesAnt] =
+    decode2[EtapasProcesalesAnt](input)
 
   override def processCommand(registro: EtapasProcesalesAnt): Future[Response.SuccessProcessing] = {
     val command = EtapasProcesalesCommands.EtapasProcesalesUpdateFromDto(

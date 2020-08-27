@@ -4,6 +4,8 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
 import design_principles.actor_model.mechanism.local_processing.LocalizedProcessingMessageExtractor
 
+import scala.concurrent.ExecutionContext
+
 trait ShardedEntity[Requirements] extends ClusterEntity[Requirements] {
 
   import ShardedEntity._
@@ -12,22 +14,28 @@ trait ShardedEntity[Requirements] extends ClusterEntity[Requirements] {
 
   def startWithRequirements(requirements: Requirements)(
       implicit
-      system: ActorSystem
-  ): ActorRef = ClusterSharding(system).start(
+      shardedEntityRequirements: ShardedEntityRequirements
+  ): ActorRef = ClusterSharding(shardedEntityRequirements.system).start(
     typeName = typeName,
     entityProps = props(requirements),
-    settings = ClusterShardingSettings(system),
+    settings = ClusterShardingSettings(shardedEntityRequirements.system),
     extractEntityId = extractEntityId,
     extractShardId = extractShardId(3)
   )
 }
 
 object ShardedEntity {
+
+  case class ShardedEntityRequirements(
+      system: ActorSystem,
+      executionContext: ExecutionContext
+  )
+
   trait ShardedEntityNoRequirements extends ShardedEntity[ShardedEntity.NoRequirements] {
 
     def start(
         implicit
-        system: ActorSystem
+        shardedEntityRequirements: ShardedEntityRequirements
     ): ActorRef = this.startWithRequirements(NoRequirements())
   }
 

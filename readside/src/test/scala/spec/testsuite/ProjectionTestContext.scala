@@ -1,7 +1,6 @@
 package spec.testsuite
 
-import scala.concurrent.Await
-
+import scala.concurrent.{Await, ExecutionContext}
 import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.adapter._
 import akka.actor.{ActorPath, ActorSelection, ActorSystem, Identify}
@@ -9,12 +8,14 @@ import infrastructure.cassandra.CassandraClient
 import infrastructure.cassandra.CassandraTestkit.RowValidation
 import spec.testkit.ProjectionTestkit
 import akka.pattern.ask
+
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
-
 import akka.util.Timeout
 
 abstract class ProjectionTestContext[Events, MessageRoots](implicit system: ActorSystem) {
+  implicit val ec: ExecutionContext = system.dispatcher
+
   def ProjectionTestkit: ProjectionTestkit[Events, MessageRoots]
 
   implicit def rowValidation: Map[String, String] => RowValidation =

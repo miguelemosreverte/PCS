@@ -1,18 +1,18 @@
 package kafka
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.duration._
-import scala.util.{Failure, Success, Try}
 import akka.Done
 import akka.actor.ActorSystem
-import akka.kafka.scaladsl.Transactional
+import akka.kafka.scaladsl.{Consumer, Transactional}
 import akka.kafka.{ConsumerMessage, ProducerMessage, Subscriptions}
 import akka.stream.KillSwitches
 import akka.stream.scaladsl.{Keep, Sink}
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.LoggerFactory
 
-class KafkaTransactionalMessageProcessor(
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success, Try}
+
+class KafkaPlainConsumerMessageProcessor(
     transactionRequirements: KafkaMessageProcessorRequirements
 ) extends MessageProcessor {
 
@@ -48,14 +48,14 @@ class KafkaTransactionalMessageProcessor(
 
     val subscription = Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerListener)
 
-    val stream = Transactional
-      .source(consumer, subscription) //.throttle(THROTTLE_ELEMENTS, THROTTLE_ELEMENTS_PER millis)
-      .mapAsync(1024) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
+    val stream = Consumer
+      .plainSource(consumer, subscription) //.throttle(THROTTLE_ELEMENTS, THROTTLE_ELEMENTS_PER millis)
+      .mapAsync(1024) { msg =>
         val message = msg
 
-        val input: String = message.record.value
+        val input: String = message.value
 
-        log.debug(message.record.value)
+        log.debug(message.value)
 
         algorithm(input)
           .map { a: Seq[String] =>
@@ -76,16 +76,16 @@ class KafkaTransactionalMessageProcessor(
         case Left((message, cause)) =>
           log.error(cause)
           RejectedMessagesCounter.increment()
-          val output = Seq(message.record.value)
+          val output = Seq(message.value())
           ProducerMessage.multi(
             records = output.map { o =>
               new ProducerRecord(
                 SOURCE_TOPIC + "_retry",
-                message.record.key,
+                message.key,
                 o
               )
             }.toList,
-            passThrough = message.partitionOffset
+            passThrough = message.offset()
           )
         case Right((message, output)) =>
           ProcessedMessagesCounter.increment()
@@ -93,19 +93,14 @@ class KafkaTransactionalMessageProcessor(
             records = output.map { o =>
               new ProducerRecord(
                 SINK_TOPIC,
-                message.record.key,
+                message.key,
                 o
               )
             }.toList,
-            passThrough = message.partitionOffset
+            passThrough = message.offset()
           )
       }
-      .via(Transactional.flow(producer, transactionalId))
       .viaMat(KillSwitches.single)(Keep.right)
-      .collect {
-        case a: ProducerMessage.MultiResult[_, String, _] =>
-          a.parts.map(a => a.record.value)
-      }
       .withAttributes(akka.defaultSupervisionStrategy)
       .toMat(Sink.ignore)(Keep.both)
 

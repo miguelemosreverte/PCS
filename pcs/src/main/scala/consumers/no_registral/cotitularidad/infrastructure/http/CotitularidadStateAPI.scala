@@ -9,10 +9,18 @@ import consumers.no_registral.cotitularidad.application.entities.CotitularidadQu
 import consumers.no_registral.cotitularidad.application.entities.CotitularidadResponses.GetCotitularesResponse
 import consumers.no_registral.cotitularidad.infrastructure.json._
 import design_principles.actor_model.mechanism.QueryStateAPI
+import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
 import monitoring.Monitoring
 
-case class CotitularidadStateAPI(actor: ActorRef, monitoring: Monitoring)(implicit system: ActorSystem)
-    extends QueryStateAPI(monitoring) {
+import scala.concurrent.ExecutionContext
+
+case class CotitularidadStateAPI(actor: ActorRef, monitoring: Monitoring)(
+    implicit
+    queryStateApiRequirements: QueryStateApiRequirements
+) extends QueryStateAPI(monitoring) {
+  implicit val system: ActorSystem = queryStateApiRequirements.system
+  implicit val ec: ExecutionContext = queryStateApiRequirements.executionContext
+
   import CotitularidadStateAPI._
   def getState: Route =
     withObjeto { objetoId =>

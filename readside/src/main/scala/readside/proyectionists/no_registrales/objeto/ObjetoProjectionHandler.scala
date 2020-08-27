@@ -1,10 +1,9 @@
 package readside.proyectionists.no_registrales.objeto
 import scala.concurrent.Future
-
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter._
 import akka.projection.eventsourced.EventEnvelope
-import akka.projections.ProjectionSettings
+import akka.projections.{ProjectionHandlerConfig, ProjectionSettings}
 import akka.projections.cassandra.CassandraProjectionHandler
 import akka.{Done, actor => classic}
 import consumers.no_registral.objeto.domain.ObjetoEvents
@@ -47,7 +46,7 @@ class ObjetoProjectionHandler(settings: ProjectionSettings, system: ActorSystem[
 object ObjetoProjectionHandler {
 
   val defaultTag = "Objeto"
-  val defaultParallelism = 3
+  val defaultParallelism = ProjectionHandlerConfig.getThisTagParallelism(defaultTag)
   val defaultProjectionSettings: Monitoring => ProjectionSettings =
     ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
 

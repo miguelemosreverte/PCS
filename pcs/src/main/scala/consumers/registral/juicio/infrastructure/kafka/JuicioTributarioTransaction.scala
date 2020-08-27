@@ -2,25 +2,28 @@ package consumers.registral.juicio.infrastructure.kafka
 
 import akka.Done
 import api.actor_transaction.ActorTransaction
+import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import consumers.registral.juicio.application.entities.JuicioCommands
-import consumers.registral.juicio.application.entities.JuicioExternalDto.{DetallesJuicio, JuicioTri}
+import consumers.registral.juicio.application.entities.JuicioExternalDto.{DetallesJuicio, JuicioAnt, JuicioTri}
 import consumers.registral.juicio.infrastructure.dependency_injection.JuicioActor
 import consumers.registral.juicio.infrastructure.json._
 import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
 import play.api.libs.json.Reads
-import serialization.decodeF
+import serialization.{decode2, decodeF}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 case class JuicioTributarioTransaction(actor: JuicioActor, monitoring: Monitoring)(
     implicit
-    system: akka.actor.typed.ActorSystem[_],
-    ec: ExecutionContext
+    actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[JuicioTri](monitoring) {
 
   val topic = "DGR-COP-JUICIOS-TRI"
+
+  def processInput(input: String): Either[Throwable, JuicioTri] =
+    decode2[JuicioTri](input)
 
   override def processCommand(registro: JuicioTri): Future[Response.SuccessProcessing] = {
 

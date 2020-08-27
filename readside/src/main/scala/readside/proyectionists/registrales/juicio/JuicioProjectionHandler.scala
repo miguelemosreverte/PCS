@@ -2,7 +2,7 @@ package readside.proyectionists.registrales.juicio
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter._
 import akka.projection.eventsourced.EventEnvelope
-import akka.projections.ProjectionSettings
+import akka.projections.{ProjectionHandlerConfig, ProjectionSettings}
 import akka.{Done, actor => classic}
 import consumers.registral.juicio.domain.JuicioEvents
 import org.slf4j.LoggerFactory
@@ -11,6 +11,7 @@ import readside.proyectionists.registrales.juicio.projections.JuicioUpdatedFromD
 import scala.concurrent.Future
 import akka.projections.cassandra.CassandraProjectionHandler
 import monitoring.Monitoring
+import readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler.defaultTag
 
 class JuicioProjectionHandler(settings: ProjectionSettings, system: ActorSystem[_])
     extends CassandraProjectionHandler[JuicioEvents](settings, system) {
@@ -48,7 +49,7 @@ class JuicioProjectionHandler(settings: ProjectionSettings, system: ActorSystem[
 
 object JuicioProjectionHandler {
   val defaultTag = "Juicio"
-  val defaultParallelism = 3
+  val defaultParallelism = ProjectionHandlerConfig.getThisTagParallelism(defaultTag)
   val defaultProjectionSettings: Monitoring => ProjectionSettings =
     ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
   def apply(monitoring: Monitoring, system: ActorSystem[_]): JuicioProjectionHandler = {

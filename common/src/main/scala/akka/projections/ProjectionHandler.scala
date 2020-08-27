@@ -6,6 +6,7 @@ import akka.projection.eventsourced.EventEnvelope
 import akka.projection.scaladsl.Handler
 import monitoring.{Counter, Histogram}
 import akka.actor.typed.scaladsl.adapter._
+import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.Future
 

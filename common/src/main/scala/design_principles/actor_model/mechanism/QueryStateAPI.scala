@@ -14,7 +14,7 @@ import design_principles.actor_model.{Query, Response}
 import monitoring.Monitoring
 import play.api.libs.json.{Format, Json}
 
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 import scala.reflect.ClassTag
 
 abstract class QueryStateAPI(monitoring: Monitoring) extends Controller(monitoring) {
@@ -26,8 +26,7 @@ abstract class QueryStateAPI(monitoring: Monitoring) extends Controller(monitori
   def queryState[GetStateResponse <: Response: ClassTag](actorRef: ActorRef, query: Query)(
       format: Format[GetStateResponse],
       isEmpty: GetStateResponse => Boolean
-  )(implicit system: ActorSystem): Route = {
-    import system.dispatcher
+  )(implicit system: ActorSystem, executionContext: ExecutionContext): Route = {
     requests.increment()
     handleErrors(exceptionHandler) {
       complete {
@@ -79,6 +78,11 @@ abstract class QueryStateAPI(monitoring: Monitoring) extends Controller(monitori
 }
 
 object QueryStateAPI {
+
+  case class QueryStateApiRequirements(
+      system: ActorSystem,
+      executionContext: ExecutionContext
+  )
 
   def standarization(json: String): String = {
 

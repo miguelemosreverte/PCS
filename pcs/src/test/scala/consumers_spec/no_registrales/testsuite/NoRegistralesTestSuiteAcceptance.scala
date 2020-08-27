@@ -13,21 +13,29 @@ import design_principles.projection.infrastructure.CassandraTestkitProduction
 import kafka.{KafkaMessageProcessorRequirements, MessageProcessor, MessageProducer}
 import monitoring.{DummyMonitoring, Monitoring}
 import akka.actor.typed.scaladsl.adapter._
+import akka.entity.ShardedEntity.ShardedEntityRequirements
 
 trait NoRegistralesTestSuiteAcceptance extends NoRegistralesTestSuite {
   def testContext()(implicit system: ActorSystem): TestContext = new AcceptanceTestContext()
 
   class AcceptanceTestContext(implicit system: ActorSystem) extends TestContext {
-    import system.dispatcher
 
     val monitoring: Monitoring = new DummyMonitoring
-    lazy val cassandraTestkit: CassandraTestkitProduction = CassandraTestkitProduction()
+    lazy val cassandraTestkit: CassandraTestkitProduction = CassandraTestkitProduction()(system, system.dispatcher)
     lazy val kafka = new KafkaTestkit(monitoring)
+
+    implicit val shardedEntityRequirements: ShardedEntityRequirements = ShardedEntityRequirements(
+      system,
+      system.dispatcher
+    )
 
     lazy val sujeto: ActorRef = SujetoActor.startWithRequirements(monitoring)
     lazy val cotitularidadActor: ActorRef =
       CotitularidadActor.startWithRequirements(
-        KafkaMessageProcessorRequirements.productionSettings(kafka.rebalancerListener.toClassic, monitoring, system)
+        KafkaMessageProcessorRequirements.productionSettings(kafka.rebalancerListener.toClassic,
+                                                             monitoring,
+                                                             system,
+                                                             system.dispatcher)
       )
 
     // start feedback loop

@@ -4,6 +4,7 @@ import scala.reflect.ClassTag
 import scala.util.Try
 import akka.persistence.journal.Tagged
 import akka.persistence.{PersistentActor, RecoveryCompleted, SnapshotOffer}
+import com.typesafe.config.ConfigFactory
 import cqrs.untyped.event.{EventBus, SyncEventBus}
 import ddd.AbstractState
 import design_principles.actor_model.mechanism.local_processing.LocalizedProcessingMessageExtractor
@@ -48,9 +49,17 @@ abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[
       logger.warn(s"[$persistenceId] Unexpected event $other")
   }
 
+  val config = ConfigFactory.load()
   def persistEvent(event: E, tags: Set[String] = Set.empty)(handler: () => Unit = () => ()): Unit = {
-    val shardId = persistenceId.hashCode.abs % 3
     val tagsWithShardId = tags map { tag =>
+      val parallelism = Try {
+        config
+          .getString(
+            s"projectionist.$tag.paralellism"
+          )
+          .toInt
+      }.getOrElse(1)
+      val shardId = persistenceId.hashCode.abs % parallelism
       s"$tag-$shardId"
     }
     persistAsync(if (tags.nonEmpty) Tagged(event, tagsWithShardId) else event) { _ =>

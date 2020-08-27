@@ -28,9 +28,14 @@ class KafkaTestkit(monitoring: Monitoring)(implicit system: ActorSystem) {
     )
 
   private implicit def kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements =
-    KafkaMessageProcessorRequirements.productionSettings(rebalancerListener.toClassic, monitoring, system)
+    KafkaMessageProcessorRequirements.productionSettings(rebalancerListener.toClassic,
+                                                         monitoring,
+                                                         system,
+                                                         system.dispatcher)
   private implicit def producerSettings: ProducerSettings[String, String] =
-    KafkaMessageProcessorRequirements.productionSettings(rebalancerListener.toClassic, monitoring, system).producer
+    KafkaMessageProcessorRequirements
+      .productionSettings(rebalancerListener.toClassic, monitoring, system, system.dispatcher)
+      .producer
   def messageProducer: KafkaMessageProducer = new KafkaMessageProducer()
 
   def messageProcessor: KafkaTransactionalMessageProcessor with MessageProcessorLogging =

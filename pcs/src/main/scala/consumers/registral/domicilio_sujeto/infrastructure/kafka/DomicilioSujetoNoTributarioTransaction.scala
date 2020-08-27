@@ -3,6 +3,8 @@ package consumers.registral.domicilio_sujeto.infrastructure.kafka
 import akka.Done
 import akka.actor.typed.ActorSystem
 import api.actor_transaction.ActorTransaction
+import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import consumers.registral.domicilio_objeto.application.entities.DomicilioObjetoExternalDto.DomicilioObjetoTri
 import consumers.registral.domicilio_sujeto.application.entities.DomicilioSujetoCommands
 import consumers.registral.domicilio_sujeto.application.entities.DomicilioSujetoExternalDto.DomicilioSujetoAnt
 import consumers.registral.domicilio_sujeto.infrastructure.dependency_injection.DomicilioSujetoActor
@@ -10,17 +12,19 @@ import consumers.registral.domicilio_sujeto.infrastructure.json._
 import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
-import serialization.decodeF
+import serialization.{decode2, decodeF}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 case class DomicilioSujetoNoTributarioTransaction(actor: DomicilioSujetoActor, monitoring: Monitoring)(
     implicit
-    system: ActorSystem[_],
-    ec: ExecutionContext
+    actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[DomicilioSujetoAnt](monitoring) {
 
   val topic = "DGR-COP-DOMICILIO-SUJ-ANT"
+
+  def processInput(input: String): Either[Throwable, DomicilioSujetoAnt] =
+    decode2[DomicilioSujetoAnt](input)
 
   override def processCommand(registro: DomicilioSujetoAnt): Future[Response.SuccessProcessing] = {
     val command = DomicilioSujetoCommands.DomicilioSujetoUpdateFromDto(

@@ -4,18 +4,28 @@ import scala.concurrent.{ExecutionContext, Future}
 import akka.Done
 import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
+import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import consumers.no_registral.objeto.application.entities.ObjetoCommands
-import consumers.no_registral.objeto.application.entities.ObjetoExternalDto.{ObjetosTri, ObjetosTriOtrosAtributos}
+import consumers.no_registral.objeto.application.entities.ObjetoExternalDto.{
+  ObjetosAnt,
+  ObjetosTri,
+  ObjetosTriOtrosAtributos
+}
 import consumers.no_registral.objeto.infrastructure.json._
 import design_principles.actor_model.Response
 import monitoring.Monitoring
 import play.api.libs.json.Reads
-import serialization.decodeF
+import serialization.{decode2, decodeF}
 
-case class ObjetoTributarioTransaction(actorRef: ActorRef, monitoring: Monitoring)(implicit ec: ExecutionContext)
-    extends ActorTransaction[ObjetosTri](monitoring) {
+case class ObjetoTributarioTransaction(actorRef: ActorRef, monitoring: Monitoring)(
+    implicit
+    actorTransactionRequirements: ActorTransactionRequirements
+) extends ActorTransaction[ObjetosTri](monitoring) {
 
   val topic = "DGR-COP-OBJETOS-TRI"
+
+  def processInput(input: String): Either[Throwable, ObjetosTri] =
+    decode2[ObjetosTri](input)
 
   def processCommand(registro: ObjetosTri): Future[Response.SuccessProcessing] = {
     implicit val a: Reads[Seq[ObjetosTri]] = Reads.seq(ObjetosTriF.reads)

@@ -31,6 +31,7 @@ class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Pro
     commandBus.subscribe[ObjetoCommands.SetBajaObjeto](new SetBajaObjetoHandler(this).handle)
     commandBus.subscribe[ObjetoCommands.ObjetoUpdateFromObligacion](new ObjetoUpdateFromObligacionHandler(this).handle)
     commandBus.subscribe[ObjetoCommands.ObjetoUpdateCotitulares](new ObjetoUpdateCotitularesHandler(this).handle)
+    commandBus.subscribe[ObjetoCommands.ObjetoAddExencion](new ObjetoAddExencionHandler(this).handle)
     commandBus.subscribe[ObjetoCommands.ObjetoUpdateFromSetBajaObligacion](
       new ObjetoUpdateFromSetBajaObligacionHandler(this).handle
     )

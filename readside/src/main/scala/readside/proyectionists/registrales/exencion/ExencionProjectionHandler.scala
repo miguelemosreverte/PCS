@@ -3,13 +3,14 @@ import scala.concurrent.Future
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter._
 import akka.projection.eventsourced.EventEnvelope
-import akka.projections.ProjectionSettings
+import akka.projections.{ProjectionHandlerConfig, ProjectionSettings}
 import akka.projections.cassandra.CassandraProjectionHandler
 import akka.{Done, actor => classic}
 import consumers.no_registral.objeto.domain.ObjetoEvents
 import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoAddedExencion
 import monitoring.Monitoring
 import org.slf4j.LoggerFactory
+import readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler.defaultTag
 import readside.proyectionists.registrales.exencion.projections.ObjetoAddedExencionProjection
 
 class ExencionProjectionHandler(settings: ProjectionSettings, system: ActorSystem[_])
@@ -45,7 +46,7 @@ class ExencionProjectionHandler(settings: ProjectionSettings, system: ActorSyste
 
 object ExencionProjectionHandler {
   val defaultTag = "Exencion"
-  val defaultParallelism = 3
+  val defaultParallelism = ProjectionHandlerConfig.getThisTagParallelism(defaultTag)
   val defaultProjectionSettings: Monitoring => ProjectionSettings =
     ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
   def apply(monitoring: Monitoring, system: ActorSystem[_]): ExencionProjectionHandler = {

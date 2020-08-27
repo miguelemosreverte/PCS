@@ -1,13 +1,12 @@
 package api.actor_transaction
 
 import scala.concurrent.ExecutionContextExecutor
-
 import akka.actor.ActorSystem
 import akka.http.Controller
 import akka.http.scaladsl.server.Directives.{complete, path, pathPrefix, post, _}
 import akka.http.scaladsl.server.Route
 import akka.stream.UniqueKillSwitch
-import kafka.{KafkaMessageProcessorRequirements, KafkaTransactionalMessageProcessor}
+import kafka.{KafkaMessageProcessorRequirements, KafkaPlainConsumerMessageProcessor, KafkaTransactionalMessageProcessor}
 
 class ActorTransactionController(
     actorTransaction: ActorTransaction[_],
@@ -38,7 +37,7 @@ class ActorTransactionController(
     val topic = actorTransaction.topic
     val transaction = actorTransaction.transaction _
     log.debug(s"Starting ${actorTransaction.topic} transaction")
-    val (killSwitch, done) = new KafkaTransactionalMessageProcessor(requirements)
+    val (killSwitch, done) = new KafkaPlainConsumerMessageProcessor(requirements)
       .run(topic, s"${topic}SINK", message => {
         transaction(message).map { output =>
           Seq(output.toString)

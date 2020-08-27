@@ -11,10 +11,18 @@ import consumers.no_registral.objeto.application.entities.ObjetoQueries.{GetStat
 import consumers.no_registral.objeto.application.entities.ObjetoResponses.{GetExencionResponse, GetObjetoResponse}
 import consumers.no_registral.objeto.infrastructure.json._
 import design_principles.actor_model.mechanism.QueryStateAPI
+import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
 import monitoring.Monitoring
 
-case class ObjetoStateAPI(actor: ActorRef, monitoring: Monitoring)(implicit system: ActorSystem)
-    extends QueryStateAPI(monitoring) {
+import scala.concurrent.ExecutionContext
+
+case class ObjetoStateAPI(actor: ActorRef, monitoring: Monitoring)(
+    implicit
+    queryStateApiRequirements: QueryStateApiRequirements
+) extends QueryStateAPI(monitoring) {
+
+  implicit val system: ActorSystem = queryStateApiRequirements.system
+  implicit val ec: ExecutionContext = queryStateApiRequirements.executionContext
   import ObjetoStateAPI._
 
   def developerTools: Route =

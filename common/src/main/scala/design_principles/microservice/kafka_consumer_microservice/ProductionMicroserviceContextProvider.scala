@@ -5,8 +5,11 @@ import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter._
 import akka.cluster.ClusterEvent.MemberUp
+import akka.entity.ShardedEntity.ShardedEntityRequirements
 import akka.http.scaladsl.server.Route
 import akka.kafka.ConsumerRebalanceEvent
+import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
 import kafka.{KafkaMessageProcessorRequirements, TopicListener}
 import monitoring.KamonMonitoring
 
@@ -23,19 +26,33 @@ object ProductionMicroserviceContextProvider {
         name = "rebalancerListener"
       )
 
-    val transactionRequirements: KafkaMessageProcessorRequirements =
+    val kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements =
       KafkaMessageProcessorRequirements.productionSettings(
         rebalancerListener.toClassic,
         monitoring,
-        ctx
+        system = ctx,
+        executionContext = ctx.dispatcher
       )
+    val queryStateApiRequirements = QueryStateApiRequirements(
+      system = ctx,
+      executionContext = ctx.dispatcher
+    )
+    val shardedEntityRequirements = ShardedEntityRequirements(
+      system = ctx,
+      executionContext = ctx.dispatcher
+    )
+    val actorTransactionRequirements = ActorTransactionRequirements(
+      executionContext = ctx.dispatcher
+    )
 
     visitor(
       KafkaConsumerMicroserviceRequirements(
         monitoring = monitoring,
-        executionContext = ctx.dispatcher,
         ctx = ctx,
-        kafkaMessageProcessorRequirements = transactionRequirements
+        queryStateApiRequirements,
+        shardedEntityRequirements,
+        actorTransactionRequirements,
+        kafkaMessageProcessorRequirements
       )
     )
   }

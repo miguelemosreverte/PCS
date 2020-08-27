@@ -73,15 +73,16 @@ object TypedAsk {
 
   Pattern type is incompatible with expected type, found: String, required: GetStateActividadSujeto#ReturnType
    */
-  implicit class AkkaTypedTypedAsk[ActorMessages <: design_principles.actor_model.ShardedMessage: ClassTag,
-                                   ActorEvents,
-                                   State <: AbstractStateWithCQRS[ActorMessages, ActorEvents, State]](
+  implicit class AkkaTypedTypedAsk[
+      ActorMessages <: design_principles.actor_model.ShardedMessage: ClassTag, ActorEvents,
+      State <: AbstractStateWithCQRS[ActorMessages, ActorEvents, State]
+  ](
       actor: BasePersistentShardedTypedActorWithCQRS[
         ActorMessages,
         ActorEvents,
         State
       ]
-  )(implicit system: akka.actor.typed.ActorSystem[_])
+  ) //(implicit system: akka.actor.typed.ActorSystem[_])
       extends TypedAsk {
 
     import scala.concurrent.duration._

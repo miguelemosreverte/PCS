@@ -6,6 +6,7 @@ import infrastructure.http.HttpClient
 import org.scalatest.concurrent.ScalaFutures
 import play.api.libs.json.Format
 
+import scala.concurrent.ExecutionContextExecutor
 import scala.reflect.ClassTag
 
 trait QueryTestkit {
@@ -36,7 +37,9 @@ object QueryTestkit {
 
     override def ask[QueryType <: QueryTypeUpperBound, ReturnType: ClassTag](
         query: QueryType
-    )(implicit system: ActorSystem, format: Format[ReturnType]): ReturnType =
+    )(implicit system: ActorSystem, format: Format[ReturnType]): ReturnType = {
+      implicit val ec: ExecutionContextExecutor = system.dispatcher
       http.GET[ReturnType](query).futureValue
+    }
   }
 }

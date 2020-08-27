@@ -52,12 +52,12 @@ abstract class BasePersistentShardedTypedActor[
       ).withTagger(tags)
     }
 
-  def getEntityRef(entityId: String)(implicit system: ActorSystem[_]): EntityRef[ActorMessages] =
+  def getEntityRef(entityId: String): EntityRef[ActorMessages] =
     sharding.entityRefFor(TypeKey, entityId)
 
   def getEntityRefTyped[InMessage <: design_principles.actor_model.ShardedMessage, Response](
       entityId: String
-  )(implicit system: ActorSystem[_]): EntityRef[MessageWithAutomaticReplyTo[InMessage, Response]] = {
+  ): EntityRef[MessageWithAutomaticReplyTo[InMessage, Response]] = {
     val TypeKey = EntityTypeKey[MessageWithAutomaticReplyTo[InMessage, Response]](
       utils.Inference.getSimpleName(this.getClass.getName)
     )

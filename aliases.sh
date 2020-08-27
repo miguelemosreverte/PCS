@@ -20,6 +20,7 @@
     alias pcs.helper.kafka.publish_obligacion_tri_example="pcs.infrastructure.publish_to_kafka DGR-COP-OBLIGACIONES-TRI"
     alias pcs.helper.kafka.publish_obligacion_ant_example="pcs.infrastructure.publish_to_kafka DGR-COP-OBLIGACIONES-ANT"
     ### pcs.helper.application
+    alias pcs.helper.application.wait_ready="sh assets/scripts/wait_ready.sh"
     alias pcs.helper.application.start_consumers="sh assets/scripts/start_consumers.sh"
     alias pcs.helper.application.stop_consumers="sh assets/scripts/stop_consumers.sh"
 
@@ -34,17 +35,42 @@
     source ~/.bashrc
   }
 
-  pcs.demo.local() {
+
+  pcs.demo.local1() {
+
+    tmux new-window  -n 'local demo'
+    tmux send-keys -t 1 'echo "Starting up infrastructure"'  Enter
+    tmux send-keys -t 1 'source aliases.sh' Enter
+
+    tmux send-keys -t 1 "\
+    pcs.demo.local.start.infrastructure; \
+    pcs.helper.application.wait_ready 8081; \
+    pcs.helper.application.start_consumers; \
+    pcs.helper.kafka.publish_obligacion_tri_example \
+    " Enter
+
+    tmux new-window  -n 'writeside' \; split-window -d \; split-window -h \; split-window -h
+    tmux send-keys -t 1 'source aliases.sh' Enter 'pcs.demo.local.start.seed'            Enter
+
+    tmux new-window  -n 'readside ' \; split-window -d \; split-window -h \; split-window -h
+    tmux send-keys -t 1 'source aliases.sh' Enter 'pcs.demo.local.start.readside1'        Enter
+  }
+
+  pcs.demo.local3() {
 
     tmux new-window  -n 'local demo'
     tmux send-keys -t 1 'echo "Starting up infrastructure"'  Enter
     tmux send-keys -t 1 'source aliases.sh' Enter 'pcs.demo.local.start.infrastructure'  Enter
+    tmux send-keys -t 1 'source aliases.sh' Enter 'pcs.demo.local.start.infrastructure'  Enter
 
     tmux new-window  -n 'writeside' \; split-window -d \; split-window -h \; split-window -h
     tmux send-keys -t 1 'source aliases.sh' Enter 'pcs.demo.local.start.seed'            Enter
+    tmux send-keys -t 1 'source aliases.sh' Enter 'pcs.helper.application.wait_ready 8081'
     tmux send-keys -t 2 'source aliases.sh' Enter 'pcs.demo.local.start.node1'           Enter
+    tmux send-keys -t 1 'source aliases.sh' Enter 'pcs.helper.application.wait_ready 8082'
     tmux send-keys -t 3 'source aliases.sh' Enter 'pcs.demo.local.start.node2'           Enter
-
+    tmux send-keys -t 1 'source aliases.sh' Enter 'pcs.helper.application.wait_ready 8083'
+    tmux send-keys -t 1 'source aliases.sh' Enter 'pcs.helper.kafka.publish_obligacion_tri_example'
 
     tmux new-window  -n 'readside ' \; split-window -d \; split-window -h \; split-window -h
     tmux send-keys -t 1 'source aliases.sh' Enter 'pcs.demo.local.start.readside1'        Enter

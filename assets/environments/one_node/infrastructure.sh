@@ -3,7 +3,7 @@ docker-compose -f assets/docker-compose/dev-lite/docker-compose.yml build grafan
 docker-compose -f assets/docker-compose/dev-lite/docker-compose.yml up -d
 
 checkCassandra() {
-  docker exec cassandra cqlsh -e 'describe tables'  > /dev/null 2>&1
+  docker exec cassandra cqlsh -e 'describe tables' > /dev/null 2>&1
 }
 
 while ! checkCassandra; do

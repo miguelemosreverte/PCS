@@ -40,6 +40,16 @@ abstract class BasePersistentShardedTypedActor[
 
   def tags(event: ActorEvents): Set[String] = Set.empty
   // maybe remove this to a Singleton?
+
+  val config = ConfigFactory.load()
+  val parallelism = Try {
+    config
+      .getString(
+        s"projectionist.$tag.paralellism"
+      )
+      .toInt
+  }.getOrElse(1)
+
   def persistentEntity(entityId: String, shardedId: ActorRef[ClusterSharding.ShardCommand]): Behavior[ActorMessages] =
     Behaviors.setup { _ =>
       EventSourcedBehavior[
@@ -52,15 +62,7 @@ abstract class BasePersistentShardedTypedActor[
         commandHandler = (state, message) => commandHandler(state, message),
         eventHandler = (state, evt) => eventHandler(state, evt)
       ).withTagger({ event =>
-        val config = ConfigFactory.load()
         val tagsWithShardId = tags(event) map { tag =>
-          val parallelism = Try {
-            config
-              .getString(
-                s"projectionist.$tag.paralellism"
-              )
-              .toInt
-          }.getOrElse(1)
           val shardId = PersistenceId(TypeKey.name, entityId).hashCode.abs % parallelism
           s"$tag-$shardId"
         }

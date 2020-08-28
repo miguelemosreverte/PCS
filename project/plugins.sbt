@@ -7,10 +7,9 @@ addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.3.0")
 // Native Packager
 addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.5.1")
 // Revolver
-addSbtPlugin("io.spray"          % "sbt-revolver"        % "0.9.1")
+addSbtPlugin("io.spray" % "sbt-revolver" % "0.9.1")
 
 //addSbtPlugin("io.kamon" % "sbt-kanela-runner" % "2.0.3")
-
 
 addSbtPlugin("io.get-coursier" % "sbt-coursier" % "2.0.0-RC2")
 

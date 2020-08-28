@@ -9,6 +9,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import design_principles.actor_model.context_provider.{Guardian, GuardianRequirements}
 import design_principles.application.Application
 import life_cycle.AppLifecycleMicroservice
+import monitoring.KamonMonitoring
 import serialization.EventSerializer
 
 import scala.concurrent.Await

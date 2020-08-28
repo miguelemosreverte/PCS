@@ -15,7 +15,8 @@ import monitoring.KamonMonitoring
 
 object ProductionMicroserviceContextProvider {
   def getContext(ctx: ActorSystem)(visitor: KafkaConsumerMicroserviceRequirements => Route): Route = {
-    val monitoring = new KamonMonitoring
+
+    implicit val monitoring: KamonMonitoring = new KamonMonitoring
 
     val rebalancerListener: ActorRef[ConsumerRebalanceEvent] =
       ctx.spawn(

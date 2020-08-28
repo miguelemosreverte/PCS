@@ -8,6 +8,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import design_principles.actor_model.context_provider.{Guardian, GuardianRequirements}
 import design_principles.application.Application
 import life_cycle.AppLifecycleMicroservice
+import monitoring.KamonMonitoring
 import serialization.EventSerializer
 
 import scala.concurrent.Await
@@ -30,8 +31,10 @@ object MainApplication {
       extraConfigurations
     ).reduce(_ withFallback _)
 
+    implicit val monitoring = new KamonMonitoring
+
     val system = Guardian.getContext(GuardianRequirements(actorSystemName, config))
-    val routes = ProductionMicroserviceContextProvider.getContext(system) { microserviceProvisioning =>
+    val routes = ProductionMicroserviceContextProvider.getContext(system, monitoring) { microserviceProvisioning =>
       val userRoutes = microservices.map(_.route(microserviceProvisioning)).reduce(_ ~ _)
       val systemRoutes = AppLifecycleMicroservice.route(microserviceProvisioning)
       userRoutes ~ systemRoutes

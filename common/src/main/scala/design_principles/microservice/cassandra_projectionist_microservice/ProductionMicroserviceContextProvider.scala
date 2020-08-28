@@ -10,9 +10,9 @@ import monitoring.KamonMonitoring
 object ProductionMicroserviceContextProvider {
 
   def getContext(
-      ctx: ActorSystem
+      ctx: ActorSystem,
+      monitoring: KamonMonitoring
   )(visitor: CassandraProjectionistMicroserviceRequirements => Route): Route = {
-    val monitoring = new KamonMonitoring
 
     visitor(
       CassandraProjectionistMicroserviceRequirements(

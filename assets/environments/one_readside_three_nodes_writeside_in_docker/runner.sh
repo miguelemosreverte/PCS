@@ -28,6 +28,6 @@ tmux send-keys -t 2 "\
 tmux new-window  -n 'readside ' \; split-window -d \;
 tmux send-keys -t 1 "\
     sbt 'readside/docker:publishLocal'; \
-    docker-compose -f assets/environments/one_readside_three_nodes_writeside_in_docker/docker-compose.yml up -d readside1 readside2 readside3; \
+    docker-compose -f assets/docker-compose/docker-compose.yml up -d readside1 readside2 readside3; \
 " Enter
 tmux send-keys -t 2 'sh assets/scripts/query_cassandra_table.sh buc_obligaciones' Enter

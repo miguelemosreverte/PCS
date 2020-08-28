@@ -7,7 +7,7 @@ services:
     container_name: cassandra
     image: cassandra
     volumes:
-      - ./cassandra/config/cassandra.yaml:/etc/cassandra/cassandra.yaml
+      - ../cassandra/config/cassandra.yaml:/etc/cassandra/cassandra.yaml
     ports:
       - 9042:9042
 
@@ -38,7 +38,7 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
 
   grafana:
-    build: './grafana'
+    build: '../grafana'
     container_name: grafana
     network_mode: ${NETWORK_MODE}
     ports:
@@ -53,4 +53,4 @@ services:
     command:
       - --config.file=/etc/prometheus/prometheus.yml
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ../prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro

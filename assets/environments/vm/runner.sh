@@ -4,10 +4,8 @@ tmux send-keys -t 1 'echo "Starting up infrastructure"'  Enter
 tmux send-keys -t 1 'source aliases.sh' Enter
 
 tmux send-keys -t 1 "\
-    sh assets/environments/three_nodes_in_docker/infrastructure.sh; \
+    sh assets/environments/vm/infrastructure.sh; \
     sh assets/scripts/wait_ready.sh 8081; \
-    sh assets/scripts/wait_ready.sh 8082; \
-    sh assets/scripts/wait_ready.sh 8083; \
     pcs.helper.application.start_consumers; \
     pcs.infrastructure.publish_to_kafka DGR-COP-SUJETO-TRI; \
     pcs.infrastructure.publish_to_kafka DGR-COP-OBLIGACIONES-TRI; \
@@ -18,7 +16,7 @@ tmux send-keys -t 1 "\
 tmux new-window  -n 'writeside' \; split-window -d \;
 tmux send-keys -t 1 "\
     sbt 'pcs/docker:publishLocal'; \
-    docker-compose -f assets/docker-compose/docker-compose.yml up -d seed  node1 node2; \
+    docker-compose -f assets/environments/vm/docker-compose.yml up -d seed \
 " Enter
 tmux send-keys -t 2 "\
     sh assets/scripts/query_api.sh \
@@ -28,6 +26,6 @@ tmux send-keys -t 2 "\
 tmux new-window  -n 'readside ' \; split-window -d \;
 tmux send-keys -t 1 "\
     sbt 'readside/docker:publishLocal'; \
-    docker-compose -f assets/docker-compose/docker-compose.yml up -d readside1 readside2 readside3; \
+    docker-compose -f assets/environments/vm/docker-compose.yml up -d readside\
 " Enter
 tmux send-keys -t 2 'sh assets/scripts/query_cassandra_table.sh buc_obligaciones' Enter

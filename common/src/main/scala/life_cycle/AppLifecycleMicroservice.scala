@@ -13,12 +13,12 @@ object AppLifecycleMicroservice extends Microservice[MicroserviceRequirements] {
   def route(microserviceRequirements: MicroserviceRequirements): Route = {
     val ctx = microserviceRequirements.ctx
     implicit val system: ActorSystem[Nothing] = ctx.toTyped
-    implicit val ec: ExecutionContext = microserviceRequirements.executionContext
+    //implicit val ec: ExecutionContext = microserviceRequirements.executionContext
     val monitoring = microserviceRequirements.monitoring
 
     val appLifecycle = new AppLifecycle(AppLifecycleActor.init(ctx.toTyped))
     val livenessController = new LivenessController(monitoring)
-    val readinessController = new ReadinessController(appLifecycle, monitoring)
+    val readinessController = new ReadinessController(appLifecycle, monitoring)(ctx.dispatcher)
     val shutdownController = new ShutdownController(appLifecycle, monitoring)
 
     val appLifeCycleRoutes =

@@ -94,7 +94,7 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
               )
             }.toSeq
 
-        val topic = "ObjetoUpdateCotitularesTransaction"
+        def topic = "ObjetoUpdateCotitularesTransaction"
         val messages = informCotitularesOfAddedCotitular map serialization.encode[ObjetoUpdateCotitulares]
         if (messages.nonEmpty)
           publishToKafka(messages, topic) { _ =>
@@ -109,7 +109,7 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
 
     case command: CotitularidadCommands.CotitularidadPublishSnapshot =>
       val replyTo = sender()
-      val topic = "ObjetoReceiveSnapshot"
+      def topic = "ObjetoReceiveSnapshot"
       val messages = state.sujetosCotitulares.filter(_ != state.sujetoResponsable).map { cotitular =>
           snapshot = ObjetoSnapshot(
             deliveryId = command.deliveryId,

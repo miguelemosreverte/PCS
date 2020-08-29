@@ -108,8 +108,8 @@ object Dependencies {
   }
 
   object Kamon extends Module {
-    private lazy val kamonBundle = "io.kamon" %% "kamon-bundle" % "2.0.1"
-    private lazy val kamonAPM = "io.kamon" %% "kamon-apm-reporter" % "2.0.0"
+    private lazy val kamonBundle = "io.kamon" %% "kamon-bundle" % "2.1.0"
+    private lazy val kamonAPM = "io.kamon" %% "kamon-apm-reporter" % "2.1.0"
     // private lazy val kamonLogStash = "com.codekeepersinc" %% "kamonlogstash" % "0.0.1"
 
     val core = "io.kamon" %% "kamon-core" % "2.1.4"

@@ -4,6 +4,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import akka.Done
 import akka.actor.ActorRef
+import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import com.typesafe.config.ConfigFactory
 import consumers.no_registral.cotitularidad.infrastructure.kafka.{
   AddCotitularTransaction,
   CotitularPublishSnapshotTransaction
@@ -26,57 +28,60 @@ import kafka.{MessageProcessor, MessageProducer}
 import monitoring.DummyMonitoring
 
 class MessageTestkitUtils(sujeto: ActorRef, cotitularidadActor: ActorRef, messageProducer: MessageProducer) {
-  val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+  implicit val actorTransactionRequirements: ActorTransactionRequirements = ActorTransactionRequirements(
+    executionContext = scala.concurrent.ExecutionContext.Implicits.global,
+    config = ConfigFactory.empty
+  )
   implicit class StartMessageProcessor(messageProcessor: MessageProcessor) {
     val monitoring = new DummyMonitoring
     def startProcessing(): Unit = {
       // COTITULARIDAD CONSUMERS
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "AddCotitularTransaction",
-        AddCotitularTransaction(cotitularidadActor, monitoring)(ec)
+        AddCotitularTransaction(cotitularidadActor, monitoring)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "CotitularidadPublishSnapshot",
-        CotitularPublishSnapshotTransaction(cotitularidadActor, monitoring)(ec)
+        CotitularPublishSnapshotTransaction(cotitularidadActor, monitoring)
       )
       // OBJETO CONSUMERS
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "DGR-COP-EXENCIONES",
-        ObjetoExencionTransaction(sujeto, monitoring)(ec)
+        ObjetoExencionTransaction(sujeto, monitoring)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "DGR-COP-OBJETOS-ANT",
-        ObjetoNoTributarioTransaction(sujeto, monitoring)(ec)
+        ObjetoNoTributarioTransaction(sujeto, monitoring)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "DGR-COP-OBJETOS-TRI",
-        ObjetoTributarioTransaction(sujeto, monitoring)(ec)
+        ObjetoTributarioTransaction(sujeto, monitoring)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "ObjetoUpdateCotitularesTransaction",
-        ObjetoUpdateCotitularesTransaction(sujeto, monitoring)(ec)
+        ObjetoUpdateCotitularesTransaction(sujeto, monitoring)
       )
       messageProcessor.subscribeActorTransaction(
         SOURCE_TOPIC = "ObjetoReceiveSnapshot",
-        ObjetoUpdateNovedadTransaction(sujeto, monitoring)(ec)
+        ObjetoUpdateNovedadTransaction(sujeto, monitoring)
       )
       // OBLIGACION CONSUMERS
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-OBLIGACIONES-ANT",
-        ObligacionNoTributariaTransaction(sujeto, monitoring)(ec)
+        ObligacionNoTributariaTransaction(sujeto, monitoring)
       )
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-OBLIGACIONES-TRI",
-        ObligacionTributariaTransaction(sujeto, monitoring)(ec)
+        ObligacionTributariaTransaction(sujeto, monitoring)
       )
       // SUJETO CONSUMERS
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-SUJETO-TRI",
-        SujetoTributarioTransaction(sujeto, monitoring)(ec)
+        SujetoTributarioTransaction(sujeto, monitoring)
       )
       messageProcessor.subscribeActorTransaction(
         "DGR-COP-SUJETO-ANT",
-        SujetoNoTributarioTransaction(sujeto, monitoring)(ec)
+        SujetoNoTributarioTransaction(sujeto, monitoring)
       )
       ()
     }
@@ -88,7 +93,7 @@ object MessageTestkitUtils {
   implicit class MessageProducerNoRegistrales(messageProducer: MessageProducer) {
     import consumers_spec.no_registrales.testsuite.ToJson._
     def produceObligacion(obligacion: ObligacionExternalDto): Future[akka.Done] = {
-      val topic = obligacion match {
+      def topic = obligacion match {
         case _: ObligacionExternalDto.ObligacionesAnt => "DGR-COP-OBLIGACIONES-ANT"
         case _: ObligacionExternalDto.ObligacionesTri => "DGR-COP-OBLIGACIONES-TRI"
       }
@@ -96,7 +101,7 @@ object MessageTestkitUtils {
     }
 
     def produceObjeto(objeto: ObjetoExternalDto): Future[akka.Done] = {
-      val topic = objeto match {
+      def topic = objeto match {
         case _: ObjetoExternalDto.ObjetosAnt => "DGR-COP-OBJETOS-ANT"
         case _: ObjetoExternalDto.ObjetosTri => "DGR-COP-OBJETOS-TRI"
       }
@@ -104,7 +109,7 @@ object MessageTestkitUtils {
     }
 
     def produceSujeto(sujeto: SujetoExternalDto): Future[akka.Done] = {
-      val topic = sujeto match {
+      def topic = sujeto match {
         case _: SujetoExternalDto.SujetoAnt => "DGR-COP-SUJETO-ANT"
         case _: SujetoExternalDto.SujetoTri => "DGR-COP-SUJETO-TRI"
       }

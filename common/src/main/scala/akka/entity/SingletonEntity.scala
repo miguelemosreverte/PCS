@@ -1,7 +1,6 @@
 package akka.entity
 
-import scala.concurrent.Await
-
+import scala.concurrent.{Await, ExecutionContext}
 import akka.actor.{ActorRef, ActorSystem, PoisonPill, Props}
 import akka.cluster.singleton.{
   ClusterSingletonManager,
@@ -9,18 +8,21 @@ import akka.cluster.singleton.{
   ClusterSingletonProxy,
   ClusterSingletonProxySettings
 }
+import akka.entity.ShardedEntity.ShardedEntityRequirements
 import akka.util.Timeout
 
 trait SingletonEntity[Requirements] extends ClusterEntity[Requirements] {
 
   def props(requirements: Requirements): Props
 
-  def startWithRequirements(requirements: Requirements)(implicit system: ActorSystem): ActorRef = {
-
-    import system.dispatcher
+  def startWithRequirements(requirements: Requirements)(
+      implicit
+      shardedEntityRequirements: ShardedEntityRequirements
+  ): ActorRef = {
 
     import scala.concurrent.duration._
     implicit val timeout: Timeout = Timeout(10 seconds)
+    val system = shardedEntityRequirements.system
     val actorRef = system.actorSelection(s"/user/${typeName}Proxy").resolveOne()
 
     Await.result(
@@ -35,11 +37,13 @@ trait SingletonEntity[Requirements] extends ClusterEntity[Requirements] {
             typeName
           )
           system.actorOf(
-            ClusterSingletonProxy.props(singletonManagerPath = s"/user/${typeName}",
-                                        settings = ClusterSingletonProxySettings(system)),
+            ClusterSingletonProxy.props(
+              singletonManagerPath = s"/user/${typeName}",
+              settings = ClusterSingletonProxySettings(system)
+            ),
             name = s"${typeName}Proxy"
           )
-      },
+      }(system.dispatcher),
       10 seconds
     )
 

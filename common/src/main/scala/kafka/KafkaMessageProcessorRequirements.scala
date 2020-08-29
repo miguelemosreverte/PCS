@@ -6,7 +6,10 @@ import monitoring.Monitoring
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
 
+import scala.concurrent.ExecutionContext
+
 case class KafkaMessageProcessorRequirements(system: akka.actor.ActorSystem,
+                                             executionContext: ExecutionContext,
                                              rebalancerListener: akka.actor.ActorRef,
                                              monitoring: Monitoring,
                                              consumer: ConsumerSettings[String, String],
@@ -30,9 +33,11 @@ object KafkaMessageProcessorRequirements {
 
   def productionSettings(rebalanceListener: akka.actor.ActorRef,
                          monitoring: Monitoring,
-                         system: akka.actor.ActorSystem) =
+                         system: akka.actor.ActorSystem,
+                         executionContext: ExecutionContext) =
     KafkaMessageProcessorRequirements(
       system,
+      executionContext,
       rebalanceListener,
       monitoring,
       consumerSettings(system),

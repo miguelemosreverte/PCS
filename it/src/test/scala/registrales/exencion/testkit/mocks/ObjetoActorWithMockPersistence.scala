@@ -4,6 +4,7 @@ import akka.actor.{ActorSystem, Props}
 import akka.projection.eventsourced.EventEnvelope
 import akka.projection.scaladsl.Handler
 import akka.projections.ProjectionSettings
+import config.MockConfig
 import consumers.no_registral.objeto.domain.ObjetoEvents
 import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoAddedExencion
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
@@ -17,9 +18,9 @@ class ObjetoActorWithMockPersistence(
   val objetoSettings = ProjectionSettings("ObjetoNovedadCotitularidad", 1, new DummyMonitoring)
 
   def props(monitoring: Monitoring): Props = {
-    val obligacionProps = ObligacionActor.props(monitoring)
+    val obligacionProps = ObligacionActor.props(monitoring, MockConfig.config)
     Props(
-      new ObjetoActor(monitoring, Some(obligacionProps)) {
+      new ObjetoActor(monitoring, Some(obligacionProps), MockConfig.config) {
 
         override def persistEvent(event: ObjetoEvents, tags: Set[String])(handler: () => Unit): Unit = {
           super.persistEvent(event, tags)(handler)

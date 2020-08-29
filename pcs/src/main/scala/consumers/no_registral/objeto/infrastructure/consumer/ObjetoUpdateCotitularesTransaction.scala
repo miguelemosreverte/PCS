@@ -1,19 +1,24 @@
 package consumers.no_registral.objeto.infrastructure.consumer
 
-import scala.concurrent.{ExecutionContext, Future}
-import akka.Done
+import scala.concurrent.Future
 import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
+import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import consumers.no_registral.objeto.application.entities.ObjetoCommands.ObjetoUpdateCotitulares
 import consumers.no_registral.objeto.infrastructure.json._
 import design_principles.actor_model.Response
 import monitoring.Monitoring
-import serialization.decodeF
+import serialization.decode2
 
-case class ObjetoUpdateCotitularesTransaction(actorRef: ActorRef, monitoring: Monitoring)(implicit ec: ExecutionContext)
-    extends ActorTransaction[ObjetoUpdateCotitulares](monitoring) {
+case class ObjetoUpdateCotitularesTransaction(actorRef: ActorRef, monitoring: Monitoring)(
+    implicit
+    actorTransactionRequirements: ActorTransactionRequirements
+) extends ActorTransaction[ObjetoUpdateCotitulares](monitoring) {
 
-  val topic = "ObjetoUpdatedCotitulares"
+  def topic = "ObjetoUpdatedCotitulares"
+
+  def processInput(input: String): Either[Throwable, ObjetoUpdateCotitulares] =
+    decode2[ObjetoUpdateCotitulares](input)
 
   def processCommand(cmd: ObjetoUpdateCotitulares): Future[Response.SuccessProcessing] = {
     actorRef.ask[Response.SuccessProcessing](cmd)

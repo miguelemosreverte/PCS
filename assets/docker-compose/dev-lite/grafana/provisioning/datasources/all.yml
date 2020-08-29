@@ -1,9 +1,0 @@
-datasources:
-- name: 'akka kamon prometheus'
-  type: 'prometheus'
-  access: 'proxy'
-  org_id: 1
-  url: 'prometheus:9090'
-  is_default: true
-  version: 1
-  editable: true

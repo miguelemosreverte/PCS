@@ -4,6 +4,8 @@ import scala.concurrent.{ExecutionContext, Future}
 import akka.Done
 import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
+import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import consumers.no_registral.objeto.application.entities.ObjetoCommands.ObjetoSnapshot
 import consumers.no_registral.obligacion.application.entities.ObligacionCommands
 import consumers.no_registral.obligacion.application.entities.ObligacionExternalDto.{
   DetallesObligacion,
@@ -13,12 +15,22 @@ import consumers.no_registral.obligacion.infrastructure.json._
 import design_principles.actor_model.Response
 import monitoring.Monitoring
 import play.api.libs.json.Reads
-import serialization.decodeF
+import serialization.{decode2, decodeF}
 
-case class ObligacionNoTributariaTransaction(actorRef: ActorRef, monitoring: Monitoring)(implicit ec: ExecutionContext)
-    extends ActorTransaction[ObligacionesAnt](monitoring) {
+import scala.util.Try
 
-  val topic = "DGR-COP-OBLIGACIONES-ANT"
+case class ObligacionNoTributariaTransaction(actorRef: ActorRef, monitoring: Monitoring)(
+    implicit
+    actorTransactionRequirements: ActorTransactionRequirements
+) extends ActorTransaction[ObligacionesAnt](monitoring) {
+
+  def topic =
+    Try {
+      actorTransactionRequirements.config.getString(s"consumers.$simpleName.topic")
+    } getOrElse "DGR-COP-OBLIGACIONES-ANT"
+
+  def processInput(input: String): Either[Throwable, ObligacionesAnt] =
+    decode2[ObligacionesAnt](input)
 
   def processCommand(registro: ObligacionesAnt): Future[Response.SuccessProcessing] = {
     implicit val b: Reads[Seq[DetallesObligacion]] = Reads.seq(DetallesObligacionF.reads)

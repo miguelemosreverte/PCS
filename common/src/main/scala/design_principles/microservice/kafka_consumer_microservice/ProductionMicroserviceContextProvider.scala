@@ -5,14 +5,19 @@ import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter._
 import akka.cluster.ClusterEvent.MemberUp
+import akka.entity.ShardedEntity.ShardedEntityRequirements
 import akka.http.scaladsl.server.Route
 import akka.kafka.ConsumerRebalanceEvent
+import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import com.typesafe.config.Config
+import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
 import kafka.{KafkaMessageProcessorRequirements, TopicListener}
 import monitoring.KamonMonitoring
 
 object ProductionMicroserviceContextProvider {
-  def getContext(ctx: ActorSystem)(visitor: KafkaConsumerMicroserviceRequirements => Route): Route = {
-    val monitoring = new KamonMonitoring
+  def getContext(ctx: ActorSystem, config: Config)(visitor: KafkaConsumerMicroserviceRequirements => Route): Route = {
+
+    implicit val monitoring: KamonMonitoring = new KamonMonitoring
 
     val rebalancerListener: ActorRef[ConsumerRebalanceEvent] =
       ctx.spawn(
@@ -23,19 +28,34 @@ object ProductionMicroserviceContextProvider {
         name = "rebalancerListener"
       )
 
-    val transactionRequirements: KafkaMessageProcessorRequirements =
+    val kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements =
       KafkaMessageProcessorRequirements.productionSettings(
         rebalancerListener.toClassic,
         monitoring,
-        ctx
+        system = ctx,
+        executionContext = ctx.dispatcher
       )
+    val queryStateApiRequirements = QueryStateApiRequirements(
+      system = ctx,
+      executionContext = ctx.dispatcher
+    )
+    val shardedEntityRequirements = ShardedEntityRequirements(
+      system = ctx
+    )
+    val actorTransactionRequirements = ActorTransactionRequirements(
+      executionContext = ctx.dispatcher,
+      config = config
+    )
 
     visitor(
       KafkaConsumerMicroserviceRequirements(
         monitoring = monitoring,
-        executionContext = ctx.dispatcher,
         ctx = ctx,
-        kafkaMessageProcessorRequirements = transactionRequirements
+        queryStateApiRequirements,
+        shardedEntityRequirements,
+        actorTransactionRequirements,
+        kafkaMessageProcessorRequirements,
+        config
       )
     )
   }

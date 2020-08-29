@@ -4,13 +4,15 @@ import scala.reflect.ClassTag
 import scala.util.Try
 import akka.persistence.journal.Tagged
 import akka.persistence.{PersistentActor, RecoveryCompleted, SnapshotOffer}
+import com.typesafe.config.{Config, ConfigFactory}
 import cqrs.untyped.event.{EventBus, SyncEventBus}
 import ddd.AbstractState
 import design_principles.actor_model.mechanism.local_processing.LocalizedProcessingMessageExtractor
 import design_principles.actor_model.{Command, Event, Query}
 import monitoring.{Counter, Monitoring}
 
-abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[E]: ClassTag](monitoring: Monitoring)
+abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[E]: ClassTag](monitoring: Monitoring,
+                                                                                              config: Config)
     extends BaseActor[E, State](monitoring)
     with PersistentActor {
 
@@ -49,8 +51,15 @@ abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[
   }
 
   def persistEvent(event: E, tags: Set[String] = Set.empty)(handler: () => Unit = () => ()): Unit = {
-    val shardId = persistenceId.hashCode.abs % 3
     val tagsWithShardId = tags map { tag =>
+      val parallelism = Try {
+        config
+          .getString(
+            s"projectionist.$tag.paralellism"
+          )
+          .toInt
+      }.getOrElse(1)
+      val shardId = persistenceId.hashCode.abs % parallelism
       s"$tag-$shardId"
     }
     persistAsync(if (tags.nonEmpty) Tagged(event, tagsWithShardId) else event) { _ =>

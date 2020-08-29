@@ -10,7 +10,7 @@ object LocalDateTimeSerializer {
   val datePattern = "y-MM-dd HH:mm:ss.S"
   val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern(datePattern)
 
-  private def localDateTimeWrites(pattern: String): Writes[LocalDateTime] =
+  private def localDateTimeWrites: Writes[LocalDateTime] =
     (d: LocalDateTime) => {
       val clampedDate = d match {
         case _ if d.equals(LocalDateTime.MIN) =>
@@ -24,7 +24,7 @@ object LocalDateTimeSerializer {
       )
     }
 
-  private def localDateTimeReads(pattern: String): Reads[LocalDateTime] = {
+  private def localDateTimeReads: Reads[LocalDateTime] = {
     case JsString(ss) =>
       JsSuccess(LocalDateTime.parse(ss, formatter))
 
@@ -38,7 +38,7 @@ object LocalDateTimeSerializer {
   }
 
   implicit val dateFormat: Format[LocalDateTime] =
-    Format[LocalDateTime](Reads.localDateTimeReads(datePattern), localDateTimeWrites(datePattern))
+    Format[LocalDateTime](localDateTimeReads, localDateTimeWrites)
   //implicit val dateFormatO: OFormat[LocalDateTime] = Jsonx.formatCaseClass[LocalDateTime]
 
 }

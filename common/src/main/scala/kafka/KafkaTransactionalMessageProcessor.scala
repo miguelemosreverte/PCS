@@ -1,9 +1,8 @@
 package kafka
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.kafka.scaladsl.Transactional
@@ -20,6 +19,7 @@ class KafkaTransactionalMessageProcessor(
   override type KillSwitch = akka.stream.UniqueKillSwitch
 
   private val log = LoggerFactory.getLogger(this.getClass)
+  implicit val ec: ExecutionContext = transactionRequirements.executionContext
 
   val THROTTLE_ELEMENTS: Int = Try(System.getenv("THROTTLE_ELEMENTS")).map(_.toInt).getOrElse(10000)
   val THROTTLE_ELEMENTS_PER: Int = Try(System.getenv("THROTTLE_ELEMENTS_PER")).map(_.toInt).getOrElse(100)
@@ -46,8 +46,7 @@ class KafkaTransactionalMessageProcessor(
     val producer = transactionRequirements.producer
     val rebalancerListener = transactionRequirements.rebalancerListener
 
-    import system.dispatcher
-      val subscription = Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerListener)
+    val subscription = Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerListener)
 
     val stream = Transactional
       .source(consumer, subscription) //.throttle(THROTTLE_ELEMENTS, THROTTLE_ELEMENTS_PER millis)

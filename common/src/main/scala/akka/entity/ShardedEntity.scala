@@ -2,7 +2,11 @@ package akka.entity
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
+import com.typesafe.config.Config
 import design_principles.actor_model.mechanism.local_processing.LocalizedProcessingMessageExtractor
+import monitoring.Monitoring
+
+import scala.concurrent.ExecutionContext
 
 trait ShardedEntity[Requirements] extends ClusterEntity[Requirements] {
 
@@ -12,22 +16,29 @@ trait ShardedEntity[Requirements] extends ClusterEntity[Requirements] {
 
   def startWithRequirements(requirements: Requirements)(
       implicit
-      system: ActorSystem
-  ): ActorRef = ClusterSharding(system).start(
+      shardedEntityRequirements: ShardedEntityRequirements
+  ): ActorRef = ClusterSharding(shardedEntityRequirements.system).start(
     typeName = typeName,
-    entityProps = props(requirements),
-    settings = ClusterShardingSettings(system),
+    entityProps = props(requirements).withDispatcher(utils.Inference.getSimpleName(this.getClass.getName)),
+    settings = ClusterShardingSettings(shardedEntityRequirements.system),
     extractEntityId = extractEntityId,
     extractShardId = extractShardId(3)
   )
 }
 
 object ShardedEntity {
+
+  case class MonitoringAndConfig(monitoring: Monitoring, config: Config)
+
+  case class ShardedEntityRequirements(
+      system: ActorSystem
+  )
+
   trait ShardedEntityNoRequirements extends ShardedEntity[ShardedEntity.NoRequirements] {
 
     def start(
         implicit
-        system: ActorSystem
+        shardedEntityRequirements: ShardedEntityRequirements
     ): ActorRef = this.startWithRequirements(NoRequirements())
   }
 

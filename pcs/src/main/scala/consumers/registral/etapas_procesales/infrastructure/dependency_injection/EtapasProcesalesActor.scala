@@ -1,6 +1,7 @@
 package consumers.registral.etapas_procesales.infrastructure.dependency_injection
 
 import akka.actor.typed.ActorSystem
+import com.typesafe.config.Config
 import consumers.registral.etapas_procesales.application.cqrs.commands.EtapasProcesalesUpdateFromDtoHandler
 import consumers.registral.etapas_procesales.application.cqrs.queries.GetStateEtapasProcesalesHandler
 import consumers.registral.etapas_procesales.application.entities.EtapasProcesalesCommands.EtapasProcesalesUpdateFromDto
@@ -11,13 +12,13 @@ import consumers.registral.etapas_procesales.domain.events.EtapasProcesalesUpdat
 import consumers.registral.etapas_procesales.domain.{EtapasProcesalesEvents, EtapasProcesalesState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
-case class EtapasProcesalesActor(state: EtapasProcesalesState = EtapasProcesalesState())(
+case class EtapasProcesalesActor(state: EtapasProcesalesState = EtapasProcesalesState(), config: Config)(
     implicit system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       EtapasProcesalesMessage,
       EtapasProcesalesEvents,
       EtapasProcesalesState
-    ](state) {
+    ](state, config) {
 
   override def tags(event: EtapasProcesalesEvents): Set[String] = event match {
     case _: EtapasProcesalesUpdatedFromDto => Set("EtapasProcesales")

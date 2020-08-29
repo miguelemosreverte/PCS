@@ -2,19 +2,20 @@ package kafka
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success}
-
 import akka.Done
 import akka.actor.{ActorRef, ActorSystem}
 import akka.kafka.ProducerSettings
 import akka.kafka.scaladsl.Producer
 import akka.stream.scaladsl.Source
+import kafka.KafkaMessageProcessorRequirements.bootstrapServers
 import monitoring.Monitoring
 import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.serialization.StringSerializer
 import org.slf4j.{Logger, LoggerFactory}
 
 class KafkaMessageProducer()(
     implicit
-    system: ActorSystem,
+    system: ActorSystem, // TODO ADD CASE CLASS WITH EXECUTION CONTEXT OKOK
     producerSettings: ProducerSettings[String, String]
 ) extends MessageProducer {
 
@@ -22,6 +23,7 @@ class KafkaMessageProducer()(
 
   def produce(data: Seq[String], topic: String)(handler: Seq[String] => Unit): Future[Done] = {
 
+    // TODO REMOVE
     implicit val ec: ExecutionContextExecutor = system.getDispatcher
 
     val publication: Future[Done] = Source(data)
@@ -50,9 +52,9 @@ object KafkaMessageProducer {
 
   def apply(monitoring: Monitoring,
             rebalancerListener: ActorRef)(implicit system: ActorSystem): KafkaMessageProducer = {
-    implicit def kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements =
-      KafkaMessageProcessorRequirements.productionSettings(rebalancerListener, monitoring, system)
-    implicit def producerSettings: ProducerSettings[String, String] = kafkaMessageProcessorRequirements.producer
+    implicit def producerSettings: ProducerSettings[String, String] =
+      ProducerSettings(system, new StringSerializer, new StringSerializer)
+        .withBootstrapServers(bootstrapServers)
     new KafkaMessageProducer()
   }
 }

@@ -14,12 +14,18 @@ import consumers.no_registral.obligacion.application.entities.ObligacionQueries.
 import consumers.no_registral.obligacion.application.entities.ObligacionResponses.GetObligacionResponse
 import consumers.no_registral.obligacion.infrastructure.json._
 import design_principles.actor_model.mechanism.QueryStateAPI
+import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
 import monitoring.Monitoring
 
-case class ObligacionStateAPI(actor: ActorRef, monitoring: Monitoring)(implicit system: ActorSystem)
-    extends QueryStateAPI(monitoring) {
+import scala.concurrent.ExecutionContext
+
+case class ObligacionStateAPI(actor: ActorRef, monitoring: Monitoring)(
+    implicit queryStateApiRequirements: QueryStateApiRequirements
+) extends QueryStateAPI(monitoring) {
   import ObligacionStateAPI._
-  implicit def ec = system.dispatcher
+
+  implicit val system: ActorSystem = queryStateApiRequirements.system
+  implicit val ec: ExecutionContext = queryStateApiRequirements.executionContext
 
   // TODO Create DeveloperToolsAPI
   def developerTools: Route =

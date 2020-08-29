@@ -1,16 +1,18 @@
 package consumers_spec.registrales
 
 import akka.Done
+import config.MockConfig
 import consumers.registral.plan_pago.application.entities.PlanPagoExternalDto.PlanPagoTri
 import consumers.registral.plan_pago.application.entities.PlanPagoQueries.GetStatePlanPago
 import consumers.registral.plan_pago.application.entities.PlanPagoResponses.GetPlanPagoResponse
+import consumers.registral.plan_pago.domain.PlanPagoState
 import consumers.registral.plan_pago.infrastructure.dependency_injection.PlanPagoActor
 import consumers_spec.Metrics
 import design_principles.actor_model.{Response, TypedActorSpec}
 
 class PlanPagoSpec extends TypedActorSpec {
 
-  val actor: PlanPagoActor = PlanPagoActor()
+  val actor: PlanPagoActor = PlanPagoActor(PlanPagoState(), MockConfig.config)
 
   "Typed cluster sharding with persistent actor" should
   "support ask with thenReply" in {

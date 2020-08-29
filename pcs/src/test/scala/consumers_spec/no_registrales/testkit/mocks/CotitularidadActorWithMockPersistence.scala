@@ -16,7 +16,10 @@ class CotitularidadActorWithMockPersistence(messageProducer: MessageProducer)(im
   override def props(monitoring: Monitoring): Props = Props(
     new CotitularidadActor(
       KafkaMessageProcessorRequirements
-        .productionSettings(new KafkaTestkit(monitoring).rebalancerListener.toClassic, monitoring, system)
+        .productionSettings(new KafkaTestkit(monitoring).rebalancerListener.toClassic,
+                            monitoring,
+                            system,
+                            system.dispatcher)
     ) {
 
       override def publishToKafka(messages: Seq[String], topic: String): (Seq[String] => Unit) => Future[Done] = {

@@ -3,13 +3,14 @@ import scala.concurrent.Future
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.adapter._
 import akka.projection.eventsourced.EventEnvelope
-import akka.projections.ProjectionSettings
+import akka.projections.{ProjectionHandlerConfig, ProjectionSettings}
 import akka.projections.cassandra.CassandraProjectionHandler
 import akka.{Done, actor => classic}
 import consumers.no_registral.sujeto.domain.SujetoEvents
 import monitoring.Monitoring
 import org.slf4j.LoggerFactory
 import readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler
+import readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler.defaultTag
 import readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler.defaultProjectionSettings
 import readside.proyectionists.no_registrales.sujeto.projections.SujetoSnapshotPersistedProjection
 
@@ -52,7 +53,7 @@ class SujetoProjectionHandler(settings: ProjectionSettings, system: ActorSystem[
 object SujetoProjectionHandler {
 
   val defaultTag = "Sujeto"
-  val defaultParallelism = 3
+  val defaultParallelism = ProjectionHandlerConfig.getThisTagParallelism(defaultTag)
   val defaultProjectionSettings: Monitoring => ProjectionSettings =
     ProjectionSettings.default(tag = defaultTag, parallelism = defaultParallelism)
 

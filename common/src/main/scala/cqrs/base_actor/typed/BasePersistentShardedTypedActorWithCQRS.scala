@@ -1,10 +1,10 @@
 package cqrs.base_actor.typed
 
 import scala.reflect.ClassTag
-
 import akka.actor.Status.Success
 import akka.actor.typed.{ActorRef, ActorSystem}
 import akka.persistence.typed.scaladsl.Effect
+import com.typesafe.config.Config
 import cqrs.typed.command.SyncEffectCommandBus
 import cqrs.typed.event.SyncEffectEventBus
 import cqrs.typed.query.SyncEffectQueryBus
@@ -16,10 +16,10 @@ abstract class BasePersistentShardedTypedActorWithCQRS[
     ActorMessages <: design_principles.actor_model.ShardedMessage: ClassTag,
     ActorEvents,
     State <: AbstractStateWithCQRS[ActorMessages, ActorEvents, State]
-](s: State)(implicit system: ActorSystem[_])
+](s: State, config: Config)(implicit system: ActorSystem[_])
     extends BasePersistentShardedTypedActor[MessageWithAutomaticReplyTo[ActorMessages, ActorMessages#ReturnType],
                                             ActorEvents,
-                                            State](s) {
+                                            State](s, config) {
 
   val logger: Logger = LoggerFactory.getLogger(getClass)
   val commandBus = new SyncEffectCommandBus[ActorEvents, State](logger)

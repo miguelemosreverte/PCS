@@ -1,6 +1,7 @@
 package consumers.registral.domicilio_objeto.infrastructure.dependency_injection
 
 import akka.actor.typed.ActorSystem
+import com.typesafe.config.Config
 import consumers.registral.domicilio_objeto.application.cqrs.commands.DomicilioObjetoUpdateFromDtoHandler
 import consumers.registral.domicilio_objeto.application.cqrs.queries.GetStateDomicilioObjetoHandler
 import consumers.registral.domicilio_objeto.application.entities.DomicilioObjetoCommands.DomicilioObjetoUpdateFromDto
@@ -11,13 +12,13 @@ import consumers.registral.domicilio_objeto.domain.events.DomicilioObjetoUpdated
 import consumers.registral.domicilio_objeto.domain.{DomicilioObjetoEvents, DomicilioObjetoState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
-case class DomicilioObjetoActor(state: DomicilioObjetoState = DomicilioObjetoState())(
+case class DomicilioObjetoActor(state: DomicilioObjetoState = DomicilioObjetoState(), config: Config)(
     implicit system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       DomicilioObjetoMessage,
       DomicilioObjetoEvents,
       DomicilioObjetoState
-    ](state) {
+    ](state, config) {
 
   override def tags(event: DomicilioObjetoEvents): Set[String] = event match {
     case _: DomicilioObjetoUpdatedFromDto => Set("DomicilioObjeto")

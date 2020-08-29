@@ -1,16 +1,18 @@
 package consumers_spec.registrales
 
 import akka.Done
+import config.MockConfig
 import consumers.registral.juicio.application.entities.JuicioExternalDto.JuicioTri
 import consumers.registral.juicio.application.entities.JuicioQueries.GetStateJuicio
 import consumers.registral.juicio.application.entities.JuicioResponses.GetJuicioResponse
+import consumers.registral.juicio.domain.JuicioState
 import consumers.registral.juicio.infrastructure.dependency_injection.JuicioActor
 import consumers_spec.Metrics
 import design_principles.actor_model.{Response, TypedActorSpec}
 
 class JuicioSpec extends TypedActorSpec {
 
-  val actor: JuicioActor = JuicioActor()
+  val actor: JuicioActor = JuicioActor(JuicioState(), MockConfig.config)
 
   "Typed cluster sharding with persistent actor" should
   "support ask with thenReply" in {

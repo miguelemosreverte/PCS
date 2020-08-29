@@ -2,6 +2,7 @@ package consumers.no_registral.obligacion.infrastructure.dependency_injection
 
 import akka.actor.Props
 import akka.persistence._
+import com.typesafe.config.Config
 import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.obligacion.application.cqrs.commands._
 import consumers.no_registral.obligacion.application.cqrs.queries.ObligacionGetStateHandler
@@ -17,22 +18,10 @@ import consumers.no_registral.obligacion.infrastructure.dependency_injection.Obl
 import cqrs.base_actor.untyped.PersistentBaseActor
 import monitoring.Monitoring
 
-class ObligacionActor(monitoring: Monitoring)
-    extends PersistentBaseActor[ObligacionEvents, ObligacionState](monitoring) {
+class ObligacionActor(monitoring: Monitoring, config: Config)
+    extends PersistentBaseActor[ObligacionEvents, ObligacionState](monitoring, config) {
 
   var state = ObligacionState()
-
-  override def receiveCommand: Receive = super.receiveCommand.orElse(oldReceiveCommand)
-  def oldReceiveCommand: Receive = {
-    case _: DeleteMessagesSuccess =>
-      logger.debug(s"[$persistenceId] Success to clean this actor akka.messages")
-
-    case _: DeleteMessagesFailure =>
-      logger.error(s"[$persistenceId] Failed to clean this actor akka.messages")
-
-    case other => logger.error(s"[$persistenceId] Received UNEXPECTED message |  $other")
-
-  }
 
   override def setupHandlers(): Unit = {
     queryBus.subscribe[ObligacionQueries.GetStateObligacion](new ObligacionGetStateHandler(this).handle)
@@ -40,7 +29,6 @@ class ObligacionActor(monitoring: Monitoring)
     commandBus.subscribe[ObligacionCommands.ObligacionUpdateExencion](new ObligacionUpdateExencionHandler(this).handle)
     commandBus.subscribe[ObligacionCommands.ObligacionRemove](new ObligacionRemoveHandler(this).handle)
     commandBus.subscribe[ObligacionCommands.DownObligacion](new DownObligacionHandler(this).handle)
-
   }
 
   def informParent(cmd: ObligacionCommands): Unit = {
@@ -84,7 +72,7 @@ class ObligacionActor(monitoring: Monitoring)
 }
 
 object ObligacionActor {
-  def props(monitoring: Monitoring): Props = Props(new ObligacionActor(monitoring))
+  def props(monitoring: Monitoring, config: Config): Props = Props(new ObligacionActor(monitoring, config))
 
   object ObligacionTags {
     val ObligacionReadside: Set[String] = Set("Obligacion")

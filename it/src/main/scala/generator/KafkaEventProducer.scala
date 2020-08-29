@@ -48,10 +48,10 @@ object KafkaEventProducer {
         .withBootstrapServers("0.0.0.0:9092")
 
     val generator: Generator[_] = topic match {
-      // case "DGR-COP-OBLIGACIONES-TRI" => new ObligacionesTriGenerator()
-      // case "DGR-COP-OBLIGACIONES-ANT" => new ObligacionesAntGenerator()
+      case "DGR-COP-OBLIGACIONES-TRI" => new ObligacionesTriGenerator()
+      case "DGR-COP-OBLIGACIONES-ANT" => new ObligacionesAntGenerator()
       case "DGR-COP-SUJETO-TRI" => new SujetoTriGenerator()
-      // case "DGR-COP-SUJETO-ANT" => new SujetoAntGenerator()
+      case "DGR-COP-SUJETO-ANT" => new SujetoAntGenerator()
     }
 
     def produce(keyValue: KafkaKeyValue) = {

@@ -1,15 +1,17 @@
 package consumers_spec.registrales
 
 import akka.Done
+import config.MockConfig
 import consumers.registral.calendario.application.entities.CalendarioQueries.GetStateCalendario
 import consumers.registral.calendario.application.entities.CalendarioResponses.GetCalendarioResponse
+import consumers.registral.calendario.domain.CalendarioState
 import consumers.registral.calendario.infrastructure.dependency_injection.CalendarioActor
 import consumers_spec.Metrics
 import design_principles.actor_model.{Response, TypedActorSpec}
 
 class CalendarioSpec extends TypedActorSpec {
 
-  val actor: CalendarioActor = CalendarioActor()
+  val actor: CalendarioActor = CalendarioActor(CalendarioState(), MockConfig.config)
 
   "Typed cluster sharding with persistent actor" should
   "support ask with thenReply" in {

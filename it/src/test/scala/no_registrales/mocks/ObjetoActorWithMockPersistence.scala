@@ -6,6 +6,7 @@ import akka.actor.{ActorSystem, Props}
 import akka.projection.eventsourced.EventEnvelope
 import akka.projection.scaladsl.Handler
 import akka.projections.ProjectionSettings
+import config.MockConfig
 import consumers.no_registral.objeto.domain.{ObjetoEvents, ObjetoState}
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor.ObjetoTags
@@ -36,7 +37,7 @@ class ObjetoActorWithMockPersistence(
     val obligacionProps =
       new ObligacionActorWithMockPersistence(validateReadside, obligacionProyectionist).props(monitoring)
     Props(
-      new ObjetoActor(monitoring, Some(obligacionProps)) {
+      new ObjetoActor(monitoring, Some(obligacionProps), MockConfig.config) {
 
         override def persistSnapshotForAllCotitulares(evt: ObjetoEvents, consolidatedState: ObjetoState)(
             handler: () => Unit = () => ()

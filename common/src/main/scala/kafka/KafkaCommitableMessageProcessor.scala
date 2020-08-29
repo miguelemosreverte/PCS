@@ -1,9 +1,9 @@
 package kafka
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
-
 import akka.Done
+import akka.actor.ActorSystem
 import akka.kafka.scaladsl.{Committer, Consumer, Producer}
 import akka.kafka.{CommitterSettings, ConsumerMessage, ProducerMessage, Subscriptions}
 import akka.stream.KillSwitches
@@ -26,12 +26,11 @@ class KafkaCommitableMessageProcessor()(
 
     type Msg = ConsumerMessage.TransactionalMessage[String, String]
 
-    implicit val system = transactionRequirements.system
+    implicit val system: ActorSystem = transactionRequirements.system
+    implicit val ec: ExecutionContext = transactionRequirements.executionContext
     val consumer = transactionRequirements.consumer
     val producer = transactionRequirements.producer
     import scala.concurrent.duration._
-
-    import system.dispatcher
 
     log.info(s"Running Transaction from SOURCE_TOPIC: ${SOURCE_TOPIC} to SINK_TOPIC: ${SINK_TOPIC}")
 

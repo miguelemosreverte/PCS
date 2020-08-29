@@ -10,6 +10,8 @@ import consumers.no_registral.sujeto.application.entity.SujetoResponses.GetSujet
 import design_principles.actor_model.testkit.QueryTestkit.AgainstHTTP
 import org.scalatest.concurrent.ScalaFutures
 
+import scala.concurrent.ExecutionContextExecutor
+
 class NoRegistralesQueryWithHTTP()(implicit system: ActorSystem)
     extends NoRegistralesQueryTestKit
     with AgainstHTTP
@@ -18,7 +20,7 @@ class NoRegistralesQueryWithHTTP()(implicit system: ActorSystem)
   import consumers.no_registral.objeto.infrastructure.json._
   import consumers.no_registral.obligacion.infrastructure.json._
   import consumers.no_registral.sujeto.infrastructure.json._
-
+  implicit val ec: ExecutionContextExecutor = system.dispatcher
   def getStateObligacion(obligacionExample: ObligacionMessageRoots): GetObligacionResponse = {
     val sujetoId = obligacionExample.sujetoId
     val objetoId = obligacionExample.objetoId

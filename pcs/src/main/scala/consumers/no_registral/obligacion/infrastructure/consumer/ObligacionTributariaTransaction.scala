@@ -4,21 +4,34 @@ import scala.concurrent.{ExecutionContext, Future}
 import akka.Done
 import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
+import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import consumers.no_registral.obligacion.application.entities.ObligacionCommands
 import consumers.no_registral.obligacion.application.entities.ObligacionExternalDto.{
   DetallesObligacion,
+  ObligacionesAnt,
   ObligacionesTri
 }
 import consumers.no_registral.obligacion.infrastructure.json._
 import design_principles.actor_model.Response
+import design_principles.actor_model.Response.SuccessProcessing
 import monitoring.Monitoring
 import play.api.libs.json.Reads
-import serialization.decodeF
+import serialization.{decode2, decodeF}
 
-case class ObligacionTributariaTransaction(actorRef: ActorRef, monitoring: Monitoring)(implicit ec: ExecutionContext)
-    extends ActorTransaction[ObligacionesTri](monitoring) {
+import scala.util.Try
 
-  val topic = "DGR-COP-OBLIGACIONES-TRI"
+case class ObligacionTributariaTransaction(actorRef: ActorRef, monitoring: Monitoring)(
+    implicit
+    actorTransactionRequirements: ActorTransactionRequirements
+) extends ActorTransaction[ObligacionesTri](monitoring) {
+
+  def topic =
+    Try {
+      actorTransactionRequirements.config.getString(s"consumers.$simpleName.topic")
+    } getOrElse "DGR-COP-OBLIGACIONES-TRI"
+
+  def processInput(input: String): Either[Throwable, ObligacionesTri] =
+    decode2[ObligacionesTri](input)
 
   def processCommand(registro: ObligacionesTri): Future[Response.SuccessProcessing] = {
     implicit val b: Reads[Seq[DetallesObligacion]] = Reads.seq(DetallesObligacionF.reads)
@@ -48,6 +61,7 @@ case class ObligacionTributariaTransaction(actorRef: ActorRef, monitoring: Monit
           registro = registro,
           detallesObligacion = detalles.getOrElse(Seq.empty)
         )
-    actorRef.ask[Response.SuccessProcessing](command)
+    actorRef ! command
+    Future.successful(SuccessProcessing(command.deliveryId))
   }
 }

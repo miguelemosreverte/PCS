@@ -1,6 +1,7 @@
 package consumers.registral.actividad_sujeto.infrastructure.dependency_injection
 
 import akka.actor.typed.ActorSystem
+import com.typesafe.config.Config
 import consumers.registral.actividad_sujeto.application.cqrs.commands.ActividadSujetoUpdateFromDtoHandler
 import consumers.registral.actividad_sujeto.application.cqrs.queries.GetStateActividadSujetoHandler
 import consumers.registral.actividad_sujeto.application.entities.ActividadSujetoCommands.ActividadSujetoUpdateFromDto
@@ -11,13 +12,13 @@ import consumers.registral.actividad_sujeto.domain.events.ActividadSujetoUpdated
 import consumers.registral.actividad_sujeto.domain.{ActividadSujetoEvents, ActividadSujetoState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
-case class ActividadSujetoActor(state: ActividadSujetoState = ActividadSujetoState())(
+case class ActividadSujetoActor(state: ActividadSujetoState = ActividadSujetoState(), config: Config)(
     implicit system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       ActividadSujetoMessage,
       ActividadSujetoEvents,
       ActividadSujetoState
-    ](state) {
+    ](state, config) {
 
   override def tags(event: ActividadSujetoEvents): Set[String] = event match {
     case _: ActividadSujetoUpdatedFromDto => Set("ActividadSujeto")

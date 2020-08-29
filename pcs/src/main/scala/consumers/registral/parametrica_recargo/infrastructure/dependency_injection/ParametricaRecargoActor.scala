@@ -1,6 +1,7 @@
 package consumers.registral.parametrica_recargo.infrastructure.dependency_injection
 
 import akka.actor.typed.ActorSystem
+import com.typesafe.config.Config
 import consumers.registral.parametrica_recargo.application.cqrs.commands.ParametricaRecargoUpdateFromDtoHandler
 import consumers.registral.parametrica_recargo.application.cqrs.queries.GetStateParametricaRecargoHandler
 import consumers.registral.parametrica_recargo.application.entities.ParametricaRecargoCommands.ParametricaRecargoUpdateFromDto
@@ -11,13 +12,13 @@ import consumers.registral.parametrica_recargo.domain.events.ParametricaRecargoU
 import consumers.registral.parametrica_recargo.domain.{ParametricaRecargoEvents, ParametricaRecargoState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
-case class ParametricaRecargoActor(state: ParametricaRecargoState = ParametricaRecargoState())(
+case class ParametricaRecargoActor(state: ParametricaRecargoState = ParametricaRecargoState(), config: Config)(
     implicit system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       ParametricaRecargoMessage,
       ParametricaRecargoEvents,
       ParametricaRecargoState
-    ](state) {
+    ](state, config) {
 
   override def tags(event: ParametricaRecargoEvents): Set[String] = event match {
     case _: ParametricaRecargoUpdatedFromDto => Set("ParametricaRecargo")

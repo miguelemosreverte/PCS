@@ -4,17 +4,29 @@ import scala.concurrent.{ExecutionContext, Future}
 import akka.Done
 import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
+import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import consumers.no_registral.cotitularidad.application.entities.CotitularidadCommands.CotitularidadAddSujetoCotitular
 import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.objeto.application.entities.ObjetoExternalDto.Exencion
 import consumers.no_registral.objeto.infrastructure.json._
 import design_principles.actor_model.Response
 import monitoring.Monitoring
-import serialization.decodeF
+import serialization.{decode2, decodeF}
 
-case class ObjetoExencionTransaction(actorRef: ActorRef, monitoring: Monitoring)(implicit ec: ExecutionContext)
-    extends ActorTransaction[Exencion](monitoring) {
+import scala.util.Try
 
-  val topic = "DGR-COP-EXENCIONES"
+case class ObjetoExencionTransaction(actorRef: ActorRef, monitoring: Monitoring)(
+    implicit
+    actorTransactionRequirements: ActorTransactionRequirements
+) extends ActorTransaction[Exencion](monitoring) {
+
+  def topic =
+    Try {
+      actorTransactionRequirements.config.getString(s"consumers.$simpleName.topic")
+    } getOrElse "DGR-COP-EXENCIONES"
+
+  def processInput(input: String): Either[Throwable, Exencion] =
+    decode2[Exencion](input)
 
   def processCommand(exencion: Exencion): Future[Response.SuccessProcessing] = {
     val command = ObjetoCommands.ObjetoAddExencion(

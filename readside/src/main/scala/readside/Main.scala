@@ -3,6 +3,7 @@ package readside
 import com.typesafe.config.{Config, ConfigFactory}
 import design_principles.microservice.cassandra_projectionist_microservice.CassandraProjectionistMicroservice
 import design_principles.microservice.cassandra_projectionist_microservice.MainApplication.startMicroservices
+import monitoring.KamonMonitoring
 
 object Main extends App {
 

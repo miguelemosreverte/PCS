@@ -23,7 +23,7 @@ abstract class CassandraProjectionHandler[T](settings: ProjectionSettings, syste
 
   protected val log = LoggerFactory.getLogger(this.getClass)
 
-  def run(): Unit =
+  def run(): Unit = {
     Try(
       CassandraProjectionist.startProjection(
         CassandraProjectionistRequirements(
@@ -38,6 +38,7 @@ abstract class CassandraProjectionHandler[T](settings: ProjectionSettings, syste
       case Success(value) =>
         log.info(s"CassandraProjection ${settings.name} started with Success($value)")
     }
+  }
 
   def route: Route =
     path("api" / "projection" / settings.name / "start") {

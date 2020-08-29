@@ -2,6 +2,9 @@ package consumers.registral.parametrica_recargo.infrastructure.kafka
 
 import akka.Done
 import api.actor_transaction.ActorTransaction
+import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import com.typesafe.config.Config
+import consumers.registral.parametrica_plan.application.entities.ParametricaPlanExternalDto.ParametricaPlanTri
 import consumers.registral.parametrica_recargo.application.entities.ParametricaRecargoExternalDto.ParametricaRecargoAnt
 import consumers.registral.parametrica_recargo.application.entities.{
   ParametricaRecargoCommands,
@@ -12,17 +15,22 @@ import consumers.registral.parametrica_recargo.infrastructure.json._
 import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
-import serialization.decodeF
+import serialization.{decode2, decodeF}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 case class ParametricaRecargoNoTributarioTransaction(actor: ParametricaRecargoActor, monitoring: Monitoring)(
     implicit
-    system: akka.actor.typed.ActorSystem[_],
-    ec: ExecutionContext
+    actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[ParametricaRecargoAnt](monitoring) {
+  def topic =
+    Try {
+      actorTransactionRequirements.config.getString(s"consumers.$simpleName.topic")
+    } getOrElse "DGR-COP-PARAMRECARGO-ANT"
 
-  val topic = "DGR-COP-PARAMRECARGO-ANT"
+  def processInput(input: String): Either[Throwable, ParametricaRecargoAnt] =
+    decode2[ParametricaRecargoAnt](input)
 
   override def processCommand(registro: ParametricaRecargoAnt): Future[Response.SuccessProcessing] = {
 

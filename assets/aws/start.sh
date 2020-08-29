@@ -69,7 +69,7 @@ kubectl exec -i $pod_name cqlsh < assets/scripts/cassandra/domain/read_side/tabl
 kubectl exec -i $pod_name cqlsh < assets/scripts/cassandra/domain/read_side/tables/buc_param_plan.cql
 kubectl exec -i $pod_name cqlsh < assets/scripts/cassandra/domain/read_side/tables/buc_param_recargo.cql
 
-export REPLICAS=3
+export REPLICAS=2
 export PARALELLISM=1024
 export IMAGE=099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest
 kubectl apply -f assets/k8s/pcs/pcs-rbac.yml

@@ -83,4 +83,5 @@ kubectl apply -f assets/k8s/pcs/pcs-service-monitor.yml
 export kafka_cluster_ip=$(kubectl get svc kafka-internal -ojsonpath='{.spec.clusterIP}')
 
 sbt 'it/runMain generator.KafkaEventProducer '"$kafka_cluster_ip"':29092 DGR-COP-SUJETO-TRI 1 500000 '
+sbt 'it/runMain generator.KafkaEventProducer '"$kafka_cluster_ip"':29092 DGR-COP-OBLIGACIONES-TRI 1 500000 '
 

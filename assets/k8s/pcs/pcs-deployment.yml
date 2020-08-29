@@ -55,9 +55,9 @@ spec:
           name: pcs-cluster
           env:
             - name: PARALELLISM
-              value: $PARALLELISM
+              value: "$PARALLELISM"
             - name: REQUIRED_CONTACT_POINTS
-              value: $REPLICAS
+              value: "$REPLICAS"
             - name: KAFKA_BROKERS_LIST
               value: "kafka-internal:29092"
             - name: CASSANDRA_CONTACT_POINTS

@@ -3,7 +3,6 @@ package generator
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.event.Logging
@@ -15,6 +14,7 @@ import no_registrales.obligacion.{ObligacionesAntGenerator, ObligacionesTriGener
 import no_registrales.sujeto.{SujetoAntGenerator, SujetoTriGenerator}
 import kafka.KafkaMessageShardProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
+import registrales.actividad_sujeto.ActividadSujetoGenerator
 
 object KafkaEventProducer {
 
@@ -52,6 +52,7 @@ object KafkaEventProducer {
       case "DGR-COP-OBLIGACIONES-ANT" => new ObligacionesAntGenerator()
       case "DGR-COP-SUJETO-TRI" => new SujetoTriGenerator()
       case "DGR-COP-SUJETO-ANT" => new SujetoAntGenerator()
+      case "DGR-COP-ACTIVIDADES" => new ActividadSujetoGenerator()
     }
 
     def produce(keyValue: KafkaKeyValue) = {

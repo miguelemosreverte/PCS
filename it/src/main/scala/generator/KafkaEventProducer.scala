@@ -23,14 +23,14 @@ object KafkaEventProducer {
     def isInt(s: String): Boolean = s.matches("""\d+""")
 
     args.toList match {
-      case topic :: from :: to :: Nil if isInt(from) && isInt(to) =>
-        produce(topic, from.toInt, to.toInt)
+      case kafkaServer :: topic :: from :: to :: Nil if isInt(from) && isInt(to) =>
+        produce(kafkaServer, topic, from.toInt, to.toInt)
       case _ =>
         throw new IllegalArgumentException("usage: <topic> <from> <to> -- example: DGR-COP-ACTIVIDADES 1 1000")
     }
   }
 
-  def produce(topic: String, From: Int, To: Int): Unit = {
+  def produce(kafkaServer: String = "0.0.0.0:9092", topic: String, From: Int, To: Int): Unit = {
 
     implicit val system: ActorSystem = ActorSystem(
       "KafkaEventProducer",
@@ -45,7 +45,7 @@ object KafkaEventProducer {
 
     val producerSettings: ProducerSettings[String, String] =
       ProducerSettings(config, new StringSerializer, new StringSerializer)
-        .withBootstrapServers("0.0.0.0:9092")
+        .withBootstrapServers(kafkaServer)
 
     val generator: Generator[_] = topic match {
       case "DGR-COP-OBLIGACIONES-TRI" => new ObligacionesTriGenerator()

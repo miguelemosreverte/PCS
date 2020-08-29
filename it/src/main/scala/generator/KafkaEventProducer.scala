@@ -29,6 +29,8 @@ object KafkaEventProducer {
         throw new IllegalArgumentException("usage: <topic> <from> <to> -- example: DGR-COP-ACTIVIDADES 1 1000")
     }
   }
+  sbt 'it/runMain generator.KafkaEventProducer '"$kafka_cluster_ip"':29092 DGR-COP-OBLIGACIONES-TRI  1000000 1200000'
+  sbt 'it/runMain generator.KafkaEventProducer '"$kafka_cluster_ip"':29092 DGR-COP-SUJETO-TRI  1000000 1200000'
 
   def produce(kafkaServer: String = "0.0.0.0:9092", topic: String, From: Int, To: Int): Unit = {
 
@@ -56,7 +58,7 @@ object KafkaEventProducer {
 
     def produce(keyValue: KafkaKeyValue) = {
       println(keyValue.aggregateRoot)
-      KafkaMessageShardProducerRecord.producerRecord(topic, 120, keyValue.aggregateRoot, keyValue.json)
+      KafkaMessageShardProducerRecord.producerRecord(topic, 20, keyValue.aggregateRoot, keyValue.json)
     }
 
     val done: Future[Done] =

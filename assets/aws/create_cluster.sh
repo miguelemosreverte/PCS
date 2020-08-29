@@ -2,7 +2,7 @@
 
 
 eksctl create cluster \
---name prod12  \
+--name prod1  \
 --version 1.17  \
 --region us-west-2  \
 --nodegroup-name linux-nodes  \

@@ -10,6 +10,7 @@ git clone https://miguelemosreverte:Alatriste007@github.com/miguelemosreverte/PC
 cd PCS
 git checkout AWS
 
+git pull origin AWS
 
 sbt pcs/docker:publishLocal
 docker tag pcs/pcs:1.0 099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest
@@ -29,8 +30,10 @@ helm install prometheus stable/prometheus-operator --namespace copernico
 sleep 60
 
 export kafkaPod=$(kubectl get pod -l "app=kafka" -o jsonpath='{.items[0].metadata.name}')
-export createSujetoTri='kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 120 --topic DGR-COP-SUJETO-TRI'
+export createSujetoTri='kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 20 --topic DGR-COP-SUJETO-TRI'
 kubectl exec $kafkaPod -- $createSujetoTri
+export createObligacionTri='kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 20 --topic DGR-COP-OBLIGACIONES-TRI'
+kubectl exec $kafkaPod -- $createObligacionTri
 
 message "Setting up cassandra"
 export pod_name=$(kubectl get pod --selector app=cassandra | grep cassandra | cut -d' ' -f 1)
@@ -79,5 +82,5 @@ kubectl apply -f assets/k8s/pcs/pcs-service-monitor.yml
 
 export kafka_cluster_ip=$(kubectl get svc kafka-internal -ojsonpath='{.spec.clusterIP}')
 
-sbt 'it/runMain generator.KafkaEventProducer '"$kafka_cluster_ip"':29092 DGR-COP-SUJETO-TRI 1 3501000 '
+sbt 'it/runMain generator.KafkaEventProducer '"$kafka_cluster_ip"':29092 DGR-COP-SUJETO-TRI 1 500000 '
 

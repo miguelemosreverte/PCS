@@ -4,6 +4,7 @@ import akka.Done
 import akka.actor.typed.ActorSystem
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import com.typesafe.config.Config
 import consumers.registral.domicilio_objeto.application.entities.DomicilioObjetoExternalDto.DomicilioObjetoTri
 import consumers.registral.domicilio_sujeto.application.entities.DomicilioSujetoCommands
 import consumers.registral.domicilio_sujeto.application.entities.DomicilioSujetoExternalDto.DomicilioSujetoAnt
@@ -15,13 +16,16 @@ import monitoring.Monitoring
 import serialization.{decode2, decodeF}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 case class DomicilioSujetoNoTributarioTransaction(actor: DomicilioSujetoActor, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[DomicilioSujetoAnt](monitoring) {
-
-  val topic = "DGR-COP-DOMICILIO-SUJ-ANT"
+  def topic =
+    Try {
+      actorTransactionRequirements.config.getString(s"consumers.$simpleName.topic")
+    } getOrElse "DGR-COP-DOMICILIO-SUJ-ANT"
 
   def processInput(input: String): Either[Throwable, DomicilioSujetoAnt] =
     decode2[DomicilioSujetoAnt](input)

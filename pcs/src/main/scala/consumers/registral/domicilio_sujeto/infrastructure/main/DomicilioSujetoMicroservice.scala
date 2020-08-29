@@ -5,6 +5,7 @@ import akka.actor.{typed, ActorSystem}
 import akka.entity.ShardedEntity.ShardedEntityRequirements
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction
+import consumers.registral.domicilio_sujeto.domain.DomicilioSujetoState
 import consumers.registral.domicilio_sujeto.infrastructure.dependency_injection.DomicilioSujetoActor
 import consumers.registral.domicilio_sujeto.infrastructure.http.DomicilioSujetoStateAPI
 import consumers.registral.domicilio_sujeto.infrastructure.kafka.{
@@ -34,7 +35,7 @@ object DomicilioSujetoMicroservice extends KafkaConsumerMicroservice {
 
     implicit val system: akka.actor.typed.ActorSystem[Nothing] = ctx.toTyped
     implicit val classicSystem: akka.actor.ActorSystem = ctx
-    implicit val actor: DomicilioSujetoActor = DomicilioSujetoActor()
+    implicit val actor: DomicilioSujetoActor = DomicilioSujetoActor(DomicilioSujetoState(), m.config)
     Seq(
       DomicilioSujetoStateAPI(actor, monitoring).route,
       DomicilioSujetoTributarioTransaction(actor, monitoring).route,

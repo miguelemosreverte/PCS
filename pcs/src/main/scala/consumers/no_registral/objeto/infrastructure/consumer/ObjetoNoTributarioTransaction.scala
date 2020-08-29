@@ -12,12 +12,17 @@ import design_principles.actor_model.Response
 import monitoring.Monitoring
 import serialization.{decode2, decodeF}
 
+import scala.util.Try
+
 case class ObjetoNoTributarioTransaction(actorRef: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[ObjetosAnt](monitoring) {
 
-  val topic = "DGR-COP-OBJETOS-ANT"
+  def topic =
+    Try {
+      actorTransactionRequirements.config.getString(s"consumers.$simpleName.topic")
+    } getOrElse "DGR-COP-OBJETOS-ANT"
 
   def processInput(input: String): Either[Throwable, ObjetosAnt] =
     decode2[ObjetosAnt](input)

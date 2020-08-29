@@ -1,15 +1,17 @@
 package consumers_spec.registrales
 
 import akka.Done
+import config.MockConfig
 import consumers.registral.actividad_sujeto.application.entities.ActividadSujetoQueries.GetStateActividadSujeto
 import consumers.registral.actividad_sujeto.application.entities.ActividadSujetoResponses.GetActividadSujetoResponse
+import consumers.registral.actividad_sujeto.domain.ActividadSujetoState
 import consumers.registral.actividad_sujeto.infrastructure.dependency_injection.ActividadSujetoActor
 import consumers_spec.Metrics
 import design_principles.actor_model.{Response, TypedActorSpec}
 
 class ActividadSujetoSpec extends TypedActorSpec {
 
-  val actor: ActividadSujetoActor = ActividadSujetoActor()
+  val actor: ActividadSujetoActor = ActividadSujetoActor(ActividadSujetoState(), MockConfig.config)
 
   "Typed cluster sharding with persistent actor" should
   "support ask with thenReply" in {

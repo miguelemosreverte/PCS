@@ -2,6 +2,7 @@ package consumers.no_registral.obligacion.infrastructure.dependency_injection
 
 import akka.actor.Props
 import akka.persistence._
+import com.typesafe.config.Config
 import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.obligacion.application.cqrs.commands._
 import consumers.no_registral.obligacion.application.cqrs.queries.ObligacionGetStateHandler
@@ -17,8 +18,8 @@ import consumers.no_registral.obligacion.infrastructure.dependency_injection.Obl
 import cqrs.base_actor.untyped.PersistentBaseActor
 import monitoring.Monitoring
 
-class ObligacionActor(monitoring: Monitoring)
-    extends PersistentBaseActor[ObligacionEvents, ObligacionState](monitoring) {
+class ObligacionActor(monitoring: Monitoring, config: Config)
+    extends PersistentBaseActor[ObligacionEvents, ObligacionState](monitoring, config) {
 
   var state = ObligacionState()
 
@@ -71,7 +72,7 @@ class ObligacionActor(monitoring: Monitoring)
 }
 
 object ObligacionActor {
-  def props(monitoring: Monitoring): Props = Props(new ObligacionActor(monitoring))
+  def props(monitoring: Monitoring, config: Config): Props = Props(new ObligacionActor(monitoring, config))
 
   object ObligacionTags {
     val ObligacionReadside: Set[String] = Set("Obligacion")

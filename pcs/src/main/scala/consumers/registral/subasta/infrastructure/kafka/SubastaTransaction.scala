@@ -3,6 +3,7 @@ package consumers.registral.subasta.infrastructure.kafka
 import akka.Done
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import com.typesafe.config.Config
 import consumers.registral.plan_pago.application.entities.PlanPagoExternalDto.PlanPagoTri
 import consumers.registral.subasta.application.entities.{SubastaCommands, SubastaExternalDto}
 import consumers.registral.subasta.infrastructure.dependency_injection.SubastaActor
@@ -13,13 +14,16 @@ import monitoring.Monitoring
 import serialization.{decode2, decodeF}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 case class SubastaTransaction(actor: SubastaActor, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[SubastaExternalDto](monitoring) {
-
-  val topic = "DGR-COP-SUBASTAS"
+  def topic =
+    Try {
+      actorTransactionRequirements.config.getString(s"consumers.$simpleName.topic")
+    } getOrElse "DGR-COP-SUBASTAS"
 
   def processInput(input: String): Either[Throwable, SubastaExternalDto] =
     decode2[SubastaExternalDto](input)

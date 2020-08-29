@@ -26,8 +26,7 @@ trait ExencionTestSuiteMock extends ExencionSpec {
   class ExencionMockE2ETestContext(implicit system: ActorSystem) extends BaseE2ETestContext {
 
     implicit val shardedEntityRequirements: ShardedEntityRequirements = ShardedEntityRequirements(
-      system,
-      system.dispatcher
+      system
     )
 
     val cassandraTestkit: CassandraTestkitMock = new CassandraTestkitMock({

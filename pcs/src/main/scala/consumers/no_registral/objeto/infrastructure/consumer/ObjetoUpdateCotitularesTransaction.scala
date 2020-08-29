@@ -15,7 +15,7 @@ case class ObjetoUpdateCotitularesTransaction(actorRef: ActorRef, monitoring: Mo
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[ObjetoUpdateCotitulares](monitoring) {
 
-  val topic = "ObjetoUpdatedCotitulares"
+  def topic = "ObjetoUpdatedCotitulares"
 
   def processInput(input: String): Either[Throwable, ObjetoUpdateCotitulares] =
     decode2[ObjetoUpdateCotitulares](input)

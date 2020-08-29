@@ -9,12 +9,13 @@ import akka.entity.ShardedEntity.ShardedEntityRequirements
 import akka.http.scaladsl.server.Route
 import akka.kafka.ConsumerRebalanceEvent
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import com.typesafe.config.Config
 import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
 import kafka.{KafkaMessageProcessorRequirements, TopicListener}
 import monitoring.KamonMonitoring
 
 object ProductionMicroserviceContextProvider {
-  def getContext(ctx: ActorSystem)(visitor: KafkaConsumerMicroserviceRequirements => Route): Route = {
+  def getContext(ctx: ActorSystem, config: Config)(visitor: KafkaConsumerMicroserviceRequirements => Route): Route = {
 
     implicit val monitoring: KamonMonitoring = new KamonMonitoring
 
@@ -39,11 +40,11 @@ object ProductionMicroserviceContextProvider {
       executionContext = ctx.dispatcher
     )
     val shardedEntityRequirements = ShardedEntityRequirements(
-      system = ctx,
-      executionContext = ctx.dispatcher
+      system = ctx
     )
     val actorTransactionRequirements = ActorTransactionRequirements(
-      executionContext = ctx.dispatcher
+      executionContext = ctx.dispatcher,
+      config = config
     )
 
     visitor(
@@ -53,7 +54,8 @@ object ProductionMicroserviceContextProvider {
         queryStateApiRequirements,
         shardedEntityRequirements,
         actorTransactionRequirements,
-        kafkaMessageProcessorRequirements
+        kafkaMessageProcessorRequirements,
+        config
       )
     )
   }

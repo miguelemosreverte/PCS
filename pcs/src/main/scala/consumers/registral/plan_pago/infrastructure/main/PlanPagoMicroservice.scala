@@ -5,6 +5,7 @@ import akka.actor.{typed, ActorSystem}
 import akka.entity.ShardedEntity.ShardedEntityRequirements
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction
+import consumers.registral.plan_pago.domain.PlanPagoState
 import consumers.registral.plan_pago.infrastructure.dependency_injection.PlanPagoActor
 import consumers.registral.plan_pago.infrastructure.http.PlanPagoStateAPI
 import consumers.registral.plan_pago.infrastructure.kafka.{
@@ -34,7 +35,7 @@ object PlanPagoMicroservice extends KafkaConsumerMicroservice {
 
     implicit val system: akka.actor.typed.ActorSystem[Nothing] = ctx.toTyped
     implicit val classicSystem: akka.actor.ActorSystem = ctx
-    implicit val actor: PlanPagoActor = PlanPagoActor()
+    implicit val actor: PlanPagoActor = PlanPagoActor(PlanPagoState(), m.config)
     Seq(
       PlanPagoStateAPI(actor, monitoring).route,
       PlanPagoTributarioTransaction(actor, monitoring).route,

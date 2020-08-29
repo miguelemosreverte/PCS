@@ -1,16 +1,18 @@
 package consumers_spec.registrales
 
 import akka.Done
+import config.MockConfig
 import consumers.registral.etapas_procesales.application.entities.EtapasProcesalesExternalDto.EtapasProcesalesTri
 import consumers.registral.etapas_procesales.application.entities.EtapasProcesalesQueries.GetStateEtapasProcesales
 import consumers.registral.etapas_procesales.application.entities.EtapasProcesalesResponses.GetEtapasProcesalesResponse
+import consumers.registral.etapas_procesales.domain.EtapasProcesalesState
 import consumers.registral.etapas_procesales.infrastructure.dependency_injection.EtapasProcesalesActor
 import consumers_spec.Metrics
 import design_principles.actor_model.{Response, TypedActorSpec}
 
 class EtapasProcesalesSpec extends TypedActorSpec {
 
-  val actor: EtapasProcesalesActor = EtapasProcesalesActor()
+  val actor: EtapasProcesalesActor = EtapasProcesalesActor(EtapasProcesalesState(), MockConfig.config)
 
   "Typed cluster sharding with persistent actor" should
   "support ask with thenReply" in {

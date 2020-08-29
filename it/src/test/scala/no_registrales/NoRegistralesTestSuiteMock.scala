@@ -34,8 +34,7 @@ trait NoRegistralesTestSuiteMock extends BaseE2ESpec {
   class MockE2ETestContext(implicit system: ActorSystem) extends BaseE2ETestContext {
 
     implicit val shardedEntityRequirements: ShardedEntityRequirements = ShardedEntityRequirements(
-      system,
-      system.dispatcher
+      system
     )
     val cassandraTestkit = new CassandraTestkitMock({
       case e: ObjetoSnapshotPersisted =>

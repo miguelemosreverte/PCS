@@ -2,13 +2,13 @@ package cqrs.base_actor.typed
 
 import scala.reflect.ClassTag
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
+import akka.actor.typed.{ActorRef, ActorSystem, Behavior, DispatcherSelector}
 import akka.cluster.sharding.external.ExternalShardAllocationStrategy
 import akka.cluster.sharding.typed.scaladsl.{ClusterSharding, Entity, EntityRef, EntityTypeKey}
 import akka.cluster.sharding.typed.{ClusterShardingSettings, HashCodeNoEnvelopeMessageExtractor}
 import akka.persistence.typed.PersistenceId
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import design_principles.actor_model.mechanism.AbstractOverReplyTo.MessageWithAutomaticReplyTo
 import design_principles.actor_model.mechanism.local_processing.LocalizedProcessingMessageExtractor
 
@@ -19,7 +19,8 @@ abstract class BasePersistentShardedTypedActor[
     ActorEvents,
     State <: BasePersistentShardedTypedActorAbstractState[ActorMessages, ActorEvents, State]
 ](
-    state: State
+    state: State,
+    config: Config
 )(implicit system: ActorSystem[_]) {
 
   val sharding: ClusterSharding = ClusterSharding(system)
@@ -33,6 +34,7 @@ abstract class BasePersistentShardedTypedActor[
     }.withAllocationStrategy(new ExternalShardAllocationStrategy(system, TypeKey.name))
       .withMessageExtractor(new LocalizedProcessingMessageExtractor[ActorMessages](120))
       .withSettings(ClusterShardingSettings(system))
+      .withEntityProps(DispatcherSelector.fromConfig(utils.Inference.getSimpleName(this.getClass.getName)))
   )
 
   def commandHandler(state: State, command: ActorMessages): Effect[ActorEvents, State]
@@ -41,7 +43,6 @@ abstract class BasePersistentShardedTypedActor[
   def tags(event: ActorEvents): Set[String] = Set.empty
   // maybe remove this to a Singleton?
 
-  val config = ConfigFactory.load()
   def persistentEntity(entityId: String, shardedId: ActorRef[ClusterSharding.ShardCommand]): Behavior[ActorMessages] =
     Behaviors.setup { _ =>
       EventSourcedBehavior[

@@ -5,6 +5,7 @@ import akka.actor.{typed, ActorSystem}
 import akka.entity.ShardedEntity.ShardedEntityRequirements
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction
+import consumers.registral.declaracion_jurada.domain.DeclaracionJuradaState
 import consumers.registral.declaracion_jurada.infrastructure.dependency_injection.DeclaracionJuradaActor
 import consumers.registral.declaracion_jurada.infrastructure.http.DeclaracionJuradaStateAPI
 import consumers.registral.declaracion_jurada.infrastructure.kafka.DeclaracionJuradaTransaction
@@ -30,7 +31,7 @@ object DeclaracionJuradaMicroservice extends KafkaConsumerMicroservice {
 
     implicit val system: akka.actor.typed.ActorSystem[Nothing] = ctx.toTyped
     implicit val classicSystem: akka.actor.ActorSystem = ctx
-    implicit val actor: DeclaracionJuradaActor = DeclaracionJuradaActor()
+    implicit val actor: DeclaracionJuradaActor = DeclaracionJuradaActor(DeclaracionJuradaState(), m.config)
     Seq(
       DeclaracionJuradaStateAPI(actor, monitoring).route,
       DeclaracionJuradaTransaction(actor, monitoring).route

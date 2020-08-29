@@ -2,7 +2,7 @@ package consumers.no_registral.objeto.infrastructure.main
 
 import scala.concurrent.ExecutionContext
 import akka.actor.{typed, ActorRef, ActorSystem}
-import akka.entity.ShardedEntity.ShardedEntityRequirements
+import akka.entity.ShardedEntity.{MonitoringAndConfig, ShardedEntityRequirements}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction
@@ -37,7 +37,7 @@ object ObjetoMicroservice extends KafkaConsumerMicroservice {
     implicit val system: akka.actor.typed.ActorSystem[Nothing] = ctx.toTyped
     implicit val classicSystem: akka.actor.ActorSystem = ctx
 
-    implicit val actor: ActorRef = SujetoActor.startWithRequirements(monitoring)
+    implicit val actor: ActorRef = SujetoActor.startWithRequirements(MonitoringAndConfig(monitoring, m.config))
 
     val feedbackLoop = ObjetoNovedadCotitularidadProjectionHandler(monitoring, system)
     feedbackLoop.run()

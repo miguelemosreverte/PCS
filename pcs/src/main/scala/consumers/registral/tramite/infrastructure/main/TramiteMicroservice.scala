@@ -5,6 +5,7 @@ import akka.actor.{typed, ActorSystem}
 import akka.entity.ShardedEntity.ShardedEntityRequirements
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction
+import consumers.registral.tramite.domain.TramiteState
 import consumers.registral.tramite.infrastructure.dependency_injection.TramiteActor
 import consumers.registral.tramite.infrastructure.http.TramiteStateAPI
 import consumers.registral.tramite.infrastructure.kafka.TramiteTransaction
@@ -31,7 +32,7 @@ object TramiteMicroservice extends KafkaConsumerMicroservice {
 
     implicit val system: akka.actor.typed.ActorSystem[Nothing] = ctx.toTyped
     implicit val classicSystem: akka.actor.ActorSystem = ctx
-    implicit val actor: TramiteActor = TramiteActor()
+    implicit val actor: TramiteActor = TramiteActor(TramiteState(), m.config)
     Seq(
       TramiteStateAPI(actor, monitoring).route,
       TramiteTransaction(actor, monitoring).route

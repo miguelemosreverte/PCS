@@ -18,12 +18,17 @@ import monitoring.Monitoring
 import play.api.libs.json.Reads
 import serialization.{decode2, decodeF}
 
+import scala.util.Try
+
 case class ObligacionTributariaTransaction(actorRef: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[ObligacionesTri](monitoring) {
 
-  val topic = "DGR-COP-OBLIGACIONES-TRI"
+  def topic =
+    Try {
+      actorTransactionRequirements.config.getString(s"consumers.$simpleName.topic")
+    } getOrElse "DGR-COP-OBLIGACIONES-TRI"
 
   def processInput(input: String): Either[Throwable, ObligacionesTri] =
     decode2[ObligacionesTri](input)

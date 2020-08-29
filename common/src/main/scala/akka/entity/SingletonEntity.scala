@@ -23,7 +23,6 @@ trait SingletonEntity[Requirements] extends ClusterEntity[Requirements] {
     import scala.concurrent.duration._
     implicit val timeout: Timeout = Timeout(10 seconds)
     val system = shardedEntityRequirements.system
-    val executionContext: ExecutionContext = shardedEntityRequirements.executionContext
     val actorRef = system.actorSelection(s"/user/${typeName}Proxy").resolveOne()
 
     Await.result(
@@ -38,11 +37,13 @@ trait SingletonEntity[Requirements] extends ClusterEntity[Requirements] {
             typeName
           )
           system.actorOf(
-            ClusterSingletonProxy.props(singletonManagerPath = s"/user/${typeName}",
-                                        settings = ClusterSingletonProxySettings(system)),
+            ClusterSingletonProxy.props(
+              singletonManagerPath = s"/user/${typeName}",
+              settings = ClusterSingletonProxySettings(system)
+            ),
             name = s"${typeName}Proxy"
           )
-      }(executionContext),
+      }(system.dispatcher),
       10 seconds
     )
 

@@ -7,6 +7,7 @@ import akka.actor.{typed, ActorSystem}
 import akka.entity.ShardedEntity.ShardedEntityRequirements
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction
+import consumers.registral.calendario.domain.CalendarioState
 import consumers.registral.calendario.infrastructure.dependency_injection.CalendarioActor
 import consumers.registral.calendario.infrastructure.http.CalendarioStateAPI
 import consumers.registral.calendario.infrastructure.kafka.CalendarioTransaction
@@ -32,7 +33,7 @@ object CalendarioMicroservice extends KafkaConsumerMicroservice {
 
     implicit val system: akka.actor.typed.ActorSystem[Nothing] = ctx.toTyped
     implicit val classicSystem: akka.actor.ActorSystem = ctx
-    implicit val actor: CalendarioActor = CalendarioActor()
+    implicit val actor: CalendarioActor = CalendarioActor(CalendarioState(), m.config)
     Seq(
       CalendarioStateAPI(actor, monitoring).route,
       CalendarioTransaction(actor, monitoring).route

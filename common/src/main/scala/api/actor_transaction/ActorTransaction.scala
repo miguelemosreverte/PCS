@@ -4,6 +4,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import com.typesafe.config.Config
 import design_principles.actor_model.Response
 import kafka.KafkaMessageProcessorRequirements
 import monitoring.Monitoring
@@ -17,7 +18,7 @@ abstract class ActorTransaction[ExternalDto](
 )(implicit actorTransactionRequirements: ActorTransactionRequirements)
     extends ActorTransactionMetrics(monitoring)(actorTransactionRequirements.executionContext) {
 
-  val topic: String
+  def topic: String
 
   def processCommand(registro: ExternalDto): Future[Response.SuccessProcessing]
 
@@ -43,8 +44,11 @@ abstract class ActorTransaction[ExternalDto](
 
   final def route(implicit system: akka.actor.ActorSystem, requirements: KafkaMessageProcessorRequirements): Route =
     new ActorTransactionController(this, requirements)(system).route
+
+  protected val simpleName = utils.Inference.getSimpleName(this.getClass.getName)
+
 }
 
 object ActorTransaction {
-  case class ActorTransactionRequirements(executionContext: ExecutionContext)
+  case class ActorTransactionRequirements(config: Config, executionContext: ExecutionContext)
 }

@@ -3,6 +3,8 @@ package consumers.no_registral.sujeto.infrastructure.dependency_injection
 import akka.ActorRefMap
 import akka.actor.{ActorRef, Props}
 import akka.entity.ShardedEntity
+import akka.entity.ShardedEntity.MonitoringAndConfig
+import com.typesafe.config.Config
 import consumers.no_registral.objeto.application.entities.ObjetoMessage
 import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMessageRoots
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
@@ -22,15 +24,15 @@ import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoA
 import cqrs.base_actor.untyped.PersistentBaseActor
 import monitoring.Monitoring
 
-class SujetoActor(monitoring: Monitoring, objetoActorPropsOption: Option[Props] = None)
-    extends PersistentBaseActor[SujetoEvents, SujetoState](monitoring) {
+class SujetoActor(monitoring: Monitoring, objetoActorPropsOption: Option[Props] = None, config: Config)
+    extends PersistentBaseActor[SujetoEvents, SujetoState](monitoring, config) {
 
   var state = SujetoState()
 
   val objetos: SujetoActorRefMap = {
     val objetoActorProps = objetoActorPropsOption match {
       case Some(props) => props
-      case None => ObjetoActor.props(monitoring)
+      case None => ObjetoActor.props(monitoring, config)
     }
     new SujetoActorRefMap(
       {
@@ -74,8 +76,9 @@ class SujetoActor(monitoring: Monitoring, objetoActorPropsOption: Option[Props] 
 
 }
 
-object SujetoActor extends ShardedEntity[Monitoring] {
-  def props(monitoring: Monitoring): Props = Props(new SujetoActor(monitoring))
+object SujetoActor extends ShardedEntity[MonitoringAndConfig] {
+  def props(sujetoActorRequirements: MonitoringAndConfig): Props =
+    Props(new SujetoActor(sujetoActorRequirements.monitoring, None, sujetoActorRequirements.config))
 
   object SujetoTags {
     val SujetoReadside: Set[String] = Set("Sujeto")

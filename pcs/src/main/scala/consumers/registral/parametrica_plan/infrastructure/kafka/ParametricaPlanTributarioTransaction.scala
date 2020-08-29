@@ -3,6 +3,7 @@ package consumers.registral.parametrica_plan.infrastructure.kafka
 import akka.Done
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import com.typesafe.config.Config
 import consumers.registral.parametrica_plan.application.entities.ParametricaPlanExternalDto.{
   ParametricaPlanAnt,
   ParametricaPlanTri
@@ -16,13 +17,16 @@ import monitoring.Monitoring
 import serialization.{decode2, decodeF}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 case class ParametricaPlanTributarioTransaction(actor: ParametricaPlanActor, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[ParametricaPlanTri](monitoring) {
-
-  val topic = "DGR-COP-PARAMPLAN-TRI"
+  def topic =
+    Try {
+      actorTransactionRequirements.config.getString(s"consumers.$simpleName.topic")
+    } getOrElse "DGR-COP-PARAMPLAN-TRI"
 
   def processInput(input: String): Either[Throwable, ParametricaPlanTri] =
     decode2[ParametricaPlanTri](input)

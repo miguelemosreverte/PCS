@@ -13,7 +13,8 @@ import design_principles.projection.infrastructure.CassandraTestkitProduction
 import kafka.{KafkaMessageProcessorRequirements, MessageProcessor, MessageProducer}
 import monitoring.{DummyMonitoring, Monitoring}
 import akka.actor.typed.scaladsl.adapter._
-import akka.entity.ShardedEntity.ShardedEntityRequirements
+import akka.entity.ShardedEntity.{MonitoringAndConfig, ShardedEntityRequirements}
+import config.MockConfig
 
 trait NoRegistralesTestSuiteAcceptance extends NoRegistralesTestSuite {
   def testContext()(implicit system: ActorSystem): TestContext = new AcceptanceTestContext()
@@ -25,11 +26,10 @@ trait NoRegistralesTestSuiteAcceptance extends NoRegistralesTestSuite {
     lazy val kafka = new KafkaTestkit(monitoring)
 
     implicit val shardedEntityRequirements: ShardedEntityRequirements = ShardedEntityRequirements(
-      system,
-      system.dispatcher
+      system
     )
 
-    lazy val sujeto: ActorRef = SujetoActor.startWithRequirements(monitoring)
+    lazy val sujeto: ActorRef = SujetoActor.startWithRequirements(MonitoringAndConfig(monitoring, MockConfig.config))
     lazy val cotitularidadActor: ActorRef =
       CotitularidadActor.startWithRequirements(
         KafkaMessageProcessorRequirements.productionSettings(kafka.rebalancerListener.toClassic,

@@ -5,6 +5,7 @@ import akka.actor.{typed, ActorSystem}
 import akka.entity.ShardedEntity.ShardedEntityRequirements
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction
+import consumers.registral.parametrica_plan.domain.ParametricaPlanState
 import consumers.registral.parametrica_plan.infrastructure.dependency_injection.ParametricaPlanActor
 import consumers.registral.parametrica_plan.infrastructure.http.ParametricaPlanStateAPI
 import consumers.registral.parametrica_plan.infrastructure.kafka.{
@@ -34,7 +35,7 @@ object ParametricaPlanMicroservice extends KafkaConsumerMicroservice {
 
     implicit val system: akka.actor.typed.ActorSystem[Nothing] = ctx.toTyped
     implicit val classicSystem: akka.actor.ActorSystem = ctx
-    implicit val actor: ParametricaPlanActor = ParametricaPlanActor()
+    implicit val actor: ParametricaPlanActor = ParametricaPlanActor(ParametricaPlanState(), m.config)
     Seq(
       ParametricaPlanStateAPI(actor, monitoring).route,
       ParametricaPlanTributarioTransaction(actor, monitoring).route,

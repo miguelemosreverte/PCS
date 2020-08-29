@@ -13,12 +13,17 @@ import design_principles.actor_model.Response
 import monitoring.Monitoring
 import serialization.{decode2, decodeF}
 
+import scala.util.Try
+
 case class ObjetoExencionTransaction(actorRef: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[Exencion](monitoring) {
 
-  val topic = "DGR-COP-EXENCIONES"
+  def topic =
+    Try {
+      actorTransactionRequirements.config.getString(s"consumers.$simpleName.topic")
+    } getOrElse "DGR-COP-EXENCIONES"
 
   def processInput(input: String): Either[Throwable, Exencion] =
     decode2[Exencion](input)

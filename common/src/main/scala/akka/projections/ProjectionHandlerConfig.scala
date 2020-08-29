@@ -1,13 +1,15 @@
 package akka.projections
 
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
+import config.StaticConfig
 
 import scala.util.Try
 
 object ProjectionHandlerConfig {
 
-  def getThisTagParallelism(tag: String): Int = {
-    val config = ConfigFactory.load()
+  def getThisTagParallelism(tag: String): Int = getThisTagParallelism(StaticConfig.config)(tag)
+  def getThisTagParallelism(config: Config)(tag: String): Int = {
+
     val projectionHandler = utils.Inference.getSimpleName(this.getClass.getName)
 
     val parallelism: Int = Try {

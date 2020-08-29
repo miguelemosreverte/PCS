@@ -3,6 +3,7 @@ package consumers.registral.juicio.infrastructure.kafka
 import akka.Done
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import com.typesafe.config.Config
 import consumers.registral.etapas_procesales.application.entities.EtapasProcesalesExternalDto.EtapasProcesalesTri
 import consumers.registral.juicio.application.entities.JuicioCommands
 import consumers.registral.juicio.application.entities.JuicioExternalDto.{DetallesJuicio, JuicioAnt}
@@ -15,13 +16,16 @@ import play.api.libs.json.Reads
 import serialization.{decode2, decodeF}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 case class JuicioNoTributarioTransaction(actorRef: JuicioActor, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[JuicioAnt](monitoring) {
-
-  val topic = "DGR-COP-JUICIOS-ANT"
+  def topic =
+    Try {
+      actorTransactionRequirements.config.getString(s"consumers.$simpleName.topic")
+    } getOrElse "DGR-COP-JUICIOS-ANT"
 
   def processInput(input: String): Either[Throwable, JuicioAnt] =
     decode2[JuicioAnt](input)

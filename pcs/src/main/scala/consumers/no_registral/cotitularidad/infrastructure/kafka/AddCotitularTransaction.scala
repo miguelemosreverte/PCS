@@ -18,7 +18,7 @@ case class AddCotitularTransaction(actorRef: ActorRef, monitoring: Monitoring)(
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[CotitularidadAddSujetoCotitular](monitoring) {
 
-  val topic = "AddCotitularTransaction"
+  def topic = "AddCotitularTransaction"
 
   def processInput(input: String): Either[Throwable, CotitularidadAddSujetoCotitular] =
     decode2[CotitularidadAddSujetoCotitular](input)

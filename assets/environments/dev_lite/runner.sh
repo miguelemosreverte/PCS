@@ -4,12 +4,12 @@ tmux send-keys -t 1 'echo "Starting up infrastructure"'  Enter
 tmux send-keys -t 1 'source aliases.sh' Enter
 
 tmux send-keys -t 1 "\
-    sh assets/environments/one_node/infrastructure.sh; \
+    sh assets/environments/dev_lite/infrastructure.sh; \
     pcs.helper.application.wait_ready 8081; \
     pcs.helper.application.start_consumers; \
     pcs.infrastructure.publish_to_kafka DGR-COP-SUJETO-TRI; \
     pcs.infrastructure.publish_to_kafka DGR-COP-OBLIGACIONES-TRI; \
-    pcs.infrastructure.publish_to_kafka DGR-COP-ACTIVIDADES-TRI; \
+    pcs.infrastructure.publish_to_kafka DGR-COP-ACTIVIDADES; \
     pcs.infrastructure.publish_to_kafka DGR-COP-DOMICILIO-SUJ-TRI; \
  " Enter
 

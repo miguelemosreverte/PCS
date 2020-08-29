@@ -1,16 +1,18 @@
 package consumers_spec.registrales
 
 import akka.Done
+import config.MockConfig
 import consumers.registral.parametrica_plan.application.entities.ParametricaPlanExternalDto.ParametricaPlanTri
 import consumers.registral.parametrica_plan.application.entities.ParametricaPlanQueries.GetStateParametricaPlan
 import consumers.registral.parametrica_plan.application.entities.ParametricaPlanResponses.GetParametricaPlanResponse
+import consumers.registral.parametrica_plan.domain.ParametricaPlanState
 import consumers.registral.parametrica_plan.infrastructure.dependency_injection.ParametricaPlanActor
 import consumers_spec.Metrics
 import design_principles.actor_model.{Response, TypedActorSpec}
 
 class ParametricaPlanSpec extends TypedActorSpec {
 
-  val actor: ParametricaPlanActor = ParametricaPlanActor()
+  val actor: ParametricaPlanActor = ParametricaPlanActor(ParametricaPlanState(), MockConfig.config)
 
   "Typed cluster sharding with persistent actor" should
   "support ask with thenReply" in {

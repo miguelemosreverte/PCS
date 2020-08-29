@@ -34,7 +34,7 @@ class ActorTransactionController(
   }
 
   def startTransaction(): Unit = {
-    val topic = actorTransaction.topic
+    def topic = actorTransaction.topic
     val transaction = actorTransaction.transaction _
     log.debug(s"Starting ${actorTransaction.topic} transaction")
     val (killSwitch, done) = new KafkaPlainConsumerMessageProcessor(requirements)

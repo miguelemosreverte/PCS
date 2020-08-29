@@ -5,6 +5,7 @@ import akka.actor.typed.scaladsl.ActorContext
 import akka.cluster.ClusterEvent.MemberUp
 import akka.entity.ShardedEntity.ShardedEntityRequirements
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import com.typesafe.config.Config
 import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
 import design_principles.microservice.MicroserviceRequirements
 import kafka.KafkaMessageProcessorRequirements
@@ -18,5 +19,6 @@ case class KafkaConsumerMicroserviceRequirements(
     queryStateApiRequirements: QueryStateApiRequirements,
     shardedEntityRequirements: ShardedEntityRequirements,
     actorTransactionRequirements: ActorTransactionRequirements,
-    kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements
+    kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements,
+    config: Config
 ) extends MicroserviceRequirements

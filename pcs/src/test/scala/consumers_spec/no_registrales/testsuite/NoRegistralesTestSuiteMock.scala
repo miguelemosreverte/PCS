@@ -29,8 +29,7 @@ trait NoRegistralesTestSuiteMock extends NoRegistralesTestSuite {
   class MockTestContext(implicit system: ActorSystem) extends TestContext {
 
     implicit val shardedEntityRequirements: ShardedEntityRequirements = ShardedEntityRequirements(
-      system,
-      system.dispatcher
+      system
     )
 
     val monitoring = new DummyMonitoring

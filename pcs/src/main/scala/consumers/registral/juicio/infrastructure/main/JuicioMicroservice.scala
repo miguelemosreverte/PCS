@@ -5,6 +5,7 @@ import akka.actor.{typed, ActorSystem}
 import akka.entity.ShardedEntity.ShardedEntityRequirements
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction
+import consumers.registral.juicio.domain.JuicioState
 import consumers.registral.juicio.infrastructure.dependency_injection.JuicioActor
 import consumers.registral.juicio.infrastructure.http.JuicioStateAPI
 import consumers.registral.juicio.infrastructure.kafka.{JuicioNoTributarioTransaction, JuicioTributarioTransaction}
@@ -31,7 +32,7 @@ object JuicioMicroservice extends KafkaConsumerMicroservice {
 
     implicit val system: akka.actor.typed.ActorSystem[Nothing] = ctx.toTyped
     implicit val classicSystem: akka.actor.ActorSystem = ctx
-    implicit val actor: JuicioActor = JuicioActor()
+    implicit val actor: JuicioActor = JuicioActor(JuicioState(), m.config)
     Seq(
       JuicioStateAPI(actor, monitoring).route,
       JuicioTributarioTransaction(actor, monitoring).route,

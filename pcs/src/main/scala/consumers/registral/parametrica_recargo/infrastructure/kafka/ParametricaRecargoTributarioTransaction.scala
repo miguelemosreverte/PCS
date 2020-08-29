@@ -3,6 +3,7 @@ package consumers.registral.parametrica_recargo.infrastructure.kafka
 import akka.Done
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import com.typesafe.config.Config
 import consumers.registral.parametrica_recargo.application.entities.ParametricaRecargoExternalDto.{
   ParametricaRecargoAnt,
   ParametricaRecargoTri
@@ -19,13 +20,16 @@ import monitoring.Monitoring
 import serialization.{decode2, decodeF}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 case class ParametricaRecargoTributarioTransaction(actor: ParametricaRecargoActor, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[ParametricaRecargoTri](monitoring) {
-
-  val topic = "DGR-COP-PARAMRECARGO-TRI"
+  def topic =
+    Try {
+      actorTransactionRequirements.config.getString(s"consumers.$simpleName.topic")
+    } getOrElse "DGR-COP-PARAMRECARGO-TRI"
 
   def processInput(input: String): Either[Throwable, ParametricaRecargoTri] =
     decode2[ParametricaRecargoTri](input)

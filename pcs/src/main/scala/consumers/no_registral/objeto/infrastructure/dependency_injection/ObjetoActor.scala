@@ -2,6 +2,7 @@ package consumers.no_registral.objeto.infrastructure.dependency_injection
 
 import akka.ActorRefMap
 import akka.actor.{ActorRef, Props}
+import com.typesafe.config.Config
 import consumers.no_registral.objeto.application.cqrs.commands._
 import consumers.no_registral.objeto.application.cqrs.queries.{GetStateExencionHandler, GetStateObjetoHandler}
 import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMessageRoots
@@ -16,8 +17,8 @@ import consumers.no_registral.sujeto.application.entity.SujetoCommands
 import cqrs.base_actor.untyped.PersistentBaseActor
 import monitoring.Monitoring
 
-class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Props] = None)
-    extends PersistentBaseActor[ObjetoEvents, ObjetoState](monitoring) {
+class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Props] = None, config: Config)
+    extends PersistentBaseActor[ObjetoEvents, ObjetoState](monitoring, config) {
   import ObjetoActor._
 
   var state = ObjetoState()
@@ -43,7 +44,7 @@ class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Pro
   val obligaciones: ObjetoActorRefMap = {
     val obligacionActorProps = obligacionActorPropsOption match {
       case Some(props) => props
-      case None => ObligacionActor.props(monitoring)
+      case None => ObligacionActor.props(monitoring, config)
     }
     new ObjetoActorRefMap(
       {
@@ -171,7 +172,7 @@ class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Pro
 }
 
 object ObjetoActor {
-  def props(monitoring: Monitoring): Props = Props(new ObjetoActor(monitoring))
+  def props(monitoring: Monitoring, config: Config): Props = Props(new ObjetoActor(monitoring, None, config))
 
   object ObjetoTags {
     val ObjetoReadside: Set[String] = Set("Objeto")

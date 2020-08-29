@@ -1,6 +1,7 @@
 package consumers.registral.declaracion_jurada.infrastructure.dependency_injection
 
 import akka.actor.typed.ActorSystem
+import com.typesafe.config.Config
 import consumers.registral.declaracion_jurada.application.cqrs.commands.DeclaracionJuradaUpdateFromDtoHandler
 import consumers.registral.declaracion_jurada.application.cqrs.queries.GetStateDeclaracionJuradaHandler
 import consumers.registral.declaracion_jurada.application.entities.DeclaracionJuradaCommands.DeclaracionJuradaUpdateFromDto
@@ -11,13 +12,13 @@ import consumers.registral.declaracion_jurada.domain.events.DeclaracionJuradaUpd
 import consumers.registral.declaracion_jurada.domain.{DeclaracionJuradaEvents, DeclaracionJuradaState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
-case class DeclaracionJuradaActor(state: DeclaracionJuradaState = DeclaracionJuradaState())(
+case class DeclaracionJuradaActor(state: DeclaracionJuradaState = DeclaracionJuradaState(), config: Config)(
     implicit system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       DeclaracionJuradaMessage,
       DeclaracionJuradaEvents,
       DeclaracionJuradaState
-    ](state) {
+    ](state, config) {
 
   override def tags(event: DeclaracionJuradaEvents): Set[String] = event match {
     case _: DeclaracionJuradaUpdatedFromDto => Set("DeclaracionJurada")

@@ -4,6 +4,7 @@ import akka.Done
 import akka.actor.typed.ActorSystem
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import com.typesafe.config.Config
 import consumers.registral.calendario.application.entities.CalendarioExternalDto
 import consumers.registral.declaracion_jurada.application.entities.DeclaracionJuradaCommands
 import consumers.registral.declaracion_jurada.application.entities.DeclaracionJuradaExternalDto.DeclaracionJurada
@@ -15,12 +16,16 @@ import monitoring.Monitoring
 import serialization.{decode2, decodeF}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 case class DeclaracionJuradaTransaction(actor: DeclaracionJuradaActor, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[DeclaracionJurada](monitoring) {
-  val topic = "DGR-COP-DECJURADAS"
+  def topic =
+    Try {
+      actorTransactionRequirements.config.getString(s"consumers.$simpleName.topic")
+    } getOrElse "DGR-COP-DECJURADAS"
 
   def processInput(input: String): Either[Throwable, DeclaracionJurada] =
     decode2[DeclaracionJurada](input)

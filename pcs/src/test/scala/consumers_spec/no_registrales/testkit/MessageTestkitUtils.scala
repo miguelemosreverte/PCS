@@ -5,6 +5,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import akka.Done
 import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import com.typesafe.config.ConfigFactory
 import consumers.no_registral.cotitularidad.infrastructure.kafka.{
   AddCotitularTransaction,
   CotitularPublishSnapshotTransaction
@@ -28,7 +29,8 @@ import monitoring.DummyMonitoring
 
 class MessageTestkitUtils(sujeto: ActorRef, cotitularidadActor: ActorRef, messageProducer: MessageProducer) {
   implicit val actorTransactionRequirements: ActorTransactionRequirements = ActorTransactionRequirements(
-    executionContext = scala.concurrent.ExecutionContext.Implicits.global
+    executionContext = scala.concurrent.ExecutionContext.Implicits.global,
+    config = ConfigFactory.empty
   )
   implicit class StartMessageProcessor(messageProcessor: MessageProcessor) {
     val monitoring = new DummyMonitoring
@@ -91,7 +93,7 @@ object MessageTestkitUtils {
   implicit class MessageProducerNoRegistrales(messageProducer: MessageProducer) {
     import consumers_spec.no_registrales.testsuite.ToJson._
     def produceObligacion(obligacion: ObligacionExternalDto): Future[akka.Done] = {
-      val topic = obligacion match {
+      def topic = obligacion match {
         case _: ObligacionExternalDto.ObligacionesAnt => "DGR-COP-OBLIGACIONES-ANT"
         case _: ObligacionExternalDto.ObligacionesTri => "DGR-COP-OBLIGACIONES-TRI"
       }
@@ -99,7 +101,7 @@ object MessageTestkitUtils {
     }
 
     def produceObjeto(objeto: ObjetoExternalDto): Future[akka.Done] = {
-      val topic = objeto match {
+      def topic = objeto match {
         case _: ObjetoExternalDto.ObjetosAnt => "DGR-COP-OBJETOS-ANT"
         case _: ObjetoExternalDto.ObjetosTri => "DGR-COP-OBJETOS-TRI"
       }
@@ -107,7 +109,7 @@ object MessageTestkitUtils {
     }
 
     def produceSujeto(sujeto: SujetoExternalDto): Future[akka.Done] = {
-      val topic = sujeto match {
+      def topic = sujeto match {
         case _: SujetoExternalDto.SujetoAnt => "DGR-COP-SUJETO-ANT"
         case _: SujetoExternalDto.SujetoTri => "DGR-COP-SUJETO-TRI"
       }

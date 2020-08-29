@@ -5,6 +5,7 @@ import akka.actor.{typed, ActorSystem}
 import akka.entity.ShardedEntity.ShardedEntityRequirements
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction
+import consumers.registral.subasta.domain.SubastaState
 import consumers.registral.subasta.infrastructure.dependency_injection.SubastaActor
 import consumers.registral.subasta.infrastructure.http.SubastaStateAPI
 import consumers.registral.subasta.infrastructure.kafka.SubastaTransaction
@@ -31,7 +32,7 @@ object SubastaMicroservice extends KafkaConsumerMicroservice {
 
     implicit val system: akka.actor.typed.ActorSystem[Nothing] = ctx.toTyped
     implicit val classicSystem: akka.actor.ActorSystem = ctx
-    implicit val actor: SubastaActor = SubastaActor()
+    implicit val actor: SubastaActor = SubastaActor(SubastaState(), m.config)
     Seq(
       SubastaStateAPI(actor, monitoring).route,
       SubastaTransaction(actor, monitoring).route

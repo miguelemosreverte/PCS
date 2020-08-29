@@ -33,7 +33,7 @@ class ObjetoNovedadCotitularidadProjectionHandler(settings: ProjectionSettings, 
   def processEvent(event: ObjetoEvents): Future[Done] = {
     event match {
       case evt: ObjetoEvents.ObjetoUpdatedFromTri =>
-        val topic = "AddCotitularTransaction"
+        def topic = "AddCotitularTransaction"
         val message =
           CotitularidadAddSujetoCotitular(
             deliveryId = evt.deliveryId,
@@ -49,7 +49,7 @@ class ObjetoNovedadCotitularidadProjectionHandler(settings: ProjectionSettings, 
 
       case evt: ObjetoEvents.ObjetoSnapshotPersisted if shouldInformCotitulares(evt) =>
         val publishedMessages: Set[Future[Done]] = evt.cotitulares.filter(_ == evt.sujetoResponsable) map { cotitular =>
-          val topic = "CotitularidadPublishSnapshot"
+          def topic = "CotitularidadPublishSnapshot"
           val message =
             CotitularidadPublishSnapshot(
               evt.deliveryId,

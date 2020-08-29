@@ -1,6 +1,7 @@
 package consumers.registral.parametrica_plan.infrastructure.dependency_injection
 
 import akka.actor.typed.ActorSystem
+import com.typesafe.config.Config
 import consumers.registral.parametrica_plan.application.cqrs.commands.ParametricaPlanUpdateFromDtoHandler
 import consumers.registral.parametrica_plan.application.cqrs.queries.GetStateParametricaPlanHandler
 import consumers.registral.parametrica_plan.application.entities.ParametricaPlanCommands.ParametricaPlanUpdateFromDto
@@ -11,13 +12,13 @@ import consumers.registral.parametrica_plan.domain.events.ParametricaPlanUpdated
 import consumers.registral.parametrica_plan.domain.{ParametricaPlanEvents, ParametricaPlanState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
-case class ParametricaPlanActor(state: ParametricaPlanState = ParametricaPlanState())(
+case class ParametricaPlanActor(state: ParametricaPlanState = ParametricaPlanState(), config: Config)(
     implicit system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       ParametricaPlanMessage,
       ParametricaPlanEvents,
       ParametricaPlanState
-    ](state) {
+    ](state, config) {
 
   override def tags(event: ParametricaPlanEvents): Set[String] = event match {
     case _: ParametricaPlanUpdatedFromDto => Set("ParametricaPlan")

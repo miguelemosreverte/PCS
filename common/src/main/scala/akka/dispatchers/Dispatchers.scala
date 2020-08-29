@@ -1,4 +1,4 @@
-package akka
+package akka.dispatchers
 
 trait Dispatchers {
 
@@ -12,7 +12,7 @@ trait Dispatchers {
     |  }
     |
     |  throughput = $throughput
-    |}"""
+    |}""".stripMargin
 
   def forkJoin(dispatcherName: String,
                parallelismMin: Int,
@@ -31,5 +31,5 @@ trait Dispatchers {
       |  }
       |
       |  throughput = $throughput
-      |}"""
+      |}""".stripMargin
 }

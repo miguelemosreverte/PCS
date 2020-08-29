@@ -7,6 +7,7 @@ import akka.entity.ShardedEntity.ShardedEntityRequirements
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction
+import consumers.registral.actividad_sujeto.domain.ActividadSujetoState
 import consumers.registral.actividad_sujeto.infrastructure.dependency_injection.ActividadSujetoActor
 import consumers.registral.actividad_sujeto.infrastructure.http.ActividadSujetoStateAPI
 import consumers.registral.actividad_sujeto.infrastructure.kafka.ActividadSujetoTransaction
@@ -31,7 +32,7 @@ object ActividadSujetoMicroservice extends KafkaConsumerMicroservice {
     import akka.actor.typed.scaladsl.adapter._
     implicit val system: ActorSystem[Nothing] = ctx.toTyped
     implicit val classicSystem: akka.actor.ActorSystem = ctx
-    implicit val actor: ActividadSujetoActor = ActividadSujetoActor()
+    implicit val actor: ActividadSujetoActor = ActividadSujetoActor(ActividadSujetoState(), m.config)
     Seq(
       ActividadSujetoStateAPI(actor, monitoring).route,
       ActividadSujetoTransaction(actor, monitoring).route

@@ -3,6 +3,7 @@ package consumers.registral.tramite.infrastructure.kafka
 import akka.Done
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import com.typesafe.config.Config
 import consumers.registral.subasta.application.entities.SubastaExternalDto
 import consumers.registral.tramite.application.entities.TramiteExternalDto.Tramite
 import consumers.registral.tramite.application.entities.{TramiteCommands, TramiteExternalDto}
@@ -14,13 +15,16 @@ import monitoring.Monitoring
 import serialization.{decode2, decodeF}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 case class TramiteTransaction(actor: TramiteActor, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[Tramite](monitoring) {
-
-  val topic = "DGR-COP-TRAMITES"
+  def topic =
+    Try {
+      actorTransactionRequirements.config.getString(s"consumers.$simpleName.topic")
+    } getOrElse "DGR-COP-TRAMITES"
 
   def processInput(input: String): Either[Throwable, Tramite] =
     decode2[Tramite](input)

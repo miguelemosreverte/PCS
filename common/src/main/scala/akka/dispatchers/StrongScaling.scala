@@ -1,21 +1,43 @@
-package akka
+package akka.dispatchers
 
-import akka.StrongScaling.HardwareSpecs
-import com.typesafe.config.ConfigFactory
+import akka.dispatchers.StrongScaling.HardwareSpecs
+import com.typesafe.config.{Config, ConfigFactory}
 
 object StrongScaling {
   /*
 
-  # Throughput (throughputPerActorPerThreadJump)
+  # Throughput (processedeMessagesPerActorPerThreadJump)
   # defines the maximum number of messages to be
   # processed per actor before the thread jumps to the next actor.
   # Set to 1 for as fair as possible.
    */
-  case class HardwareSpecs(parallelismMin: Int,
-                           parallelismMax: Int,
-                           parallelismFactor: Int,
-                           throughputPerActorPerThreadJump: Int)
+  case class HardwareSpecs(
+      parallelismMin: Int,
+      parallelismMax: Int,
+      parallelismFactor: Int,
+      processedMessagesPerActorPerThreadJump: Int
+  )
+  object HardwareSpecs {
+
+    def apply(config: Config): HardwareSpecs = {
+
+      val parallelismMin = config.getInt("hardwareSpecs.parallelismMin")
+      val parallelismMax = config.getInt("hardwareSpecs.parallelismMax")
+      val parallelismFactor = config.getInt("hardwareSpecs.parallelismFactor")
+      val processedMessagesPerActorPerThreadJump = config.getInt("hardwareSpecs.processedMessagesPerActorPerThreadJump")
+
+      HardwareSpecs(
+        parallelismMin,
+        parallelismMax,
+        parallelismFactor,
+        processedMessagesPerActorPerThreadJump
+      )
+    }
+  }
+
+  def apply(config: Config): StrongScaling = new StrongScaling(HardwareSpecs.apply(config))
 }
+
 class StrongScaling(hardwareSpec: HardwareSpecs) extends Dispatchers {
 
   def strongScalingDispatcher(dispatcherName: String) =
@@ -24,7 +46,7 @@ class StrongScaling(hardwareSpec: HardwareSpecs) extends Dispatchers {
       hardwareSpec.parallelismMin,
       hardwareSpec.parallelismMax,
       hardwareSpec.parallelismFactor,
-      hardwareSpec.throughputPerActorPerThreadJump
+      hardwareSpec.processedMessagesPerActorPerThreadJump
     )}"
 
   def strongScalingDispatcherCassandra = {

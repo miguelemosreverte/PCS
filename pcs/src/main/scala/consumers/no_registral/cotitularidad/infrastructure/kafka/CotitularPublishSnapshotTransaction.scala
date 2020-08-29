@@ -21,7 +21,7 @@ case class CotitularPublishSnapshotTransaction(actorRef: ActorRef, monitoring: M
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[CotitularidadPublishSnapshot](monitoring) {
 
-  val topic = "CotitularidadPublishSnapshot"
+  def topic = "CotitularidadPublishSnapshot"
 
   def processInput(input: String): Either[Throwable, CotitularidadPublishSnapshot] =
     decode2[CotitularidadPublishSnapshot](input)

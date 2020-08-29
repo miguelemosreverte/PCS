@@ -1,16 +1,18 @@
 package consumers_spec.registrales
 
 import akka.Done
+import config.MockConfig
 import consumers.registral.domicilio_objeto.application.entities.DomicilioObjetoExternalDto.DomicilioObjetoTri
 import consumers.registral.domicilio_objeto.application.entities.DomicilioObjetoQueries.GetStateDomicilioObjeto
 import consumers.registral.domicilio_objeto.application.entities.DomicilioObjetoResponses.GetDomicilioObjetoResponse
+import consumers.registral.domicilio_objeto.domain.DomicilioObjetoState
 import consumers.registral.domicilio_objeto.infrastructure.dependency_injection.DomicilioObjetoActor
 import consumers_spec.Metrics
 import design_principles.actor_model.{Response, TypedActorSpec}
 
 class DomicilioObjetoSpec extends TypedActorSpec {
 
-  val actor: DomicilioObjetoActor = DomicilioObjetoActor()
+  val actor: DomicilioObjetoActor = DomicilioObjetoActor(DomicilioObjetoState(), MockConfig.config)
 
   "Typed cluster sharding with persistent actor" should
   "support ask with thenReply" in {

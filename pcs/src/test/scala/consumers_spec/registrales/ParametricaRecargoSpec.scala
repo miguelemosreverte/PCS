@@ -1,16 +1,18 @@
 package consumers_spec.registrales
 
 import akka.Done
+import config.MockConfig
 import consumers.registral.parametrica_recargo.application.entities.ParametricaRecargoExternalDto.ParametricaRecargoTri
 import consumers.registral.parametrica_recargo.application.entities.ParametricaRecargoQueries.GetStateParametricaRecargo
 import consumers.registral.parametrica_recargo.application.entities.ParametricaRecargoResponses.GetParametricaRecargoResponse
+import consumers.registral.parametrica_recargo.domain.ParametricaRecargoState
 import consumers.registral.parametrica_recargo.infrastructure.dependency_injection.ParametricaRecargoActor
 import consumers_spec.Metrics
 import design_principles.actor_model.{Response, TypedActorSpec}
 
 class ParametricaRecargoSpec extends TypedActorSpec {
 
-  val actor: ParametricaRecargoActor = ParametricaRecargoActor()
+  val actor: ParametricaRecargoActor = ParametricaRecargoActor(ParametricaRecargoState(), MockConfig.config)
 
   "Typed cluster sharding with persistent actor" should
   "support ask with thenReply" in {

@@ -2,7 +2,9 @@ package akka.entity
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
+import com.typesafe.config.Config
 import design_principles.actor_model.mechanism.local_processing.LocalizedProcessingMessageExtractor
+import monitoring.Monitoring
 
 import scala.concurrent.ExecutionContext
 
@@ -17,7 +19,7 @@ trait ShardedEntity[Requirements] extends ClusterEntity[Requirements] {
       shardedEntityRequirements: ShardedEntityRequirements
   ): ActorRef = ClusterSharding(shardedEntityRequirements.system).start(
     typeName = typeName,
-    entityProps = props(requirements),
+    entityProps = props(requirements).withDispatcher(utils.Inference.getSimpleName(this.getClass.getName)),
     settings = ClusterShardingSettings(shardedEntityRequirements.system),
     extractEntityId = extractEntityId,
     extractShardId = extractShardId(3)
@@ -26,9 +28,10 @@ trait ShardedEntity[Requirements] extends ClusterEntity[Requirements] {
 
 object ShardedEntity {
 
+  case class MonitoringAndConfig(monitoring: Monitoring, config: Config)
+
   case class ShardedEntityRequirements(
-      system: ActorSystem,
-      executionContext: ExecutionContext
+      system: ActorSystem
   )
 
   trait ShardedEntityNoRequirements extends ShardedEntity[ShardedEntity.NoRequirements] {

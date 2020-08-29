@@ -3,6 +3,7 @@ package consumers.registral.plan_pago.infrastructure.kafka
 import akka.Done
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import com.typesafe.config.Config
 import consumers.registral.parametrica_recargo.application.entities.ParametricaRecargoExternalDto.ParametricaRecargoTri
 import consumers.registral.plan_pago.application.entities.PlanPagoExternalDto.PlanPagoAnt
 import consumers.registral.plan_pago.application.entities.{PlanPagoCommands, PlanPagoExternalDto}
@@ -14,13 +15,16 @@ import monitoring.Monitoring
 import serialization.{decode2, decodeF}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 case class PlanPagoNoTributarioTransaction(actor: PlanPagoActor, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[PlanPagoAnt](monitoring) {
-
-  val topic = "DGR-COP-PLANES-ANT"
+  def topic =
+    Try {
+      actorTransactionRequirements.config.getString(s"consumers.$simpleName.topic")
+    } getOrElse "DGR-COP-PLANES-ANT"
 
   def processInput(input: String): Either[Throwable, PlanPagoAnt] =
     decode2[PlanPagoAnt](input)

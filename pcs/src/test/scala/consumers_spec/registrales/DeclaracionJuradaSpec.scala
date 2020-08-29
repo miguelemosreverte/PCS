@@ -1,15 +1,17 @@
 package consumers_spec.registrales
 
 import akka.Done
+import config.MockConfig
 import consumers.registral.declaracion_jurada.application.entities.DeclaracionJuradaQueries.GetStateDeclaracionJurada
 import consumers.registral.declaracion_jurada.application.entities.DeclaracionJuradaResponses.GetDeclaracionJuradaResponse
+import consumers.registral.declaracion_jurada.domain.DeclaracionJuradaState
 import consumers.registral.declaracion_jurada.infrastructure.dependency_injection.DeclaracionJuradaActor
 import consumers_spec.Metrics
 import design_principles.actor_model.{Response, TypedActorSpec}
 
 class DeclaracionJuradaSpec extends TypedActorSpec {
 
-  val actor = DeclaracionJuradaActor()
+  val actor = DeclaracionJuradaActor(DeclaracionJuradaState(), MockConfig.config)
 
   "Typed cluster sharding with persistent actor" should
   "support ask with thenReply" in {

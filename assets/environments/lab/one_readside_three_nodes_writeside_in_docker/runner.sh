@@ -4,7 +4,7 @@ tmux send-keys -t 1 'echo "Starting up infrastructure"'  Enter
 tmux send-keys -t 1 'source aliases.sh' Enter
 
 tmux send-keys -t 1 "\
-    sh assets/environments/three_nodes_in_docker/infrastructure.sh; \
+    sh assets/environments/lab/one_readside_three_nodes_writeside_in_docker/infrastructure.sh; \
     sh assets/scripts/wait_ready.sh 8081; \
     sh assets/scripts/wait_ready.sh 8082; \
     sh assets/scripts/wait_ready.sh 8083; \

@@ -49,7 +49,7 @@ spec:
       serviceAccountName: pcs-cluster
       containers:
         - image: pcs/pcs:1.0
-          imagePullPolicy: Never
+          imagePullPolicy: Always
           name: pcs-cluster
           env:
             - name: REQUIRED_CONTACT_POINTS

@@ -82,7 +82,4 @@ class StrongScaling(hardwareSpec: HardwareSpecs) extends Dispatchers {
     """.stripMargin
   }
 
-  val cassandraDispatcherConfig = ConfigFactory
-    .parseString(strongScalingDispatcherCassandra)
-
 }

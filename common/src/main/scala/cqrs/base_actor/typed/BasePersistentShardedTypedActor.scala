@@ -34,7 +34,7 @@ abstract class BasePersistentShardedTypedActor[
     }.withAllocationStrategy(new ExternalShardAllocationStrategy(system, TypeKey.name))
       .withMessageExtractor(new LocalizedProcessingMessageExtractor[ActorMessages](20))
       .withSettings(ClusterShardingSettings(system))
-    //.withEntityProps(DispatcherSelector.fromConfig(utils.Inference.getSimpleName(this.getClass.getName)))
+      .withEntityProps(DispatcherSelector.fromConfig(utils.Inference.getSimpleName(this.getClass.getName)))
   )
 
   def commandHandler(state: State, command: ActorMessages): Effect[ActorEvents, State]

@@ -2,14 +2,14 @@
 
 
 eksctl create cluster \
---name prod11  \
+--name prod12  \
 --version 1.17  \
 --region us-west-2  \
 --nodegroup-name linux-nodes  \
 --node-type t2.large  \
---nodes 5  \
---nodes-min 5  \
---nodes-max 5  \
+--nodes 2  \
+--nodes-min 2  \
+--nodes-max 2  \
 --ssh-access  \
 --ssh-public-key my-public-key.pub  \
 --managed

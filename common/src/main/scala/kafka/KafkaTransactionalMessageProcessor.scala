@@ -48,10 +48,10 @@ class KafkaTransactionalMessageProcessor(
 
     val subscription = Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerListener)
 
-    val `100k_a_minute_per_node` = 1000000 / 60
+    val `200k_a_minute_per_node` = 2000000 / 60
     val stream = Transactional
       .source(consumer, subscription)
-      .throttle(`100k_a_minute_per_node`, 1 second)
+      .throttle(`200k_a_minute_per_node`, 1 second)
       .mapAsync(1024) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
         val message = msg
 

@@ -70,8 +70,10 @@ object KafkaEventProducer {
     done.onComplete {
       case Success(value) =>
         log.info(s"KakfaEventProducer finished with Success($value)")
+        System.exit(0)
       case Failure(exception) =>
         log.info(s"KakfaEventProducer finished with Failure($exception)")
+        System.exit(1)
     }(system.dispatcher)
   }
 }

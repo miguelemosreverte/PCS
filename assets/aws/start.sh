@@ -1,16 +1,8 @@
 
 
-
-
-aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 099925565557.dkr.ecr.us-west-2.amazonaws.com
-
-
-
-git clone https://miguelemosreverte:Alatriste007@github.com/miguelemosreverte/PCS
-cd PCS
-git checkout AWS
-
 git pull origin AWS
+
+git commit -m "m"
 
 sbt pcs/docker:publishLocal
 docker tag pcs/pcs:1.0 099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest

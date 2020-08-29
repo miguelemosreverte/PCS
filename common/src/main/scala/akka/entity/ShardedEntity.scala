@@ -19,7 +19,7 @@ trait ShardedEntity[Requirements] extends ClusterEntity[Requirements] {
       shardedEntityRequirements: ShardedEntityRequirements
   ): ActorRef = ClusterSharding(shardedEntityRequirements.system).start(
     typeName = typeName,
-    entityProps = props(requirements) //.withDispatcher(utils.Inference.getSimpleName(this.getClass.getName)),
+    entityProps = props(requirements), //.withDispatcher(utils.Inference.getSimpleName(this.getClass.getName)),
     settings = ClusterShardingSettings(shardedEntityRequirements.system),
     extractEntityId = extractEntityId,
     extractShardId = extractShardId(3)

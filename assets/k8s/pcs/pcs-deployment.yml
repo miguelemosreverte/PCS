@@ -50,7 +50,7 @@ spec:
       nodeSelector:
         kind: akka
       containers:
-        - image: "$IMAGE"
+        - image: $IMAGE
           imagePullPolicy: Always
           name: pcs-cluster
           env:

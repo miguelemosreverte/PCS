@@ -55,6 +55,7 @@ spec:
                       operator: In
                       values:
                         - casandra
+                topologyKey: failure-domain.beta.kubernetes.io/zone
       terminationGracePeriodSeconds: 30
       restartPolicy: Always
       serviceAccountName: pcs-cluster

@@ -25,7 +25,7 @@ tmux send-keys -t 1 "
       curl -X POST http://0.0.0.0:8081/kafka/start/DGR-COP-OBLIGACIONES-TRI; \
       curl -X POST http://0.0.0.0:8082/kafka/start/DGR-COP-OBLIGACIONES-TRI; \
 " Enter
-tmux send-keys -t 2 'sh assets/scripts/query_cassandra_table.sh buc_obligaciones' Enter
+tmux send-keys -t 2 'sleep 20; sh assets/aws/grafana.sh' Enter
 
 
 

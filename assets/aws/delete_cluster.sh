@@ -1,1 +1,2 @@
-eksctl delete cluster --name prod12
+sh assets/aws/stop_all.sh
+eksctl delete cluster --name prod1

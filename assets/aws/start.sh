@@ -27,7 +27,6 @@ kubectl exec $kafkaPod -- $createSujetoTri
 export createObligacionTri='kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 20 --topic DGR-COP-OBLIGACIONES-TRI'
 kubectl exec $kafkaPod -- $createObligacionTri
 
-message "Setting up cassandra"
 export pod_name=$(kubectl get pod --selector app=cassandra | grep cassandra | cut -d' ' -f 1)
 
 # call setup_cassandra.sh

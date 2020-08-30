@@ -44,6 +44,17 @@ spec:
       labels:
         app: pcs-cluster
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - casandra
       terminationGracePeriodSeconds: 30
       restartPolicy: Always
       serviceAccountName: pcs-cluster

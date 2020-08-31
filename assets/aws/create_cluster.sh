@@ -6,7 +6,7 @@ eksctl create cluster \
 --version 1.17  \
 --region us-west-2  \
 --nodegroup-name linux-nodes  \
---node-type t2.large  \
+--node-type t2.2xlarge  \
 --nodes 3  \
 --nodes-min 3  \
 --nodes-max 3  \

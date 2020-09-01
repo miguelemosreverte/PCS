@@ -77,6 +77,10 @@ object Dependencies {
       "com.typesafe.akka" %% "akka-actor-typed" % akkaVersion ::
       "com.typesafe.akka" %% "akka-persistence-typed" % akkaVersion ::
       "com.typesafe.akka" %% "akka-cluster-sharding-typed" % akkaVersion ::
+      "com.lightbend.akka.discovery" %% "akka-discovery-kubernetes-api" % akkaManagementVersion ::
+      "com.lightbend.akka.management" %% "akka-management" % akkaManagementVersion ::
+      "com.lightbend.akka.management" %% "akka-management-cluster-http" % akkaManagementVersion ::
+      "com.lightbend.akka.management" %% "akka-management-cluster-bootstrap" % akkaManagementVersion ::
       akkaStreamKafka ::
       Nil
   }

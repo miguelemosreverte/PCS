@@ -17,3 +17,4 @@ eksctl create cluster \
 kubectl apply -f assets/k8s/namespace.yml
 kubectl config set-context --current --namespace=copernico
 kubectl apply -f assets/aws/admin
+sh assets/aws/label_nodes.sh

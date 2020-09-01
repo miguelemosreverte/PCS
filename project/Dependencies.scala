@@ -78,10 +78,6 @@ object Dependencies {
       "com.typesafe.akka" %% "akka-persistence-typed" % akkaVersion ::
       "com.typesafe.akka" %% "akka-cluster-sharding-typed" % akkaVersion ::
       akkaStreamKafka ::
-      "com.evolutiongaming" %% "kafka-journal" % "0.0.145" ::
-      "com.evolutiongaming" %% "kafka-journal-persistence" % "0.0.145" ::
-      "com.evolutiongaming" %% "kafka-journal-replicator" % "0.0.145" ::
-      "com.evolutiongaming" %% "kafka-journal-eventual-cassandra" % "0.0.145" ::
       Nil
   }
 

@@ -51,8 +51,8 @@ spec:
                   - key: index
                     operator: In
                     values:
-                      - 1
-                      - 2
+                      - "1"
+                      - "2"
       terminationGracePeriodSeconds: 30
       restartPolicy: Always
       serviceAccountName: readside-cluster

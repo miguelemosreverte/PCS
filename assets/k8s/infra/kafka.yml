@@ -51,7 +51,7 @@ spec:
         app: kafka
     spec:
       nodeSelector:
-        index: 3
+        index: "3"
       containers:
         - name: kafka
           image: confluentinc/cp-enterprise-kafka:5.4.0

@@ -34,7 +34,7 @@ spec:
         app: cassandra
     spec:
       nodeSelector:
-        index: 3
+        index: "3"
       containers:
         - name: cassandra
           image: cassandra

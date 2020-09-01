@@ -12,7 +12,8 @@ object Dependencies {
     // for Embedded Kafka 2.4.0
     Resolver.bintrayRepo("seglo", "maven"),
     // the library is available in Bintray repository
-    "dnvriend" at "http://dl.bintray.com/dnvriend/maven"
+    "dnvriend" at "http://dl.bintray.com/dnvriend/maven",
+    Resolver.bintrayRepo("evolutiongaming", "maven")
   )
 
   // Modules
@@ -82,6 +83,10 @@ object Dependencies {
       "com.lightbend.akka.management" %% "akka-management-cluster-http" % akkaManagementVersion ::
       "com.lightbend.akka.management" %% "akka-management-cluster-bootstrap" % akkaManagementVersion ::
       akkaStreamKafka ::
+      "com.evolutiongaming" %% "kafka-journal" % "0.0.145" ::
+      "com.evolutiongaming" %% "kafka-journal-persistence" % "0.0.145" ::
+      "com.evolutiongaming" %% "kafka-journal-replicator" % "0.0.145" ::
+      "com.evolutiongaming" %% "kafka-journal-eventual-cassandra" % "0.0.145" ::
       Nil
   }
 

@@ -38,7 +38,7 @@ trait FastPersistentActor { a: PersistentActor =>
   val persistenceId: String
   private final val aggregateRoot = persistenceId
 
-  implicit val ec = s.dispatcher
+  private implicit val ec = s.dispatcher
   override def persist[A](event: A)(handler: A => Unit): Unit = a.fastPersist(event)(handler)
   def fastPersist[A](event: A)(handler: A => Unit): Unit = {
     val serializedEvent = event.toString // serialization.encode(event)

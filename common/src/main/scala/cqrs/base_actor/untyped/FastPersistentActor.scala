@@ -26,7 +26,7 @@ trait FastPersistentActor { a: PersistentActor =>
   final private val statement = {
     Await.result(
       session.prepare(s"""
-        INSERT INTO EventSourcing.events 
+        INSERT INTO eventsourcing.events 
         (aggregateRoot, event) 
         VALUES (?, ?);
       """.stripMargin),

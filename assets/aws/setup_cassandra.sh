@@ -19,6 +19,8 @@ for cassandra_pod_name in $(kubectl get pods -o name --selector app=cassandra );
 
   echo "$cassandra_pod_name IS UP"
 
+  sleep 20
+
   kubectl exec -i $cassandra_pod_name -- cqlsh < assets/scripts/cassandra/infrastructure/akka/keyspaces/akka.cql
 
   kubectl exec -i $cassandra_pod_name -- cqlsh < assets/scripts/cassandra/infrastructure/akka/keyspaces/akka.cql

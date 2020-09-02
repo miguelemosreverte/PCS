@@ -5,10 +5,10 @@ nodes:
       #index: "3"
 resources:
   requests:
-   memory: 25Gi
-   cpu: 7
+   memory: 20Gi
+   cpu: 4
   limits:
-   memory: 25Gi
-   cpu: 7
+   memory: 20Gi
+   cpu: 4
 persistence:
   enabled: false

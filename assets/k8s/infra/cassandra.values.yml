@@ -4,7 +4,11 @@ nodes:
     nodeSelector:
       index: "3"
 resources:
-  - Memory: 32Gi
-  - CPU: 8
+  requests:
+   memory: 32Gi
+   cpu: 8
+  limits:
+   memory: 32Gi
+   cpu: 8
 persistence:
   enabled: false

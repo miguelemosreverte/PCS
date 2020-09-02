@@ -18,7 +18,7 @@ import scala.concurrent.duration._
 import akka.pattern.pipe
 
 trait FastPersistentActor { a: PersistentActor =>
-  val s: ActorSystem = a.system
+  val s: ActorSystem = a.context.system
   private val sessionSettings = CassandraSessionSettings.create()
   private implicit val session: CassandraSession = CassandraSessionRegistry.get(s).sessionFor(sessionSettings)
   private val logger = LoggerFactory.getLogger(this.getClass)

@@ -15,6 +15,7 @@ import scala.collection.mutable
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 import scala.concurrent.duration._
+import akka.pattern.pipe
 
 trait FastPersistentActor { a: PersistentActor =>
   val s: ActorSystem = a.system
@@ -37,11 +38,11 @@ trait FastPersistentActor { a: PersistentActor =>
   val persistenceId: String
   private final val aggregateRoot = persistenceId
 
-  override def persist[A](event: A)(handler: A => Unit): Unit = a.fastPersist(event.toString)(handler)
-  def fastPersist[A](event: String)(handler: A => Unit): Unit = {
-    val serializedEvent = event // serialization.encode(event)
-    session.executeWrite(statement.bind(aggregateRoot, serializedEvent))
-    /*val result = for {
+  implicit val ec = s.dispatcher
+  override def persist[A](event: A)(handler: A => Unit): Unit = a.fastPersist(event)(handler)
+  def fastPersist[A](event: A)(handler: A => Unit): Unit = {
+    val serializedEvent = event.toString // serialization.encode(event)
+    val result = for {
       done <- session.executeWrite(statement.bind(aggregateRoot, serializedEvent))
     } yield done
     result.onComplete {
@@ -51,6 +52,6 @@ trait FastPersistentActor { a: PersistentActor =>
       case Success(value) =>
         logger.debug("Cassandra succeeded with value {}", value.toString)
         handler(event)
-    }*/
+    }
   }
 }

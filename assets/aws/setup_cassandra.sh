@@ -7,7 +7,7 @@ if [ ! "$BASH_VERSION" ] ; then
 fi
 
 ITER=0
-for $cassandra_pod_name in $(kubectl get pods -o name --selector app=cassandra ); do
+for cassandra_pod_name in $(kubectl get pods -o name --selector app=cassandra ); do
   ITER=$(expr $ITER + 1)
 
   kubectl exec -i $cassandra_pod_name cqlsh < assets/scripts/cassandra/infrastructure/akka/keyspaces/akka.cql

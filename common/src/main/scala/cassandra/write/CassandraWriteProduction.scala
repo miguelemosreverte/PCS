@@ -17,7 +17,7 @@ class CassandraWriteProduction(implicit session: CassandraSession) extends Cassa
       state: ReadSideProjection[E]
   )(implicit system: ActorSystem, ec: ExecutionContext): Future[Done] = {
     val result = for {
-      boundStmt <- state.prepareStatement(session)
+      boundStmt <- state.prepareStatement(session) // HAHAHA this should only be made once
       done <- session.executeWrite(boundStmt)
     } yield done
     result.onComplete {

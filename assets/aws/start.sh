@@ -31,7 +31,7 @@ export createObligacionTri='kafka-topics --create --bootstrap-server localhost:9
 kubectl exec $kafkaPod -- $createObligacionTri
 
 
-export REPLICAS=3
+export REPLICAS=1
 export PARALELLISM=1024
 export IMAGE=099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest
 kubectl apply -f assets/k8s/pcs/pcs-rbac.yml

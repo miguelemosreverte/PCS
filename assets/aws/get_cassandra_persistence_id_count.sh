@@ -9,6 +9,6 @@ fi
 ITER=0
 for cassandra_pod_name in $(kubectl get pods -o name --selector app=cassandra ); do
   ITER=$(expr $ITER + 1)
-  kubectl exec -it $cassandra_pod_name -- cqlsh -e 'select count(*) from akka.all_persistence_ids'
+  echo "$cassandra_pod_name: select count(*) from akka.messages"
   kubectl exec -it $cassandra_pod_name -- cqlsh -e 'select count(*) from akka.messages'
   done

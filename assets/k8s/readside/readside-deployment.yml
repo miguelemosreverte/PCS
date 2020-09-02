@@ -67,8 +67,6 @@ spec:
               value: "kafka-internal:29092"
             - name: CASSANDRA_CONTACT_POINTS
               value: "cassandra:9043"
-            - name: CASSANDRA_REPLICAS
-              value: "1"
             - name: DISCOVERY_METHOD
               value: "kubernetes-api"
             - name: MANAGEMENT_PORT

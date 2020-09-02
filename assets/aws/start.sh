@@ -11,7 +11,7 @@ docker push 099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest
 export IMAGE=099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest
 
 kubectl apply -f assets/k8s/infra/kafka.yml
-# kubectl apply -f assets/k8s/infra/cassandra.yml
+kubectl apply -f assets/k8s/infra/cassandra.yml
 helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com
 helm install cassandra incubator/cassandra --version 0.15.2
 

@@ -14,29 +14,3 @@ spec:
     - protocol: TCP
       port: 9043
       targetPort: 9042
-
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: cassandra
-  namespace: copernico
-  labels:
-    app: cassandra
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: cassandra
-  template:
-    metadata:
-      labels:
-        app: cassandra
-    spec:
-      nodeSelector:
-        index: "3"
-      containers:
-        - name: cassandra
-          image: cassandra
-          ports:
-            - containerPort: 9043

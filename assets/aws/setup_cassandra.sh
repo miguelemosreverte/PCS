@@ -18,7 +18,7 @@ for cassandra_pod_name in $(kubectl get pods -o name --selector app=cassandra );
   done
 
   echo "$cassandra_pod_name IS UP"
-  kubectl exec $cassandra_pod_name -- cqlsh -e 'describe tables' > /dev/null 2>&1
+  kubectl exec $cassandra_pod_name -- cqlsh -e 'describe tables' 
 
   sleep 20
 

@@ -1,3 +1,10 @@
+#!/bin/bash
+
+# this forces usage of bash because for loop is bash-only
+# in case this script is called using sh, it will re-call itself using bash.
+if [ ! "$BASH_VERSION" ] ; then
+    exec /bin/bash "$0" "$@"
+fi
 
 ITER=0
 for $cassandra_pod_name in $(kubectl get pods -o name --selector app=cassandra ); do

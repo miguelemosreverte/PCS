@@ -10,6 +10,15 @@ ITER=0
 for cassandra_pod_name in $(kubectl get pods -o name --selector app=cassandra ); do
   ITER=$(expr $ITER + 1)
 
+
+
+  checkCassandra() {
+    kubectl exec $cassandra_pod_name -- cqlsh -e 'describe tables' > /dev/null 2>&1
+  }
+  while ! checkCassandra; do
+      sleep 1
+  done
+
   kubectl exec -i $cassandra_pod_name -- cqlsh < assets/scripts/cassandra/infrastructure/akka/keyspaces/akka.cql
 
   kubectl exec -i $cassandra_pod_name -- cqlsh < assets/scripts/cassandra/infrastructure/akka/keyspaces/akka.cql

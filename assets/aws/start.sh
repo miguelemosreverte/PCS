@@ -19,8 +19,8 @@ curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bas
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
 helm install prometheus stable/prometheus-operator --namespace copernico
 
+sh assets/aws/setup_cassandra.sh
 
-sleep 60
 
 export kafkaPod=$(kubectl get pod -l "app=kafka" -o jsonpath='{.items[0].metadata.name}')
 export createSujetoTri='kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 20 --topic DGR-COP-SUJETO-TRI'
@@ -28,7 +28,6 @@ kubectl exec $kafkaPod -- $createSujetoTri
 export createObligacionTri='kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 20 --topic DGR-COP-OBLIGACIONES-TRI'
 kubectl exec $kafkaPod -- $createObligacionTri
 
-sh assets/aws/setup_cassandra.sh
 
 export REPLICAS=2
 export PARALELLISM=1024

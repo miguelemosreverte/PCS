@@ -28,7 +28,7 @@ kubectl exec $kafkaPod -- $createSujetoTri
 export createObligacionTri='kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 20 --topic DGR-COP-OBLIGACIONES-TRI'
 kubectl exec $kafkaPod -- $createObligacionTri
 
-sh assets/aws/setup_cassandra.sh 
+sh assets/aws/setup_cassandra.sh
 
 export REPLICAS=2
 export PARALELLISM=1024

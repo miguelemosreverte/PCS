@@ -30,7 +30,7 @@ metadata:
   name: pcs
   namespace: copernico
 spec:
-  replicas: 2
+  replicas: $REPLICAS
   selector:
     matchLabels:
       app: pcs-cluster
@@ -44,16 +44,28 @@ spec:
       labels:
         app: pcs-cluster
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: index
+                    operator: In
+                    values:
+                      - "1"
+                      - "2"
       terminationGracePeriodSeconds: 30
       restartPolicy: Always
       serviceAccountName: pcs-cluster
       containers:
-        - image: pcs/pcs:1.0
-          imagePullPolicy: Never
+        - image: $IMAGE
+          imagePullPolicy: Always
           name: pcs-cluster
           env:
+            - name: PARALELLISM
+              value: "$PARALLELISM"
             - name: REQUIRED_CONTACT_POINTS
-              value: "2"
+              value: "$REPLICAS"
             - name: KAFKA_BROKERS_LIST
               value: "kafka-internal:29092"
             - name: CASSANDRA_CONTACT_POINTS

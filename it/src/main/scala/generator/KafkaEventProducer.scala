@@ -3,7 +3,6 @@ package generator
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
-
 import akka.Done
 import akka.actor.ActorSystem
 import akka.event.Logging
@@ -15,6 +14,7 @@ import no_registrales.obligacion.{ObligacionesAntGenerator, ObligacionesTriGener
 import no_registrales.sujeto.{SujetoAntGenerator, SujetoTriGenerator}
 import kafka.KafkaMessageShardProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
+import registrales.actividad_sujeto.ActividadSujetoGenerator
 
 object KafkaEventProducer {
 
@@ -23,14 +23,14 @@ object KafkaEventProducer {
     def isInt(s: String): Boolean = s.matches("""\d+""")
 
     args.toList match {
-      case topic :: from :: to :: Nil if isInt(from) && isInt(to) =>
-        produce(topic, from.toInt, to.toInt)
+      case kafkaServer :: topic :: from :: to :: Nil if isInt(from) && isInt(to) =>
+        produce(kafkaServer, topic, from.toInt, to.toInt)
       case _ =>
         throw new IllegalArgumentException("usage: <topic> <from> <to> -- example: DGR-COP-ACTIVIDADES 1 1000")
     }
   }
 
-  def produce(topic: String, From: Int, To: Int): Unit = {
+  def produce(kafkaServer: String = "0.0.0.0:9092", topic: String, From: Int, To: Int): Unit = {
 
     implicit val system: ActorSystem = ActorSystem(
       "KafkaEventProducer",
@@ -45,18 +45,19 @@ object KafkaEventProducer {
 
     val producerSettings: ProducerSettings[String, String] =
       ProducerSettings(config, new StringSerializer, new StringSerializer)
-        .withBootstrapServers("0.0.0.0:9092")
+        .withBootstrapServers(kafkaServer)
 
     val generator: Generator[_] = topic match {
       case "DGR-COP-OBLIGACIONES-TRI" => new ObligacionesTriGenerator()
       case "DGR-COP-OBLIGACIONES-ANT" => new ObligacionesAntGenerator()
       case "DGR-COP-SUJETO-TRI" => new SujetoTriGenerator()
       case "DGR-COP-SUJETO-ANT" => new SujetoAntGenerator()
+      case "DGR-COP-ACTIVIDADES" => new ActividadSujetoGenerator()
     }
 
     def produce(keyValue: KafkaKeyValue) = {
       println(keyValue.aggregateRoot)
-      KafkaMessageShardProducerRecord.producerRecord(topic, 120, keyValue.aggregateRoot, keyValue.json)
+      KafkaMessageShardProducerRecord.producerRecord(topic, 20, keyValue.aggregateRoot, keyValue.json)
     }
 
     val done: Future[Done] =
@@ -70,8 +71,10 @@ object KafkaEventProducer {
     done.onComplete {
       case Success(value) =>
         log.info(s"KakfaEventProducer finished with Success($value)")
+        System.exit(0)
       case Failure(exception) =>
         log.info(s"KakfaEventProducer finished with Failure($exception)")
+        System.exit(1)
     }(system.dispatcher)
   }
 }

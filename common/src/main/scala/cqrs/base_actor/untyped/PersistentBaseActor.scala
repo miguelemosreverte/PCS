@@ -62,7 +62,7 @@ abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[
       val shardId = persistenceId.hashCode.abs % parallelism
       s"$tag-$shardId"
     }
-    persistAsync(if (tags.nonEmpty) Tagged(event, tagsWithShardId) else event) { _ =>
+    persist(if (tags.nonEmpty) Tagged(event, tagsWithShardId) else event) { _ =>
       logger.debug(s"[$persistenceId] Persist event | $event")
       persistedCounter.increment()
       monitoring.counter(s"$name-persisted-${utils.Inference.getSimpleName(event.getClass.getName)}").increment()

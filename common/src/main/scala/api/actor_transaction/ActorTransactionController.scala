@@ -37,7 +37,7 @@ class ActorTransactionController(
     def topic = actorTransaction.topic
     val transaction = actorTransaction.transaction _
     log.debug(s"Starting ${actorTransaction.topic} transaction")
-    val (killSwitch, done) = new KafkaPlainConsumerMessageProcessor(requirements)
+    val (killSwitch, done) = new KafkaTransactionalMessageProcessor(requirements)
       .run(topic, s"${topic}SINK", message => {
         transaction(message).map { output =>
           Seq(output.toString)

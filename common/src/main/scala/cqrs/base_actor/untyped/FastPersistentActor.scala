@@ -47,10 +47,10 @@ trait FastPersistentActor { a: PersistentActor =>
     } yield done
     result.onComplete {
       case Failure(throwable) =>
-        println("Cassandra failed with {} due to {}", serializedEvent, throwable.toString)
+        println(s"Cassandra failed with ${serializedEvent} due to ${throwable}")
         handler(event)
       case Success(value) =>
-        println("Cassandra succeeded with value {}", value.toString)
+        println(s"Cassandra succeeded with value ${value}")
         handler(event)
     }
   }

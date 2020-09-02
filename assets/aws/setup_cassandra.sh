@@ -9,7 +9,7 @@ fi
 ITER=0
 for $cassandra_pod_name in $(kubectl get pods -o name --selector app=cassandra ); do
   ITER=$(expr $ITER + 1)
-  # call setup_cassandra.sh
+
   kubectl exec -i $cassandra_pod_name cqlsh < assets/scripts/cassandra/infrastructure/akka/keyspaces/akka.cql
 
   kubectl exec -i $cassandra_pod_name cqlsh < assets/scripts/cassandra/infrastructure/akka/keyspaces/akka.cql

@@ -10,3 +10,4 @@ kubectl delete -f assets/k8s/pcs/pcs-service-monitor.yml
 
 
 helm uninstall prometheus
+helm uninstall cassandra

@@ -6,3 +6,5 @@ nodes:
 resources:
   - Memory: 32Gi
   - CPU: 8
+persistence:
+  enabled: false

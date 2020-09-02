@@ -11,11 +11,28 @@ for cassandra_pod_name in $(kubectl get pods -o name --selector app=cassandra );
   ITER=$(expr $ITER + 1)
 
 
-
+  echo "WTFFFFFFFFFFFFFFFFFFFFF"
+  echo "WTFFFFFFFFFFFFFFFFFFFFF"
+  echo "WTFFFFFFFFFFFFFFFFFFFFF"
+  echo "WTFFFFFFFFFFFFFFFFFFFFF"
+  echo "WTFFFFFFFFFFFFFFFFFFFFF"
+  echo "WTFFFFFFFFFFFFFFFFFFFFF"
+  echo "WTFFFFFFFFFFFFFFFFFFFFF"
+  echo "WTFFFFFFFFFFFFFFFFFFFFF"
+  echo "WTFFFFFFFFFFFFFFFFFFFFF"
+  echo "WTFFFFFFFFFFFFFFFFFFFFF"
+  echo "WTFFFFFFFFFFFFFFFFFFFFF"
+  echo "WTFFFFFFFFFFFFFFFFFFFFF"
+  echo "WTFFFFFFFFFFFFFFFFFFFFF"
+  echo "WTFFFFFFFFFFFFFFFFFFFFF"
+  echo "WTFFFFFFFFFFFFFFFFFFFFF"
+  echo "WTFFFFFFFFFFFFFFFFFFFFF"
+  echo "WTFFFFFFFFFFFFFFFFFFFFF"
   checkCassandra() {
     kubectl exec $cassandra_pod_name -- cqlsh -e 'describe tables' > /dev/null 2>&1
   }
   while ! checkCassandra; do
+      echo "WTFFFFFFFFFFFFFFFFFFFFF ???????"
       sleep 1
   done
 

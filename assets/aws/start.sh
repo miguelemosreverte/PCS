@@ -1,6 +1,5 @@
 
 
-git pull origin MergeThisFranco
 git pull origin AWS
 
 git commit -m "m"

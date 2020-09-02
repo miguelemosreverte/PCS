@@ -1,8 +1,8 @@
 nodes:
   enabled: true
-  selector:
-    nodeSelector:
-      index: "3"
+  #selector:
+    #nodeSelector:
+      #index: "3"
 resources:
   requests:
    memory: 25Gi

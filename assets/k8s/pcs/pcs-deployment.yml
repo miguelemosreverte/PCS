@@ -54,6 +54,7 @@ spec:
                     values:
                       - "1"
                       - "2"
+                      - "3"
       terminationGracePeriodSeconds: 30
       restartPolicy: Always
       serviceAccountName: pcs-cluster

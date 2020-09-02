@@ -10,31 +10,14 @@ ITER=0
 for cassandra_pod_name in $(kubectl get pods -o name --selector app=cassandra ); do
   ITER=$(expr $ITER + 1)
 
-
-  echo "WTFFFFFFFFFFFFFFFFFFFFF"
-  echo "WTFFFFFFFFFFFFFFFFFFFFF"
-  echo "WTFFFFFFFFFFFFFFFFFFFFF"
-  echo "WTFFFFFFFFFFFFFFFFFFFFF"
-  echo "WTFFFFFFFFFFFFFFFFFFFFF"
-  echo "WTFFFFFFFFFFFFFFFFFFFFF"
-  echo "WTFFFFFFFFFFFFFFFFFFFFF"
-  echo "WTFFFFFFFFFFFFFFFFFFFFF"
-  echo "WTFFFFFFFFFFFFFFFFFFFFF"
-  echo "WTFFFFFFFFFFFFFFFFFFFFF"
-  echo "WTFFFFFFFFFFFFFFFFFFFFF"
-  echo "WTFFFFFFFFFFFFFFFFFFFFF"
-  echo "WTFFFFFFFFFFFFFFFFFFFFF"
-  echo "WTFFFFFFFFFFFFFFFFFFFFF"
-  echo "WTFFFFFFFFFFFFFFFFFFFFF"
-  echo "WTFFFFFFFFFFFFFFFFFFFFF"
-  echo "WTFFFFFFFFFFFFFFFFFFFFF"
   checkCassandra() {
     kubectl exec $cassandra_pod_name -- cqlsh -e 'describe tables' > /dev/null 2>&1
   }
   while ! checkCassandra; do
-      echo "WTFFFFFFFFFFFFFFFFFFFFF ???????"
       sleep 1
   done
+
+  echo "$cassandra_pod_name IS UP"
 
   kubectl exec -i $cassandra_pod_name -- cqlsh < assets/scripts/cassandra/infrastructure/akka/keyspaces/akka.cql
 

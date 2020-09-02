@@ -13,7 +13,7 @@ export IMAGE=099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest
 kubectl apply -f assets/k8s/infra/kafka.yml
 kubectl apply -f assets/k8s/infra/cassandra.yml
 helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com
-helm install cassandra incubator/cassandra --version 0.15.2
+helm install cassandra incubator/cassandra --version 0.15.2 -f assets/k8s/infra/cassandra.values.yml
 
 curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 helm repo add stable https://kubernetes-charts.storage.googleapis.com

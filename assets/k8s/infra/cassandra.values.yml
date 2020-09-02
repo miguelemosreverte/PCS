@@ -1,0 +1,8 @@
+nodes:
+  enabled: true
+  selector:
+    nodeSelector:
+      index: "3"
+resources:
+  - Memory: 4Gi
+  - CPU: 2

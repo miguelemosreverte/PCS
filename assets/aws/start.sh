@@ -1,6 +1,6 @@
 
 
-git pull origin MergeThisFranco
+git pull origin AWS
 
 git commit -m "m"
 
@@ -62,17 +62,3 @@ kubectl exec -i $pod_name cqlsh < assets/scripts/cassandra/domain/read_side/tabl
 kubectl exec -i $pod_name cqlsh < assets/scripts/cassandra/domain/read_side/tables/buc_etapas_procesales.cql
 kubectl exec -i $pod_name cqlsh < assets/scripts/cassandra/domain/read_side/tables/buc_param_plan.cql
 kubectl exec -i $pod_name cqlsh < assets/scripts/cassandra/domain/read_side/tables/buc_param_recargo.cql
-
-export REPLICAS=2
-export PARALELLISM=1024
-export IMAGE=099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest
-kubectl apply -f assets/k8s/pcs/pcs-rbac.yml
-envsubst < assets/k8s/pcs/pcs-deployment.yml | kubectl apply -f -
-kubectl apply -f assets/k8s/pcs/pcs-service.yml
-kubectl apply -f assets/k8s/pcs/pcs-service-monitor.yml
-
-export kafka_cluster_ip=$(kubectl get svc kafka-internal -ojsonpath='{.spec.clusterIP}')
-sbt 'it/runMain generator.KafkaEventProducer '"$kafka_cluster_ip"':29092 DGR-COP-SUJETO-TRI 1000000 2000000'
-export kafka_cluster_ip=$(kubectl get svc kafka-internal -ojsonpath='{.spec.clusterIP}')
-sbt 'it/runMain generator.KafkaEventProducer '"$kafka_cluster_ip"':29092 DGR-COP-OBLIGACIONES-TRI 1000000 2000000'
-

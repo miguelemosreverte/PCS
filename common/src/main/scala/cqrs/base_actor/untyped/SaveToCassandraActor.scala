@@ -1,11 +1,11 @@
 package cqrs.base_actor.untyped
 
 import akka.Done
-import akka.actor.{Actor, ActorSystem}
+import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.stream.alpakka.cassandra.CassandraSessionSettings
 import akka.stream.alpakka.cassandra.scaladsl.{CassandraSession, CassandraSessionRegistry}
 import com.datastax.oss.driver.api.core.cql.PreparedStatement
-import cqrs.base_actor.untyped.SaveToCassandraActor.{session, SerializedEvent}
+import cqrs.base_actor.untyped.SaveToCassandraActor.{saveToCassandraActor, session, SerializedEvent}
 import design_principles.actor_model.Event
 import org.slf4j.LoggerFactory
 
@@ -52,6 +52,16 @@ object SaveToCassandraActor {
     }
   }
 
+  var saveToCassandraActor: Option[ActorRef] = None
+  def getSaveToCassandraActor(s: ActorSystem) =
+    saveToCassandraActor match {
+      case Some(saveToCassandraActor) => saveToCassandraActor
+      case None =>
+        val newActor = s.actorOf(Props(new SaveToCassandraActor()))
+        saveToCassandraActor = Some(newActor)
+        newActor
+
+    }
 }
 class SaveToCassandraActor extends Actor {
 

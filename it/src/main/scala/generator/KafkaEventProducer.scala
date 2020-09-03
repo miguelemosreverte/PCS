@@ -55,16 +55,16 @@ object KafkaEventProducer {
       case "DGR-COP-ACTIVIDADES" => new ActividadSujetoGenerator()
     }
 
-    def produce(keyValue: KafkaKeyValue) = {
-      println(keyValue.aggregateRoot)
-      KafkaMessageShardProducerRecord.producerRecord(topic, 20, keyValue.aggregateRoot, keyValue.json)
+    def produce(keyValue: ((Int, KafkaKeyValue))) = {
+      if (keyValue._1 % 100000 == 0) println(keyValue)
+      KafkaMessageShardProducerRecord.producerRecord(topic, 20, keyValue._2.aggregateRoot, keyValue._2.json)
     }
 
     val done: Future[Done] =
       akka.stream.scaladsl.Source
         .fromIterator[Int](() => (From to To).iterator)
         // .throttle(1, 0.1 seconds)
-        .map(i => generator.nextKafkaKeyValue(i))
+        .map(i => (i, generator.nextKafkaKeyValue(i)))
         .map(produce)
         .runWith(Producer.plainSink(producerSettings))
 

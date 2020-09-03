@@ -3,7 +3,7 @@ package cqrs.base_actor.untyped
 import akka.Done
 import akka.actor.{ActorContext, ActorRef, ActorSystem, Props}
 import akka.persistence.PersistentActor
-import cqrs.base_actor.untyped.SaveToCassandraActor.{getSaveToCassandraActor, SerializedEvent}
+import cqrs.base_actor.untyped.SaveToCassandraActor.{getSaveToCassandraActor, session, statement, SerializedEvent}
 
 trait FastPersistentActor { a: PersistentActor =>
   val s: ActorSystem = a.context.system
@@ -20,6 +20,13 @@ trait FastPersistentActor { a: PersistentActor =>
         |
         |""".stripMargin)
     val serializedEvent = event.toString // serialization.encode(event)
+
+    session
+      .executeAsync(statement.bind(aggregateRoot, serializedEvent))
+      .toScala
+      .map { _ =>
+        Done
+      } pipeTo (self)
 
     getSaveToCassandraActor(context.system) ! SerializedEvent(
       aggregateRoot,

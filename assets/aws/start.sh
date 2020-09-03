@@ -1,6 +1,7 @@
 
 
 git pull origin AWS_CassandraPerformance
+git checkout AWS_CassandraPerformance
 
 git commit -m "m"
 

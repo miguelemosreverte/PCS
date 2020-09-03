@@ -1,6 +1,6 @@
 
 
-git pull origin AWS
+git pull origin AWS_CassandraPerformance
 
 git commit -m "m"
 

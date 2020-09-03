@@ -53,7 +53,7 @@ object KafkaEventProducer {
       case "DGR-COP-SUJETO-TRI" => new SujetoTriGenerator()
       case "DGR-COP-SUJETO-ANT" => new SujetoAntGenerator()
       case "DGR-COP-ACTIVIDADES" => new ActividadSujetoGenerator()
-    }
+    }AW
 
     def produce(keyValue: ((Int, KafkaKeyValue))) = {
       if (keyValue._1 % 100000 == 0) println(keyValue)

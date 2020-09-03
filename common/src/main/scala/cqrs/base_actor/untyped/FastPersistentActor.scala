@@ -41,6 +41,11 @@ trait FastPersistentActor { a: PersistentActor =>
   private implicit val ec = s.dispatcher
 
   def fastPersist[A](event: A)(handler: A => Unit): Unit = {
+    println("""
+        |
+        | CALLING FAST PERSIST
+        |
+        |""".stripMargin)
     val serializedEvent = event.toString // serialization.encode(event)
     val result = for {
       done <- session.executeWrite(statement.bind(aggregateRoot, serializedEvent))

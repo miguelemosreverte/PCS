@@ -68,7 +68,7 @@ abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[
   implicit val ec = context.system.dispatcher
   val aggregateRoot = persistenceId
   def persistEvent(event: E, tags: Set[String] = Set.empty)(handler: () => Unit = () => ()): Unit = {
-    val tagsWithShardId = tags map { tag =>
+    /*val tagsWithShardId = tags map { tag =>
       val parallelism = Try {
         config
           .getString(
@@ -78,18 +78,13 @@ abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[
       }.getOrElse(1)
       val shardId = persistenceId.hashCode.abs % parallelism
       s"$tag-$shardId"
+    }*/
+    persistAsync(event) { _ =>
+      logger.debug(s"[$persistenceId] Persist event | $event")
+      persistedCounter.increment()
+      monitoring.counter(s"$name-persisted-${utils.Inference.getSimpleName(event.getClass.getName)}").increment()
+      handler()
     }
-    //persist(if (tags.nonEmpty) Tagged(event, tagsWithShardId) else event) { _ =>
-
-    session
-      .executeAsync(statement.bind(aggregateRoot, event.toString))
-      .toScala
-      .map { _ =>
-        logger.debug(s"[$persistenceId] Persist event | $event")
-        persistedCounter.increment()
-        monitoring.counter(s"$name-persisted-${utils.Inference.getSimpleName(event.getClass.getName)}").increment()
-        handler()
-      }
 
   }
 }

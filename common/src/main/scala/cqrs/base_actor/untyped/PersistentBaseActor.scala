@@ -14,8 +14,7 @@ import monitoring.{Counter, Monitoring}
 abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[E]: ClassTag](monitoring: Monitoring,
                                                                                               config: Config)
     extends BaseActor[E, State](monitoring)
-    with PersistentActor
-    with FastPersistentActor {
+    with PersistentActor {
 
   val persistedCounter: Counter = monitoring.counter(s"$name-persisted")
 
@@ -63,8 +62,7 @@ abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[
       val shardId = persistenceId.hashCode.abs % parallelism
       s"$tag-$shardId"
     }
-    //persistAsync(if (tags.nonEmpty) Tagged(event, tagsWithShardId) else event) { _ =>
-    fastPersist(event) { _ =>
+    persist(if (tags.nonEmpty) Tagged(event, tagsWithShardId) else event) { _ =>
       logger.debug(s"[$persistenceId] Persist event | $event")
       persistedCounter.increment()
       monitoring.counter(s"$name-persisted-${utils.Inference.getSimpleName(event.getClass.getName)}").increment()

@@ -9,7 +9,6 @@ import akka.persistence.{PersistentActor, RecoveryCompleted, SnapshotOffer}
 import com.datastax.oss.driver.api.core.CqlSession
 import com.datastax.oss.driver.api.core.cql.PreparedStatement
 import com.typesafe.config.{Config, ConfigFactory}
-import cqrs.base_actor.untyped.SaveToCassandraActor.{session, statement}
 import cqrs.untyped.event.{EventBus, SyncEventBus}
 import ddd.AbstractState
 import design_principles.actor_model.mechanism.local_processing.LocalizedProcessingMessageExtractor

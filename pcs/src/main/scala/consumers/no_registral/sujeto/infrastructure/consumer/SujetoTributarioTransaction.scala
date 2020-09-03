@@ -8,6 +8,7 @@ import consumers.no_registral.sujeto.application.entity.SujetoExternalDto.{Sujet
 import consumers.no_registral.sujeto.application.entity.{SujetoCommands, SujetoExternalDto}
 import consumers.no_registral.sujeto.infrastructure.json._
 import design_principles.actor_model.Response
+import design_principles.actor_model.Response.SuccessProcessing
 import monitoring.Monitoring
 import serialization.decode2
 
@@ -35,6 +36,7 @@ case class SujetoTributarioTransaction(actorRef: ActorRef, monitoring: Monitorin
           registro = registro
         )
     }
-    actorRef.ask[Response.SuccessProcessing](command)
+    actorRef ! command
+    Future.successful(SuccessProcessing(command.deliveryId))
   }
 }

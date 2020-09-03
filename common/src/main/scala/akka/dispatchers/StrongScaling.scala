@@ -51,7 +51,7 @@ class StrongScaling(hardwareSpec: HardwareSpecs) extends Dispatchers {
 
   def strongScalingDispatcherCassandra = {
     val dispatcherName = "cassandraDispatcher"
-    val partitionSize = 50
+    val partitionSize = 2000
     val resultSize = 25
     s"""
        |${strongScalingDispatcher(dispatcherName)}

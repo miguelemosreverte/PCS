@@ -26,5 +26,6 @@ trait FastPersistentActor { a: PersistentActor =>
       aggregateRoot,
       serializedEvent
     )
+    handler(event)
   }
 }

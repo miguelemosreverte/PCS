@@ -11,13 +11,10 @@ import design_principles.actor_model.mechanism.local_processing.LocalizedProcess
 import design_principles.actor_model.{Command, Event, Query}
 import monitoring.{Counter, Monitoring}
 
-import scala.concurrent.ExecutionContext
-
 abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[E]: ClassTag](monitoring: Monitoring,
                                                                                               config: Config)
     extends BaseActor[E, State](monitoring)
-    with PersistentActor
-    with FastPersistentActor {
+    with PersistentActor {
 
   val persistedCounter: Counter = monitoring.counter(s"$name-persisted")
 
@@ -53,10 +50,8 @@ abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[
       logger.warn(s"[$persistenceId] Unexpected event $other")
   }
 
-  implicit val ec: ExecutionContext = context.system.dispatcher
-
   def persistEvent(event: E, tags: Set[String] = Set.empty)(handler: () => Unit = () => ()): Unit = {
-    /*val tagsWithShardId = tags map { tag =>
+    val tagsWithShardId = tags map { tag =>
       val parallelism = Try {
         config
           .getString(
@@ -66,14 +61,9 @@ abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[
       }.getOrElse(1)
       val shardId = persistenceId.hashCode.abs % parallelism
       s"$tag-$shardId"
-    }*/
-    persist(event) { _ =>
-      // (if (tags.nonEmpty) Tagged(event, tagsWithShardId) else event) { _ =>
-      println(s"""
-      
-      [$persistenceId] fastPersist -- Persist event | $event
-      
-      """)
+    }
+    persistAsync(if (tags.nonEmpty) Tagged(event, tagsWithShardId) else event) { _ =>
+      logger.debug(s"[$persistenceId] Persist event | $event")
       persistedCounter.increment()
       monitoring.counter(s"$name-persisted-${utils.Inference.getSimpleName(event.getClass.getName)}").increment()
       handler()

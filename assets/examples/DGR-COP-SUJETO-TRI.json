@@ -2,7 +2,7 @@
   "EV_ID" : "2",
   "SUJ_IDENTIFICADOR" : "3",
   "SUJ_CAT_SUJ_ID" : null,
-  "SUJ_DENOMINACION" : "",
+  "SUJ_DENOMINACION" : "it is normal to have lot's of nulls in SujetoTri.",
   "SUJ_DFE" : null,
   "SUJ_DIRECCION" : null,
   "SUJ_EMAIL" : null,

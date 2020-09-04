@@ -1,7 +1,7 @@
 package consumers.no_registral.sujeto.infrastructure.consumer
 
 import scala.concurrent.{ExecutionContext, Future}
-import akka.actor.ActorRef
+import akka.actor.{Actor, ActorRef}
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import consumers.no_registral.sujeto.application.entity.SujetoExternalDto.{SujetoAnt, SujetoTri}
@@ -36,9 +36,13 @@ case class SujetoTributarioTransaction(actorRef: ActorRef, monitoring: Monitorin
           registro = registro
         )
     }
-    actorRef ! command
-    Future.successful(SuccessProcessing(command.deliveryId))
-    //actorRef.ask[Response.SuccessProcessing](command)
+
+    /*class Amiguito extends Actor {
+      ove
+    }*/
+    //actorRef ! command
+    //Future.successful(SuccessProcessing(command.deliveryId))
+    actorRef.ask[Response.SuccessProcessing](command)
 
   }
 }

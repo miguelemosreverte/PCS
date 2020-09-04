@@ -70,7 +70,7 @@ class StrongScaling(hardwareSpec: HardwareSpecs) extends Dispatchers {
        |  replay-dispatcher = "$dispatcherName"
        |  max-result-size = $resultSize
        |  max-result-size-replay = $resultSize
-       |  target-partition-size = $partitionSize
+       |  target-partition-size = 500000
        |  max-message-batch-size = $partitionSize
        |}
        |

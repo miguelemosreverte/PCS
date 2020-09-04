@@ -63,20 +63,7 @@ class StrongScaling(hardwareSpec: HardwareSpecs) extends Dispatchers {
     val partitionSize = 3000
     val resultSize = 1
     s"""
-       |${superhero(dispatcherName)}
        |
-       |akka.persistence.cassandra.journal {
-       |  plugin-dispatcher = "$dispatcherName"
-       |  replay-dispatcher = "$dispatcherName"
-       |  target-partition-size = 500000
-       |  max-message-batch-size = 4000
-       |}
-       |
-       |akka.persistence.cassandra.query {
-       |  plugin-dispatcher = "$dispatcherName"
-       |  max-buffer-size = $resultSize
-       |  max-result-size-query = $resultSize
-       |}
        |akka.persistence {
        |  journal-plugin-fallback {
        |    circuit-breaker {

@@ -53,8 +53,8 @@ class StrongScaling(hardwareSpec: HardwareSpecs) extends Dispatchers {
     s"${forkJoin(
       dispatcherName,
       8,
-      64,
-      2.0,
+      16,
+      1,
       hardwareSpec.processedMessagesPerActorPerThreadJump
     )}"
 

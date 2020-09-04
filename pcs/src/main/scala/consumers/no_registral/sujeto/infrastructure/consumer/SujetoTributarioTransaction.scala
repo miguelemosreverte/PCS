@@ -40,9 +40,9 @@ case class SujetoTributarioTransaction(actorRef: ActorRef, monitoring: Monitorin
     /*class Amiguito extends Actor {
       ove
     }*/
-    //actorRef ! command
-    //Future.successful(SuccessProcessing(command.deliveryId))
-    actorRef.ask[Response.SuccessProcessing](command)
+    actorRef ! command
+    Future.successful(SuccessProcessing(command.deliveryId))
+    //actorRef.ask[Response.SuccessProcessing](command)
 
   }
 }

@@ -13,7 +13,7 @@ import consumers.registral.declaracion_jurada.infrastructure.json._
 import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
-import serialization.{decode2, decodeF}
+import serialization.{decodeF, maybeDecode}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -28,7 +28,7 @@ case class DeclaracionJuradaTransaction(actor: DeclaracionJuradaActor, monitorin
     } getOrElse "DGR-COP-DECJURADAS"
 
   def processInput(input: String): Either[Throwable, DeclaracionJurada] =
-    decode2[DeclaracionJurada](input)
+    maybeDecode[DeclaracionJurada](input)
 
   override def processCommand(registro: DeclaracionJurada): Future[Response.SuccessProcessing] = {
     val command = DeclaracionJuradaCommands.DeclaracionJuradaUpdateFromDto(

@@ -14,7 +14,7 @@ import consumers.registral.parametrica_plan.infrastructure.json._
 import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
-import serialization.{decode2, decodeF}
+import serialization.{decodeF, maybeDecode}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -29,7 +29,7 @@ case class ParametricaPlanTributarioTransaction(actor: ParametricaPlanActor, mon
     } getOrElse "DGR-COP-PARAMPLAN-TRI"
 
   def processInput(input: String): Either[Throwable, ParametricaPlanTri] =
-    decode2[ParametricaPlanTri](input)
+    maybeDecode[ParametricaPlanTri](input)
 
   override def processCommand(registro: ParametricaPlanTri): Future[Response.SuccessProcessing] = {
 

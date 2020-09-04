@@ -11,7 +11,7 @@ import consumers.no_registral.sujeto.application.entity.SujetoExternalDto.Sujeto
 import consumers.no_registral.sujeto.infrastructure.json._
 import design_principles.actor_model.Response
 import monitoring.Monitoring
-import serialization.{decode2, decodeF}
+import serialization.{decodeF, maybeDecode}
 
 import scala.util.Try
 
@@ -26,7 +26,7 @@ case class SujetoNoTributarioTransaction(actorRef: ActorRef, monitoring: Monitor
     } getOrElse "DGR-COP-SUJETO-ANT"
 
   def processInput(input: String): Either[Throwable, SujetoAnt] =
-    decode2[SujetoAnt](input)
+    maybeDecode[SujetoAnt](input)
 
   def processCommand(registro: SujetoAnt): Future[Response.SuccessProcessing] = {
     val command = SujetoCommands.SujetoUpdateFromAnt(

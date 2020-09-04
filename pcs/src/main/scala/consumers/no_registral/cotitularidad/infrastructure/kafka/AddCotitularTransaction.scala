@@ -11,7 +11,7 @@ import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaClassicTypedAsk
 import monitoring.Monitoring
 import play.api.libs.json.Json
-import serialization.decode2
+import serialization.maybeDecode
 
 case class AddCotitularTransaction(actorRef: ActorRef, monitoring: Monitoring)(
     implicit
@@ -21,7 +21,7 @@ case class AddCotitularTransaction(actorRef: ActorRef, monitoring: Monitoring)(
   def topic = "AddCotitularTransaction"
 
   def processInput(input: String): Either[Throwable, CotitularidadAddSujetoCotitular] =
-    decode2[CotitularidadAddSujetoCotitular](input)
+    maybeDecode[CotitularidadAddSujetoCotitular](input)
 
   def processCommand(cmd: CotitularidadAddSujetoCotitular): Future[Response.SuccessProcessing] = {
     actorRef.ask[Response.SuccessProcessing](cmd)

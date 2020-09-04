@@ -15,7 +15,7 @@ import consumers.registral.etapas_procesales.infrastructure.json._
 import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
-import serialization.{decode2, decodeF}
+import serialization.{decodeF, maybeDecode}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -30,7 +30,7 @@ case class EtapasProcesalesNoTributarioTransaction(actor: EtapasProcesalesActor,
     } getOrElse "DGR-COP-ETAPROCESALES-ANT"
 
   def processInput(input: String): Either[Throwable, EtapasProcesalesAnt] =
-    decode2[EtapasProcesalesAnt](input)
+    maybeDecode[EtapasProcesalesAnt](input)
 
   override def processCommand(registro: EtapasProcesalesAnt): Future[Response.SuccessProcessing] = {
     val command = EtapasProcesalesCommands.EtapasProcesalesUpdateFromDto(

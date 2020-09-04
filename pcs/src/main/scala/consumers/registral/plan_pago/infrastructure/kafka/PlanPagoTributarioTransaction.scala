@@ -11,7 +11,7 @@ import consumers.registral.plan_pago.infrastructure.json._
 import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
-import serialization.{decode2, decodeF}
+import serialization.{decodeF, maybeDecode}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -26,7 +26,7 @@ case class PlanPagoTributarioTransaction(actor: PlanPagoActor, monitoring: Monit
     } getOrElse "DGR-COP-PLANES-TRI"
 
   def processInput(input: String): Either[Throwable, PlanPagoTri] =
-    decode2[PlanPagoTri](input)
+    maybeDecode[PlanPagoTri](input)
 
   override def processCommand(registro: PlanPagoTri): Future[Response.SuccessProcessing] = {
     val command = PlanPagoCommands.PlanPagoUpdateFromDto(

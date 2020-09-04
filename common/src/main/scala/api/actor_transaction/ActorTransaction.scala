@@ -9,7 +9,7 @@ import design_principles.actor_model.Response
 import kafka.KafkaMessageProcessorRequirements
 import monitoring.Monitoring
 import play.api.libs.json.Format
-import serialization.decode2
+import serialization.maybeDecode
 
 import scala.util.{Failure, Success, Try}
 

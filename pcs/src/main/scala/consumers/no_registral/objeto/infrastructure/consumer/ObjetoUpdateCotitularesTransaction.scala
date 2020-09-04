@@ -8,7 +8,7 @@ import consumers.no_registral.objeto.application.entities.ObjetoCommands.ObjetoU
 import consumers.no_registral.objeto.infrastructure.json._
 import design_principles.actor_model.Response
 import monitoring.Monitoring
-import serialization.decode2
+import serialization.maybeDecode
 
 case class ObjetoUpdateCotitularesTransaction(actorRef: ActorRef, monitoring: Monitoring)(
     implicit
@@ -18,7 +18,7 @@ case class ObjetoUpdateCotitularesTransaction(actorRef: ActorRef, monitoring: Mo
   def topic = "ObjetoUpdatedCotitulares"
 
   def processInput(input: String): Either[Throwable, ObjetoUpdateCotitulares] =
-    decode2[ObjetoUpdateCotitulares](input)
+    maybeDecode[ObjetoUpdateCotitulares](input)
 
   def processCommand(cmd: ObjetoUpdateCotitulares): Future[Response.SuccessProcessing] = {
     actorRef.ask[Response.SuccessProcessing](cmd)

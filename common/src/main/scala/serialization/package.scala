@@ -31,8 +31,7 @@ package object serialization {
     }
   }
 
-  // TODO reorganize, standarize
-  def decode2[A: ClassTag](a: String)(implicit format: Format[A]): Either[Throwable, A] = {
+  def maybeDecode[A: ClassTag](a: String)(implicit format: Format[A]): Either[Throwable, A] = {
     def ctag = implicitly[reflect.ClassTag[A]]
     def AClass: Class[A] = ctag.runtimeClass.asInstanceOf[Class[A]]
     if (AClass.getName == "java.lang.String") {
@@ -40,20 +39,18 @@ package object serialization {
     } else {
       Json.parse(a).asOpt[A] match {
         case Some(a) => Right(a)
-        case None => Left(new SerializationError(s"Failed to decode ${AClass.getName} $a"))
-      }
-    }
-  }
-
-  def maybeDecode[A: ClassTag](a: String)(implicit format: Format[A]): Either[String, A] = {
-    def ctag = implicitly[reflect.ClassTag[A]]
-    def AClass: Class[A] = ctag.runtimeClass.asInstanceOf[Class[A]]
-    if (AClass.getName == "java.lang.String") {
-      Right(a.asInstanceOf[A])
-    } else {
-      Json.parse(a).asOpt[A] match {
-        case Some(a) => Right(a)
-        case None => Left(s"Failed to decode ${AClass.getName} $a)}")
+        case None =>
+          Left(
+            new SerializationError(
+              s"""
+              Failed to decode ${AClass.getName}
+              because of:
+              ${Json.parse(a).validate}
+              message that failed was: 
+              $a
+              """
+            )
+          )
       }
     }
   }

@@ -14,7 +14,7 @@ import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaClassicTypedAsk
 import monitoring.Monitoring
 import play.api.libs.json.Json
-import serialization.decode2
+import serialization.maybeDecode
 
 case class CotitularPublishSnapshotTransaction(actorRef: ActorRef, monitoring: Monitoring)(
     implicit
@@ -24,7 +24,7 @@ case class CotitularPublishSnapshotTransaction(actorRef: ActorRef, monitoring: M
   def topic = "CotitularidadPublishSnapshot"
 
   def processInput(input: String): Either[Throwable, CotitularidadPublishSnapshot] =
-    decode2[CotitularidadPublishSnapshot](input)
+    maybeDecode[CotitularidadPublishSnapshot](input)
 
   def processCommand(cmd: CotitularidadPublishSnapshot): Future[Response.SuccessProcessing] = {
     actorRef.ask[Response.SuccessProcessing](cmd)

@@ -14,7 +14,7 @@ import consumers.registral.actividad_sujeto.infrastructure.json._
 import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
-import serialization.{decode2, decodeF}
+import serialization.{decodeF, maybeDecode}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -29,7 +29,7 @@ case class ActividadSujetoTransaction(actor: ActividadSujetoActor, monitoring: M
     } getOrElse "DGR-COP-ACTIVIDADES"
 
   def processInput(input: String): Either[Throwable, ActividadSujeto] =
-    decode2[ActividadSujeto](input)
+    maybeDecode[ActividadSujeto](input)
 
   override def processCommand(registro: ActividadSujeto): Future[Response.SuccessProcessing] = {
     val command =

@@ -17,7 +17,7 @@ import consumers.registral.parametrica_recargo.infrastructure.json._
 import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
-import serialization.{decode2, decodeF}
+import serialization.{decodeF, maybeDecode}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -32,7 +32,7 @@ case class ParametricaRecargoTributarioTransaction(actor: ParametricaRecargoActo
     } getOrElse "DGR-COP-PARAMRECARGO-TRI"
 
   def processInput(input: String): Either[Throwable, ParametricaRecargoTri] =
-    decode2[ParametricaRecargoTri](input)
+    maybeDecode[ParametricaRecargoTri](input)
 
   override def processCommand(registro: ParametricaRecargoTri): Future[Response.SuccessProcessing] = {
     val command = ParametricaRecargoCommands.ParametricaRecargoUpdateFromDto(

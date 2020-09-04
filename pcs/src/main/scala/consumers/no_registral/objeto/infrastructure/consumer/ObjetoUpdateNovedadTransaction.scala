@@ -9,7 +9,7 @@ import consumers.no_registral.objeto.application.entities.ObjetoCommands.{Objeto
 import consumers.no_registral.objeto.infrastructure.json._
 import design_principles.actor_model.Response
 import monitoring.Monitoring
-import serialization.{decode2, decodeF}
+import serialization.{decodeF, maybeDecode}
 
 case class ObjetoUpdateNovedadTransaction(actorRef: ActorRef, monitoring: Monitoring)(
     implicit
@@ -19,7 +19,7 @@ case class ObjetoUpdateNovedadTransaction(actorRef: ActorRef, monitoring: Monito
   def topic = "ObjetoReceiveSnapshot"
 
   def processInput(input: String): Either[Throwable, ObjetoSnapshot] =
-    decode2[ObjetoSnapshot](input)
+    maybeDecode[ObjetoSnapshot](input)
 
   def processCommand(cmd: ObjetoSnapshot): Future[Response.SuccessProcessing] = {
     actorRef.ask[Response.SuccessProcessing](cmd)

@@ -16,7 +16,7 @@ import design_principles.actor_model.Response
 import design_principles.actor_model.Response.SuccessProcessing
 import monitoring.Monitoring
 import play.api.libs.json.Reads
-import serialization.{decode2, decodeF}
+import serialization.{decodeF, maybeDecode}
 
 import scala.util.Try
 
@@ -31,7 +31,7 @@ case class ObligacionTributariaTransaction(actorRef: ActorRef, monitoring: Monit
     } getOrElse "DGR-COP-OBLIGACIONES-TRI"
 
   def processInput(input: String): Either[Throwable, ObligacionesTri] =
-    decode2[ObligacionesTri](input)
+    maybeDecode[ObligacionesTri](input)
 
   def processCommand(registro: ObligacionesTri): Future[Response.SuccessProcessing] = {
     implicit val b: Reads[Seq[DetallesObligacion]] = Reads.seq(DetallesObligacionF.reads)

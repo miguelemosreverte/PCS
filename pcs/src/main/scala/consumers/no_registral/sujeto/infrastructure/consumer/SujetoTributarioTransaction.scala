@@ -9,7 +9,7 @@ import consumers.no_registral.sujeto.application.entity.{SujetoCommands, SujetoE
 import consumers.no_registral.sujeto.infrastructure.json._
 import design_principles.actor_model.Response
 import monitoring.Monitoring
-import serialization.decode2
+import serialization.maybeDecode
 
 import scala.util.Try
 
@@ -24,7 +24,7 @@ case class SujetoTributarioTransaction(actorRef: ActorRef, monitoring: Monitorin
     } getOrElse "DGR-COP-SUJETO-TRI"
 
   def processInput(input: String): Either[Throwable, SujetoTri] =
-    decode2[SujetoTri](input)
+    maybeDecode[SujetoTri](input)
 
   def processCommand(registro: SujetoTri): Future[Response.SuccessProcessing] = {
     val command = registro match {

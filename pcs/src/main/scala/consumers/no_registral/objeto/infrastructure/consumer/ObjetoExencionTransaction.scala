@@ -11,7 +11,7 @@ import consumers.no_registral.objeto.application.entities.ObjetoExternalDto.Exen
 import consumers.no_registral.objeto.infrastructure.json._
 import design_principles.actor_model.Response
 import monitoring.Monitoring
-import serialization.{decode2, decodeF}
+import serialization.{decodeF, maybeDecode}
 
 import scala.util.Try
 
@@ -26,7 +26,7 @@ case class ObjetoExencionTransaction(actorRef: ActorRef, monitoring: Monitoring)
     } getOrElse "DGR-COP-EXENCIONES"
 
   def processInput(input: String): Either[Throwable, Exencion] =
-    decode2[Exencion](input)
+    maybeDecode[Exencion](input)
 
   def processCommand(exencion: Exencion): Future[Response.SuccessProcessing] = {
     val command = ObjetoCommands.ObjetoAddExencion(

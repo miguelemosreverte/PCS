@@ -13,7 +13,7 @@ import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
 import play.api.libs.json.Reads
-import serialization.{decode2, decodeF}
+import serialization.{decodeF, maybeDecode}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -28,7 +28,7 @@ case class JuicioNoTributarioTransaction(actorRef: JuicioActor, monitoring: Moni
     } getOrElse "DGR-COP-JUICIOS-ANT"
 
   def processInput(input: String): Either[Throwable, JuicioAnt] =
-    decode2[JuicioAnt](input)
+    maybeDecode[JuicioAnt](input)
 
   override def processCommand(registro: JuicioAnt): Future[Response.SuccessProcessing] = {
 

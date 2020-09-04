@@ -12,7 +12,7 @@ import consumers.registral.tramite.infrastructure.json._
 import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
-import serialization.{decode2, decodeF}
+import serialization.{decodeF, maybeDecode}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -27,7 +27,7 @@ case class TramiteTransaction(actor: TramiteActor, monitoring: Monitoring)(
     } getOrElse "DGR-COP-TRAMITES"
 
   def processInput(input: String): Either[Throwable, Tramite] =
-    decode2[Tramite](input)
+    maybeDecode[Tramite](input)
 
   override def processCommand(registro: Tramite): Future[Response.SuccessProcessing] = {
     val command = TramiteCommands.TramiteUpdateFromDto(

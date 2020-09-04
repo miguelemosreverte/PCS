@@ -15,7 +15,7 @@ import consumers.registral.domicilio_sujeto.infrastructure.json._
 import design_principles.actor_model.Response
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
 import monitoring.Monitoring
-import serialization.{decode2, decodeF}
+import serialization.{decodeF, maybeDecode}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
@@ -30,7 +30,7 @@ case class DomicilioSujetoTributarioTransaction(actor: DomicilioSujetoActor, mon
     } getOrElse "DGR-COP-DOMICILIO-SUJ-TRI"
 
   def processInput(input: String): Either[Throwable, DomicilioSujetoTri] =
-    decode2[DomicilioSujetoTri](input)
+    maybeDecode[DomicilioSujetoTri](input)
 
   override def processCommand(registro: DomicilioSujetoTri): Future[Response.SuccessProcessing] = {
     val command = DomicilioSujetoCommands.DomicilioSujetoUpdateFromDto(

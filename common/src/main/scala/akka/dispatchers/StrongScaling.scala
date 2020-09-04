@@ -49,12 +49,21 @@ class StrongScaling(hardwareSpec: HardwareSpecs) extends Dispatchers {
       hardwareSpec.processedMessagesPerActorPerThreadJump
     )}"
 
+  def superhero(dispatcherName: String) =
+    s"${forkJoin(
+      dispatcherName,
+      8,
+      64,
+      2.0,
+      hardwareSpec.processedMessagesPerActorPerThreadJump
+    )}"
+
   def strongScalingDispatcherCassandra = {
     val dispatcherName = "cassandraDispatcher"
     val partitionSize = 1000
     val resultSize = 20
     s"""
-       |${strongScalingDispatcher(dispatcherName)}
+       |${superhero(dispatcherName)}
        |
        |akka.persistence.cassandra.journal {
        |  plugin-dispatcher = "$dispatcherName"

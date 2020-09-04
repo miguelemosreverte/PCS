@@ -52,11 +52,11 @@ class StrongScaling(hardwareSpec: HardwareSpecs) extends Dispatchers {
   def strongScalingDispatcherCassandra = {
     val dispatcherName = "cassandraDispatcher"
     val partitionSize = 2000
-    val resultSize = 25
+    val resultSize = 2000
     s"""
        |${strongScalingDispatcher(dispatcherName)}
        |
-       |cassandra-journal {
+       |akka.persistence.cassandra.journal {
        |  plugin-dispatcher = "$dispatcherName"
        |  replay-dispatcher = "$dispatcherName"
        |  max-result-size = $resultSize
@@ -65,7 +65,7 @@ class StrongScaling(hardwareSpec: HardwareSpecs) extends Dispatchers {
        |  max-message-batch-size = $partitionSize
        |}
        |
-       |cassandra-query-journal {
+       |akka.persistence.cassandra.query {
        |  plugin-dispatcher = "$dispatcherName"
        |  max-buffer-size = $resultSize
        |  max-result-size-query = $resultSize

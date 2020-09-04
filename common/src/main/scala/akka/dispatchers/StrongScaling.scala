@@ -68,10 +68,8 @@ class StrongScaling(hardwareSpec: HardwareSpecs) extends Dispatchers {
        |akka.persistence.cassandra.journal {
        |  plugin-dispatcher = "$dispatcherName"
        |  replay-dispatcher = "$dispatcherName"
-       |  max-result-size = $resultSize
-       |  max-result-size-replay = $resultSize
        |  target-partition-size = 500000
-       |  max-message-batch-size = $partitionSize
+       |  max-message-batch-size = 4000
        |}
        |
        |akka.persistence.cassandra.query {

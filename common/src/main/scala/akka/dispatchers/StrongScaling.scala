@@ -43,8 +43,8 @@ class StrongScaling(hardwareSpec: HardwareSpecs) extends Dispatchers {
   def strongScalingDispatcher(dispatcherName: String) =
     s"${forkJoin(
       dispatcherName,
-      hardwareSpec.parallelismMin,
-      hardwareSpec.parallelismMax,
+      4,
+      4,
       hardwareSpec.parallelismFactor,
       hardwareSpec.processedMessagesPerActorPerThreadJump
     )}"
@@ -52,16 +52,16 @@ class StrongScaling(hardwareSpec: HardwareSpecs) extends Dispatchers {
   def superhero(dispatcherName: String) =
     s"${forkJoin(
       dispatcherName,
-      8,
-      16,
+      4,
+      12,
       1,
       hardwareSpec.processedMessagesPerActorPerThreadJump
     )}"
 
   def strongScalingDispatcherCassandra = {
     val dispatcherName = "cassandraDispatcher"
-    val partitionSize = 1000
-    val resultSize = 20
+    val partitionSize = 2000
+    val resultSize = 1
     s"""
        |${superhero(dispatcherName)}
        |

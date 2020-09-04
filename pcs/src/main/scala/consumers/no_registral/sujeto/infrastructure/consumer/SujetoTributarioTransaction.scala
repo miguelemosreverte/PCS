@@ -36,7 +36,9 @@ case class SujetoTributarioTransaction(actorRef: ActorRef, monitoring: Monitorin
           registro = registro
         )
     }
-    actorRef ! command
-    Future.successful(SuccessProcessing(command.deliveryId))
+    // actorRef ! command
+    // Future.successful(SuccessProcessing(command.deliveryId))
+    actorRef.ask[Response.SuccessProcessing](command)
+
   }
 }

@@ -398,7 +398,7 @@
       "pluginVersion": "7.0.3",
       "targets": [
         {
-          "expr": "sum(copernico_counters_total{entity=\"SujetoActor-persisted-SujetoSnapshotPersisted\"} )\n",
+          "expr": "sum(copernico_counters_total{entity=\"SujetoActor-persisted-SujetoUpdatedFromTri\"} )\n",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,

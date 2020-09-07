@@ -4,10 +4,11 @@ git pull origin master
 
 git commit -m "m"
 
-# sbt pcs/docker:publishLocal
-# docker tag pcs/pcs:1.0 099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest
-# docker push 099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest
-# export IMAGE=099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest
+sbt pcs/docker:publishLocal
+aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 099925565557.dkr.ecr.us-west-2.amazonaws.com
+docker tag pcs/pcs:1.0 099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest
+docker push 099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest
+export IMAGE=099925565557.dkr.ecr.us-west-2.amazonaws.com/pcs-akka:latest
 
 # kubectl apply -f assets/k8s/infra/cassandra.yml
 helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com

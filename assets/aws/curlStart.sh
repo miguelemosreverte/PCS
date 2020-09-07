@@ -10,11 +10,15 @@ tmux send-keys -t 1 "
       kubectl port-forward $(kubectl get pod -l app=pcs-cluster -o jsonpath='{.items[0].metadata.name}') 8081:8081; \
 " Enter
 
-tmux new-window  -n 'port forward akkaPod2 ' \; split-window -d \;
+tmux new-window  -n 'port forward akkaPod1 ' \;
+tmux send-keys -t 1 "
+      kubectl port-forward $(kubectl get pod -l app=pcs-cluster -o jsonpath='{.items[1].metadata.name}') 8082:8081; \
+" Enter
+
+tmux new-window  -n 'port forward akkaPod2 ' \;
 tmux send-keys -t 1 "
       kubectl port-forward $(kubectl get pod -l app=pcs-cluster -o jsonpath='{.items[2].metadata.name}') 8083:8081; \
 " Enter
-tmux send-keys -t 2 'sh assets/scripts/query_cassandra_table.sh buc_obligaciones' Enter
 
 
 tmux new-window  -n 'START ' \; split-window -d \;

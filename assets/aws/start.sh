@@ -25,9 +25,9 @@ helm install prometheus stable/prometheus-operator --namespace copernico
 sleep 60
 
 export kafkaPod=$(kubectl get pod -l "app=kafka" -o jsonpath='{.items[0].metadata.name}')
-export createSujetoTri='kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 120 --topic DGR-COP-SUJETO-TRI'
+export createSujetoTri='kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 30 --topic DGR-COP-SUJETO-TRI'
 kubectl exec $kafkaPod -- $createSujetoTri
-export createObligacionTri='kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 120 --topic DGR-COP-OBLIGACIONES-TRI'
+export createObligacionTri='kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 30 --topic DGR-COP-OBLIGACIONES-TRI'
 kubectl exec $kafkaPod -- $createObligacionTri
 
 

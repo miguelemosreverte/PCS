@@ -57,7 +57,7 @@ object KafkaEventProducer {
 
     def produce(keyValue: KafkaKeyValue) = {
       println(keyValue.aggregateRoot)
-      KafkaMessageShardProducerRecord.producerRecord(topic, 120, keyValue.aggregateRoot, keyValue.json)
+      KafkaMessageShardProducerRecord.producerRecord(topic, 30, keyValue.aggregateRoot, keyValue.json)
     }
 
     val done: Future[Done] =

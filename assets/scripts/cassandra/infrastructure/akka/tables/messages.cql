@@ -28,3 +28,11 @@ CREATE TABLE IF NOT EXISTS akka.messages (
     'min_threshold' : 4,
     'min_sstable_size' : 50
     };
+
+
+CREATE KEYSPACE eventsourcing WITH replication = {'class':'SimpleStrategy', 'replication_factor':1};
+CREATE TABLE IF NOT EXISTS eventsourcing.events (
+    aggregateRoot text,
+    event text,
+    PRIMARY KEY(aggregateRoot)
+);

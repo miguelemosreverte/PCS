@@ -8,4 +8,4 @@ aws ecr get-login-password --region us-west-2 | docker login --username AWS --pa
 
 git clone https://miguelemosreverte:Alatriste007@github.com/miguelemosreverte/PCS
 cd PCS
-git checkout AWS
+git checkout master

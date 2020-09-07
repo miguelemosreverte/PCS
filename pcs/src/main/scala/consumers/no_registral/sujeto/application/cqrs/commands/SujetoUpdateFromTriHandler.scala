@@ -20,9 +20,13 @@ class SujetoUpdateFromTriHandler(actor: SujetoActor) extends SyncCommandHandler[
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
       actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
     } else {
+      println("       about to call SujetoUpdateFromTriHandler.actor.persistEvent")
+
       actor.persistEvent(event) { () =>
         actor.state += event
+        println("        SujetoUpdateFromTriHandler.actor.persistEvent() { () =>")
         actor.persistSnapshot() { () =>
+          println("        SujetoUpdateFromTriHandler.actor.persistSnapshot() { () =>")
           actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
         }
       }

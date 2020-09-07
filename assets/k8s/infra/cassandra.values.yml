@@ -1,0 +1,16 @@
+nodes:
+  enabled: true
+  #selector:
+    #nodeSelector:
+      #index: "3"
+resources:
+  requests:
+   memory: 20Gi
+   cpu: 4
+  limits:
+   memory: 20Gi
+   cpu: 4
+persistence:
+  enabled: false
+
+

@@ -54,6 +54,7 @@ spec:
                     values:
                       - "1"
                       - "2"
+                      - "3"
       terminationGracePeriodSeconds: 30
       restartPolicy: Always
       serviceAccountName: pcs-cluster
@@ -69,9 +70,7 @@ spec:
             - name: KAFKA_BROKERS_LIST
               value: "kafka-internal:29092"
             - name: CASSANDRA_CONTACT_POINTS
-              value: "cassandra:9043"
-            - name: CASSANDRA_REPLICAS
-              value: "1"
+              value: "cassandra:9042"
             - name: DISCOVERY_METHOD
               value: "kubernetes-api"
             - name: CLUSTER_IP

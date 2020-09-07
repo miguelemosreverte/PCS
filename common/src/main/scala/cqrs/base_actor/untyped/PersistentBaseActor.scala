@@ -11,10 +11,13 @@ import design_principles.actor_model.mechanism.local_processing.LocalizedProcess
 import design_principles.actor_model.{Command, Event, Query}
 import monitoring.{Counter, Monitoring}
 
+import scala.concurrent.ExecutionContext
+
 abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[E]: ClassTag](monitoring: Monitoring,
                                                                                               config: Config)
     extends BaseActor[E, State](monitoring)
-    with PersistentActor {
+    with PersistentActor
+    with FastPersistentActor {
 
   val persistedCounter: Counter = monitoring.counter(s"$name-persisted")
 
@@ -49,6 +52,8 @@ abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[
     case other =>
       logger.warn(s"[$persistenceId] Unexpected event $other")
   }
+
+  implicit val ec: ExecutionContext = context.system.dispatcher
 
   def persistEvent(event: E, tags: Set[String] = Set.empty)(handler: () => Unit = () => ()): Unit = {
     val tagsWithShardId = tags map { tag =>

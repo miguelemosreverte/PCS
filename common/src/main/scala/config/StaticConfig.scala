@@ -10,7 +10,7 @@ object StaticConfig {
     mainConfig,
     ConfigFactory parseString EventSerializer.eventAdapterConf,
     ConfigFactory parseString EventSerializer.serializationConf,
-    ConfigFactory parseString new ActorsDispatchers(mainConfig).actorsDispatchers,
-    ConfigFactory parseString StrongScaling.apply(mainConfig).strongScalingDispatcherCassandra
+    ConfigFactory parseString new ActorsDispatchers(mainConfig).actorsDispatchers
+    //ConfigFactory parseString StrongScaling.apply(mainConfig).strongScalingDispatcherCassandra
   ).reduce(_ withFallback _)
 }

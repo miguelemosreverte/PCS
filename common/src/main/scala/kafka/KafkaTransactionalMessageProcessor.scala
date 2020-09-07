@@ -48,11 +48,18 @@ class KafkaTransactionalMessageProcessor(
 
     val subscription = Subscriptions.topics(SOURCE_TOPIC).withRebalanceListener(rebalancerListener)
 
+    /*
+    30 particiones / 3 nodos = 10 particiones por nodo
+      10 mapAsync
+      10 particiones * 10 mapAsync = 100
+
+    el tema es que con solo nodo, tenemos 100K
+     */
     val `300k_a_minute_per_node` = 300000
     val stream = Transactional
       .source(consumer, subscription)
-      .throttle(2000, 1 second)
-      .mapAsync(10) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
+      .throttle(1000, 1 second) // si vos buscas 3000 total, osea 200K, por pod, deberia ser 3000 / 3 = 1000
+      .mapAsync(1) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
         val message = msg
 
         val input: String = message.record.value

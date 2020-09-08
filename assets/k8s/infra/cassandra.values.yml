@@ -2,7 +2,7 @@
 ## ref: https://hub.docker.com/r/library/cassandra/
 image:
   repo: cassandra
-  tag: 3.11.6
+  tag: 3.11.4
   pullPolicy: IfNotPresent
   ## Specify ImagePullSecrets for Pods
   ## ref: https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
@@ -40,10 +40,10 @@ persistence:
 ## ref: http://docs.datastax.com/en/archived/cassandra/2.0/cassandra/architecture/architecturePlanningHardware_c.html
 resources:
   requests:
-    memory: 20Gi
+    memory: 16Gi
     cpu: 4
   limits:
-    memory: 20Gi
+    memory: 16Gi
     cpu: 4
 
 ## Change cassandra configuration parameters below:
@@ -64,8 +64,8 @@ config:
   dc_name: DC1
   rack_name: RAC1
   endpoint_snitch: SimpleSnitch
-  max_heap_size: 20000M
-  heap_new_size: 20000M
+  max_heap_size: 16000M
+  heap_new_size: 16000M
   start_rpc: false
   ports:
     cql: 9042

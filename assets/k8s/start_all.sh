@@ -7,11 +7,6 @@ message() {
   echo -e "${CYAN}[$1]${NORMAL}"
 }
 
-
-message "Starting up cassandra"
-kubectl apply -f assets/k8s/infra/cassandra.yml
-message "cassandra started up"
-
 message "Setting up kubernetes context and namespace..."
 kubectl config use-context docker-for-desktop
 #eval $(minikube docker-env)
@@ -26,6 +21,9 @@ message "Starting up kafka"
 kubectl apply -f assets/k8s/infra/kafka.yml
 message "kafka started up"
 
+message "Starting up cassandra"
+kubectl apply -f assets/k8s/infra/cassandra.yml
+message "cassandra started up"
 
 message "awainting for cassandra to be ready"
 sleep 30

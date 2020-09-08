@@ -61,6 +61,6 @@ case class ObligacionTributariaTransaction(actorRef: ActorRef, monitoring: Monit
           registro = registro,
           detallesObligacion = detalles.getOrElse(Seq.empty)
         )
-    actorRef ask command
+    actorRef.ask[Response.SuccessProcessing](command)
   }
 }

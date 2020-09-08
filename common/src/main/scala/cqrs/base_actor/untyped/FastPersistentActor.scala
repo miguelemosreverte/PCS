@@ -1,5 +1,8 @@
 package cqrs.base_actor.untyped
 
+import com.datastax.oss.driver.api.core.CqlSession
+
+import scala.jdk.javaapi.FutureConverters._
 import akka.Done
 import akka.actor.{ActorContext, ActorSystem}
 import akka.persistence.PersistentActor
@@ -17,22 +20,24 @@ import scala.util.{Failure, Success}
 import scala.concurrent.duration._
 import akka.pattern.pipe
 
-trait FastPersistentActor { a: PersistentActor =>
-  val s: ActorSystem = a.context.system
-  private val sessionSettings = CassandraSessionSettings.create()
-  private implicit val session: CassandraSession = CassandraSessionRegistry.get(s).sessionFor(sessionSettings)
-  private val logger = LoggerFactory.getLogger(this.getClass)
+import scala.jdk.FutureConverters.CompletionStageOps
+object FastPersistentActor {
+  val sessionSettings = CassandraSessionSettings.create()
+  implicit val session = CqlSession.builder().build()
+  val logger = LoggerFactory.getLogger(this.getClass)
 
-  final private val statement = {
-    Await.result(
-      session.prepare(s"""
+  val statement: PreparedStatement =
+    session.prepare(s"""
         INSERT INTO eventsourcing.events 
         (aggregateRoot, event) 
         VALUES (?, ?);
-      """.stripMargin),
-      60 seconds
-    )
-  }
+      """.stripMargin)
+
+}
+trait FastPersistentActor { a: PersistentActor =>
+  val s: ActorSystem = a.context.system
+  import FastPersistentActor._
+  private val logger = LoggerFactory.getLogger(this.getClass)
 
   var batch: mutable.Buffer[String] = mutable.Buffer.empty
   val persistenceId: String
@@ -43,7 +48,7 @@ trait FastPersistentActor { a: PersistentActor =>
   def fastPersist[A](event: A)(handler: A => Unit): Unit = {
     val serializedEvent = event.toString // serialization.encode(event)
     val result = for {
-      done <- session.executeWrite(statement.bind(aggregateRoot, serializedEvent))
+      done <- session.executeAsync(statement.bind(aggregateRoot, serializedEvent)).asScala
     } yield done
     result.onComplete {
       case Failure(throwable) =>

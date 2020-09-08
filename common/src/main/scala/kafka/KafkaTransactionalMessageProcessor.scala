@@ -21,10 +21,6 @@ class KafkaTransactionalMessageProcessor(
   private val log = LoggerFactory.getLogger(this.getClass)
   implicit val ec: ExecutionContext = transactionRequirements.executionContext
 
-  val THROTTLE_ELEMENTS: Int = Try(System.getenv("THROTTLE_ELEMENTS")).map(_.toInt).getOrElse(10000)
-  val THROTTLE_ELEMENTS_PER: Int = Try(System.getenv("THROTTLE_ELEMENTS_PER")).map(_.toInt).getOrElse(100)
-  val CONSUMER_PARALLELISM: Int = Try(System.getenv("CONSUMER_PARALLELISM")).map(_.toInt).getOrElse(1)
-
   def transactionalId: String = java.util.UUID.randomUUID().toString
 
   def run(
@@ -60,11 +56,15 @@ class KafkaTransactionalMessageProcessor(
       - una vez perdido el orden, no es necesario seguirse preocupando por el orden
 
      */
-    val `300k_a_minute_per_node` = 300000
+
+    val THROTTLE_ELEMENTS: Int = Try(System.getenv("THROTTLE_ELEMENTS")).map(_.toInt).getOrElse(1000)
+    val THROTTLE_ELEMENTS_PER: Int = Try(System.getenv("THROTTLE_ELEMENTS_PER")).map(_.toInt).getOrElse(1)
+    val CONSUMER_PARALLELISM: Int = Try(System.getenv("CONSUMER_PARALLELISM")).map(_.toInt).getOrElse(1024)
+
     val stream = Transactional
       .source(consumer, subscription) // TPS -- Transaction Per Second
-      .throttle(1000, 1 second) // si vos buscas 3000 total, osea 200K, por pod, deberia ser 3000 / 3 = 1000
-      .mapAsyncUnordered(120) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
+      .throttle(THROTTLE_ELEMENTS, THROTTLE_ELEMENTS_PER second) // si vos buscas 3000 total, osea 200K, por pod, deberia ser 3000 / 3 = 1000
+      .mapAsyncUnordered(CONSUMER_PARALLELISM) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
         val message = msg
 
         val input: String = message.record.value

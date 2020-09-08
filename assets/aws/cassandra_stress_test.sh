@@ -24,4 +24,5 @@ spec:
           args: ["run", "KeyValue", "--host", "cassandra", "--duration", "2m"]
 ' | kubectl apply -f -
 
+sleep 30
 kubectl logs -f $(kubectl get pods -o name --selector job-name=tlp-stress)

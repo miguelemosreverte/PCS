@@ -26,11 +26,12 @@ class ObligacionUpdateFromDtoHandler(actor: ObligacionActor) extends SyncCommand
       actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
       Success(Response.SuccessProcessing(command.deliveryId))
     } else {
+      val sender = actor.context.sender()
       actor.persistEvent(event) { () =>
         actor.state += event
         actor.informParent(command)
         actor.persistSnapshot() { () =>
-          actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
+          sender ! Response.SuccessProcessing(command.deliveryId)
         }
       }
     }

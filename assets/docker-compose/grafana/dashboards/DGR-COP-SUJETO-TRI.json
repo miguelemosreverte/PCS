@@ -721,7 +721,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "\nsum(\nincrease(copernico_counters_total{entity=\"SujetoActor-persisted-SujetoSnapshotPersisted\"}[1m])\n)\n",
+          "expr": "\nsum(\nincrease(copernico_counters_total{entity=\"SujetoActor-persisted-SujetoUpdatedFromTri\"}[1m])\n)\n",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -917,7 +917,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "copernico_counters_total{entity=\"SujetoActor-persisted-SujetoSnapshotPersisted\"} ",
+          "expr": "copernico_counters_total{entity=\"SujetoActor-persisted-SujetoUpdatedFromTri\"} ",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,

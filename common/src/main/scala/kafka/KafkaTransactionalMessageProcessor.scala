@@ -50,16 +50,21 @@ class KafkaTransactionalMessageProcessor(
 
     /*
     30 particiones / 3 nodos = 10 particiones por nodo
-      10 mapAsync
-      10 particiones * 10 mapAsync = 100
+      Actores creados con maxParallelism de 12 en su forkJoin
+      10 * 12 = 120
 
-    el tema es que con solo nodo, tenemos 100K
+      mapAsyncUnordered(120)
+
+      comentario sobre mapAsyncUnordered:
+      - utilizar particiones de Kafka es en sí mismo una violación del orden
+      - una vez perdido el orden, no es necesario seguirse preocupando por el orden
+
      */
     val `300k_a_minute_per_node` = 300000
     val stream = Transactional
       .source(consumer, subscription) // TPS -- Transaction Per Second
       .throttle(1000, 1 second) // si vos buscas 3000 total, osea 200K, por pod, deberia ser 3000 / 3 = 1000
-      .mapAsync(12) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
+      .mapAsyncUnordered(120) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
         val message = msg
 
         val input: String = message.record.value

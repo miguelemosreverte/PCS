@@ -65,7 +65,7 @@ config:
   rack_name: RAC1
   endpoint_snitch: SimpleSnitch
   max_heap_size: 16000M
-  heap_new_size: 6000M
+  heap_new_size: 1000M
   start_rpc: false
   ports:
     cql: 9042

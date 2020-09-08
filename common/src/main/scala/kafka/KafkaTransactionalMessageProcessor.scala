@@ -59,7 +59,7 @@ class KafkaTransactionalMessageProcessor(
     val stream = Transactional
       .source(consumer, subscription) // TPS -- Transaction Per Second
       .throttle(1000, 1 second) // si vos buscas 3000 total, osea 200K, por pod, deberia ser 3000 / 3 = 1000
-      .mapAsync(1) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
+      .mapAsync(10) { msg: ConsumerMessage.TransactionalMessage[String, String] =>
         val message = msg
 
         val input: String = message.record.value

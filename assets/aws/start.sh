@@ -5,9 +5,11 @@ git pull origin master
 git commit -m "m"
 
 
+echo "INSTALLING HELM CASSANDRA"
 # kubectl apply -f assets/k8s/infra/cassandra.yml
 helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com
 helm install cassandra incubator/cassandra --version 0.15.2 -f assets/k8s/infra/cassandra.values.yml
+echo "INSTALLED HELM CASSANDRA"
 
 sbt pcs/docker:publishLocal
 aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 099925565557.dkr.ecr.us-west-2.amazonaws.com

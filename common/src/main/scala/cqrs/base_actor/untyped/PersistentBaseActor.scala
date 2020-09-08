@@ -16,8 +16,7 @@ import scala.concurrent.ExecutionContext
 abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[E]: ClassTag](monitoring: Monitoring,
                                                                                               config: Config)
     extends BaseActor[E, State](monitoring)
-    with PersistentActor
-    with FastPersistentActor {
+    with PersistentActor {
 
   val persistedCounter: Counter = monitoring.counter(s"$name-persisted")
 

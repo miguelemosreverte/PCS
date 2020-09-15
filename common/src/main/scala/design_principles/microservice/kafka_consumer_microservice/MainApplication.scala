@@ -45,7 +45,7 @@ object MainApplication {
         microservices.flatMap(_.actorTransactionControllers).toSet
       ).route
       val systemRoutes = (new AppLifecycleMicroservice).route
-      val statRoutes = new ClusterStats()(system).route
+      val statRoutes = new ClusterStats().route
       userRoutes ~ systemRoutes ~ statRoutes ~ startStopKafka
     }
     AkkaHttpServer.start(routes, ip, port)(system)

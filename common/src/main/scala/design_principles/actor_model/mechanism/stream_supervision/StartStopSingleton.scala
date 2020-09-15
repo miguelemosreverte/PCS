@@ -7,12 +7,11 @@ import akka.entity.SingletonEntity
 import scala.concurrent.duration.DurationInt
 
 object StartStopSingleton extends SingletonEntity[NoRequirements] {
-  // 🎵 🎵 🎵 https://www.youtube.com/watch?v=fWNaR-rxAic 🎵 🎵 🎵
-  case class `hey, i just meet you, and this is crazy, but here's my number, so call me maybe`(actorRef: ActorRef)
+  case class SubscribeMe(actorRef: ActorRef)
   case class Start()
   case class Stop()
-  case class `hey, i just can't stop thinking about you!`()
-  case class `me neither`()
+  case class Ping()
+  case class Pong()
 
   override def props(requirements: NoRequirements): Props = Props(new StartStopSingleton())
   def start(implicit actorSystem: ActorSystem): ActorRef = startWithRequirements(NoRequirements())
@@ -26,7 +25,7 @@ class StartStopSingleton() extends Actor with ActorLogging {
 
   override def receive: Receive = {
 
-    case `hey, i just meet you, and this is crazy, but here's my number, so call me maybe`(actorRef: ActorRef) =>
+    case SubscribeMe(actorRef: ActorRef) =>
       phonebook = phonebook :+ actorRef
       log.info(s"StartStopSingleton added ${actorRef.path.name} to the list to be stopped/started")
 
@@ -35,12 +34,12 @@ class StartStopSingleton() extends Actor with ActorLogging {
     case Stop() =>
       phonebook foreach { _ ! Stop() }
 
-    case `me neither`() =>
+    case Pong() =>
   }
 
   object Call extends Runnable {
     def run(): Unit = {
-      phonebook foreach { _ ! `hey, i just can't stop thinking about you!`() }
+      phonebook foreach { _ ! Ping() }
     }
   }
 

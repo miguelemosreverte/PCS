@@ -4,11 +4,11 @@ import akka.actor.{Actor, ActorLogging, ActorRef}
 import akka.stream.KillSwitch
 import api.actor_transaction.ActorTransactionController
 import design_principles.actor_model.mechanism.stream_supervision.StartStopSingleton.{
-  `hey, i just can't stop thinking about you!`,
-  `hey, i just meet you, and this is crazy, but here's my number, so call me maybe`,
-  `me neither`,
+  Ping,
+  Pong,
   Start,
-  Stop
+  Stop,
+  SubscribeMe
 }
 
 class MessageProcessorSupervisorActor(
@@ -21,14 +21,14 @@ class MessageProcessorSupervisorActor(
 
   override def preStart(): Unit = {
     super.preStart()
-    startStopSingleton ! `hey, i just meet you, and this is crazy, but here's my number, so call me maybe`(
+    startStopSingleton ! SubscribeMe(
       self
     )
   }
 
   override def receive: Receive = {
 
-    case `hey, i just can't stop thinking about you!`() => sender() ! `me neither`()
+    case Ping() => sender() ! Pong()
 
     case Start() =>
       if (killSwitches.nonEmpty) {

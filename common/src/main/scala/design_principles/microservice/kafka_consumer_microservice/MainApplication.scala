@@ -5,9 +5,11 @@ import akka.cluster.ClusterEvent
 import akka.dispatchers.ActorsDispatchers
 import akka.http.AkkaHttpServer
 import akka.http.scaladsl.server.Directives._
+import api.actor_transaction.{ActorTransaction, ActorTransactionController}
 import api.stats.ClusterStats
 import com.typesafe.config.{Config, ConfigFactory}
 import design_principles.actor_model.context_provider.{Guardian, GuardianRequirements}
+import design_principles.actor_model.mechanism.stream_supervision.{MessageProcessorSupervisorActorController}
 import design_principles.application.Application
 import life_cycle.AppLifecycleMicroservice
 import monitoring.KamonMonitoring
@@ -19,7 +21,7 @@ import scala.concurrent.duration.Duration
 object MainApplication {
 
   def startMicroservices(
-      microservices: Seq[KafkaConsumerMicroservice],
+      microservicesFactory: KafkaConsumerMicroserviceRequirements => Seq[KafkaConsumerMicroservice],
       ip: String,
       port: Int,
       actorSystemName: String,
@@ -35,12 +37,16 @@ object MainApplication {
       extraConfigurations
     ).reduce(_ withFallback _)
 
-    val system = Guardian.getContext(GuardianRequirements(actorSystemName, config))
-    val routes = ProductionMicroserviceContextProvider.getContext(system, config) { microserviceProvisioning =>
-      val userRoutes = microservices.map(_.route(microserviceProvisioning)).reduce(_ ~ _)
-      val systemRoutes = AppLifecycleMicroservice.route(microserviceProvisioning)
+    implicit val system = Guardian.getContext(GuardianRequirements(actorSystemName, config))
+    val routes = ProductionMicroserviceContextProvider.getContext(system, config) { implicit microserviceProvisioning =>
+      val microservices = microservicesFactory(microserviceProvisioning)
+      val userRoutes = microservices.map(_.route).reduce(_ ~ _)
+      val startStopKafka = new MessageProcessorSupervisorActorController(
+        microservices.flatMap(_.actorTransactionControllers).toSet
+      ).route
+      val systemRoutes = (new AppLifecycleMicroservice).route
       val statRoutes = new ClusterStats()(system).route
-      userRoutes ~ systemRoutes ~ statRoutes
+      userRoutes ~ systemRoutes ~ statRoutes ~ startStopKafka
     }
     AkkaHttpServer.start(routes, ip, port)(system)
 

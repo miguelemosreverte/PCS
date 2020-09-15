@@ -14,8 +14,9 @@ import design_principles.microservice.cassandra_projectionist_microservice.{
 import readside.proyectionists.registrales.parametrica_plan.ParametricaPlanProjectionHandler
 import readside.proyectionists.registrales.parametrica_recargo.ParametricaRecargoProjectionHandler
 
-object ParametricaRecargoProjectionistMicroservice extends CassandraProjectionistMicroservice {
-  override def route(context: CassandraProjectionistMicroserviceRequirements): Route = {
+class ParametricaRecargoProjectionistMicroservice(implicit context: CassandraProjectionistMicroserviceRequirements)
+    extends CassandraProjectionistMicroservice {
+  override def route: Route = {
     val monitoring = context.monitoring
     import akka.actor.typed.scaladsl.adapter._
     val system = context.ctx.toTyped

@@ -65,6 +65,7 @@ object Inference {
         "consumers",
         "readside",
         "serialization",
+        "design_principles",
         "cassandra"
       )
   ): Set[Class[_]] = {

@@ -16,13 +16,13 @@ class KafkaCommitableMessageProcessor()(
     transactionRequirements: KafkaMessageProcessorRequirements
 ) extends MessageProcessor {
 
-  override type KillSwitch = akka.stream.UniqueKillSwitch
+  override type MessageProcessorKillSwitch = akka.stream.UniqueKillSwitch
 
   def run(
       SOURCE_TOPIC: String,
       SINK_TOPIC: String,
       algorithm: String => Future[Seq[String]]
-  ): (KillSwitch, Future[Done]) = {
+  ): (Option[MessageProcessorKillSwitch], Future[Done]) = {
 
     type Msg = ConsumerMessage.TransactionalMessage[String, String]
 
@@ -103,7 +103,7 @@ class KafkaCommitableMessageProcessor()(
         log.error(s"Stream completed with failure -- ${ex.getMessage}")
     }
 
-    (killSwitch, done)
+    (Some(killSwitch), done)
   }
 
   def transactionalId: String = java.util.UUID.randomUUID().toString

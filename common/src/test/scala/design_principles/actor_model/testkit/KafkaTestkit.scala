@@ -42,7 +42,7 @@ class KafkaTestkit(monitoring: Monitoring)(implicit system: ActorSystem) {
     new KafkaTransactionalMessageProcessor(kafkaMessageProcessorRequirements) with MessageProcessorLogging {
       override def run(SOURCE_TOPIC: String,
                        SINK_TOPIC: String,
-                       algorithm: String => Future[Seq[String]]): (UniqueKillSwitch, Future[Done]) = {
+                       algorithm: String => Future[Seq[String]]): (Option[UniqueKillSwitch], Future[Done]) = {
         def loggedAlgorithm: String => Future[Seq[String]] = { message: String =>
           messageHistory = messageHistory :+ ((SOURCE_TOPIC, message))
           algorithm(message)

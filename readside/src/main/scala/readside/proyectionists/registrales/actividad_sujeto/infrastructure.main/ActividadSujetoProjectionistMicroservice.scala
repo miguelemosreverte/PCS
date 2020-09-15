@@ -14,8 +14,9 @@ import design_principles.microservice.cassandra_projectionist_microservice.{
 import readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler
 import readside.proyectionists.registrales.actividad_sujeto.ActividadSujetoProjectionHandler
 
-object ActividadSujetoProjectionistMicroservice extends CassandraProjectionistMicroservice {
-  override def route(context: CassandraProjectionistMicroserviceRequirements): Route = {
+class ActividadSujetoProjectionistMicroservice(implicit context: CassandraProjectionistMicroserviceRequirements)
+    extends CassandraProjectionistMicroservice {
+  override def route: Route = {
     val monitoring = context.monitoring
     import akka.actor.typed.scaladsl.adapter._
     val system = context.ctx.toTyped

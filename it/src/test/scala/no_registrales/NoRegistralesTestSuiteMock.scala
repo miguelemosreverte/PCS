@@ -26,16 +26,11 @@ import readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler
 import readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler
 import readside.proyectionists.no_registrales.sujeto.SujetoProjectionHandler
 import akka.actor.typed.scaladsl.adapter._
-import akka.entity.ShardedEntity.ShardedEntityRequirements
-
 trait NoRegistralesTestSuiteMock extends BaseE2ESpec {
   def testContext()(implicit system: ActorSystem): TestContext = new MockE2ETestContext()
 
   class MockE2ETestContext(implicit system: ActorSystem) extends BaseE2ETestContext {
 
-    implicit val shardedEntityRequirements: ShardedEntityRequirements = ShardedEntityRequirements(
-      system
-    )
     val cassandraTestkit = new CassandraTestkitMock({
       case e: ObjetoSnapshotPersisted =>
         (

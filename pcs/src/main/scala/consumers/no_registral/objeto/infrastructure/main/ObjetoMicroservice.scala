@@ -2,10 +2,10 @@ package consumers.no_registral.objeto.infrastructure.main
 
 import scala.concurrent.ExecutionContext
 import akka.actor.{typed, ActorRef, ActorSystem}
-import akka.entity.ShardedEntity.{MonitoringAndConfig, ShardedEntityRequirements}
+import akka.entity.ShardedEntity.MonitoringAndConfig
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import api.actor_transaction.ActorTransaction
+import api.actor_transaction.{ActorTransaction, ActorTransactionController}
 import consumers.no_registral.objeto.infrastructure.consumer.{
   ObjetoExencionTransaction,
   ObjetoNoTributarioTransaction,
@@ -21,34 +21,25 @@ import design_principles.microservice.kafka_consumer_microservice.{
   KafkaConsumerMicroserviceRequirements
 }
 import kafka.KafkaMessageProcessorRequirements
-object ObjetoMicroservice extends KafkaConsumerMicroservice {
+class ObjetoMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
 
-  def route(m: KafkaConsumerMicroserviceRequirements): Route = {
-    val monitoring = m.monitoring
+  implicit val actor: ActorRef = SujetoActor.startWithRequirements(MonitoringAndConfig(monitoring, m.config))
 
-    implicit val shardedEntityR: ShardedEntityRequirements = m.shardedEntityRequirements
-    implicit val queryStateApiR: QueryStateApiRequirements = m.queryStateApiRequirements
-    implicit val kafkaMessageProcessorR: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
-    implicit val actorTransactionR: ActorTransaction.ActorTransactionRequirements = m.actorTransactionRequirements
+  override def actorTransactions: Set[ActorTransaction[_]] = Set(
+    ObjetoExencionTransaction(actor, monitoring),
+    ObjetoNoTributarioTransaction(actor, monitoring),
+    ObjetoTributarioTransaction(actor, monitoring),
+    ObjetoUpdateNovedadTransaction(actor, monitoring)
+  )
 
-    val ctx = m.ctx
-    import akka.actor.typed.scaladsl.adapter._
-
-    implicit val system: akka.actor.typed.ActorSystem[Nothing] = ctx.toTyped
-    implicit val classicSystem: akka.actor.ActorSystem = ctx
-
-    implicit val actor: ActorRef = SujetoActor.startWithRequirements(MonitoringAndConfig(monitoring, m.config))
-
+  def route: Route = {
     val feedbackLoop = ObjetoNovedadCotitularidadProjectionHandler(monitoring, system)
     feedbackLoop.run()
 
-    Seq(
+    (Seq(
       feedbackLoop.route,
-      ObjetoStateAPI(actor, monitoring).route,
-      ObjetoExencionTransaction(actor, monitoring).route,
-      ObjetoNoTributarioTransaction(actor, monitoring).route,
-      ObjetoTributarioTransaction(actor, monitoring).route,
-      ObjetoUpdateNovedadTransaction(actor, monitoring).route
-    ) reduce (_ ~ _)
+      ObjetoStateAPI(actor, monitoring).route
+    ) ++ actorTransactions.map(_.route).toSeq) reduce (_ ~ _)
   }
+
 }

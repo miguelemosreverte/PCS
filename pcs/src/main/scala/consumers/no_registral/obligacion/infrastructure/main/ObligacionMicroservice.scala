@@ -2,7 +2,7 @@ package consumers.no_registral.obligacion.infrastructure.main
 
 import scala.concurrent.ExecutionContext
 import akka.actor.{typed, ActorRef, ActorSystem}
-import akka.entity.ShardedEntity.{MonitoringAndConfig, ShardedEntityRequirements}
+import akka.entity.ShardedEntity.{MonitoringAndConfig}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction
@@ -19,25 +19,21 @@ import design_principles.microservice.kafka_consumer_microservice.{
 }
 import kafka.KafkaMessageProcessorRequirements
 
-object ObligacionMicroservice extends KafkaConsumerMicroservice {
+class ObligacionMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
 
-  def route(m: KafkaConsumerMicroserviceRequirements): Route = {
-    val monitoring = m.monitoring
+  implicit val actor: ActorRef = SujetoActor.startWithRequirements(MonitoringAndConfig(monitoring, m.config))
 
-    implicit val shardedEntityR: ShardedEntityRequirements = m.shardedEntityRequirements
-    implicit val queryStateApiR: QueryStateApiRequirements = m.queryStateApiRequirements
-    implicit val kafkaMessageProcessorR: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
-    implicit val actorTransactionR: ActorTransaction.ActorTransactionRequirements = m.actorTransactionRequirements
+  override def actorTransactions: Set[ActorTransaction[_]] =
+    Set(
+      ObligacionTributariaTransaction(actor, monitoring),
+      ObligacionNoTributariaTransaction(actor, monitoring)
+    )
 
-    val ctx = m.ctx
-    import akka.actor.typed.scaladsl.adapter._
-    implicit val system: ActorSystem = ctx
-    implicit val actor: ActorRef = SujetoActor.startWithRequirements(MonitoringAndConfig(monitoring, m.config))
-
-    Seq(
-      ObligacionStateAPI(actor, monitoring).route,
-      ObligacionTributariaTransaction(actor, monitoring).route,
-      ObligacionNoTributariaTransaction(actor, monitoring).route
-    ) reduce (_ ~ _)
+  def route: Route = {
+    (Seq(
+      ObligacionStateAPI(actor, monitoring).route
+    ) ++
+    actorTransactions.map(_.route).toSeq) reduce (_ ~ _)
   }
+
 }

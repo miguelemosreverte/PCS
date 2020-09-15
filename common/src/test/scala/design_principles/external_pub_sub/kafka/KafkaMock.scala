@@ -1,14 +1,15 @@
 package design_principles.external_pub_sub.kafka
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 import akka.Done
 import akka.actor.ActorSystem
-import akka.stream.OverflowStrategy
+import akka.stream.{KillSwitch, OverflowStrategy, UniqueKillSwitch}
 import akka.stream.scaladsl.{Sink, Source, SourceQueue}
 import api.actor_transaction.ActorTransaction
 import kafka.{KafkaCommitableMessageProcessor, KafkaTransactionalMessageProcessor, MessageProcessor, MessageProducer}
 
 import scala.collection.mutable
+import scala.util.Try
 
 class KafkaMock() extends MessageProducer with MessageProcessor with MessageProcessorLogging {
 
@@ -48,10 +49,10 @@ class KafkaMock() extends MessageProducer with MessageProcessor with MessageProc
     Future.successful(Done)
   }
 
-  override type KillSwitch = Done
+  override type MessageProcessorKillSwitch = UniqueKillSwitch
 
   override def run(SOURCE_TOPIC: String, SINK_TOPIC: String, algorithm: String => Future[Seq[String]]) =
-    (Done, {
+    (None, {
       receive(PubSub.SubscribeMe(SOURCE_TOPIC, algorithm))
       Future.successful(Done)
     })

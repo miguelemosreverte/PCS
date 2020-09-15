@@ -15,8 +15,6 @@ import monitoring.{DummyMonitoring, Monitoring}
 import readside.proyectionists.registrales.exencion.ExencionProjectionHandler
 import registrales.exencion.testkit.query.ExencionQueryTestkitAgainstActors
 import akka.actor.typed.scaladsl.adapter._
-import akka.entity.ShardedEntity.ShardedEntityRequirements
-
 import scala.concurrent.ExecutionContext
 
 trait ExencionTestSuiteMock extends ExencionSpec {
@@ -24,10 +22,6 @@ trait ExencionTestSuiteMock extends ExencionSpec {
   def testContext()(implicit system: ActorSystem): TestContext = new ExencionMockE2ETestContext()
 
   class ExencionMockE2ETestContext(implicit system: ActorSystem) extends BaseE2ETestContext {
-
-    implicit val shardedEntityRequirements: ShardedEntityRequirements = ShardedEntityRequirements(
-      system
-    )
 
     val cassandraTestkit: CassandraTestkitMock = new CassandraTestkitMock({
       case e: ObjetoEvents.ObjetoAddedExencion =>

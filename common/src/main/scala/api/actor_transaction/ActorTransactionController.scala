@@ -11,9 +11,9 @@ import kafka.{KafkaMessageProcessorRequirements, KafkaPlainConsumerMessageProces
 class ActorTransactionController(
     actorTransaction: ActorTransaction[_],
     requirements: KafkaMessageProcessorRequirements
-)(implicit system: ActorSystem)
-    extends Controller(requirements.monitoring) {
+) extends Controller(requirements.monitoring) {
 
+  implicit val system = requirements.system
   implicit private val ec: ExecutionContextExecutor = system.dispatcher
 
   var currentTransaction: Option[UniqueKillSwitch] = None
@@ -22,21 +22,21 @@ class ActorTransactionController(
   def stopTransaction(): Unit = {
     currentTransaction = currentTransaction match {
       case Some(killswitch) =>
-        log.debug(s"${actorTransaction.topic} transaction stopped.")
+        log.info(s"${actorTransaction.topic} transaction stopped.")
         killswitch.shutdown()
-        log.debug("Setting currentTransaction to None")
+        log.info("Setting currentTransaction to None")
 
         None
       case None =>
-        log.debug(s"${actorTransaction.topic} transaction was already stopped!")
+        log.info(s"${actorTransaction.topic} transaction was already stopped!")
         None
     }
   }
 
-  def startTransaction(): Unit = {
+  def startTransaction(): Option[UniqueKillSwitch] = {
     def topic = actorTransaction.topic
     val transaction = actorTransaction.transaction _
-    log.debug(s"Starting ${actorTransaction.topic} transaction")
+    log.info(s"Starting ${actorTransaction.topic} transaction")
     val (killSwitch, done) = new KafkaTransactionalMessageProcessor(requirements)
       .run(topic, s"${topic}SINK", message => {
         transaction(message).map { output =>
@@ -46,13 +46,14 @@ class ActorTransactionController(
     done.onComplete { result =>
       // restart if the flag is set to true
       if (shouldBeRunning) {
-        log.debug(s"Transaction finished with $result. Restarting it.")
+        log.info(s"Transaction finished with $result. Restarting it.")
         stopTransaction()
         startTransaction()
       }
     }
-    log.debug("Setting currentTransaction to Some(killswitch)")
-    currentTransaction = Some(killSwitch)
+    log.info("Setting currentTransaction to Some(killswitch)")
+    currentTransaction = killSwitch
+    killSwitch
   }
 
   def start_kafka: Route = {

@@ -5,7 +5,6 @@ import akka.actor.typed.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter._
 import akka.cluster.ClusterEvent.MemberUp
-import akka.entity.ShardedEntity.ShardedEntityRequirements
 import akka.http.scaladsl.server.Route
 import akka.kafka.ConsumerRebalanceEvent
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
@@ -39,9 +38,6 @@ object ProductionMicroserviceContextProvider {
       system = ctx,
       executionContext = ctx.dispatcher
     )
-    val shardedEntityRequirements = ShardedEntityRequirements(
-      system = ctx
-    )
     val actorTransactionRequirements = ActorTransactionRequirements(
       executionContext = ctx.dispatcher,
       config = config
@@ -52,7 +48,6 @@ object ProductionMicroserviceContextProvider {
         monitoring = monitoring,
         ctx = ctx,
         queryStateApiRequirements,
-        shardedEntityRequirements,
         actorTransactionRequirements,
         kafkaMessageProcessorRequirements,
         config

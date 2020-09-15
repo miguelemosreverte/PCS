@@ -1,7 +1,6 @@
 package consumers.no_registral.cotitularidad.infrastructure.main
 
 import akka.actor.{ActorRef, ActorSystem}
-import akka.entity.ShardedEntity.ShardedEntityRequirements
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction
@@ -21,25 +20,17 @@ import kafka.KafkaMessageProcessorRequirements
 
 import scala.concurrent.ExecutionContext
 
-object CotitularidadMicroservice extends KafkaConsumerMicroservice {
+class CotitularidadMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
 
-  def route(m: KafkaConsumerMicroserviceRequirements): Route = {
-    val monitoring = m.monitoring
+  implicit val actor: ActorRef =
+    CotitularidadActor.startWithRequirements(kafkaMessageProcessorR)
 
-    implicit val shardedEntityR: ShardedEntityRequirements = m.shardedEntityRequirements
-    implicit val queryStateApiR: QueryStateApiRequirements = m.queryStateApiRequirements
-    implicit val kafkaMessageProcessorR: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
-    implicit val actorTransactionR: ActorTransaction.ActorTransactionRequirements = m.actorTransactionRequirements
+  override def actorTransactions: Set[ActorTransaction[_]] =
+    Set(
+      AddCotitularTransaction(actor, monitoring),
+      CotitularPublishSnapshotTransaction(actor, monitoring)
+    )
 
-    val ctx = m.ctx
-    import akka.actor.typed.scaladsl.adapter._
-    implicit val system: ActorSystem = ctx
-    implicit val actor: ActorRef =
-      CotitularidadActor.startWithRequirements(kafkaMessageProcessorR)
-    Seq(
-      CotitularidadStateAPI(actor, monitoring).route,
-      AddCotitularTransaction(actor, monitoring).route,
-      CotitularPublishSnapshotTransaction(actor, monitoring).route
-    ) reduce (_ ~ _)
-  }
+  override def route: Route =
+    (Seq(CotitularidadStateAPI(actor, monitoring).route) ++ actorTransactions.map(_.route)) reduce (_ ~ _)
 }

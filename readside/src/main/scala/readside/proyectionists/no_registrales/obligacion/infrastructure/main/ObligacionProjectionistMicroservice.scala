@@ -1,11 +1,15 @@
 package readside.proyectionists.no_registrales.obligacion.infrastructure.main
 
 import akka.http.scaladsl.server.Route
-import design_principles.microservice.cassandra_projectionist_microservice.{CassandraProjectionistMicroservice, CassandraProjectionistMicroserviceRequirements}
+import design_principles.microservice.cassandra_projectionist_microservice.{
+  CassandraProjectionistMicroservice,
+  CassandraProjectionistMicroserviceRequirements
+}
 import readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler
 
-object ObligacionProjectionistMicroservice extends CassandraProjectionistMicroservice {
-  override def route(context: CassandraProjectionistMicroserviceRequirements): Route = {
+class ObligacionProjectionistMicroservice(implicit context: CassandraProjectionistMicroserviceRequirements)
+    extends CassandraProjectionistMicroservice {
+  override def route: Route = {
     val monitoring = context.monitoring
 
     import akka.actor.typed.scaladsl.adapter._

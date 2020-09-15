@@ -14,15 +14,30 @@ trait ShardedEntity[Requirements] extends ClusterEntity[Requirements] {
 
   def props(requirements: Requirements): Props
 
+  val extractEntityId: ShardRegion.ExtractEntityId = {
+    case s: Sharded => (s.entityId, s)
+  }
+
+  val numberOfShards = 3
+  def extractShardId: ShardRegion.ExtractShardId = {
+    case s: Sharded =>
+      new LocalizedProcessingMessageExtractor(numberOfShards * 10).shardId(s.shardedId)
+  }
+
+  def clusterShardingSettings(
+      implicit
+      system: ActorSystem
+  ) = ClusterShardingSettings(system)
+
   def startWithRequirements(requirements: Requirements)(
       implicit
-      shardedEntityRequirements: ShardedEntityRequirements
-  ): ActorRef = ClusterSharding(shardedEntityRequirements.system).start(
+      system: ActorSystem
+  ): ActorRef = ClusterSharding(system).start(
     typeName = typeName,
     entityProps = props(requirements).withDispatcher(utils.Inference.getSimpleName(this.getClass.getName)),
-    settings = ClusterShardingSettings(shardedEntityRequirements.system),
+    settings = clusterShardingSettings,
     extractEntityId = extractEntityId,
-    extractShardId = extractShardId(3)
+    extractShardId = extractShardId
   )
 }
 
@@ -30,25 +45,12 @@ object ShardedEntity {
 
   case class MonitoringAndConfig(monitoring: Monitoring, config: Config)
 
-  case class ShardedEntityRequirements(
-      system: ActorSystem
-  )
-
   trait ShardedEntityNoRequirements extends ShardedEntity[ShardedEntity.NoRequirements] {
 
     def start(
         implicit
-        shardedEntityRequirements: ShardedEntityRequirements
+        system: ActorSystem
     ): ActorRef = this.startWithRequirements(NoRequirements())
-  }
-
-  val extractEntityId: ShardRegion.ExtractEntityId = {
-    case s: Sharded => (s.entityId, s)
-  }
-
-  def extractShardId(numberOfShards: Int): ShardRegion.ExtractShardId = {
-    case s: Sharded =>
-      new LocalizedProcessingMessageExtractor(30).shardId(s.shardedId)
   }
 
   case class NoRequirements()

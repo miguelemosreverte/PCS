@@ -9,8 +9,9 @@ import design_principles.microservice.{Microservice, MicroserviceRequirements}
 import life_cycle.typed.controller.{LivenessController, ReadinessController, ShutdownController}
 import life_cycle.typed.{AppLifecycle, AppLifecycleActor}
 import akka.actor.typed.scaladsl.adapter._
-object AppLifecycleMicroservice extends Microservice[MicroserviceRequirements] {
-  def route(microserviceRequirements: MicroserviceRequirements): Route = {
+class AppLifecycleMicroservice(implicit microserviceRequirements: MicroserviceRequirements)
+    extends Microservice[MicroserviceRequirements] {
+  def route: Route = {
     val ctx = microserviceRequirements.ctx
     implicit val system: ActorSystem[Nothing] = ctx.toTyped
     //implicit val ec: ExecutionContext = microserviceRequirements.executionContext

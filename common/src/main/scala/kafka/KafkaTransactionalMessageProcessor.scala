@@ -16,7 +16,7 @@ class KafkaTransactionalMessageProcessor(
     transactionRequirements: KafkaMessageProcessorRequirements
 ) extends MessageProcessor {
 
-  override type KillSwitch = akka.stream.UniqueKillSwitch
+  override type MessageProcessorKillSwitch = akka.stream.UniqueKillSwitch
 
   private val log = LoggerFactory.getLogger(this.getClass)
   implicit val ec: ExecutionContext = transactionRequirements.executionContext
@@ -27,7 +27,7 @@ class KafkaTransactionalMessageProcessor(
       SOURCE_TOPIC: String,
       SINK_TOPIC: String,
       algorithm: String => Future[Seq[String]]
-  ): (KillSwitch, Future[Done]) = {
+  ): (Option[MessageProcessorKillSwitch], Future[Done]) = {
 
     val ProcessedMessagesCounter = transactionRequirements.monitoring.counter(
       s"$SOURCE_TOPIC-ProcessedMessagesCounter"
@@ -139,6 +139,6 @@ class KafkaTransactionalMessageProcessor(
         killSwitch.shutdown()
         run(SOURCE_TOPIC, SINK_TOPIC, algorithm)
     }
-    (killSwitch, done)
+    (Some(killSwitch), done)
   }
 }

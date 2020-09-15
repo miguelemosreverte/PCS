@@ -16,7 +16,7 @@ tmux send-keys -t 1 "\
 tmux new-window  -n 'writeside' \; split-window -d \;
 tmux send-keys -t 1 "\
     sbt 'pcs/docker:publishLocal'; \
-    docker-compose -f assets/environments/vm/docker-compose.yml up -d seed \
+    docker-compose -f assets/environments/vm/docker-compose.yml up -d seed node1 \
 " Enter
 tmux send-keys -t 2 "\
     sh assets/scripts/query_api.sh \

@@ -42,8 +42,10 @@ abstract class ActorTransaction[ExternalDto](
 
   def processInput(input: String): Either[Throwable, ExternalDto]
 
+  def controller(implicit requirements: KafkaMessageProcessorRequirements) =
+    new ActorTransactionController(this, requirements)
   final def route(implicit system: akka.actor.ActorSystem, requirements: KafkaMessageProcessorRequirements): Route =
-    new ActorTransactionController(this, requirements)(system).route
+    controller.route
 
   protected val simpleName = utils.Inference.getSimpleName(this.getClass.getName)
 

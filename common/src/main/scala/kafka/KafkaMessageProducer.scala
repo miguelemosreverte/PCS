@@ -8,6 +8,7 @@ import akka.kafka.ProducerSettings
 import akka.kafka.scaladsl.Producer
 import akka.stream.scaladsl.Source
 import kafka.KafkaMessageProcessorRequirements.bootstrapServers
+import kafka.KafkaMessageProducer.KafkaKeyValue
 import monitoring.Monitoring
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
@@ -21,7 +22,9 @@ class KafkaMessageProducer()(
 
   val log: Logger = LoggerFactory.getLogger(this.getClass)
 
-  def produce(data: Seq[String], topic: String)(handler: Seq[String] => Unit): Future[Done] = {
+  def createTopic(topic: String): Future[Done] = Future.successful(Done)
+
+  def produce(data: Seq[KafkaKeyValue], topic: String)(handler: Seq[KafkaKeyValue] => Unit): Future[Done] = {
 
     // TODO REMOVE
     implicit val ec: ExecutionContextExecutor = system.getDispatcher
@@ -30,7 +33,9 @@ class KafkaMessageProducer()(
     // NOTE: If no partition is specified but a key is present a partition will be chosen
     // using a hash of the key. If neither key nor partition is present a partition
     // will be assigned in a round-robin fashion.
-      .map(new ProducerRecord[String, String](topic, _))
+      .map { m =>
+        new ProducerRecord[String, String](topic, m.aggregateRoot, m.json)
+      }
       .runWith(Producer.plainSink(producerSettings))
 
     publication.onComplete {
@@ -49,6 +54,11 @@ class KafkaMessageProducer()(
 }
 
 object KafkaMessageProducer {
+
+  case class KafkaKeyValue(aggregateRoot: String, json: String) {
+    def key = aggregateRoot
+    def value = json
+  }
 
   def apply(monitoring: Monitoring,
             rebalancerListener: ActorRef)(implicit system: ActorSystem): KafkaMessageProducer = {

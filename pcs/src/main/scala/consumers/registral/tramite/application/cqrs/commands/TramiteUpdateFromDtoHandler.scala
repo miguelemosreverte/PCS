@@ -17,6 +17,7 @@ class TramiteUpdateFromDtoHandler() {
         TramiteState
       ](
         TramiteUpdatedFromDto(
+          command.deliveryId,
           command.sujetoId,
           command.tramiteId,
           command.registro

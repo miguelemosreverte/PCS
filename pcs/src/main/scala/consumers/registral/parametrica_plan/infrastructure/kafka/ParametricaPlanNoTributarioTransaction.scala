@@ -29,7 +29,7 @@ case class ParametricaPlanNoTributarioTransaction(actor: ParametricaPlanActor, m
   def processInput(input: String): Either[Throwable, ParametricaPlanAnt] =
     maybeDecode[ParametricaPlanAnt](input)
 
-  override def processCommand(registro: ParametricaPlanAnt): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: ParametricaPlanAnt): Future[Response.SuccessProcessing] = {
     val command = ParametricaPlanCommands.ParametricaPlanUpdateFromDto(
       parametricaPlanId = registro.BPP_FPM_ID,
       deliveryId = BigInt(registro.EV_ID),

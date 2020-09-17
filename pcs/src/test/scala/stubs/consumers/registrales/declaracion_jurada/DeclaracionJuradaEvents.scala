@@ -5,6 +5,7 @@ import stubs.consumers.registrales.declaracion_jurada.DeclaracionJuradaExternalD
 
 object DeclaracionJuradaEvents {
   def declaracionJuradaUpdatedFromDtoStub = DeclaracionJuradaUpdatedFromDto(
+    deliveryId = declaracionJuradaStub.EV_ID.toInt,
     sujetoId = declaracionJuradaStub.BDJ_SUJ_IDENTIFICADOR,
     objetoId = declaracionJuradaStub.BDJ_SOJ_IDENTIFICADOR,
     tipoObjeto = declaracionJuradaStub.BDJ_SOJ_TIPO_OBJETO,

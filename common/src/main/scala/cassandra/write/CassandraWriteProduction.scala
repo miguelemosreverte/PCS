@@ -2,23 +2,22 @@ package cassandra.write
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
-
 import akka.Done
-import akka.actor.ActorSystem
-import akka.stream.alpakka.cassandra.scaladsl.CassandraSession
+import cassandra.CqlSessionSingleton
 import ddd.ReadSideProjection
 import design_principles.actor_model.Event
 import org.slf4j.LoggerFactory
+import scala.jdk.FutureConverters.CompletionStageOps
 
-class CassandraWriteProduction(implicit session: CassandraSession) extends CassandraWrite {
+class CassandraWriteProduction extends CassandraWrite {
   private val logger = LoggerFactory.getLogger(this.getClass)
+  private val session = CqlSessionSingleton.session
 
   def writeState[E <: Event](
       state: ReadSideProjection[E]
-  )(implicit system: ActorSystem, ec: ExecutionContext): Future[Done] = {
+  )(implicit ec: ExecutionContext): Future[Done] = {
     val result = for {
-      boundStmt <- state.prepareStatement(session) // HAHAHA this should only be made once
-      done <- session.executeWrite(boundStmt)
+      done <- state.updateReadside()
     } yield done
     result.onComplete {
       case Failure(throwable) =>
@@ -29,6 +28,8 @@ class CassandraWriteProduction(implicit session: CassandraSession) extends Cassa
     result
   }
 
-  override def cql(cql: String): Future[Done] =
-    session.executeDDL(cql)
+  override def cql(cql: String)(implicit ec: ExecutionContext): Future[Done] =
+    session.executeAsync(cql).asScala.map { _ =>
+      akka.Done
+    }
 }

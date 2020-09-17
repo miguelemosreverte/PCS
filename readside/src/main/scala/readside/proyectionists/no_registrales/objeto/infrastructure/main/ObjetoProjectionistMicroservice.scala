@@ -1,18 +1,24 @@
 package readside.proyectionists.no_registrales.objeto.infrastructure.main
 
+import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import design_principles.microservice.cassandra_projectionist_microservice._
-import readside.proyectionists.no_registrales.objeto.ObjetoProjectionHandler
+import api.actor_transaction.ActorTransaction
+import design_principles.microservice.cassandra_projectionist_microservice.{
+  CassandraProjectionistMicroservice,
+  CassandraProjectionistMicroserviceRequirements
+}
+import readside.proyectionists.no_registrales.objeto.ObjetoSnapshotPersistedHandler
 
-class ObjetoProjectionistMicroservice(implicit context: CassandraProjectionistMicroserviceRequirements)
-    extends CassandraProjectionistMicroservice {
-  override def route: Route = {
-    val monitoring = context.monitoring
-    import akka.actor.typed.scaladsl.adapter._
-    import akka.actor.typed.scaladsl.adapter._
-    val system = context.ctx.toTyped
-    val projectionist = ObjetoProjectionHandler(monitoring, system)
-    projectionist.run()
-    projectionist.route
-  }
+class ObjetoProjectionistMicroservice(
+    implicit m: CassandraProjectionistMicroserviceRequirements
+) extends CassandraProjectionistMicroservice {
+
+  override def actorTransactions: Set[ActorTransaction[_]] =
+    Set(
+      new ObjetoSnapshotPersistedHandler
+    )
+
+  override def route: Route =
+    actorTransactions.map(_.route) reduce (_ ~ _)
+
 }

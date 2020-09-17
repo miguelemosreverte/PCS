@@ -29,7 +29,7 @@ case class PlanPagoNoTributarioTransaction(actor: PlanPagoActor, monitoring: Mon
   def processInput(input: String): Either[Throwable, PlanPagoAnt] =
     maybeDecode[PlanPagoAnt](input)
 
-  override def processCommand(registro: PlanPagoAnt): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: PlanPagoAnt): Future[Response.SuccessProcessing] = {
     val command = PlanPagoCommands.PlanPagoUpdateFromDto(
       sujetoId = registro.BPL_SUJ_IDENTIFICADOR,
       objetoId = registro.BPL_SOJ_IDENTIFICADOR,

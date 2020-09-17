@@ -2,9 +2,12 @@ package akka.entity
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
+import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import cassandra.write.{CassandraWrite, CassandraWriteProduction}
 import com.typesafe.config.Config
 import design_principles.actor_model.mechanism.local_processing.LocalizedProcessingMessageExtractor
-import monitoring.Monitoring
+import kafka.{KafkaMessageProducer, MessageProducer}
+import monitoring.{KamonMonitoring, Monitoring}
 
 import scala.concurrent.ExecutionContext
 
@@ -43,7 +46,32 @@ trait ShardedEntity[Requirements] extends ClusterEntity[Requirements] {
 
 object ShardedEntity {
 
-  case class MonitoringAndConfig(monitoring: Monitoring, config: Config)
+  trait MonitoringAndCassandraWrite {
+    val monitoring: Monitoring
+    val cassandraWrite: CassandraWrite
+    val actorTransactionRequirements: ActorTransactionRequirements
+
+    def ec = actorTransactionRequirements.executionContext
+  }
+
+  case class ProductionMonitoringAndCassandraWrite(
+      monitoring: KamonMonitoring,
+      cassandraWrite: CassandraWriteProduction,
+      actorTransactionRequirements: ActorTransactionRequirements
+  ) extends MonitoringAndCassandraWrite
+
+  trait MonitoringAndMessageProducer {
+    val monitoring: Monitoring
+    val messageProducer: MessageProducer
+  }
+  case class ProductionMonitoringAndMessageProducer(
+      monitoring: KamonMonitoring,
+      messageProducer: KafkaMessageProducer
+  ) extends MonitoringAndMessageProducer
+
+  case class ShardedEntityRequirements(
+      system: ActorSystem
+  )
 
   trait ShardedEntityNoRequirements extends ShardedEntity[ShardedEntity.NoRequirements] {
 

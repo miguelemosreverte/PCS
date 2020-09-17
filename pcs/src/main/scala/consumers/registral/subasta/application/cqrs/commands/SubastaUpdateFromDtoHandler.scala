@@ -17,6 +17,7 @@ class SubastaUpdateFromDtoHandler() {
         SubastaState
       ](
         SubastaUpdatedFromDto(
+          command.deliveryId,
           command.sujetoId,
           command.objetoId,
           command.tipoObjeto,

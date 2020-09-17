@@ -13,7 +13,7 @@ import design_principles.microservice.kafka_consumer_microservice.{
 }
 
 class CalendarioMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
-  implicit val actor: CalendarioActor = CalendarioActor(CalendarioState(), m.config)
+  implicit val actor: CalendarioActor = CalendarioActor(CalendarioState())
 
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(CalendarioTransaction(actor, monitoring))

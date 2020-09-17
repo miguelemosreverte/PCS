@@ -14,7 +14,7 @@ import design_principles.microservice.kafka_consumer_microservice.{
 }
 
 class ParametricaPlanMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
-  implicit val actor: ParametricaPlanActor = ParametricaPlanActor(ParametricaPlanState(), m.config)
+  implicit val actor: ParametricaPlanActor = ParametricaPlanActor(ParametricaPlanState())
 
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(ParametricaPlanNoTributarioTransaction(actor, monitoring),

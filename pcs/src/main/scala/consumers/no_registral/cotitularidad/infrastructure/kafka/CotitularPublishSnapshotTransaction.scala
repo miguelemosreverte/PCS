@@ -26,7 +26,7 @@ case class CotitularPublishSnapshotTransaction(actorRef: ActorRef, monitoring: M
   def processInput(input: String): Either[Throwable, CotitularidadPublishSnapshot] =
     maybeDecode[CotitularidadPublishSnapshot](input)
 
-  def processCommand(cmd: CotitularidadPublishSnapshot): Future[Response.SuccessProcessing] = {
+  def processMessage(cmd: CotitularidadPublishSnapshot): Future[Response.SuccessProcessing] = {
     actorRef.ask[Response.SuccessProcessing](cmd)
   }
 }

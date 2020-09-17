@@ -3,6 +3,7 @@ package consumers.no_registral.cotitularidad.infrastructure.dependency_injection
 import akka.actor.Props
 import akka.actor.Status.Success
 import akka.entity.ShardedEntity
+import akka.entity.ShardedEntity.MonitoringAndMessageProducer
 import akka.persistence.{PersistentActor, RecoveryCompleted, SnapshotOffer}
 import consumers.no_registral.cotitularidad.application.entities.{
   CotitularidadCommands,
@@ -11,16 +12,17 @@ import consumers.no_registral.cotitularidad.application.entities.{
 }
 import consumers.no_registral.cotitularidad.domain.{CotitularidadEvents, CotitularidadState}
 import consumers.no_registral.objeto.application.entities.ObjetoCommands.{ObjetoSnapshot, ObjetoUpdateCotitulares}
+import consumers.no_registral.objeto.infrastructure.consumer.ObjetoUpdateCotitularesTransaction
 import consumers.no_registral.objeto.infrastructure.json._
 import design_principles.actor_model.Response
-import kafka.{KafkaMessageProcessorRequirements, KafkaMessageProducer}
-import utils.implicits.StringT._
+import kafka.KafkaMessageProducer.KafkaKeyValue
 
-class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequirements)
+class CotitularidadActor(requirements: MonitoringAndMessageProducer)
     extends PersistentActor
     with akka.actor.ActorLogging {
-  implicit val producerSettings = transactionRequirements.producer
 
+  val monitoring = requirements.monitoring
+  val messageProducer = requirements.messageProducer
   import context.system
 
   var state = CotitularidadState()
@@ -39,10 +41,6 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
     )
 
   def obligacionId = self.path.name
-
-  val kafka = new KafkaMessageProducer()
-  def publishToKafka(message: Seq[String], topic: String) =
-    kafka.produce(message, topic) _
 
   override def receiveCommand: Receive = {
 
@@ -79,6 +77,9 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
           cotitulares = state.sujetosCotitulares
         )
 
+        println(s"state.sujetosCotitulares.size ${state.sujetosCotitulares.size}")
+        println(s"state.sujetosCotitulares ${state.sujetosCotitulares}")
+
         val informCotitularesOfAddedCotitular =
           if (state.sujetosCotitulares.size == 1)
             Seq.empty[ObjetoUpdateCotitulares]
@@ -94,10 +95,18 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
               )
             }.toSeq
 
-        def topic = "ObjetoUpdateCotitularesTransaction"
-        val messages = informCotitularesOfAddedCotitular map serialization.encode[ObjetoUpdateCotitulares]
+        val topic = "ObjetoUpdatedCotitulares"
+        val messages = informCotitularesOfAddedCotitular map { message =>
+          KafkaKeyValue(
+            message.aggregateRoot,
+            serialization.encode(message)
+          )
+        }
         if (messages.nonEmpty)
-          publishToKafka(messages, topic) { _ =>
+          messageProducer.produce(
+            data = messages,
+            topic = topic
+          ) { _ =>
             log.debug(
               s"[$persistenceId] Published message | ObjetoSnapshot to Sujeto(${command.sujetoId})"
             )
@@ -111,23 +120,25 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
       val replyTo = sender()
       def topic = "ObjetoReceiveSnapshot"
       val messages = state.sujetosCotitulares.filter(_ != state.sujetoResponsable).map { cotitular =>
-          snapshot = ObjetoSnapshot(
-            deliveryId = command.deliveryId,
-            sujetoId = cotitular,
-            objetoId = command.objetoId,
-            tipoObjeto = command.tipoObjeto,
-            saldo = command.saldo,
-            cotitulares = state.sujetosCotitulares,
-            tags = command.tags,
-            sujetoResponsable = state.sujetoResponsable,
-            obligacionesSaldo = command.obligacionesSaldo
-          )
+        snapshot = ObjetoSnapshot(
+          deliveryId = command.deliveryId,
+          sujetoId = cotitular,
+          objetoId = command.objetoId,
+          tipoObjeto = command.tipoObjeto,
+          saldo = command.saldo,
+          cotitulares = state.sujetosCotitulares,
+          tags = command.tags,
+          sujetoResponsable = state.sujetoResponsable,
+          obligacionesSaldo = command.obligacionesSaldo
+        )
+        snapshot
+      } map { message =>
+        KafkaKeyValue(message.aggregateRoot, serialization.encode(message))
 
-          snapshot
-        } map serialization.encode[ObjetoSnapshot]
+      }
 
       if (messages.nonEmpty)
-        publishToKafka(messages.toSeq, topic) { _ =>
+        messageProducer.produce(messages.toSeq, topic) { _ =>
           log.debug(
             s"[$persistenceId] Published message | ObjetoSnapshot to Sujeto(${state.sujetosCotitulares.mkString(",")})"
           )
@@ -151,6 +162,6 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
 
 }
 
-object CotitularidadActor extends ShardedEntity[KafkaMessageProcessorRequirements] {
-  def props(requirements: KafkaMessageProcessorRequirements): Props = Props(new CotitularidadActor(requirements))
+object CotitularidadActor extends ShardedEntity[MonitoringAndMessageProducer] {
+  def props(requirements: MonitoringAndMessageProducer): Props = Props(new CotitularidadActor(requirements))
 }

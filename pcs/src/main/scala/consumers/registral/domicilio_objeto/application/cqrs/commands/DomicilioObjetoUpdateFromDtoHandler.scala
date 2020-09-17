@@ -17,6 +17,7 @@ class DomicilioObjetoUpdateFromDtoHandler() {
         DomicilioObjetoState
       ](
         DomicilioObjetoUpdatedFromDto(
+          command.deliveryId,
           command.sujetoId,
           command.objetoId,
           command.tipoObjeto,

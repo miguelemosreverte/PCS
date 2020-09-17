@@ -26,7 +26,21 @@ class ObjetoSnapshotHandler(actor: ObjetoActor) extends SyncCommandHandler[Objet
       command.obligacionesSaldo
     )
     val consolidatedState = actor.state + event
+
+    println(s"""
+               |event ${event}
+               | STATE ${actor.state}
+               |COnsOLidATED STATE ${consolidatedState}
+               |""".stripMargin)
+
     actor.persistSnapshot(event, consolidatedState) { () =>
+      println(s"""
+           |
+           |  AFTER  actor.persistSnapshot(event, consolidatedState) { () =>
+           |event ${event}
+           | STATE ${actor.state}
+           |COnsOLidATED STATE ${consolidatedState}
+          |""".stripMargin)
       actor.state = consolidatedState
       actor.informParent(command, actor.state)
       actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)

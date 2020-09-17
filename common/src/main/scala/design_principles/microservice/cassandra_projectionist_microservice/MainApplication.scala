@@ -30,12 +30,11 @@ object MainApplication {
     implicit val monitoring = new KamonMonitoring
 
     val system = Guardian.getContext(GuardianRequirements(actorSystemName, config))
-    val routes = ProductionMicroserviceContextProvider.getContext(system, monitoring) {
-      implicit microserviceProvisioning =>
-        val microservices = microservicesFactory(microserviceProvisioning)
-        val userRoutes = microservices.map(_.route).reduce(_ ~ _)
-        val systemRoutes = (new AppLifecycleMicroservice).route
-        userRoutes ~ systemRoutes
+    val routes = ProductionMicroserviceContextProvider.getContext(system, config) { implicit microserviceProvisioning =>
+      val microservices = microservicesFactory(microserviceProvisioning)
+      val userRoutes = microservices.map(_.route).reduce(_ ~ _)
+      val systemRoutes = (new AppLifecycleMicroservice).route
+      userRoutes ~ systemRoutes
     }
     AkkaHttpServer.start(routes, ip, port)(system)
 

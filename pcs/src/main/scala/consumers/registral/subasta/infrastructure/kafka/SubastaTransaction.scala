@@ -28,7 +28,7 @@ case class SubastaTransaction(actor: SubastaActor, monitoring: Monitoring)(
   def processInput(input: String): Either[Throwable, SubastaExternalDto] =
     maybeDecode[SubastaExternalDto](input)
 
-  override def processCommand(registro: SubastaExternalDto): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: SubastaExternalDto): Future[Response.SuccessProcessing] = {
     val command = SubastaCommands.SubastaUpdateFromDto(
       sujetoId = registro.BSB_SUJ_IDENTIFICADOR_ADQ,
       objetoId = registro.BSB_SOJ_IDENTIFICADOR,

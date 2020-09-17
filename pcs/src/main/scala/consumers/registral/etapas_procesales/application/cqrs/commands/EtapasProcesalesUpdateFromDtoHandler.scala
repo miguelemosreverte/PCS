@@ -17,6 +17,7 @@ class EtapasProcesalesUpdateFromDtoHandler() {
         EtapasProcesalesState
       ](
         EtapasProcesalesUpdatedFromDto(
+          command.deliveryId,
           command.juicioId,
           command.etapaId,
           command.registro

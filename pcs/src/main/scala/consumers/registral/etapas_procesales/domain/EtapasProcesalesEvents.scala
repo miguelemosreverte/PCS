@@ -10,6 +10,7 @@ sealed trait EtapasProcesalesEvents extends Event {
 
 object EtapasProcesalesEvents {
   case class EtapasProcesalesUpdatedFromDto(
+      deliveryId: BigInt,
       juicioId: String,
       etapaId: String,
       registro: EtapasProcesalesExternalDto

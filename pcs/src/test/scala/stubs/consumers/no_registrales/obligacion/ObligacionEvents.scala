@@ -3,10 +3,12 @@ package stubs.consumers.no_registrales.obligacion
 import consumers.no_registral.obligacion.domain.ObligacionEvents._
 import stubs.consumers.no_registrales.obligacion.ObligacionCommands.detallesObligaciones
 import stubs.consumers.no_registrales.obligacion.ObligacionExternalDtoStub._
+import stubs.consumers.registrales.actividad_sujeto.ActividadSujetoExternalDto.actividadSujetoStub
 import utils.generators.Model.deliveryId
 
 object ObligacionEvents {
   def obligacionPersistedSnapshot = ObligacionPersistedSnapshot(
+    deliveryId = obligacionUpdatedFromDtoTriStub.deliveryId.toInt,
     obligacionUpdatedFromDtoTriStub.sujetoId,
     obligacionUpdatedFromDtoTriStub.objetoId,
     obligacionUpdatedFromDtoTriStub.tipoObjeto,

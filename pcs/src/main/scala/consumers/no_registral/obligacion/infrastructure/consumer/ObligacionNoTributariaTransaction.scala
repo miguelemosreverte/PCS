@@ -32,7 +32,7 @@ case class ObligacionNoTributariaTransaction(actorRef: ActorRef, monitoring: Mon
   def processInput(input: String): Either[Throwable, ObligacionesAnt] =
     maybeDecode[ObligacionesAnt](input)
 
-  def processCommand(registro: ObligacionesAnt): Future[Response.SuccessProcessing] = {
+  def processMessage(registro: ObligacionesAnt): Future[Response.SuccessProcessing] = {
     implicit val b: Reads[Seq[DetallesObligacion]] = Reads.seq(DetallesObligacionF.reads)
 
     val detalles: Option[Seq[DetallesObligacion]] = for {

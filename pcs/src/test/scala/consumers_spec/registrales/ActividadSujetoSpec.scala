@@ -11,7 +11,7 @@ import design_principles.actor_model.{Response, TypedActorSpec}
 
 class ActividadSujetoSpec extends TypedActorSpec {
 
-  val actor: ActividadSujetoActor = ActividadSujetoActor(ActividadSujetoState(), MockConfig.config)
+  val actor: ActividadSujetoActor = ActividadSujetoActor(ActividadSujetoState())
 
   "Typed cluster sharding with persistent actor" should
   "support ask with thenReply" in {

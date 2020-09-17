@@ -4,14 +4,19 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 import akka.Done
 import akka.actor.ActorRef
+import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import com.typesafe.config.ConfigFactory
 import consumers.no_registral.cotitularidad.infrastructure.kafka.{
-  AddCotitularTransaction,
+  AddSujetoCotitularTransaction,
   CotitularPublishSnapshotTransaction
 }
 import consumers.no_registral.objeto.application.entities.ObjetoExternalDto
-import consumers.no_registral.objeto.infrastructure.consumer._
+import consumers.no_registral.objeto.infrastructure.consumer.{ObjetoTributarioTransaction, _}
+import consumers.no_registral.objeto.infrastructure.event_processor.{
+  ObjetoReceiveSnapshotHandler,
+  ObjetoUpdatedFromTriHandler
+}
 import consumers.no_registral.obligacion.application.entities.ObligacionExternalDto
 import consumers.no_registral.obligacion.infrastructure.consumer.{
   ObligacionNoTributariaTransaction,
@@ -24,66 +29,42 @@ import consumers.no_registral.sujeto.infrastructure.consumer.{
 }
 import design_principles.actor_model.Response
 import design_principles.external_pub_sub.kafka.KafkaMock.MessageProcessorImplicits
+import kafka.KafkaMessageProducer.KafkaKeyValue
 import kafka.{MessageProcessor, MessageProducer}
 import monitoring.DummyMonitoring
 
-class MessageTestkitUtils(sujeto: ActorRef, cotitularidadActor: ActorRef, messageProducer: MessageProducer) {
+class MessageTestkitUtils(sujeto: ActorRef, cotitularidadActor: ActorRef) {
   implicit val actorTransactionRequirements: ActorTransactionRequirements = ActorTransactionRequirements(
     executionContext = scala.concurrent.ExecutionContext.Implicits.global,
     config = ConfigFactory.empty
   )
-  implicit class StartMessageProcessor(messageProcessor: MessageProcessor) {
+  implicit class StartMessageProcessor(messageBroker: MessageProcessor with MessageProducer) {
     val monitoring = new DummyMonitoring
-    def startProcessing(): Unit = {
-      // COTITULARIDAD CONSUMERS
-      messageProcessor.subscribeActorTransaction(
-        SOURCE_TOPIC = "AddCotitularTransaction",
-        AddCotitularTransaction(cotitularidadActor, monitoring)
-      )
-      messageProcessor.subscribeActorTransaction(
-        SOURCE_TOPIC = "CotitularidadPublishSnapshot",
-        CotitularPublishSnapshotTransaction(cotitularidadActor, monitoring)
-      )
-      // OBJETO CONSUMERS
-      messageProcessor.subscribeActorTransaction(
-        SOURCE_TOPIC = "DGR-COP-EXENCIONES",
-        ObjetoExencionTransaction(sujeto, monitoring)
-      )
-      messageProcessor.subscribeActorTransaction(
-        SOURCE_TOPIC = "DGR-COP-OBJETOS-ANT",
-        ObjetoNoTributarioTransaction(sujeto, monitoring)
-      )
-      messageProcessor.subscribeActorTransaction(
-        SOURCE_TOPIC = "DGR-COP-OBJETOS-TRI",
-        ObjetoTributarioTransaction(sujeto, monitoring)
-      )
-      messageProcessor.subscribeActorTransaction(
-        SOURCE_TOPIC = "ObjetoUpdateCotitularesTransaction",
-        ObjetoUpdateCotitularesTransaction(sujeto, monitoring)
-      )
-      messageProcessor.subscribeActorTransaction(
-        SOURCE_TOPIC = "ObjetoReceiveSnapshot",
-        ObjetoUpdateNovedadTransaction(sujeto, monitoring)
-      )
-      // OBLIGACION CONSUMERS
-      messageProcessor.subscribeActorTransaction(
-        "DGR-COP-OBLIGACIONES-ANT",
-        ObligacionNoTributariaTransaction(sujeto, monitoring)
-      )
-      messageProcessor.subscribeActorTransaction(
-        "DGR-COP-OBLIGACIONES-TRI",
-        ObligacionTributariaTransaction(sujeto, monitoring)
-      )
-      // SUJETO CONSUMERS
-      messageProcessor.subscribeActorTransaction(
-        "DGR-COP-SUJETO-TRI",
-        SujetoTributarioTransaction(sujeto, monitoring)
-      )
-      messageProcessor.subscribeActorTransaction(
-        "DGR-COP-SUJETO-ANT",
-        SujetoNoTributarioTransaction(sujeto, monitoring)
-      )
-      ()
+    def startProcessing(topics: Set[ActorTransaction[_]] = Set.empty): Unit = {
+
+      (if (topics.isEmpty)
+         Set(
+           AddSujetoCotitularTransaction(cotitularidadActor, monitoring),
+           CotitularPublishSnapshotTransaction(cotitularidadActor, monitoring),
+           ObjetoUpdateCotitularesTransaction(sujeto, monitoring),
+           ObjetoTributarioTransaction(sujeto, monitoring),
+           ObjetoExencionTransaction(sujeto, monitoring),
+           ObjetoNoTributarioTransaction(sujeto, monitoring),
+           ObjetoUpdateNovedadTransaction(sujeto, monitoring),
+           ObligacionNoTributariaTransaction(sujeto, monitoring),
+           ObligacionTributariaTransaction(sujeto, monitoring),
+           SujetoTributarioTransaction(sujeto, monitoring),
+           SujetoNoTributarioTransaction(sujeto, monitoring)
+         ) // if no filter is set, then allow passthrough
+       else topics)
+        .foreach { transaction =>
+          messageBroker.createTopic(transaction.topic)
+          messageBroker.subscribeActorTransaction(
+            transaction.topic,
+            transaction
+          )
+        }
+
     }
   }
 
@@ -97,7 +78,17 @@ object MessageTestkitUtils {
         case _: ObligacionExternalDto.ObligacionesAnt => "DGR-COP-OBLIGACIONES-ANT"
         case _: ObligacionExternalDto.ObligacionesTri => "DGR-COP-OBLIGACIONES-TRI"
       }
-      messageProducer.produce(Seq(obligacion.toJson), topic)(_ => ())
+
+      messageProducer.produce(
+        Seq(
+          KafkaKeyValue(
+            aggregateRoot =
+              s"Sujeto-${obligacion.BOB_SUJ_IDENTIFICADOR}-Objeto-${obligacion.BOB_SOJ_IDENTIFICADOR}-Tipo-I-Obligacion-${obligacion.BOB_OBN_ID}",
+            json = obligacion.toJson
+          )
+        ),
+        topic
+      )(_ => ())
     }
 
     def produceObjeto(objeto: ObjetoExternalDto): Future[akka.Done] = {
@@ -105,7 +96,16 @@ object MessageTestkitUtils {
         case _: ObjetoExternalDto.ObjetosAnt => "DGR-COP-OBJETOS-ANT"
         case _: ObjetoExternalDto.ObjetosTri => "DGR-COP-OBJETOS-TRI"
       }
-      messageProducer.produce(Seq(objeto.toJson), topic)(_ => ())
+
+      messageProducer.produce(
+        Seq(
+          KafkaKeyValue(
+            aggregateRoot = s"Sujeto-${objeto.SOJ_SUJ_IDENTIFICADOR}-Objeto-${objeto.SOJ_IDENTIFICADOR}-Tipo-I",
+            json = objeto.toJson
+          )
+        ),
+        topic
+      )(_ => ())
     }
 
     def produceSujeto(sujeto: SujetoExternalDto): Future[akka.Done] = {
@@ -113,7 +113,13 @@ object MessageTestkitUtils {
         case _: SujetoExternalDto.SujetoAnt => "DGR-COP-SUJETO-ANT"
         case _: SujetoExternalDto.SujetoTri => "DGR-COP-SUJETO-TRI"
       }
-      messageProducer.produce(Seq(sujeto.toJson), topic)(_ => ())
+      messageProducer.produce(Seq(
+                                KafkaKeyValue(
+                                  aggregateRoot = s"Sujeto-${sujeto.SUJ_IDENTIFICADOR}",
+                                  json = sujeto.toJson
+                                )
+                              ),
+                              topic)(_ => ())
     }
   }
 }

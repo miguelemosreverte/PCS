@@ -2,7 +2,6 @@ package consumers.no_registral.sujeto.infrastructure.main
 
 import scala.concurrent.ExecutionContext
 import akka.actor.{typed, ActorRef, ActorSystem}
-import akka.entity.ShardedEntity.MonitoringAndConfig
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction
@@ -22,7 +21,7 @@ import design_principles.microservice.kafka_consumer_microservice.{
 import kafka.KafkaMessageProcessorRequirements
 
 class SujetoMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
-  implicit val actor: ActorRef = SujetoActor.startWithRequirements(MonitoringAndConfig(monitoring, m.config))
+  implicit val actor: ActorRef = SujetoActor.startWithRequirements(monitoringAndMessageProducer)
 
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(

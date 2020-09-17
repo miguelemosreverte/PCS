@@ -29,7 +29,7 @@ case class CalendarioTransaction(actor: CalendarioActor, monitoring: Monitoring)
   def processInput(input: String): Either[Throwable, CalendarioExternalDto] =
     maybeDecode[CalendarioExternalDto](input)
 
-  override def processCommand(registro: CalendarioExternalDto): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: CalendarioExternalDto): Future[Response.SuccessProcessing] = {
     val command = registro match {
       case registro: CalendarioExternalDto =>
         CalendarioCommands.CalendarioUpdateFromDto(

@@ -13,7 +13,7 @@ import design_principles.microservice.kafka_consumer_microservice.{
 }
 
 class ActividadSujetoMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
-  implicit val actor: ActividadSujetoActor = ActividadSujetoActor(ActividadSujetoState(), m.config)
+  implicit val actor: ActividadSujetoActor = ActividadSujetoActor(ActividadSujetoState())
 
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(ActividadSujetoTransaction(actor, monitoring))

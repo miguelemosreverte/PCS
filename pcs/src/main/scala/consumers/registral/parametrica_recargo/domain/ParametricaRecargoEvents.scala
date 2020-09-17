@@ -16,6 +16,7 @@ sealed trait ParametricaRecargoEvents extends Event {
 
 object ParametricaRecargoEvents {
   case class ParametricaRecargoUpdatedFromDto(
+      deliveryId: BigInt,
       bprIndice: String,
       bprTipoIndice: String,
       bprFechaDesde: LocalDateTime,

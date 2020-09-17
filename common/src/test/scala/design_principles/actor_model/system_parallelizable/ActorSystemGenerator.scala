@@ -23,7 +23,8 @@ class ActorSystemGenerator extends Actor {
   override def receive: Receive = {
 
     case RunTest(test) =>
-      val system = ActorSpec.system
+      val system =
+        ActorSpec.system
       childSystems.addOne(system)
 
       processTest(test, system)

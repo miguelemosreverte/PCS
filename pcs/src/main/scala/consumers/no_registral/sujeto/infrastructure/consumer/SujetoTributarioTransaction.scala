@@ -26,7 +26,7 @@ case class SujetoTributarioTransaction(actorRef: ActorRef, monitoring: Monitorin
   def processInput(input: String): Either[Throwable, SujetoTri] =
     maybeDecode[SujetoTri](input)
 
-  def processCommand(registro: SujetoTri): Future[Response.SuccessProcessing] = {
+  def processMessage(registro: SujetoTri): Future[Response.SuccessProcessing] = {
     val command = registro match {
       case _: SujetoExternalDto.SujetoTri =>
         SujetoCommands.SujetoUpdateFromTri(

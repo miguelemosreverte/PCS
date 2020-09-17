@@ -14,7 +14,7 @@ import design_principles.microservice.kafka_consumer_microservice.{
 }
 
 class DomicilioSujetoMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
-  implicit val actor: DomicilioSujetoActor = DomicilioSujetoActor(DomicilioSujetoState(), m.config)
+  implicit val actor: DomicilioSujetoActor = DomicilioSujetoActor(DomicilioSujetoState())
 
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(DomicilioSujetoNoTributarioTransaction(actor, monitoring),

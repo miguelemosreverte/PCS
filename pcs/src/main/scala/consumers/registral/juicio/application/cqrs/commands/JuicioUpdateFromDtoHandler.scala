@@ -17,6 +17,7 @@ class JuicioUpdateFromDtoHandler() {
         JuicioState
       ](
         JuicioUpdatedFromDto(
+          command.deliveryId,
           command.sujetoId,
           command.objetoId,
           command.tipoObjeto,

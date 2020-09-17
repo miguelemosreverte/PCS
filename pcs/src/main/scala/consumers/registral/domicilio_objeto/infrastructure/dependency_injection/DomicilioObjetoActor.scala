@@ -12,17 +12,13 @@ import consumers.registral.domicilio_objeto.domain.events.DomicilioObjetoUpdated
 import consumers.registral.domicilio_objeto.domain.{DomicilioObjetoEvents, DomicilioObjetoState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
-case class DomicilioObjetoActor(state: DomicilioObjetoState = DomicilioObjetoState(), config: Config)(
+case class DomicilioObjetoActor(state: DomicilioObjetoState = DomicilioObjetoState())(
     implicit system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       DomicilioObjetoMessage,
       DomicilioObjetoEvents,
       DomicilioObjetoState
-    ](state, config) {
-
-  override def tags(event: DomicilioObjetoEvents): Set[String] = event match {
-    case _: DomicilioObjetoUpdatedFromDto => Set("DomicilioObjeto")
-  }
+    ](state) {
 
   commandBus.subscribe[DomicilioObjetoUpdateFromDto](new DomicilioObjetoUpdateFromDtoHandler().handle)
   queryBus.subscribe[GetStateDomicilioObjeto](new GetStateDomicilioObjetoHandler().handle)

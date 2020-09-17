@@ -12,6 +12,7 @@ sealed trait PlanPagoEvents extends Event {
 
 object PlanPagoEvents {
   case class PlanPagoUpdatedFromDto(
+      deliveryId: BigInt,
       sujetoId: String,
       objetoId: String,
       tipoObjeto: String,

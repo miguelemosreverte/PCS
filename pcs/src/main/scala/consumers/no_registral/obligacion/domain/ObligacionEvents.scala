@@ -15,6 +15,7 @@ sealed trait ObligacionEvents extends Event {
 object ObligacionEvents {
 
   case class ObligacionPersistedSnapshot(
+      deliveryId: BigInt,
       sujetoId: String,
       objetoId: String,
       tipoObjeto: String,

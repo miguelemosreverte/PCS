@@ -14,7 +14,7 @@ import design_principles.microservice.kafka_consumer_microservice.{
 }
 
 class PlanPagoMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
-  implicit val actor: PlanPagoActor = PlanPagoActor(PlanPagoState(), m.config)
+  implicit val actor: PlanPagoActor = PlanPagoActor(PlanPagoState())
 
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(PlanPagoNoTributarioTransaction(actor, monitoring), PlanPagoTributarioTransaction(actor, monitoring))

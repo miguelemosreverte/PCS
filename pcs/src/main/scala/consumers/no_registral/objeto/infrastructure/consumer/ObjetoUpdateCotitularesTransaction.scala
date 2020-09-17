@@ -20,7 +20,7 @@ case class ObjetoUpdateCotitularesTransaction(actorRef: ActorRef, monitoring: Mo
   def processInput(input: String): Either[Throwable, ObjetoUpdateCotitulares] =
     maybeDecode[ObjetoUpdateCotitulares](input)
 
-  def processCommand(cmd: ObjetoUpdateCotitulares): Future[Response.SuccessProcessing] = {
+  def processMessage(cmd: ObjetoUpdateCotitulares): Future[Response.SuccessProcessing] = {
     actorRef.ask[Response.SuccessProcessing](cmd)
   }
 }

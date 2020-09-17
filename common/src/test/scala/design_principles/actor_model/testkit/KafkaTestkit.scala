@@ -1,5 +1,5 @@
 package design_principles.actor_model.testkit
-
+/*
 import scala.concurrent.Future
 import akka.Done
 import akka.actor.ActorSystem
@@ -11,12 +11,18 @@ import kafka.{
   KafkaMessageProcessorRequirements,
   KafkaMessageProducer,
   KafkaTransactionalMessageProcessor,
+  MessageProcessor,
+  MessageProducer,
   TopicListener
 }
 import monitoring.{DummyMonitoring, Monitoring}
 import akka.actor.typed.scaladsl.adapter._
+import design_principles.patterns.pub_sub.algebra.sub.MessageProcessor
 
-class KafkaTestkit(monitoring: Monitoring)(implicit system: ActorSystem) {
+class KafkaTestkit(monitoring: Monitoring)(implicit system: ActorSystem)
+    extends MessageProducer
+    with MessageProcessor[_, _]
+    with MessageProcessorLogging {
 
   val rebalancerListener: ActorRef[ConsumerRebalanceEvent] =
     system.spawn(
@@ -52,3 +58,6 @@ class KafkaTestkit(monitoring: Monitoring)(implicit system: ActorSystem) {
       }
     }
 }
+ */
+
+object KafkaTestkit {}

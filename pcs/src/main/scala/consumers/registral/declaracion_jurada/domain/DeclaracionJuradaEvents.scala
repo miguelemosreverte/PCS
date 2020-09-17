@@ -12,6 +12,7 @@ sealed trait DeclaracionJuradaEvents extends Event {
 
 object DeclaracionJuradaEvents {
   case class DeclaracionJuradaUpdatedFromDto(
+      deliveryId: BigInt,
       sujetoId: String,
       objetoId: String,
       tipoObjeto: String,

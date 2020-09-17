@@ -18,6 +18,7 @@ class ParametricaRecargoUpdateFromDtoHandler() {
         ParametricaRecargoState
       ](
         ParametricaRecargoEvents.ParametricaRecargoUpdatedFromDto(
+          command.deliveryId,
           bprIndice = registro.BPR_INDICE,
           bprTipoIndice = registro.BPR_TIPO_INDICE,
           bprFechaDesde = registro.BPR_FECHA_DESDE,

@@ -12,6 +12,7 @@ sealed trait SubastaEvents extends Event {
 
 object SubastaEvents {
   case class SubastaUpdatedFromDto(
+      deliveryId: BigInt,
       sujetoId: String,
       objetoId: String,
       tipoObjeto: String,

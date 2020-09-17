@@ -8,12 +8,12 @@ import com.typesafe.config.Config
 import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
 import design_principles.microservice.MicroserviceRequirements
 import kafka.KafkaMessageProcessorRequirements
-import monitoring.Monitoring
+import monitoring.{KamonMonitoring, Monitoring}
 
 import scala.concurrent.ExecutionContext
 
 case class KafkaConsumerMicroserviceRequirements(
-    monitoring: Monitoring,
+    monitoring: KamonMonitoring,
     ctx: ActorSystem,
     queryStateApiRequirements: QueryStateApiRequirements,
     actorTransactionRequirements: ActorTransactionRequirements,

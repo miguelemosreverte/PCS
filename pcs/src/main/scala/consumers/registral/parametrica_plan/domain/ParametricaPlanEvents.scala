@@ -27,6 +27,7 @@ sealed trait ParametricaPlanEvents extends Event {
 }
 object ParametricaPlanEvents {
   case class ParametricaPlanUpdatedFromDto(
+      deliveryId: BigInt,
       bppRdlId: String,
       bppFpmId: String,
       bppCantMaxCuotas: BigInt,

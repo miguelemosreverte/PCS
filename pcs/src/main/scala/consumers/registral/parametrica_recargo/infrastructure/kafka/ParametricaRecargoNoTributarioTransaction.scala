@@ -32,7 +32,7 @@ case class ParametricaRecargoNoTributarioTransaction(actor: ParametricaRecargoAc
   def processInput(input: String): Either[Throwable, ParametricaRecargoAnt] =
     maybeDecode[ParametricaRecargoAnt](input)
 
-  override def processCommand(registro: ParametricaRecargoAnt): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: ParametricaRecargoAnt): Future[Response.SuccessProcessing] = {
 
     val command = ParametricaRecargoCommands.ParametricaRecargoUpdateFromDto(
       parametricaRecargoId = registro.BPR_INDICE,

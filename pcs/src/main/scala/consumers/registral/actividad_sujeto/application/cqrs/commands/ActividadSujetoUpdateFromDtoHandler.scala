@@ -17,6 +17,7 @@ class ActividadSujetoUpdateFromDtoHandler() {
         ActividadSujetoState
       ](
         ActividadSujetoUpdatedFromDto(
+          command.deliveryId,
           command.sujetoId,
           command.actividadSujetoId,
           command.registro

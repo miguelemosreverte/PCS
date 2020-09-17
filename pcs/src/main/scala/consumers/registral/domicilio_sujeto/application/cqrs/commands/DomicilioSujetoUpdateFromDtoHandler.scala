@@ -17,6 +17,7 @@ class DomicilioSujetoUpdateFromDtoHandler() {
         DomicilioSujetoState
       ](
         DomicilioSujetoUpdatedFromDto(
+          command.deliveryId,
           command.sujetoId,
           command.domicilioId,
           command.registro

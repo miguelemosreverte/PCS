@@ -12,7 +12,7 @@ import design_principles.actor_model.{Response, TypedActorSpec}
 
 class JuicioSpec extends TypedActorSpec {
 
-  val actor: JuicioActor = JuicioActor(JuicioState(), MockConfig.config)
+  val actor: JuicioActor = JuicioActor(JuicioState())
 
   "Typed cluster sharding with persistent actor" should
   "support ask with thenReply" in {

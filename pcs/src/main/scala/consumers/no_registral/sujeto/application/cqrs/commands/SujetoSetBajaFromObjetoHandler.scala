@@ -20,7 +20,7 @@ class SujetoSetBajaFromObjetoHandler(actor: SujetoActor) extends SyncCommandHand
 
     actor.persistEvent(event) { () =>
       actor.state += event
-      actor.persistSnapshot()(() => ())
+      actor.persistSnapshot()(_ => ())
     }
     Success(Response.SuccessProcessing(command.deliveryId))
   }

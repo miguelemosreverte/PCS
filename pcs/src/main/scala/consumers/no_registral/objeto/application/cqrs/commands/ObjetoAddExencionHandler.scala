@@ -27,7 +27,7 @@ class ObjetoAddExencionHandler(actor: ObjetoActor) extends SyncCommandHandler[Ob
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
       actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
     } else {
-      actor.persistEvent(event, Set("Exencion")) { () =>
+      actor.persistEvent(event) { () =>
         actor.state += event
         actor.state.obligaciones.foreach { obligacionId =>
           val obligacion = actor.obligaciones((command.sujetoId, command.objetoId, command.tipoObjeto, obligacionId))

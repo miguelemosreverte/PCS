@@ -12,7 +12,7 @@ import design_principles.actor_model.{Response, TypedActorSpec}
 
 class PlanPagoSpec extends TypedActorSpec {
 
-  val actor: PlanPagoActor = PlanPagoActor(PlanPagoState(), MockConfig.config)
+  val actor: PlanPagoActor = PlanPagoActor(PlanPagoState())
 
   "Typed cluster sharding with persistent actor" should
   "support ask with thenReply" in {

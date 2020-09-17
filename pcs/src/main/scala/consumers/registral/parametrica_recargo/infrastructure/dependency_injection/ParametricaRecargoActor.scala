@@ -12,18 +12,13 @@ import consumers.registral.parametrica_recargo.domain.events.ParametricaRecargoU
 import consumers.registral.parametrica_recargo.domain.{ParametricaRecargoEvents, ParametricaRecargoState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
-case class ParametricaRecargoActor(state: ParametricaRecargoState = ParametricaRecargoState(), config: Config)(
+case class ParametricaRecargoActor(state: ParametricaRecargoState = ParametricaRecargoState())(
     implicit system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       ParametricaRecargoMessage,
       ParametricaRecargoEvents,
       ParametricaRecargoState
-    ](state, config) {
-
-  override def tags(event: ParametricaRecargoEvents): Set[String] = event match {
-    case _: ParametricaRecargoUpdatedFromDto => Set("ParametricaRecargo")
-  }
-
+    ](state) {
   commandBus.subscribe[ParametricaRecargoUpdateFromDto](new ParametricaRecargoUpdateFromDtoHandler().handle)
   queryBus.subscribe[GetStateParametricaRecargo](new GetStateParametricaRecargoHandler().handle)
   eventBus.subscribe[ParametricaRecargoUpdatedFromDto](new ParametricaRecargoUpdatedFromDtoHandler().handle)

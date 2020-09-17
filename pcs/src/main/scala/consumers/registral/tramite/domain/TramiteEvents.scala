@@ -10,6 +10,7 @@ sealed trait TramiteEvents extends Event {
 
 object TramiteEvents {
   case class TramiteUpdatedFromDto(
+      deliveryId: BigInt,
       sujetoId: String,
       tramiteId: String,
       registro: Tramite

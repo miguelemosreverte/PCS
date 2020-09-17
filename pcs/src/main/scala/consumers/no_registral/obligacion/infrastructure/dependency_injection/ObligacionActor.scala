@@ -1,7 +1,7 @@
 package consumers.no_registral.obligacion.infrastructure.dependency_injection
 
 import akka.actor.Props
-import akka.persistence._
+import akka.entity.ShardedEntity.MonitoringAndMessageProducer
 import com.typesafe.config.Config
 import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.obligacion.application.cqrs.commands._
@@ -14,12 +14,13 @@ import consumers.no_registral.obligacion.application.entities.{
 }
 import consumers.no_registral.obligacion.domain.ObligacionEvents.ObligacionPersistedSnapshot
 import consumers.no_registral.obligacion.domain.{ObligacionEvents, ObligacionState}
-import consumers.no_registral.obligacion.infrastructure.dependency_injection.ObligacionActor.ObligacionTags
 import cqrs.base_actor.untyped.PersistentBaseActor
+import kafka.KafkaMessageProducer.KafkaKeyValue
+import kafka.MessageProducer
 import monitoring.Monitoring
 
-class ObligacionActor(monitoring: Monitoring, config: Config)
-    extends PersistentBaseActor[ObligacionEvents, ObligacionState](monitoring, config) {
+class ObligacionActor(requirements: MonitoringAndMessageProducer)
+    extends PersistentBaseActor[ObligacionEvents, ObligacionState](requirements.monitoring) {
 
   var state = ObligacionState()
 
@@ -54,10 +55,12 @@ class ObligacionActor(monitoring: Monitoring, config: Config)
     )
   }
 
+  import consumers.no_registral.obligacion.infrastructure.json._
   def persistSnapshot()(handler: () => Unit): Unit = {
     val ids = ObligacionMessageRoots.extractor(persistenceId)
 
     val event = ObligacionPersistedSnapshot(
+      deliveryId = lastDeliveryId,
       sujetoId = ids.sujetoId,
       objetoId = ids.objetoId,
       tipoObjeto = ids.tipoObjeto,
@@ -67,15 +70,20 @@ class ObligacionActor(monitoring: Monitoring, config: Config)
       porcentajeExencion = state.porcentajeExencion.getOrElse(0),
       saldo = state.saldo
     )
-    persistEvent(event, ObligacionTags.ObligacionReadside)(handler)
+    import serialization.encode
+    requirements.messageProducer.produce(
+      data = Seq(
+        KafkaKeyValue(
+          persistenceId,
+          encode(event)
+        )
+      ),
+      topic = "ObligacionPersistedSnapshot"
+    )(_ => ())
   }
 }
 
 object ObligacionActor {
-  def props(monitoring: Monitoring, config: Config): Props = Props(new ObligacionActor(monitoring, config))
-
-  object ObligacionTags {
-    val ObligacionReadside: Set[String] = Set("Obligacion")
-  }
-
+  def props(requirements: MonitoringAndMessageProducer): Props =
+    Props(new ObligacionActor(requirements))
 }

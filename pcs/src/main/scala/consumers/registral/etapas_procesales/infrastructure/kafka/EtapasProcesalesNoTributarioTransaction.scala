@@ -32,7 +32,7 @@ case class EtapasProcesalesNoTributarioTransaction(actor: EtapasProcesalesActor,
   def processInput(input: String): Either[Throwable, EtapasProcesalesAnt] =
     maybeDecode[EtapasProcesalesAnt](input)
 
-  override def processCommand(registro: EtapasProcesalesAnt): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: EtapasProcesalesAnt): Future[Response.SuccessProcessing] = {
     val command = EtapasProcesalesCommands.EtapasProcesalesUpdateFromDto(
       juicioId = registro.BEP_JUI_ID,
       etapaId = registro.BPE_ETA_ID,

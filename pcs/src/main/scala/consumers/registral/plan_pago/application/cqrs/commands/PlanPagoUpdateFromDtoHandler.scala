@@ -17,6 +17,7 @@ class PlanPagoUpdateFromDtoHandler() {
         PlanPagoState
       ](
         PlanPagoUpdatedFromDto(
+          command.deliveryId,
           command.sujetoId,
           command.objetoId,
           command.tipoObjeto,

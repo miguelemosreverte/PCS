@@ -12,18 +12,13 @@ import consumers.registral.parametrica_plan.domain.events.ParametricaPlanUpdated
 import consumers.registral.parametrica_plan.domain.{ParametricaPlanEvents, ParametricaPlanState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
-case class ParametricaPlanActor(state: ParametricaPlanState = ParametricaPlanState(), config: Config)(
+case class ParametricaPlanActor(state: ParametricaPlanState = ParametricaPlanState())(
     implicit system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       ParametricaPlanMessage,
       ParametricaPlanEvents,
       ParametricaPlanState
-    ](state, config) {
-
-  override def tags(event: ParametricaPlanEvents): Set[String] = event match {
-    case _: ParametricaPlanUpdatedFromDto => Set("ParametricaPlan")
-  }
-
+    ](state) {
   commandBus.subscribe[ParametricaPlanUpdateFromDto](new ParametricaPlanUpdateFromDtoHandler().handle)
   queryBus.subscribe[GetStateParametricaPlan](new GetStateParametricaPlanHandler().handle)
   eventBus.subscribe[ParametricaPlanUpdatedFromDto](new ParametricaPlanUpdatedFromDtoHandler().handle)

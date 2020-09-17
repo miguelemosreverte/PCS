@@ -17,6 +17,7 @@ class CalendarioUpdateFromDtoHandler() {
         CalendarioState
       ](
         CalendarioUpdatedFromDto(
+          command.deliveryId,
           command.aggregateRoot,
           command.registro
         )

@@ -10,6 +10,7 @@ sealed trait DomicilioSujetoEvents extends Event {
 
 object DomicilioSujetoEvents {
   case class DomicilioSujetoUpdatedFromDto(
+      deliveryId: BigInt,
       sujetoId: String,
       domicilioSujetoId: String,
       registro: DomicilioSujetoExternalDto

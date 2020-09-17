@@ -12,18 +12,13 @@ import consumers.registral.calendario.domain.events.CalendarioUpdatedFromDtoHand
 import consumers.registral.calendario.domain.{CalendarioEvents, CalendarioState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
-case class CalendarioActor(state: CalendarioState = CalendarioState(), config: Config)(
+case class CalendarioActor(state: CalendarioState = CalendarioState())(
     implicit system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       CalendarioMessage,
       CalendarioEvents,
       CalendarioState
-    ](state, config) {
-
-  override def tags(event: CalendarioEvents): Set[String] = event match {
-    case _: CalendarioUpdatedFromDto => Set("Calendario")
-  }
-
+    ](state) {
   commandBus.subscribe[CalendarioUpdateFromDto](new CalendarioUpdateFromDtoHandler().handle)
   queryBus.subscribe[GetStateCalendario](new GetStateCalendarioHandler().handle)
   eventBus.subscribe[CalendarioUpdatedFromDto](new CalendarioUpdatedFromDtoHandler().handle)

@@ -12,17 +12,13 @@ import consumers.registral.declaracion_jurada.domain.events.DeclaracionJuradaUpd
 import consumers.registral.declaracion_jurada.domain.{DeclaracionJuradaEvents, DeclaracionJuradaState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
-case class DeclaracionJuradaActor(state: DeclaracionJuradaState = DeclaracionJuradaState(), config: Config)(
+case class DeclaracionJuradaActor(state: DeclaracionJuradaState = DeclaracionJuradaState())(
     implicit system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       DeclaracionJuradaMessage,
       DeclaracionJuradaEvents,
       DeclaracionJuradaState
-    ](state, config) {
-
-  override def tags(event: DeclaracionJuradaEvents): Set[String] = event match {
-    case _: DeclaracionJuradaUpdatedFromDto => Set("DeclaracionJurada")
-  }
+    ](state) {
 
   commandBus.subscribe[DeclaracionJuradaUpdateFromDto](new DeclaracionJuradaUpdateFromDtoHandler().handle)
   queryBus.subscribe[GetStateDeclaracionJurada](new GetStateDeclaracionJuradaHandler().handle)

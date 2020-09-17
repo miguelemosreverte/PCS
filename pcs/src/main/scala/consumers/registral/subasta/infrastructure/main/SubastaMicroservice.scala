@@ -13,7 +13,7 @@ import design_principles.microservice.kafka_consumer_microservice.{
 }
 
 class SubastaMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
-  implicit val actor: SubastaActor = SubastaActor(SubastaState(), m.config)
+  implicit val actor: SubastaActor = SubastaActor(SubastaState())
 
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(SubastaTransaction(actor, monitoring))

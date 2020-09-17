@@ -17,6 +17,7 @@ class ParametricaPlanUpdateFromDtoHandler() {
         ParametricaPlanState
       ](
         ParametricaPlanEvents.ParametricaPlanUpdatedFromDto(
+          command.deliveryId,
           bppRdlId = command.registro.BPP_RDL_ID,
           bppFpmId = command.registro.BPP_FPM_ID,
           bppCantMaxCuotas = command.registro.BPP_CANT_MAX_CUOTAS,

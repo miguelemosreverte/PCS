@@ -13,7 +13,7 @@ import design_principles.microservice.kafka_consumer_microservice.{
 }
 
 class TramiteMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
-  implicit val actor: TramiteActor = TramiteActor(TramiteState(), m.config)
+  implicit val actor: TramiteActor = TramiteActor(TramiteState())
 
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(TramiteTransaction(actor, monitoring))

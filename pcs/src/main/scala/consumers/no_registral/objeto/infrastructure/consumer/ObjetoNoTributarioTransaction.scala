@@ -27,7 +27,7 @@ case class ObjetoNoTributarioTransaction(actorRef: ActorRef, monitoring: Monitor
   def processInput(input: String): Either[Throwable, ObjetosAnt] =
     maybeDecode[ObjetosAnt](input)
 
-  def processCommand(registro: ObjetosAnt): Future[Response.SuccessProcessing] = {
+  def processMessage(registro: ObjetosAnt): Future[Response.SuccessProcessing] = {
     val command: ObjetoCommands =
       if (registro.SOJ_ESTADO.contains("BAJA"))
         ObjetoCommands.SetBajaObjeto(

@@ -1,7 +1,0 @@
-package consumers_spec.no_registrales.obligacion
-
-import consumers_spec.no_registrales.testsuite.NoRegistralesTestSuiteAcceptance
-import org.scalatest.Ignore
-
-@Ignore
-class ObligacionSpecAcceptance extends ObligacionSpec with NoRegistralesTestSuiteAcceptance

@@ -31,7 +31,7 @@ case class ActividadSujetoTransaction(actor: ActividadSujetoActor, monitoring: M
   def processInput(input: String): Either[Throwable, ActividadSujeto] =
     maybeDecode[ActividadSujeto](input)
 
-  override def processCommand(registro: ActividadSujeto): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: ActividadSujeto): Future[Response.SuccessProcessing] = {
     val command =
       ActividadSujetoUpdateFromDto(
         sujetoId = registro.BAT_SUJ_IDENTIFICADOR,

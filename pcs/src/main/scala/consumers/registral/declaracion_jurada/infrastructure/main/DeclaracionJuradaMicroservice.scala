@@ -14,7 +14,7 @@ import design_principles.microservice.kafka_consumer_microservice.{
 
 class DeclaracionJuradaMicroservice(implicit m: KafkaConsumerMicroserviceRequirements)
     extends KafkaConsumerMicroservice {
-  implicit val actor: DeclaracionJuradaActor = DeclaracionJuradaActor(DeclaracionJuradaState(), m.config)
+  implicit val actor: DeclaracionJuradaActor = DeclaracionJuradaActor(DeclaracionJuradaState())
 
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(DeclaracionJuradaTransaction(actor, monitoring))

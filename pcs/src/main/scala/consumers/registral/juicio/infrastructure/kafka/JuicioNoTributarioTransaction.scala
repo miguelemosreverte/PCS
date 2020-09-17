@@ -30,7 +30,7 @@ case class JuicioNoTributarioTransaction(actorRef: JuicioActor, monitoring: Moni
   def processInput(input: String): Either[Throwable, JuicioAnt] =
     maybeDecode[JuicioAnt](input)
 
-  override def processCommand(registro: JuicioAnt): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: JuicioAnt): Future[Response.SuccessProcessing] = {
 
     implicit val b: Reads[Seq[DetallesJuicio]] = Reads.seq(DetallesJuicioF.reads)
 

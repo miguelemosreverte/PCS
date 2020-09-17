@@ -5,7 +5,6 @@ import design_principles.actor_model.mechanism.DeliveryIdManagement._
 import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.objeto.domain.ObjetoEvents
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
-import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor.ObjetoTags
 import cqrs.untyped.command.CommandHandler.SyncCommandHandler
 import design_principles.actor_model.Response
 
@@ -30,9 +29,10 @@ class ObjetoUpdateFromTriHandler(actor: ObjetoActor) extends SyncCommandHandler[
       actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
     } else {
       // because ObjetoNovedadCotitularidad, the event processor, needs this event to publish AddCotitular
-      actor.persistEvent(event, ObjetoTags.CotitularesReadside) { () =>
+      actor.persistEvent(event) { () =>
         actor.state += event
         actor.informParent(command, actor.state)
+        actor.AddSujetoCotitularTransaction(event)
         actor.persistSnapshot(event, actor.state) { () =>
           if (!actor.state.isResponsable)
             actor.removeObligaciones()

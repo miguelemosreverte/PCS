@@ -13,6 +13,7 @@ sealed trait JuicioEvents extends Event {
 
 object JuicioEvents {
   case class JuicioUpdatedFromDto(
+      deliveryId: BigInt,
       sujetoId: String,
       objetoId: String,
       tipoObjeto: String,

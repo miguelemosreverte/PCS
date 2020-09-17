@@ -29,7 +29,7 @@ case class TramiteTransaction(actor: TramiteActor, monitoring: Monitoring)(
   def processInput(input: String): Either[Throwable, Tramite] =
     maybeDecode[Tramite](input)
 
-  override def processCommand(registro: Tramite): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: Tramite): Future[Response.SuccessProcessing] = {
     val command = TramiteCommands.TramiteUpdateFromDto(
       sujetoId = registro.BTR_SUJ_IDENTIFICADOR,
       tramiteId = registro.BTR_TRMID,

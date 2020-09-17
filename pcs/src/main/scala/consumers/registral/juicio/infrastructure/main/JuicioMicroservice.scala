@@ -14,7 +14,7 @@ import design_principles.microservice.kafka_consumer_microservice.{
 }
 
 class JuicioMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
-  implicit val actor: JuicioActor = JuicioActor(JuicioState(), m.config)
+  implicit val actor: JuicioActor = JuicioActor(JuicioState())
 
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(JuicioNoTributarioTransaction(actor, monitoring), JuicioTributarioTransaction(actor, monitoring))

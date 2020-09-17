@@ -20,7 +20,7 @@ abstract class ActorTransaction[ExternalDto](
 
   def topic: String
 
-  def processCommand(registro: ExternalDto): Future[Response.SuccessProcessing]
+  def processMessage(registro: ExternalDto): Future[Response.SuccessProcessing]
 
   final def transaction(input: String): Future[Response.SuccessProcessing] = {
     recordRequests()
@@ -30,7 +30,7 @@ abstract class ActorTransaction[ExternalDto](
         Future.failed(serializationError)
 
       case Right(value) =>
-        val future = processCommand(value)
+        val future = processMessage(value)
         future.onComplete {
           case Failure(exception) => recordErrors(exception)
           case Success(_) => ()
@@ -48,6 +48,8 @@ abstract class ActorTransaction[ExternalDto](
     controller.route
 
   protected val simpleName = utils.Inference.getSimpleName(this.getClass.getName)
+
+  implicit val ex = actorTransactionRequirements.executionContext
 
 }
 

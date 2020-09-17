@@ -31,7 +31,10 @@ object ActividadSujetoGenerator {
       serialization.encode(ActividadSujeto)
 
     def toEvent: ActividadSujetoUpdatedFromDto =
-      ActividadSujetoUpdatedFromDto(deliveryId.toString, ActividadSujeto.BAT_SUJ_IDENTIFICADOR, ActividadSujeto)
+      ActividadSujetoUpdatedFromDto(deliveryId,
+                                    ActividadSujeto.BAT_SUJ_IDENTIFICADOR,
+                                    ActividadSujeto.BAT_ATD_ID,
+                                    ActividadSujeto)
 
     def toCommand: ActividadSujetoUpdateFromDto =
       ActividadSujetoUpdateFromDto(ActividadSujeto.BAT_SUJ_IDENTIFICADOR,

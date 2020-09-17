@@ -31,7 +31,7 @@ case class ParametricaPlanTributarioTransaction(actor: ParametricaPlanActor, mon
   def processInput(input: String): Either[Throwable, ParametricaPlanTri] =
     maybeDecode[ParametricaPlanTri](input)
 
-  override def processCommand(registro: ParametricaPlanTri): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: ParametricaPlanTri): Future[Response.SuccessProcessing] = {
 
     val command = ParametricaPlanCommands.ParametricaPlanUpdateFromDto(
       parametricaPlanId = registro.BPP_FPM_ID,

@@ -30,7 +30,7 @@ case class DeclaracionJuradaTransaction(actor: DeclaracionJuradaActor, monitorin
   def processInput(input: String): Either[Throwable, DeclaracionJurada] =
     maybeDecode[DeclaracionJurada](input)
 
-  override def processCommand(registro: DeclaracionJurada): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: DeclaracionJurada): Future[Response.SuccessProcessing] = {
     val command = DeclaracionJuradaCommands.DeclaracionJuradaUpdateFromDto(
       sujetoId = registro.BDJ_SUJ_IDENTIFICADOR,
       objetoId = registro.BDJ_SOJ_IDENTIFICADOR,

@@ -12,17 +12,13 @@ import consumers.registral.etapas_procesales.domain.events.EtapasProcesalesUpdat
 import consumers.registral.etapas_procesales.domain.{EtapasProcesalesEvents, EtapasProcesalesState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 
-case class EtapasProcesalesActor(state: EtapasProcesalesState = EtapasProcesalesState(), config: Config)(
+case class EtapasProcesalesActor(state: EtapasProcesalesState = EtapasProcesalesState())(
     implicit system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       EtapasProcesalesMessage,
       EtapasProcesalesEvents,
       EtapasProcesalesState
-    ](state, config) {
-
-  override def tags(event: EtapasProcesalesEvents): Set[String] = event match {
-    case _: EtapasProcesalesUpdatedFromDto => Set("EtapasProcesales")
-  }
+    ](state) {
 
   commandBus.subscribe[EtapasProcesalesUpdateFromDto](new EtapasProcesalesUpdateFromDtoHandler().handle)
   queryBus.subscribe[GetStateEtapasProcesales](new GetStateEtapasProcesalesHandler().handle)

@@ -1,14 +1,27 @@
 package cassandra.mechanism
 
-import scala.concurrent.{ExecutionContext, Future}
+import akka.Done
 
+import scala.concurrent.{ExecutionContext, Future}
 import akka.stream.alpakka.cassandra.scaladsl.CassandraSession
-import cassandra.CassandraTypesAdapter
+import cassandra.{CassandraTypesAdapter, CqlSessionSingleton}
 import com.datastax.oss.driver.api.core.cql.{BoundStatement, PreparedStatement}
 import ddd.ReadSideProjection
 import design_principles.actor_model.Event
 
 trait UpdateReadSideProjection[E <: Event] extends ReadSideProjection[E] {
+
+  val session = CqlSessionSingleton.session
+
+  final protected def boundStatement: BoundStatement =
+    session.prepare(statement) bind (binds: _*)
+
+  def updateReadside()(implicit ec: ExecutionContext): Future[Done] = {
+    import scala.jdk.FutureConverters._
+    session.executeAsync(boundStatement).asScala.map { _ =>
+      akka.Done
+    }
+  }
 
   def event: E
 
@@ -44,8 +57,4 @@ trait UpdateReadSideProjection[E <: Event] extends ReadSideProjection[E] {
 
   def binds: List[Object] = (curatedBindings ++ curatedKeys).map(_._2)
 
-  def boundedStatement: PreparedStatement => BoundStatement = stmt => stmt.bind(binds: _*)
-
-  def prepareStatement(session: CassandraSession)(implicit ec: ExecutionContext): Future[BoundStatement] =
-    session.prepare(statement) map boundedStatement
 }

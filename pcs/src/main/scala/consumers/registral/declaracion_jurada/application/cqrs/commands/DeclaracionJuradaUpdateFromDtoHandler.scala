@@ -17,6 +17,7 @@ class DeclaracionJuradaUpdateFromDtoHandler() {
         DeclaracionJuradaState
       ](
         DeclaracionJuradaUpdatedFromDto(
+          command.deliveryId,
           command.sujetoId,
           command.objetoId,
           command.tipoObjeto,

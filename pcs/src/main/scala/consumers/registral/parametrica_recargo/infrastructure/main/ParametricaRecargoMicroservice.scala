@@ -15,7 +15,7 @@ import design_principles.microservice.kafka_consumer_microservice.{
 
 class ParametricaRecargoMicroservice(implicit m: KafkaConsumerMicroserviceRequirements)
     extends KafkaConsumerMicroservice {
-  implicit val actor: ParametricaRecargoActor = ParametricaRecargoActor(ParametricaRecargoState(), m.config)
+  implicit val actor: ParametricaRecargoActor = ParametricaRecargoActor(ParametricaRecargoState())
 
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(ParametricaRecargoNoTributarioTransaction(actor, monitoring),

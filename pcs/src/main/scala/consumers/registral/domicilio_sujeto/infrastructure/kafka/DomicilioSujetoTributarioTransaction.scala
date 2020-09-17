@@ -32,7 +32,7 @@ case class DomicilioSujetoTributarioTransaction(actor: DomicilioSujetoActor, mon
   def processInput(input: String): Either[Throwable, DomicilioSujetoTri] =
     maybeDecode[DomicilioSujetoTri](input)
 
-  override def processCommand(registro: DomicilioSujetoTri): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: DomicilioSujetoTri): Future[Response.SuccessProcessing] = {
     val command = DomicilioSujetoCommands.DomicilioSujetoUpdateFromDto(
       sujetoId = registro.BDS_SUJ_IDENTIFICADOR,
       domicilioId = registro.BDS_DOM_ID,

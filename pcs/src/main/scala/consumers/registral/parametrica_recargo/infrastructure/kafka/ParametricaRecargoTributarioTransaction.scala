@@ -34,7 +34,7 @@ case class ParametricaRecargoTributarioTransaction(actor: ParametricaRecargoActo
   def processInput(input: String): Either[Throwable, ParametricaRecargoTri] =
     maybeDecode[ParametricaRecargoTri](input)
 
-  override def processCommand(registro: ParametricaRecargoTri): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: ParametricaRecargoTri): Future[Response.SuccessProcessing] = {
     val command = ParametricaRecargoCommands.ParametricaRecargoUpdateFromDto(
       parametricaRecargoId = registro.BPR_INDICE,
       deliveryId = BigInt(registro.EV_ID),

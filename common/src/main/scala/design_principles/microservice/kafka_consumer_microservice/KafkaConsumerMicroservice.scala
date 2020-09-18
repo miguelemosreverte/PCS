@@ -7,6 +7,7 @@ import kafka.{KafkaMessageProcessorRequirements, KafkaMessageProducer}
 import monitoring.{KamonMonitoring, Monitoring}
 import akka.actor.typed.scaladsl.adapter._
 import akka.entity.ShardedEntity.{ProductionMonitoringAndCassandraWrite, ProductionMonitoringAndMessageProducer}
+import design_principles.actor_model.mechanism.stream_supervision.UniqueTopicPerNode.uniqueTopicPerNode
 
 abstract class KafkaConsumerMicroservice(implicit m: KafkaConsumerMicroserviceRequirements)
     extends Microservice[KafkaConsumerMicroserviceRequirements] {
@@ -36,6 +37,6 @@ abstract class KafkaConsumerMicroservice(implicit m: KafkaConsumerMicroserviceRe
 
   final def actorTransactionControllers: Set[(String, ActorTransactionController)] =
     actorTransactions.map { actorTransaction =>
-      (actorTransaction.topic, actorTransaction.controller)
+      (uniqueTopicPerNode(actorTransaction.topic), actorTransaction.controller)
     }
 }

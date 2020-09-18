@@ -5,6 +5,8 @@ import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransactionController
 import akka.http.Controller
 import akka.http.scaladsl.server.Directives.{complete, path, pathPrefix, post, _}
+import com.typesafe.config.ConfigFactory
+import design_principles.actor_model.mechanism.stream_supervision.UniqueTopicPerNode.uniqueTopicPerNode
 import design_principles.microservice.kafka_consumer_microservice.KafkaConsumerMicroserviceRequirements
 
 class MessageProcessorSupervisorActorController(
@@ -25,9 +27,10 @@ class MessageProcessorSupervisorActorController(
 
   def stopAll(): Unit = startStopSingleton ! StartStopSingleton.Stop()
 
-  def startByTopic(topic: String): Unit = startStopSingleton ! StartStopSingleton.StartByTopic(topic)
-
-  def stopByTopic(topic: String): Unit = startStopSingleton ! StartStopSingleton.StopByTopic(topic)
+  def startByTopic(topic: String): Unit =
+    startStopSingleton ! StartStopSingleton.StartByTopic(uniqueTopicPerNode(topic))
+  def stopByTopic(topic: String): Unit =
+    startStopSingleton ! StartStopSingleton.StopByTopic(uniqueTopicPerNode(topic))
 
   def stop_kafka: Route =
     post {

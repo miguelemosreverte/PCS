@@ -8,6 +8,8 @@ import scala.collection.mutable
 import java.time.Duration
 import java.time.temporal.ChronoUnit
 
+import scala.concurrent.duration.DurationInt
+
 object TellSupervisor {
   private def props(actorRef: ActorRef): Props = Props(new TellSupervisor(actorRef))
   def start(actorRef: ActorRef)(implicit system: ActorSystem): ActorRef = system.actorOf(props(actorRef))
@@ -41,10 +43,13 @@ class TellSupervisor(actorRef: ActorRef) extends Actor {
       }
   }
 
-  context.system.scheduler.scheduleAtFixedRate(
-    initialDelay = Duration.of(0, ChronoUnit.SECONDS),
-    interval = Duration.of(30, ChronoUnit.SECONDS),
-    runnable = new Resend,
-    executor = context.system.dispatcher
-  )
+  context.system.scheduler.scheduleAtFixedRate(10.seconds, 20.seconds) { () =>
+    commands.foreach {
+      case (aggregateRoot: String, commandMap: mutable.Map[BigInt, Command]) =>
+        commandMap foreach {
+          case (deliveryId: BigInt, command: Command) =>
+            actorRef ! command
+        }
+    }
+  }(context.system.dispatcher)
 }

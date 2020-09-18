@@ -1,7 +1,7 @@
 package design_principles.microservice.kafka_consumer_microservice
 
-import akka.actor.ActorSystem
-import akka.actor.typed.ActorRef
+import akka.actor.{ActorSystem, Props}
+import akka.actor.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter._
 import akka.cluster.ClusterEvent.MemberUp
@@ -19,18 +19,19 @@ object ProductionMicroserviceContextProvider {
 
     implicit val monitoring: KamonMonitoring = new KamonMonitoring
 
-    val rebalancerListener: ActorRef[ConsumerRebalanceEvent] =
-      ctx.spawn(
-        TopicListener(
-          typeKeyName = "rebalancerListener",
-          monitoring
-        ),
-        name = "rebalancerListener"
+    val rebalancerListener: ActorRef =
+      ctx.actorOf(
+        Props(
+          new TopicListener(
+            typeKeyName = "rebalancerListener",
+            monitoring
+          )
+        )
       )
 
     val kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements =
       KafkaMessageProcessorRequirements.productionSettings(
-        rebalancerListener.toClassic,
+        rebalancerListener,
         monitoring,
         system = ctx,
         executionContext = ctx.dispatcher

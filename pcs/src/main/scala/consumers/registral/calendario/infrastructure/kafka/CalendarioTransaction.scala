@@ -1,6 +1,7 @@
 package consumers.registral.calendario.infrastructure.kafka
 
 import akka.Done
+import akka.actor.ActorRef
 import akka.actor.typed.ActorSystem
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
@@ -17,7 +18,7 @@ import serialization.{decodeF, maybeDecode}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-case class CalendarioTransaction(actor: CalendarioActor, monitoring: Monitoring)(
+case class CalendarioTransaction(actor: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[CalendarioExternalDto](monitoring) {

@@ -1,6 +1,7 @@
 package consumers.registral.subasta.infrastructure.kafka
 
 import akka.Done
+import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import com.typesafe.config.Config
@@ -16,7 +17,7 @@ import serialization.{decodeF, maybeDecode}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-case class SubastaTransaction(actor: SubastaActor, monitoring: Monitoring)(
+case class SubastaTransaction(actor: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[SubastaExternalDto](monitoring) {

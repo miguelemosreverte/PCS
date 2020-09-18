@@ -1,6 +1,7 @@
 package consumers.registral.tramite.infrastructure.kafka
 
 import akka.Done
+import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import com.typesafe.config.Config
@@ -17,7 +18,7 @@ import serialization.{decodeF, maybeDecode}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-case class TramiteTransaction(actor: TramiteActor, monitoring: Monitoring)(
+case class TramiteTransaction(actor: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[Tramite](monitoring) {

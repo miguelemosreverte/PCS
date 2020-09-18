@@ -1,6 +1,7 @@
 package consumers.registral.domicilio_objeto.infrastructure.kafka
 
 import akka.Done
+import akka.actor.ActorRef
 import akka.actor.typed.ActorSystem
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
@@ -20,7 +21,7 @@ import serialization.{decodeF, maybeDecode}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-case class DomicilioObjetoTributarioTransaction(actor: DomicilioObjetoActor, monitoring: Monitoring)(
+case class DomicilioObjetoTributarioTransaction(actor: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[DomicilioObjetoTri](monitoring) {

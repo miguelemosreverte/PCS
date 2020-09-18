@@ -1,6 +1,7 @@
 package consumers.registral.actividad_sujeto.infrastructure.kafka
 
 import akka.Done
+import akka.actor.ActorRef
 import akka.actor.typed.ActorSystem
 import akka.util.Timeout
 import api.actor_transaction.ActorTransaction
@@ -19,7 +20,7 @@ import serialization.{decodeF, maybeDecode}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-case class ActividadSujetoTransaction(actor: ActividadSujetoActor, monitoring: Monitoring)(
+case class ActividadSujetoTransaction(actor: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[ActividadSujeto](monitoring) {

@@ -1,6 +1,7 @@
 package consumers.registral.parametrica_recargo.infrastructure.kafka
 
 import akka.Done
+import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import com.typesafe.config.Config
@@ -22,7 +23,7 @@ import serialization.{decodeF, maybeDecode}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-case class ParametricaRecargoTributarioTransaction(actor: ParametricaRecargoActor, monitoring: Monitoring)(
+case class ParametricaRecargoTributarioTransaction(actor: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[ParametricaRecargoTri](monitoring) {

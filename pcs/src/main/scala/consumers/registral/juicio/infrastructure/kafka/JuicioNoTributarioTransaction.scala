@@ -1,6 +1,7 @@
 package consumers.registral.juicio.infrastructure.kafka
 
 import akka.Done
+import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import com.typesafe.config.Config
@@ -18,7 +19,7 @@ import serialization.{decodeF, maybeDecode}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-case class JuicioNoTributarioTransaction(actorRef: JuicioActor, monitoring: Monitoring)(
+case class JuicioNoTributarioTransaction(actorRef: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[JuicioAnt](monitoring) {

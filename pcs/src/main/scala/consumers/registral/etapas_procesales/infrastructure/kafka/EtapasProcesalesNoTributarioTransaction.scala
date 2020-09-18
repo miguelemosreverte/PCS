@@ -1,6 +1,7 @@
 package consumers.registral.etapas_procesales.infrastructure.kafka
 
 import akka.Done
+import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import com.typesafe.config.Config
@@ -20,7 +21,7 @@ import serialization.{decodeF, maybeDecode}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-case class EtapasProcesalesNoTributarioTransaction(actor: EtapasProcesalesActor, monitoring: Monitoring)(
+case class EtapasProcesalesNoTributarioTransaction(actor: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[EtapasProcesalesAnt](monitoring) {

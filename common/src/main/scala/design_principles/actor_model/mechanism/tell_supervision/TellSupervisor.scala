@@ -13,8 +13,9 @@ import monitoring.Monitoring
 import scala.concurrent.duration.DurationInt
 
 object TellSupervisor {
-  private def props(actorRef: ActorRef): Props = Props(new TellSupervisor(actorRef))
-  def start(actorRef: ActorRef)(implicit system: ActorSystem): ActorRef = system.actorOf(props(actorRef))
+  private def props(actorRef: ActorRef, monitoring: Monitoring): Props = Props(new TellSupervisor(actorRef, monitoring))
+  def start(actorRef: ActorRef)(implicit system: ActorSystem, monitoring: Monitoring): ActorRef =
+    system.actorOf(props(actorRef, monitoring))
 }
 
 class TellSupervisor(actorRef: ActorRef, monitoring: Monitoring) extends Actor {

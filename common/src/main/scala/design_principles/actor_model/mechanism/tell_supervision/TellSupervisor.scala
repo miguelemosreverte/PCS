@@ -8,6 +8,8 @@ import scala.collection.mutable
 import java.time.Duration
 import java.time.temporal.ChronoUnit
 
+import monitoring.Monitoring
+
 import scala.concurrent.duration.DurationInt
 
 object TellSupervisor {
@@ -15,8 +17,10 @@ object TellSupervisor {
   def start(actorRef: ActorRef)(implicit system: ActorSystem): ActorRef = system.actorOf(props(actorRef))
 }
 
-class TellSupervisor(actorRef: ActorRef) extends Actor {
+class TellSupervisor(actorRef: ActorRef, monitoring: Monitoring) extends Actor {
   var commands: mutable.Map[String, mutable.Map[BigInt, Command]] = mutable.Map.empty
+  val inFlightMessagesGauge = monitoring.gauge("inFlightMessages")
+
   override def receive: Receive = {
     case SuccessProcessing(aggregateRoot, deliveryId) =>
       commands.get(aggregateRoot) map { _ =>
@@ -43,7 +47,8 @@ class TellSupervisor(actorRef: ActorRef) extends Actor {
       }
   }
 
-  context.system.scheduler.scheduleAtFixedRate(10.seconds, 20.seconds) { () =>
+  context.system.scheduler.scheduleAtFixedRate(10.seconds, 40.seconds) { () =>
+    inFlightMessagesGauge.set(commands.size)
     commands.foreach {
       case (aggregateRoot: String, commandMap: mutable.Map[BigInt, Command]) =>
         commandMap foreach {

@@ -45,7 +45,7 @@
     alias pcs.helper.kafka.publish_paramplan_tri_example="pcs.infrastructure.publish_to_kafka DGR-COP-PARAMPLAN-TRI"
 
     alias pcs.helper.kafka.publish_paramrecargo_ant_example="pcs.infrastructure.publish_to_kafka DGR-COP-PARAMRECARGO-ANT"
-    # TODO REVISAR PARAMRECARGO_TRI
+
     alias pcs.helper.kafka.publish_paramrecargo_tri_example="pcs.infrastructure.publish_to_kafka DGR-COP-PARAMRECARGO-TRI"
 
     alias pcs.helper.kafka.publish_planes_ant_example="pcs.infrastructure.publish_to_kafka DGR-COP-PLANES-ANT"

@@ -41,27 +41,7 @@ object MainApplication {
     val routes = ProductionMicroserviceContextProvider.getContext(system, config) { implicit microserviceProvisioning =>
       val microservices = microservicesFactory(microserviceProvisioning)
       val userRoutes = microservices.map(_.route).reduce(_ ~ _)
-      println(s"""
-          |
-          |
-          |Sending microservices to MessageProcessorSupervisorActorController:
-          |
-          |
-          |
-          |${microservices
-                   .flatMap {
-                     _.actorTransactionControllers
-                   }
-                   .mkString("\n")}
-          |
-          |
-          |and as Map...
-          |
-          |${microservices.flatMap { _.actorTransactionControllers }.toMap.keys.mkString("\n")}
-          |
-          |
-          |
-          |""".stripMargin)
+
       val startStopKafka = new MessageProcessorSupervisorActorController(
         microservices.flatMap { _.actorTransactionControllers }.toMap
       ).route

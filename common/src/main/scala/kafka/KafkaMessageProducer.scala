@@ -16,7 +16,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 class KafkaMessageProducer()(
     implicit
-    system: ActorSystem, // TODO ADD CASE CLASS WITH EXECUTION CONTEXT OKOK
+    system: ActorSystem,
     producerSettings: ProducerSettings[String, String]
 ) extends MessageProducer {
 
@@ -26,7 +26,6 @@ class KafkaMessageProducer()(
 
   def produce(data: Seq[KafkaKeyValue], topic: String)(handler: Seq[KafkaKeyValue] => Unit): Future[Done] = {
 
-    // TODO REMOVE
     implicit val ec: ExecutionContextExecutor = system.getDispatcher
 
     val publication: Future[Done] = Source(data)

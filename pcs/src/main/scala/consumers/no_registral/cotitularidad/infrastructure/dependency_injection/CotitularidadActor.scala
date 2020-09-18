@@ -48,7 +48,7 @@ class CotitularidadActor(requirements: MonitoringAndMessageProducer)
       )
     case command: ObjetoSnapshotPersistedReaction
         if command.event.sujetoResponsable.isDefined
-        && command.event.sujetoResponsable.get == command.event.sujetoId =>
+        && command.event.sujetoResponsable.get == command.event.sujetoId => {
       val replyTo = sender()
 
       val event = CotitularidadAddedSujetoCotitular(
@@ -60,13 +60,8 @@ class CotitularidadActor(requirements: MonitoringAndMessageProducer)
         sujetoResponsable = command.event.sujetoResponsable
       )
 
-      println(s"CotitularidadAddedSujetoCotitular: ${CotitularidadAddedSujetoCotitular}")
-
       persist(event) { _ =>
         state += event
-
-        println(s"CotitularState: ${state}")
-
         if (sujetosNoResponsables.isEmpty) {
           replyTo ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
         } else {
@@ -80,13 +75,11 @@ class CotitularidadActor(requirements: MonitoringAndMessageProducer)
             }.toSeq,
             "ObjetoReceiveSnapshot"
           ) { keyValue =>
-            println(s"Cotitular: Published this ${keyValue} to ObjetoReceiveSnapshot")
-
             replyTo ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
           }
         }
       }
-
+    }
     case command: ObjetoSnapshotPersistedReaction if !state.sujetosCotitulares.contains(command.event.sujetoId) =>
       val replyTo = sender()
 

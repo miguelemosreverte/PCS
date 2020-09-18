@@ -32,11 +32,15 @@ class StartStopSingleton() extends Actor with ActorLogging {
       phonebook(topic) = actorRef
       log.info(s"StartStopSingleton added ${topic} to the list to be stopped/started")
 
-    case message @ StartByTopic(topic) =>
+    case message @ StartByTopic(topic) if phonebook.keys.toSet.contains(topic) =>
       phonebook(topic) ! message
 
-    case message @ StopByTopic(topic) =>
+    case message @ StartByTopic(topic) if !phonebook.keys.toSet.contains(topic) =>
+      log.error(s"You are trying to start a topic ($topic) who does not exist in the codebase")
+    case message @ StopByTopic(topic) if phonebook.keys.toSet.contains(topic) =>
       phonebook(topic) ! message
+    case message @ StopByTopic(topic) if !phonebook.keys.toSet.contains(topic) =>
+      log.error(s"You are trying to start a topic ($topic) who does not exist in the codebase")
 
     case Start() =>
       phonebook.values foreach { _ ! Start() }

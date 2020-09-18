@@ -23,13 +23,13 @@ class ActorTransactionController(
   def stopTransaction(): Unit = {
     currentTransaction = currentTransaction match {
       case Some(killswitch) =>
-        log.info(s"${actorTransaction.topic} transaction stopped.")
+        log.debug(s"${actorTransaction.topic} transaction stopped.")
         killswitch.shutdown()
-        log.info("Setting currentTransaction to None")
+        log.debug("Setting currentTransaction to None")
 
         None
       case None =>
-        log.info(s"${actorTransaction.topic} transaction was already stopped!")
+        log.debug(s"${actorTransaction.topic} transaction was already stopped!")
         None
     }
   }
@@ -37,7 +37,7 @@ class ActorTransactionController(
   def startTransaction(): Option[UniqueKillSwitch] = {
     def topic = actorTransaction.topic
     val transaction = actorTransaction.transaction _
-    log.info(s"Starting ${actorTransaction.topic} transaction")
+    log.debug(s"Starting ${actorTransaction.topic} transaction")
     val (killSwitch, done) = new KafkaTransactionalMessageProcessor(requirements)
       .run(topic, s"${topic}SINK", message => {
         transaction(message).map { output =>
@@ -47,12 +47,12 @@ class ActorTransactionController(
     done.onComplete { result =>
       // restart if the flag is set to true
       if (shouldBeRunning) {
-        log.info(s"Transaction finished with $result. Restarting it.")
+        log.debug(s"Transaction finished with $result. Restarting it.")
         stopTransaction()
         startTransaction()
       }
     }
-    log.info("Setting currentTransaction to Some(killswitch)")
+    log.debug("Setting currentTransaction to Some(killswitch)")
     currentTransaction = killSwitch
     killSwitch
   }

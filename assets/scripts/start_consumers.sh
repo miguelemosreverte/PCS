@@ -42,5 +42,4 @@ curl -X POST http://0.0.0.0:8081/kafka/start/ObjetoSnapshotPersisted
 
 curl -X POST http://0.0.0.0:8081/kafka/start/ObjetoReceiveSnapshot
 
-# TODO REVISAR EXENCIONES
 curl -X POST http://0.0.0.0:8081/kafka/start/DGR-COP-EXENCIONES

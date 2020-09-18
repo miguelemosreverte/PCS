@@ -40,48 +40,46 @@ class MessageProcessorSupervisorActor(
 
     case StartByTopic(topic) =>
       if (killSwitches.contains(topic)) {
-        log.info(s"Already started!")
+        log.debug(s"Already started!")
       } else {
         streams(topic).startTransaction() foreach { killSwitch =>
           killSwitches(topic) = killSwitch
         }
-        log.info(s"Starting all kafka consumers on node")
+        log.debug(s"Starting all kafka consumers on node")
       }
 
     case StopByTopic(topic) =>
       if (!killSwitches.contains(topic)) {
-        log.info(s"There are no kafka consumers to stop on node")
+        log.debug(s"There are no kafka consumers to stop on node")
       } else {
-        log.info(s"Stopping all kafka consumers on node ")
+        log.debug(s"Stopping all kafka consumers on node ")
         killSwitches(topic).shutdown
         killSwitches.remove(topic)
       }
 
     case Start() =>
-      if (killSwitches.nonEmpty) {
-        log.info(s"""
-        This API is for global initialization of all streams.
-        Some streams are already up and running. 
-        If you want to start all of them,
-        hit the /kafka/stop API first, 
-        and then hit this API again.
-        """)
+      val inKillSwitches = (topic: String) => killSwitches.keys.toSet.contains(topic)
+      val alreadyStarted = (topic: String) => inKillSwitches(topic)
+
+      if (streams.keys.forall(alreadyStarted)) {
+        log.debug(s"All kafka consumers were already started")
+
       } else {
         killSwitches = mutable.Map(streams.flatMap {
-          case (topic, stream) =>
+          case (topic, stream) if !alreadyStarted(topic) =>
             val killswitch = stream.startTransaction()
             killswitch.map(
               (topic, _)
             )
         }.toSeq: _*)
-        log.info(s"Starting all kafka consumers on node")
+        log.debug(s"Starting all kafka consumers on node")
       }
 
     case Stop() =>
       if (killSwitches.isEmpty) {
-        log.info(s"There are no kafka consumers to stop on node")
+        log.debug(s"There are no kafka consumers to stop on node")
       } else {
-        log.info(s"Stopping all kafka consumers on node ")
+        log.debug(s"Stopping all kafka consumers on node ")
         killSwitches.values foreach (_.shutdown)
         killSwitches = killSwitches.empty
       }

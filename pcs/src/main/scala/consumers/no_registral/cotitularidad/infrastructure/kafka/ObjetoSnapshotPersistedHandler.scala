@@ -24,10 +24,8 @@ case class ObjetoSnapshotPersistedHandler(actorRef: ActorRef, monitoring: Monito
 
   def topic = "ObjetoSnapshotPersisted"
 
-  def processInput(input: String): Either[Throwable, ObjetoSnapshotPersisted] = {
-    println("COTITULAR RECEIVED ObjetoSnapshotPersisted")
+  def processInput(input: String): Either[Throwable, ObjetoSnapshotPersisted] =
     maybeDecode[ObjetoSnapshotPersisted](input)
-  }
 
   def processMessage(evt: ObjetoSnapshotPersisted): Future[Response.SuccessProcessing] = {
     actorRef.ask[Response.SuccessProcessing](

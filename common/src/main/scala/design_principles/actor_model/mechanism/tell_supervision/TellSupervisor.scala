@@ -23,15 +23,13 @@ class TellSupervisor(actorRef: ActorRef) extends Actor {
       }
     case command: Command =>
       commands.get(command.aggregateRoot) match {
-        case None =>
-          commands(command.aggregateRoot) = mutable.Map.empty
+        case None => commands(command.aggregateRoot) = mutable.Map.empty
         case Some(_) =>
       }
       commands(command.aggregateRoot)(command.deliveryId) = command
       actorRef ! command
       sender() ! SuccessProcessing(command.aggregateRoot, command.deliveryId)
   }
-
   class Resend extends Runnable {
     override def run(): Unit =
       commands.foreach {

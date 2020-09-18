@@ -17,7 +17,6 @@ class ObjetoSnapshotPersistedHandler(
 
   override def processInput(input: String): Either[Throwable, ObjetoSnapshotPersisted] = {
     import consumers.no_registral.objeto.infrastructure.json._
-    print("RECEIVED OBJETO SNAPSHOT AT READSIDE")
     serialization
       .maybeDecode[ObjetoSnapshotPersisted](input)
   }

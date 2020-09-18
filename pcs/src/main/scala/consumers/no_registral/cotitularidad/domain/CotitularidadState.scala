@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 import ddd.AbstractState
 
 case class CotitularidadState(
-    sujetoResponsable: String = "",
+    sujetoResponsable: Option[String] = None,
     sujetosCotitulares: Set[String] = Set.empty,
     lastDeliveryIdByEvents: Map[String, BigInt] = Map.empty,
     fechaUltMod: LocalDateTime = LocalDateTime.now
@@ -14,7 +14,10 @@ case class CotitularidadState(
     event match {
       case evt: CotitularidadEvents.CotitularidadAddedSujetoCotitular =>
         copy(
-          sujetoResponsable = if (evt.isResponsable.getOrElse(false)) evt.sujetoId else sujetoResponsable,
+          sujetoResponsable = evt.sujetoResponsable match {
+            case Some(s) => Some(s)
+            case None => this.sujetoResponsable
+          },
           sujetosCotitulares = sujetosCotitulares + evt.sujetoId,
           lastDeliveryIdByEvents = lastDeliveryIdByEvents + ((evt.getClass.getSimpleName, evt.deliveryId)),
           fechaUltMod = LocalDateTime.now

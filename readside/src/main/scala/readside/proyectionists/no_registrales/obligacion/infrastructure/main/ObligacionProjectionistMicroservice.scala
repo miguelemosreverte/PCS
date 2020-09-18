@@ -1,23 +1,28 @@
 package readside.proyectionists.no_registrales.obligacion.infrastructure.main
 
+import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import design_principles.microservice.cassandra_projectionist_microservice.{CassandraProjectionistMicroservice, CassandraProjectionistMicroserviceRequirements}
-import readside.proyectionists.no_registrales.obligacion.ObligacionProjectionHandler
-
-object ObligacionProjectionistMicroservice extends CassandraProjectionistMicroservice {
-  override def route(context: CassandraProjectionistMicroserviceRequirements): Route = {
-    val monitoring = context.monitoring
-
-    import akka.actor.typed.scaladsl.adapter._
-    val system = context.ctx.toTyped
-    val projectionist = ObligacionProjectionHandler(monitoring, system)
-    projectionist.run()
-    projectionist.route
-  }
+import api.actor_transaction.ActorTransaction
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
+}
+import readside.proyectionists.no_registrales.obligacion.{
+  ObligacionAddedExencionHandler,
+  ObligacionPersistedSnapshotHandler
 }
 
-/*
-application
-  - handler -- seria como el controller HTTP (estamos haciendo todo en el controller )
-dominio
-  - persistentSnapshot*/
+class ObligacionProjectionistMicroservice(
+    implicit m: KafkaConsumerMicroserviceRequirements
+) extends KafkaConsumerMicroservice {
+
+  override def actorTransactions: Set[ActorTransaction[_]] =
+    Set(
+      new ObligacionAddedExencionHandler,
+      new ObligacionPersistedSnapshotHandler
+    )
+
+  override def route: Route =
+    actorTransactions.map(_.route) reduce (_ ~ _)
+
+}

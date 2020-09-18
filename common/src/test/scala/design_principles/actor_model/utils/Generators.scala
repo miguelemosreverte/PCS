@@ -2,6 +2,7 @@ package design_principles.actor_model.utils
 
 import akka.actor.ActorSystem
 import com.typesafe.config.{Config, ConfigFactory}
+import config.StaticConfig
 import serialization.EventSerializer
 
 object Generators {
@@ -20,13 +21,12 @@ object Generators {
 
       akka.cluster.seed-nodes = ["akka://$actorSystemName@0.0.0.0:$port"]
       akka.remote.artery.canonical.port = $port
+
       """)
     lazy val config: Config = Seq(
-      ConfigFactory parseString EventSerializer.eventAdapterConf,
-      ConfigFactory parseString EventSerializer.serializationConf,
-      customConf,
-      extraConfig, // maybe move up in position to override customConf
-      ConfigFactory.load()
+      extraConfig, // Level 0 - Max priority
+      customConf, // Level 1 - will replace values set in StaticConfig
+      StaticConfig.config // Level 2 - this is the base config. Ready for overrides.
     ).reduce(_ withFallback _)
 
     ActorSystem(actorSystemName, config)

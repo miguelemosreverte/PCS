@@ -2,6 +2,7 @@ package consumers.no_registral.objeto.infrastructure.dependency_injection
 
 import akka.ActorRefMap
 import akka.actor.{ActorRef, Props}
+import akka.entity.ShardedEntity.MonitoringAndMessageProducer
 import com.typesafe.config.Config
 import consumers.no_registral.objeto.application.cqrs.commands._
 import consumers.no_registral.objeto.application.cqrs.queries.{GetStateExencionHandler, GetStateObjetoHandler}
@@ -15,13 +16,16 @@ import consumers.no_registral.obligacion.application.entities.{ObligacionCommand
 import consumers.no_registral.obligacion.infrastructure.dependency_injection.ObligacionActor
 import consumers.no_registral.sujeto.application.entity.SujetoCommands
 import cqrs.base_actor.untyped.PersistentBaseActor
+import kafka.KafkaMessageProducer.KafkaKeyValue
+import kafka.MessageProducer
 import monitoring.Monitoring
 
-class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Props] = None, config: Config)
-    extends PersistentBaseActor[ObjetoEvents, ObjetoState](monitoring, config) {
+class ObjetoActor(requirements: MonitoringAndMessageProducer, obligacionActorPropsOption: Option[Props] = None)
+    extends PersistentBaseActor[ObjetoEvents, ObjetoState](requirements.monitoring) {
   import ObjetoActor._
 
   var state = ObjetoState()
+  implicit val messageProducer: MessageProducer = requirements.messageProducer
 
   override def setupHandlers(): Unit = {
     commandBus.subscribe[ObjetoCommands.ObjetoSnapshot](new ObjetoSnapshotHandler(this).handle)
@@ -44,7 +48,7 @@ class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Pro
   val obligaciones: ObjetoActorRefMap = {
     val obligacionActorProps = obligacionActorPropsOption match {
       case Some(props) => props
-      case None => ObligacionActor.props(monitoring, config)
+      case None => ObligacionActor.props(requirements)
     }
     new ObjetoActorRefMap(
       {
@@ -103,13 +107,7 @@ class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Pro
       }
   }
 
-  def shouldInformCotitulares(consolidatedState: ObjetoState): Boolean =
-    consolidatedState.isResponsable && consolidatedState.sujetos.size > 1
-
-  def persistSnapshotForAllCotitulares(event: ObjetoEvents, consolidatedState: ObjetoState)(handler: () => Unit): Unit =
-    persistEvent(event, ObjetoTags.ReadsideAndCotitulares)(handler)
-  def persistSnapshotForSelf(event: ObjetoEvents, consolidatedState: ObjetoState)(handler: () => Unit): Unit =
-    persistEvent(event, ObjetoTags.ObjetoReadside)(handler)
+  import consumers.no_registral.objeto.infrastructure.json._
 
   def persistSnapshot(evt: ObjetoEvents, consolidatedState: ObjetoState)(handler: () => Unit): Unit = {
     val snapshot =
@@ -121,16 +119,32 @@ class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Pro
         consolidatedState.saldo,
         consolidatedState.sujetos,
         consolidatedState.tags,
-        consolidatedState.sujetoResponsable.getOrElse(evt.sujetoId),
+        consolidatedState.sujetoResponsable,
         consolidatedState.porcentajeResponsabilidad,
         consolidatedState.registro,
         consolidatedState.obligacionesSaldo
       )
 
-    if (this.shouldInformCotitulares(consolidatedState)) {
-      persistSnapshotForAllCotitulares(snapshot, consolidatedState)(handler)
-    } else {
-      persistSnapshotForSelf(snapshot, consolidatedState)(handler)
+    import consumers.no_registral.cotitularidad.infrastructure.json._
+
+    requirements.messageProducer.produce(
+      data = Seq(
+        KafkaKeyValue(
+          snapshot.aggregateRoot,
+          serialization.encode(snapshot)
+        )
+      ),
+      "ObjetoSnapshotPersisted"
+    ) { _ =>
+      requirements.messageProducer.produce(
+        data = Seq(
+          KafkaKeyValue(
+            snapshot.aggregateRoot,
+            serialization.encode(snapshot)
+          )
+        ),
+        "ObjetoSnapshotPersistedReadside"
+      )(_ => handler())
     }
 
   }
@@ -172,13 +186,8 @@ class ObjetoActor(monitoring: Monitoring, obligacionActorPropsOption: Option[Pro
 }
 
 object ObjetoActor {
-  def props(monitoring: Monitoring, config: Config): Props = Props(new ObjetoActor(monitoring, None, config))
-
-  object ObjetoTags {
-    val ObjetoReadside: Set[String] = Set("Objeto")
-    val CotitularesReadside: Set[String] = Set("ObjetoNovedadCotitularidad")
-    val ReadsideAndCotitulares: Set[String] = Set("Objeto", "ObjetoNovedadCotitularidad")
-  }
+  def props(requirements: MonitoringAndMessageProducer): Props =
+    Props(new ObjetoActor(requirements, None))
 
   type ObligacionAgregateRoot = (String, String, String, String)
   class ObjetoActorRefMap(newActor: ObligacionAgregateRoot => ActorRef)

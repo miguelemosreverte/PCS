@@ -32,7 +32,7 @@ case class ObjetoTributarioTransaction(actorRef: ActorRef, monitoring: Monitorin
   def processInput(input: String): Either[Throwable, ObjetosTri] =
     maybeDecode[ObjetosTri](input)
 
-  def processCommand(registro: ObjetosTri): Future[Response.SuccessProcessing] = {
+  def processMessage(registro: ObjetosTri): Future[Response.SuccessProcessing] = {
     implicit val a: Reads[Seq[ObjetosTri]] = Reads.seq(ObjetosTriF.reads)
     implicit val b: Reads[Seq[ObjetosTriOtrosAtributos]] = Reads.seq(ObjetosTriOtrosAtributosF.reads)
 

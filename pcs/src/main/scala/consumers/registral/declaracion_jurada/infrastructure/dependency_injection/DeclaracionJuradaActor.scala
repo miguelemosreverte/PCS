@@ -11,18 +11,18 @@ import consumers.registral.declaracion_jurada.domain.DeclaracionJuradaEvents.Dec
 import consumers.registral.declaracion_jurada.domain.events.DeclaracionJuradaUpdatedFromDtoHandler
 import consumers.registral.declaracion_jurada.domain.{DeclaracionJuradaEvents, DeclaracionJuradaState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
+import kafka.MessageProducer
 
-case class DeclaracionJuradaActor(state: DeclaracionJuradaState = DeclaracionJuradaState(), config: Config)(
-    implicit system: ActorSystem[Nothing]
+case class DeclaracionJuradaActor(state: DeclaracionJuradaState = DeclaracionJuradaState())(
+    implicit
+
+    messageProducer: MessageProducer,
+    system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       DeclaracionJuradaMessage,
       DeclaracionJuradaEvents,
       DeclaracionJuradaState
-    ](state, config) {
-
-  override def tags(event: DeclaracionJuradaEvents): Set[String] = event match {
-    case _: DeclaracionJuradaUpdatedFromDto => Set("DeclaracionJurada")
-  }
+    ](state) {
 
   commandBus.subscribe[DeclaracionJuradaUpdateFromDto](new DeclaracionJuradaUpdateFromDtoHandler().handle)
   queryBus.subscribe[GetStateDeclaracionJurada](new GetStateDeclaracionJuradaHandler().handle)

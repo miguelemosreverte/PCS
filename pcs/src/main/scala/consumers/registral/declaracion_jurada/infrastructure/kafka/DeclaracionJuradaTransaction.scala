@@ -1,6 +1,7 @@
 package consumers.registral.declaracion_jurada.infrastructure.kafka
 
 import akka.Done
+import akka.actor.ActorRef
 import akka.actor.typed.ActorSystem
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
@@ -18,7 +19,7 @@ import serialization.{decodeF, maybeDecode}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-case class DeclaracionJuradaTransaction(actor: DeclaracionJuradaActor, monitoring: Monitoring)(
+case class DeclaracionJuradaTransaction(actor: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[DeclaracionJurada](monitoring) {
@@ -30,7 +31,7 @@ case class DeclaracionJuradaTransaction(actor: DeclaracionJuradaActor, monitorin
   def processInput(input: String): Either[Throwable, DeclaracionJurada] =
     maybeDecode[DeclaracionJurada](input)
 
-  override def processCommand(registro: DeclaracionJurada): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: DeclaracionJurada): Future[Response.SuccessProcessing] = {
     val command = DeclaracionJuradaCommands.DeclaracionJuradaUpdateFromDto(
       sujetoId = registro.BDJ_SUJ_IDENTIFICADOR,
       objetoId = registro.BDJ_SOJ_IDENTIFICADOR,

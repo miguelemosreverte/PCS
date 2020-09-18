@@ -11,19 +11,17 @@ import consumers.registral.tramite.domain.TramiteEvents.TramiteUpdatedFromDto
 import consumers.registral.tramite.domain.events.TramiteUpdatedFromDtoHandler
 import consumers.registral.tramite.domain.{TramiteEvents, TramiteState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
+import kafka.MessageProducer
 
-case class TramiteActor(state: TramiteState = TramiteState(), config: Config)(
-    implicit system: ActorSystem[Nothing]
+case class TramiteActor(state: TramiteState = TramiteState())(
+    implicit
+    messageProducer: MessageProducer,
+    system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       TramiteMessage,
       TramiteEvents,
       TramiteState
-    ](state, config) {
-
-  override def tags(event: TramiteEvents): Set[String] = event match {
-    case _: TramiteUpdatedFromDto => Set("Tramite")
-  }
-
+    ](state) {
   commandBus.subscribe[TramiteUpdateFromDto](new TramiteUpdateFromDtoHandler().handle)
   queryBus.subscribe[GetStateTramite](new GetStateTramiteHandler().handle)
   eventBus.subscribe[TramiteUpdatedFromDto](new TramiteUpdatedFromDtoHandler().handle)

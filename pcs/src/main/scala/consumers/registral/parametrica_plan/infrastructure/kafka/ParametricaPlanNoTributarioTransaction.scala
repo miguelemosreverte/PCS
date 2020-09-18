@@ -1,6 +1,7 @@
 package consumers.registral.parametrica_plan.infrastructure.kafka
 
 import akka.Done
+import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import com.typesafe.config.Config
@@ -17,7 +18,7 @@ import serialization.{decodeF, maybeDecode}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-case class ParametricaPlanNoTributarioTransaction(actor: ParametricaPlanActor, monitoring: Monitoring)(
+case class ParametricaPlanNoTributarioTransaction(actor: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[ParametricaPlanAnt](monitoring) {
@@ -29,7 +30,7 @@ case class ParametricaPlanNoTributarioTransaction(actor: ParametricaPlanActor, m
   def processInput(input: String): Either[Throwable, ParametricaPlanAnt] =
     maybeDecode[ParametricaPlanAnt](input)
 
-  override def processCommand(registro: ParametricaPlanAnt): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: ParametricaPlanAnt): Future[Response.SuccessProcessing] = {
     val command = ParametricaPlanCommands.ParametricaPlanUpdateFromDto(
       parametricaPlanId = registro.BPP_FPM_ID,
       deliveryId = BigInt(registro.EV_ID),

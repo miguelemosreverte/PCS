@@ -1,6 +1,7 @@
 package consumers.registral.parametrica_recargo.infrastructure.kafka
 
 import akka.Done
+import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import com.typesafe.config.Config
@@ -22,7 +23,7 @@ import serialization.{decodeF, maybeDecode}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-case class ParametricaRecargoTributarioTransaction(actor: ParametricaRecargoActor, monitoring: Monitoring)(
+case class ParametricaRecargoTributarioTransaction(actor: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[ParametricaRecargoTri](monitoring) {
@@ -34,7 +35,7 @@ case class ParametricaRecargoTributarioTransaction(actor: ParametricaRecargoActo
   def processInput(input: String): Either[Throwable, ParametricaRecargoTri] =
     maybeDecode[ParametricaRecargoTri](input)
 
-  override def processCommand(registro: ParametricaRecargoTri): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: ParametricaRecargoTri): Future[Response.SuccessProcessing] = {
     val command = ParametricaRecargoCommands.ParametricaRecargoUpdateFromDto(
       parametricaRecargoId = registro.BPR_INDICE,
       deliveryId = BigInt(registro.EV_ID),

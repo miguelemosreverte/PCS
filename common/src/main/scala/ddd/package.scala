@@ -1,5 +1,6 @@
-import scala.concurrent.{ExecutionContext, Future}
+import akka.Done
 
+import scala.concurrent.{ExecutionContext, Future}
 import akka.stream.alpakka.cassandra.scaladsl.CassandraSession
 import com.datastax.oss.driver.api.core.cql.BoundStatement
 import design_principles.actor_model.Event
@@ -24,6 +25,7 @@ package object ddd {
 
   trait ReadSideProjection[E <: Event] {
     def event: E
-    def prepareStatement(session: CassandraSession)(implicit ec: ExecutionContext): Future[BoundStatement]
+    def updateReadside()(implicit ec: ExecutionContext): Future[Done]
+    //def prepareStatement(session: CassandraSession)(implicit ec: ExecutionContext): Future[BoundStatement]
   }
 }

@@ -1,6 +1,7 @@
 package consumers.registral.plan_pago.infrastructure.kafka
 
 import akka.Done
+import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import com.typesafe.config.Config
@@ -16,7 +17,7 @@ import serialization.{decodeF, maybeDecode}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-case class PlanPagoTributarioTransaction(actor: PlanPagoActor, monitoring: Monitoring)(
+case class PlanPagoTributarioTransaction(actor: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[PlanPagoTri](monitoring) {
@@ -28,7 +29,7 @@ case class PlanPagoTributarioTransaction(actor: PlanPagoActor, monitoring: Monit
   def processInput(input: String): Either[Throwable, PlanPagoTri] =
     maybeDecode[PlanPagoTri](input)
 
-  override def processCommand(registro: PlanPagoTri): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: PlanPagoTri): Future[Response.SuccessProcessing] = {
     val command = PlanPagoCommands.PlanPagoUpdateFromDto(
       sujetoId = registro.BPL_SUJ_IDENTIFICADOR,
       objetoId = registro.BPL_SOJ_IDENTIFICADOR,

@@ -16,9 +16,9 @@ abstract class Controller(monitoring: Monitoring) extends PlayJsonSupport {
 
   def route: Route
   val exceptionHandler: ExceptionHandler = ExceptionHandler {
-    case _ =>
+    case e =>
       criticals.increment()
-      complete(StatusCodes.InternalServerError)
+      complete((StatusCodes.InternalServerError, e.getMessage))
   }
 
   private val metricPrefix = "controller"

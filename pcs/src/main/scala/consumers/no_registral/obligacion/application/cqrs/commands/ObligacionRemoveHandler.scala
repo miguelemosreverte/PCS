@@ -4,7 +4,6 @@ import akka.Done
 import consumers.no_registral.obligacion.application.entities.ObligacionCommands.ObligacionRemove
 import consumers.no_registral.obligacion.domain.ObligacionEvents
 import consumers.no_registral.obligacion.infrastructure.dependency_injection.ObligacionActor
-import consumers.no_registral.obligacion.infrastructure.dependency_injection.ObligacionActor.ObligacionTags
 import cqrs.untyped.command.CommandHandler.SyncCommandHandler
 import design_principles.actor_model.Response
 
@@ -12,6 +11,7 @@ import scala.util.{Success, Try}
 
 class ObligacionRemoveHandler(actor: ObligacionActor) extends SyncCommandHandler[ObligacionRemove] {
   override def handle(command: ObligacionRemove): Try[Response.SuccessProcessing] = {
+    val sender = actor.context.sender()
 
     val event =
       ObligacionEvents.ObligacionRemoved(
@@ -21,10 +21,10 @@ class ObligacionRemoveHandler(actor: ObligacionActor) extends SyncCommandHandler
         command.tipoObjeto,
         command.obligacionId
       )
-    actor.persistEvent(event, ObligacionTags.ObligacionReadside) { () =>
+    actor.persistEvent(event) { () =>
       actor.state += event
-      actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
+      sender ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
     }
-    Success(Response.SuccessProcessing(command.deliveryId))
+    Success(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
   }
 }

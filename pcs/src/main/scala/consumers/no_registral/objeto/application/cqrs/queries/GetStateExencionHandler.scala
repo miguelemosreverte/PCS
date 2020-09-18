@@ -9,13 +9,14 @@ import scala.util.{Success, Try}
 
 class GetStateExencionHandler(actor: ObjetoActor) extends SyncQueryHandler[GetStateExencion] {
   override def handle(query: GetStateExencion): Try[GetStateExencion#ReturnType] = {
+    val sender = actor.context.sender()
 
     val response =
       GetExencionResponse(
         actor.state.exenciones.find(_.BEX_EXE_ID == query.exencion)
       )
     log.info(s"[${actor.persistenceId}] GetState | $response")
-    actor.context.sender() ! response
+    sender ! response
     Success(response)
   }
 }

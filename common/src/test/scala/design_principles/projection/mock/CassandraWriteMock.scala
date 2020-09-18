@@ -13,13 +13,13 @@ class CassandraWriteMock(rowsAsMap: mutable.Map[String, Map[String, String]],
 
   override def writeState[E <: Event](
       state: ddd.ReadSideProjection[E]
-  )(implicit system: actor.ActorSystem, ec: ExecutionContext): Future[Done] = {
+  )(implicit ec: ExecutionContext): Future[Done] = {
     val (key, value) = proyectionistReaction(state.event)
     rowsAsMap.addOne((key, Map("event" -> value)))
     Future.successful(Done)
   }
 
-  override def cql(cql: String): Future[Done] = {
+  override def cql(cql: String)(implicit ec: ExecutionContext): Future[Done] = {
     cql match {
       case s"Delete this row: $key" =>
         rowsAsMap.remove(key)

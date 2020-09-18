@@ -14,6 +14,7 @@ class ObjetoUpdateFromAntHandler(actor: ObjetoActor) extends SyncCommandHandler[
   override def handle(
       command: ObjetoCommands.ObjetoUpdateFromAnt
   ): Try[Response.SuccessProcessing] = {
+    val sender = actor.context.sender()
 
     val event = ObjetoEvents.ObjetoUpdatedFromAnt(
       command.deliveryId,
@@ -24,16 +25,16 @@ class ObjetoUpdateFromAntHandler(actor: ObjetoActor) extends SyncCommandHandler[
     )
     if (validateCommand(event, command, actor.state.lastDeliveryIdByEvents)) {
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
-      actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
+      sender ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
     } else {
       actor.persistEvent(event) { () =>
         actor.state += event
         actor.informParent(command, actor.state)
         actor.persistSnapshot(event, actor.state) { () =>
-          actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
+          sender ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
         }
       }
     }
-    Success(Response.SuccessProcessing(command.deliveryId))
+    Success(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
   }
 }

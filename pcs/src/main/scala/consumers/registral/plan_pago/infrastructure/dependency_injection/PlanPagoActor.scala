@@ -11,19 +11,17 @@ import consumers.registral.plan_pago.domain.PlanPagoEvents.PlanPagoUpdatedFromDt
 import consumers.registral.plan_pago.domain.events.PlanPagoUpdatedFromDtoHandler
 import consumers.registral.plan_pago.domain.{PlanPagoEvents, PlanPagoState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
+import kafka.MessageProducer
 
-case class PlanPagoActor(state: PlanPagoState = PlanPagoState(), config: Config)(
-    implicit system: ActorSystem[Nothing]
+case class PlanPagoActor(state: PlanPagoState = PlanPagoState())(
+    implicit
+    messageProducer: MessageProducer,
+    system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       PlanPagoMessage,
       PlanPagoEvents,
       PlanPagoState
-    ](state, config) {
-
-  override def tags(event: PlanPagoEvents): Set[String] = event match {
-    case _: PlanPagoUpdatedFromDto => Set("PlanPago")
-  }
-
+    ](state) {
   commandBus.subscribe[PlanPagoUpdateFromDto](new PlanPagoUpdateFromDtoHandler().handle)
   queryBus.subscribe[GetStatePlanPago](new GetStatePlanPagoHandler().handle)
   eventBus.subscribe[PlanPagoUpdatedFromDto](new PlanPagoUpdatedFromDtoHandler().handle)

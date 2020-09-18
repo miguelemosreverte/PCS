@@ -5,7 +5,6 @@ import akka.Done
 import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
-import consumers.no_registral.cotitularidad.application.entities.CotitularidadCommands.CotitularidadAddSujetoCotitular
 import consumers.no_registral.objeto.application.entities.ObjetoCommands
 import consumers.no_registral.objeto.application.entities.ObjetoExternalDto.Exencion
 import consumers.no_registral.objeto.infrastructure.json._
@@ -28,7 +27,7 @@ case class ObjetoExencionTransaction(actorRef: ActorRef, monitoring: Monitoring)
   def processInput(input: String): Either[Throwable, Exencion] =
     maybeDecode[Exencion](input)
 
-  def processCommand(exencion: Exencion): Future[Response.SuccessProcessing] = {
+  def processMessage(exencion: Exencion): Future[Response.SuccessProcessing] = {
     val command = ObjetoCommands.ObjetoAddExencion(
       deliveryId = exencion.EV_ID,
       sujetoId = exencion.BEX_SUJ_IDENTIFICADOR,

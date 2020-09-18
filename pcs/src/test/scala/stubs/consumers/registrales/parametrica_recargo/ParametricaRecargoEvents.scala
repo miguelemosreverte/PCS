@@ -5,9 +5,11 @@ import stubs.consumers.registrales.parametrica_recargo.ParametricaRecargoExterna
   parametricaRecargoAntStub,
   parametricaRecargoTriStub
 }
+import stubs.consumers.registrales.plan_pago.PlanPagoExternalDto.planPagoTriStub
 
 object ParametricaRecargoEvents {
   def parametricaPlanUpdatedFromDtoAntStub = ParametricaRecargoUpdatedFromDto(
+    deliveryId = parametricaRecargoAntStub.EV_ID.toInt,
     bprIndice = parametricaRecargoAntStub.BPR_INDICE,
     bprTipoIndice = parametricaRecargoAntStub.BPR_TIPO_INDICE,
     bprFechaDesde = parametricaRecargoAntStub.BPR_FECHA_DESDE,
@@ -17,6 +19,7 @@ object ParametricaRecargoEvents {
     registro = parametricaRecargoAntStub
   )
   def parametricaPlanUpdatedFromDtoTriStub = ParametricaRecargoUpdatedFromDto(
+    deliveryId = parametricaRecargoTriStub.EV_ID.toInt,
     bprIndice = parametricaRecargoTriStub.BPR_INDICE,
     bprTipoIndice = parametricaRecargoTriStub.BPR_TIPO_INDICE,
     bprFechaDesde = parametricaRecargoTriStub.BPR_FECHA_DESDE,

@@ -28,7 +28,7 @@ case class SujetoNoTributarioTransaction(actorRef: ActorRef, monitoring: Monitor
   def processInput(input: String): Either[Throwable, SujetoAnt] =
     maybeDecode[SujetoAnt](input)
 
-  def processCommand(registro: SujetoAnt): Future[Response.SuccessProcessing] = {
+  def processMessage(registro: SujetoAnt): Future[Response.SuccessProcessing] = {
     val command = SujetoCommands.SujetoUpdateFromAnt(
       sujetoId = registro.SUJ_IDENTIFICADOR,
       deliveryId = registro.EV_ID,

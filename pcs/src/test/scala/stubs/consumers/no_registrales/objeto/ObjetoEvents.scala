@@ -41,9 +41,9 @@ object ObjetoEvents {
       saldo = 0,
       cotitulares = Set.empty,
       tags = Set.empty,
-      sujetoResponsable = objetoTriStub.SOJ_SUJ_IDENTIFICADOR,
+      sujetoResponsable = Some(objetoTriStub.SOJ_SUJ_IDENTIFICADOR),
       porcentajeResponsabilidad = 0,
-      obligacionesSaldo = Map.empty,
+      obligacionesSaldo = Map.empty
     )
 
   def objetoUpdatedFromDtoTriStub =

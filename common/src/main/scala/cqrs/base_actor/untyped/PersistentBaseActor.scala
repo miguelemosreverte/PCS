@@ -1,5 +1,7 @@
 package cqrs.base_actor.untyped
 
+import akka.actor.ActorLogging
+
 import scala.reflect.ClassTag
 import scala.util.Try
 import akka.persistence.journal.Tagged
@@ -13,10 +15,10 @@ import monitoring.{Counter, Monitoring}
 
 import scala.concurrent.ExecutionContext
 
-abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[E]: ClassTag](monitoring: Monitoring,
-                                                                                              config: Config)
+abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[E]: ClassTag](monitoring: Monitoring)
     extends BaseActor[E, State](monitoring)
-    with PersistentActor {
+    with PersistentActor
+    with ActorLogging {
 
   val persistedCounter: Counter = monitoring.counter(s"$name-persisted")
 
@@ -55,18 +57,7 @@ abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[
   implicit val ec: ExecutionContext = context.system.dispatcher
 
   def persistEvent(event: E, tags: Set[String] = Set.empty)(handler: () => Unit = () => ()): Unit = {
-    val tagsWithShardId = tags map { tag =>
-      val parallelism = Try {
-        config
-          .getString(
-            s"projectionist.$tag.paralellism"
-          )
-          .toInt
-      }.getOrElse(1)
-      val shardId = persistenceId.hashCode.abs % parallelism
-      s"$tag-$shardId"
-    }
-    persistAsync(if (tags.nonEmpty) Tagged(event, tagsWithShardId) else event) { _ =>
+    persistAsync(event) { _ =>
       logger.debug(s"[$persistenceId] Persist event | $event")
       persistedCounter.increment()
       monitoring.counter(s"$name-persisted-${utils.Inference.getSimpleName(event.getClass.getName)}").increment()

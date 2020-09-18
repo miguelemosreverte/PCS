@@ -12,6 +12,7 @@ class ObjetoTagRemoveHandler(actor: ObjetoActor) extends SyncCommandHandler[Obje
   override def handle(
       command: ObjetoCommands.ObjetoTagRemove
   ): Try[Response.SuccessProcessing] = {
+    val sender = actor.context.sender()
 
     val event = ObjetoEvents.ObjetoTagAdded(command.deliveryId,
                                             command.sujetoId,
@@ -21,10 +22,10 @@ class ObjetoTagRemoveHandler(actor: ObjetoActor) extends SyncCommandHandler[Obje
     actor.persistEvent(event) { () =>
       actor.state += event
       actor.persistSnapshot(event, actor.state) { () =>
-        actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
+        sender ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
       }
     }
-    Success(Response.SuccessProcessing(command.deliveryId))
+    Success(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
 
   }
 }

@@ -12,7 +12,7 @@ import design_principles.actor_model.{Response, TypedActorSpec}
 
 class DomicilioSujetoSpec extends TypedActorSpec {
 
-  val actor: DomicilioSujetoActor = DomicilioSujetoActor(DomicilioSujetoState(), MockConfig.config)
+  val actor: DomicilioSujetoActor = DomicilioSujetoActor(DomicilioSujetoState())
 
   "Typed cluster sharding with persistent actor" should
   "support ask with thenReply" in {

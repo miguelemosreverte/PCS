@@ -11,18 +11,18 @@ import consumers.registral.etapas_procesales.domain.EtapasProcesalesEvents.Etapa
 import consumers.registral.etapas_procesales.domain.events.EtapasProcesalesUpdatedFromDtoHandler
 import consumers.registral.etapas_procesales.domain.{EtapasProcesalesEvents, EtapasProcesalesState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
+import kafka.MessageProducer
 
-case class EtapasProcesalesActor(state: EtapasProcesalesState = EtapasProcesalesState(), config: Config)(
-    implicit system: ActorSystem[Nothing]
+case class EtapasProcesalesActor(state: EtapasProcesalesState = EtapasProcesalesState())(
+    implicit
+
+    messageProducer: MessageProducer,
+    system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       EtapasProcesalesMessage,
       EtapasProcesalesEvents,
       EtapasProcesalesState
-    ](state, config) {
-
-  override def tags(event: EtapasProcesalesEvents): Set[String] = event match {
-    case _: EtapasProcesalesUpdatedFromDto => Set("EtapasProcesales")
-  }
+    ](state) {
 
   commandBus.subscribe[EtapasProcesalesUpdateFromDto](new EtapasProcesalesUpdateFromDtoHandler().handle)
   queryBus.subscribe[GetStateEtapasProcesales](new GetStateEtapasProcesalesHandler().handle)

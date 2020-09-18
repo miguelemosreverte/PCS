@@ -1,27 +1,24 @@
 package readside.proyectionists.registrales.subasta.infrastructure.main
 
-import akka.cluster.sharding.typed.{ClusterShardingSettings, ShardedDaemonProcessSettings}
-import akka.cluster.sharding.typed.scaladsl.ShardedDaemonProcess
-import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import akka.projection.ProjectionBehavior
-import akka.projections.ProjectionSettings
-import akka.projections.cassandra.CassandraProjectionFactory
-import design_principles.microservice.cassandra_projectionist_microservice.{
-  CassandraProjectionistMicroservice,
-  CassandraProjectionistMicroserviceRequirements
+import api.actor_transaction.ActorTransaction
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
 }
-import readside.proyectionists.registrales.plan_pago.PlanPagoProjectionHandler
-import readside.proyectionists.registrales.subasta.SubastaProjectionHandler
+import readside.proyectionists.registrales.subasta.SubastaUpdatedFromDtoHandler
 
-object SubastaProjectionistMicroservice extends CassandraProjectionistMicroservice {
-  override def route(context: CassandraProjectionistMicroserviceRequirements): Route = {
-    val monitoring = context.monitoring
-    import akka.actor.typed.scaladsl.adapter._
-    val system = context.ctx.toTyped
+class SubastaProjectionistMicroservice(
+    implicit m: KafkaConsumerMicroserviceRequirements
+) extends KafkaConsumerMicroservice {
 
-    val projectionist = SubastaProjectionHandler(monitoring, system)
-    projectionist.run()
-    projectionist.route
-  }
+  override def actorTransactions: Set[ActorTransaction[_]] =
+    Set(
+      new SubastaUpdatedFromDtoHandler
+    )
+
+  override def route: Route =
+    actorTransactions.map(_.route) reduce (_ ~ _)
+
 }

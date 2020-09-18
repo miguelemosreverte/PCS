@@ -30,7 +30,3 @@ class ActorSystemParallelizerSpec
       .futureValue(timeout(2.minutes))
       .get
 }
-
-object ActorSystemParallelizerSpec {
-  lazy val config: Config = ConfigFactory.load()
-}

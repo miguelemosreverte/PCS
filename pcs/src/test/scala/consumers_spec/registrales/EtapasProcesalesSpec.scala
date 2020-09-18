@@ -12,7 +12,7 @@ import design_principles.actor_model.{Response, TypedActorSpec}
 
 class EtapasProcesalesSpec extends TypedActorSpec {
 
-  val actor: EtapasProcesalesActor = EtapasProcesalesActor(EtapasProcesalesState(), MockConfig.config)
+  val actor: EtapasProcesalesActor = EtapasProcesalesActor(EtapasProcesalesState())
 
   "Typed cluster sharding with persistent actor" should
   "support ask with thenReply" in {

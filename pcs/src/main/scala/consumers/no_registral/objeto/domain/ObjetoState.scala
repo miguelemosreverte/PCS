@@ -22,11 +22,12 @@ case class ObjetoState(
     isBaja: Boolean = false
 ) extends AbstractState[ObjetoEvents] {
 
-  override def +(event: ObjetoEvents): ObjetoState =
+  override def +(event: ObjetoEvents): ObjetoState = {
     changeState(event).copy(
       fechaUltMod = LocalDateTime.now,
       lastDeliveryIdByEvents = lastDeliveryIdByEvents + ((event.getClass.getSimpleName, event.deliveryId))
     )
+  }
 
   private def changeState(event: ObjetoEvents): ObjetoState =
     event match {
@@ -72,7 +73,7 @@ case class ObjetoState(
         copy(
           saldo = evt.saldo,
           sujetos = evt.cotitulares,
-          sujetoResponsable = Some(evt.sujetoResponsable),
+          sujetoResponsable = evt.sujetoResponsable,
           obligacionesSaldo = evt.obligacionesSaldo,
           tags = evt.tags
         )

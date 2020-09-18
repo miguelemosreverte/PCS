@@ -2,7 +2,6 @@ package consumers.no_registral.obligacion.infrastructure.main
 
 import scala.concurrent.ExecutionContext
 import akka.actor.{typed, ActorRef, ActorSystem}
-import akka.entity.ShardedEntity.{MonitoringAndConfig, ShardedEntityRequirements}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction
@@ -13,31 +12,30 @@ import consumers.no_registral.obligacion.infrastructure.consumer.{
 import consumers.no_registral.obligacion.infrastructure.http.ObligacionStateAPI
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor
 import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
+import design_principles.actor_model.mechanism.tell_supervision.TellSupervisor
 import design_principles.microservice.kafka_consumer_microservice.{
   KafkaConsumerMicroservice,
   KafkaConsumerMicroserviceRequirements
 }
 import kafka.KafkaMessageProcessorRequirements
 
-object ObligacionMicroservice extends KafkaConsumerMicroservice {
+class ObligacionMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
 
-  def route(m: KafkaConsumerMicroserviceRequirements): Route = {
-    val monitoring = m.monitoring
+  implicit val actor: ActorRef = SujetoActor.startWithRequirements(monitoringAndMessageProducer)
 
-    implicit val shardedEntityR: ShardedEntityRequirements = m.shardedEntityRequirements
-    implicit val queryStateApiR: QueryStateApiRequirements = m.queryStateApiRequirements
-    implicit val kafkaMessageProcessorR: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
-    implicit val actorTransactionR: ActorTransaction.ActorTransactionRequirements = m.actorTransactionRequirements
+  val tellSupervisor: ActorRef = TellSupervisor.start(actor)
 
-    val ctx = m.ctx
-    import akka.actor.typed.scaladsl.adapter._
-    implicit val system: ActorSystem = ctx
-    implicit val actor: ActorRef = SujetoActor.startWithRequirements(MonitoringAndConfig(monitoring, m.config))
+  override def actorTransactions: Set[ActorTransaction[_]] =
+    Set(
+      ObligacionTributariaTransaction(tellSupervisor, monitoring),
+      ObligacionNoTributariaTransaction(tellSupervisor, monitoring)
+    )
 
-    Seq(
-      ObligacionStateAPI(actor, monitoring).route,
-      ObligacionTributariaTransaction(actor, monitoring).route,
-      ObligacionNoTributariaTransaction(actor, monitoring).route
-    ) reduce (_ ~ _)
+  def route: Route = {
+    (Seq(
+      ObligacionStateAPI(actor, monitoring).route
+    ) ++
+    actorTransactions.map(_.route).toSeq) reduce (_ ~ _)
   }
+
 }

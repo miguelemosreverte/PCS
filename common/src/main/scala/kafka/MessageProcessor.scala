@@ -1,8 +1,8 @@
 package kafka
 
 import scala.concurrent.Future
-
 import akka.Done
+import akka.stream.KillSwitch
 
 /*
 This mechanism allows the user to process messages from the message bus
@@ -16,11 +16,11 @@ It returns a tuple which contains
  */
 trait MessageProcessor {
 
-  type KillSwitch
+  type MessageProcessorKillSwitch <: KillSwitch
   def run(
       SOURCE_TOPIC: String,
       SINK_TOPIC: String,
       algorithm: String => Future[Seq[String]]
-  ): (KillSwitch, Future[Done])
+  ): (Option[MessageProcessorKillSwitch], Future[Done])
 
 }

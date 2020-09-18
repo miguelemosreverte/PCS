@@ -1,9 +1,6 @@
 package consumers.no_registral.cotitularidad.infrastructure
 
-import consumers.no_registral.cotitularidad.application.entities.CotitularidadCommands.{
-  CotitularidadAddSujetoCotitular,
-  CotitularidadPublishSnapshot
-}
+import consumers.no_registral.cotitularidad.application.entities.CotitularidadCommands.{CotitularidadPublishSnapshot}
 import consumers.no_registral.cotitularidad.application.entities.CotitularidadQueries.GetCotitulares
 import consumers.no_registral.cotitularidad.application.entities.CotitularidadResponses.GetCotitularesResponse
 import consumers.no_registral.cotitularidad.domain.CotitularidadEvents.CotitularidadAddedSujetoCotitular
@@ -11,7 +8,6 @@ import play.api.libs.json.Json
 import serialization.EventSerializer
 
 package object json {
-  implicit val CotitularidadAddSujetoCotitularF = Json.format[CotitularidadAddSujetoCotitular]
   implicit val CotitularPublishSnapshotF = Json.format[CotitularidadPublishSnapshot]
 
   implicit val CotitularidadAddedSujetoCotitularF = Json.format[CotitularidadAddedSujetoCotitular]

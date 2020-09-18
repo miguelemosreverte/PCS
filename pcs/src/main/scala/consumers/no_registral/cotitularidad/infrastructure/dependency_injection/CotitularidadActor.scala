@@ -3,46 +3,38 @@ package consumers.no_registral.cotitularidad.infrastructure.dependency_injection
 import akka.actor.Props
 import akka.actor.Status.Success
 import akka.entity.ShardedEntity
+import akka.entity.ShardedEntity.MonitoringAndMessageProducer
 import akka.persistence.{PersistentActor, RecoveryCompleted, SnapshotOffer}
+import consumers.no_registral.cotitularidad.application.entities.CotitularidadCommands.ObjetoSnapshotPersistedReaction
 import consumers.no_registral.cotitularidad.application.entities.{
   CotitularidadCommands,
   CotitularidadQueries,
   CotitularidadResponses
 }
+import consumers.no_registral.cotitularidad.domain.CotitularidadEvents.CotitularidadAddedSujetoCotitular
 import consumers.no_registral.cotitularidad.domain.{CotitularidadEvents, CotitularidadState}
 import consumers.no_registral.objeto.application.entities.ObjetoCommands.{ObjetoSnapshot, ObjetoUpdateCotitulares}
+import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoSnapshotPersisted
+import consumers.no_registral.objeto.infrastructure.consumer.ObjetoUpdateCotitularesTransaction
 import consumers.no_registral.objeto.infrastructure.json._
 import design_principles.actor_model.Response
-import kafka.{KafkaMessageProcessorRequirements, KafkaMessageProducer}
-import utils.implicits.StringT._
+import kafka.KafkaMessageProducer.KafkaKeyValue
 
-class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequirements)
+class CotitularidadActor(requirements: MonitoringAndMessageProducer)
     extends PersistentActor
     with akka.actor.ActorLogging {
-  implicit val producerSettings = transactionRequirements.producer
 
+  val monitoring = requirements.monitoring
+  val messageProducer = requirements.messageProducer
   import context.system
 
   var state = CotitularidadState()
 
-  var snapshot: ObjetoSnapshot =
-    ObjetoSnapshot(
-      deliveryId = 0,
-      sujetoId = "",
-      objetoId = "",
-      tipoObjeto = "",
-      saldo = 0,
-      cotitulares = Set.empty,
-      tags = Set.empty,
-      sujetoResponsable = "",
-      obligacionesSaldo = Map.empty
-    )
-
-  def obligacionId = self.path.name
-
-  val kafka = new KafkaMessageProducer()
-  def publishToKafka(message: Seq[String], topic: String) =
-    kafka.produce(message, topic) _
+  def sujetosNoResponsables: Set[String] =
+    state.sujetoResponsable match {
+      case Some(s) => state.sujetosCotitulares.filter(_ != s)
+      case None => Set.empty
+    }
 
   override def receiveCommand: Receive = {
 
@@ -51,88 +43,64 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
         query.objetoId,
         query.tipoObjeto,
         state.sujetosCotitulares,
-        state.sujetoResponsable,
+        state.sujetoResponsable.getOrElse(""),
         state.fechaUltMod
       )
-    case command: CotitularidadCommands.CotitularidadAddSujetoCotitular =>
+    case command: ObjetoSnapshotPersistedReaction
+        if command.event.sujetoResponsable.isDefined
+        && command.event.sujetoResponsable.get == command.event.sujetoId => {
       val replyTo = sender()
-      val event = CotitularidadEvents.CotitularidadAddedSujetoCotitular(
+
+      val event = CotitularidadAddedSujetoCotitular(
         command.deliveryId,
-        command.sujetoId,
+        command.event.sujetoId,
         command.objetoId,
         command.tipoObjeto,
-        command.isResponsable,
-        command.sujetoResponsable
+        isResponsable = command.event.sujetoResponsable.map(_ == command.event.sujetoId),
+        sujetoResponsable = command.event.sujetoResponsable
+      )
+
+      persist(event) { _ =>
+        state += event
+        if (sujetosNoResponsables.isEmpty) {
+          replyTo ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
+        } else {
+          messageProducer.produce(
+            sujetosNoResponsables.map { sujetoNoResponsable =>
+              val event = command.event
+              val redirection = event.copy(
+                sujetoId = sujetoNoResponsable
+              )
+              KafkaKeyValue(redirection.aggregateRoot, serialization.encode(redirection))
+            }.toSeq,
+            "ObjetoReceiveSnapshot"
+          ) { keyValue =>
+            replyTo ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
+          }
+        }
+      }
+    }
+    case command: ObjetoSnapshotPersistedReaction if !state.sujetosCotitulares.contains(command.event.sujetoId) =>
+      val replyTo = sender()
+
+      val event = CotitularidadAddedSujetoCotitular(
+        command.deliveryId,
+        command.event.sujetoId,
+        command.objetoId,
+        command.tipoObjeto,
+        isResponsable = command.event.sujetoResponsable.map(_ == command.event.sujetoId),
+        sujetoResponsable = command.event.sujetoResponsable
       )
       persist(event) { _ =>
-        log.debug(s"[$persistenceId] Persist event | $event")
-
         state += event
-
-        log.debug(s"[$persistenceId] Cotitulares: | ${state}")
-
-        snapshot = snapshot.copy(
-          sujetoId = command.sujetoId,
-          objetoId = command.objetoId,
-          tipoObjeto = command.tipoObjeto,
-          sujetoResponsable = state.sujetoResponsable,
-          cotitulares = state.sujetosCotitulares
-        )
-
-        val informCotitularesOfAddedCotitular =
-          if (state.sujetosCotitulares.size == 1)
-            Seq.empty[ObjetoUpdateCotitulares]
-          else
-            state.sujetosCotitulares.map { cotitular =>
-              snapshot.copy(sujetoId = cotitular, cotitulares = state.sujetosCotitulares)
-              ObjetoUpdateCotitulares(
-                deliveryId = command.deliveryId,
-                sujetoId = cotitular,
-                objetoId = command.objetoId,
-                tipoObjeto = command.tipoObjeto,
-                cotitulares = state.sujetosCotitulares
-              )
-            }.toSeq
-
-        def topic = "ObjetoUpdateCotitularesTransaction"
-        val messages = informCotitularesOfAddedCotitular map serialization.encode[ObjetoUpdateCotitulares]
-        if (messages.nonEmpty)
-          publishToKafka(messages, topic) { _ =>
-            log.debug(
-              s"[$persistenceId] Published message | ObjetoSnapshot to Sujeto(${command.sujetoId})"
-            )
-            replyTo ! Response.SuccessProcessing(command.deliveryId)
-          }
-
-        replyTo ! Response.SuccessProcessing(command.deliveryId)
+        replyTo ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
       }
 
-    case command: CotitularidadCommands.CotitularidadPublishSnapshot =>
-      val replyTo = sender()
-      def topic = "ObjetoReceiveSnapshot"
-      val messages = state.sujetosCotitulares.filter(_ != state.sujetoResponsable).map { cotitular =>
-          snapshot = ObjetoSnapshot(
-            deliveryId = command.deliveryId,
-            sujetoId = cotitular,
-            objetoId = command.objetoId,
-            tipoObjeto = command.tipoObjeto,
-            saldo = command.saldo,
-            cotitulares = state.sujetosCotitulares,
-            tags = command.tags,
-            sujetoResponsable = state.sujetoResponsable,
-            obligacionesSaldo = command.obligacionesSaldo
-          )
+    case command: ObjetoSnapshotPersistedReaction if state.sujetosCotitulares.contains(command.event.sujetoId) =>
+      sender() ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
 
-          snapshot
-        } map serialization.encode[ObjetoSnapshot]
-
-      if (messages.nonEmpty)
-        publishToKafka(messages.toSeq, topic) { _ =>
-          log.debug(
-            s"[$persistenceId] Published message | ObjetoSnapshot to Sujeto(${state.sujetosCotitulares.mkString(",")})"
-          )
-          replyTo ! Response.SuccessProcessing(command.deliveryId)
-        }
+    case command: ObjetoSnapshotPersistedReaction if command.event.sujetoResponsable.isEmpty =>
+      sender() ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
 
     case other => log.error(s"[$persistenceId] Unexpected message |  ${other}")
 
@@ -151,6 +119,6 @@ class CotitularidadActor(transactionRequirements: KafkaMessageProcessorRequireme
 
 }
 
-object CotitularidadActor extends ShardedEntity[KafkaMessageProcessorRequirements] {
-  def props(requirements: KafkaMessageProcessorRequirements): Props = Props(new CotitularidadActor(requirements))
+object CotitularidadActor extends ShardedEntity[MonitoringAndMessageProducer] {
+  def props(requirements: MonitoringAndMessageProducer): Props = Props(new CotitularidadActor(requirements))
 }

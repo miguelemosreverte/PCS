@@ -1,6 +1,7 @@
 package consumers.registral.domicilio_objeto.infrastructure.kafka
 
 import akka.Done
+import akka.actor.ActorRef
 import akka.actor.typed.ActorSystem
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
@@ -18,7 +19,7 @@ import serialization.{decodeF, maybeDecode}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-case class DomicilioObjetoNoTributarioTransaction(actor: DomicilioObjetoActor, monitoring: Monitoring)(
+case class DomicilioObjetoNoTributarioTransaction(actor: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[DomicilioObjetoAnt](monitoring) {
@@ -30,7 +31,7 @@ case class DomicilioObjetoNoTributarioTransaction(actor: DomicilioObjetoActor, m
   def processInput(input: String): Either[Throwable, DomicilioObjetoAnt] =
     maybeDecode[DomicilioObjetoAnt](input)
 
-  override def processCommand(registro: DomicilioObjetoAnt): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: DomicilioObjetoAnt): Future[Response.SuccessProcessing] = {
     val command = DomicilioObjetoCommands.DomicilioObjetoUpdateFromDto(
       sujetoId = registro.BDO_SUJ_IDENTIFICADOR,
       objetoId = registro.BDO_SOJ_IDENTIFICADOR,

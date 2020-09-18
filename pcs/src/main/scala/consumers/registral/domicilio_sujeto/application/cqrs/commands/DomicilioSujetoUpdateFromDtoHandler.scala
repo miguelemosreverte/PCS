@@ -7,8 +7,11 @@ import consumers.registral.domicilio_sujeto.application.entities.DomicilioSujeto
 import consumers.registral.domicilio_sujeto.domain.DomicilioSujetoEvents.DomicilioSujetoUpdatedFromDto
 import consumers.registral.domicilio_sujeto.domain.DomicilioSujetoState
 import design_principles.actor_model.Response
+import kafka.KafkaMessageProducer.KafkaKeyValue
+import kafka.MessageProducer
+import consumers.registral.domicilio_sujeto.infrastructure.json.DomiciliSujetoUpdatedF
 
-class DomicilioSujetoUpdateFromDtoHandler() {
+class DomicilioSujetoUpdateFromDtoHandler(implicit messageProducer: MessageProducer) {
 
   def handle(command: DomicilioSujetoUpdateFromDto)(replyTo: ActorRef[Success]) =
     Effect
@@ -17,11 +20,28 @@ class DomicilioSujetoUpdateFromDtoHandler() {
         DomicilioSujetoState
       ](
         DomicilioSujetoUpdatedFromDto(
+          command.deliveryId,
           command.sujetoId,
           command.domicilioId,
           command.registro
         )
       )
-      .thenReply(replyTo)(state => Success(Response.SuccessProcessing(command.deliveryId)))
+      .thenReply(replyTo) { state =>
+        messageProducer.produce(
+          Seq(
+            KafkaKeyValue(command.aggregateRoot,
+                          serialization.encode(
+                            DomicilioSujetoUpdatedFromDto(
+                              command.deliveryId,
+                              command.sujetoId,
+                              command.domicilioId,
+                              command.registro
+                            )
+                          ))
+          ),
+          "DomicilioSujetoUpdatedFromDto"
+        )(_ => ())
+        Success(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
+      }
 
 }

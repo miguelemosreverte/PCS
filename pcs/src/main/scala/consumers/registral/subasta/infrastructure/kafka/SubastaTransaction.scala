@@ -1,6 +1,7 @@
 package consumers.registral.subasta.infrastructure.kafka
 
 import akka.Done
+import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import com.typesafe.config.Config
@@ -16,7 +17,7 @@ import serialization.{decodeF, maybeDecode}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-case class SubastaTransaction(actor: SubastaActor, monitoring: Monitoring)(
+case class SubastaTransaction(actor: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[SubastaExternalDto](monitoring) {
@@ -28,7 +29,7 @@ case class SubastaTransaction(actor: SubastaActor, monitoring: Monitoring)(
   def processInput(input: String): Either[Throwable, SubastaExternalDto] =
     maybeDecode[SubastaExternalDto](input)
 
-  override def processCommand(registro: SubastaExternalDto): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: SubastaExternalDto): Future[Response.SuccessProcessing] = {
     val command = SubastaCommands.SubastaUpdateFromDto(
       sujetoId = registro.BSB_SUJ_IDENTIFICADOR_ADQ,
       objetoId = registro.BSB_SOJ_IDENTIFICADOR,

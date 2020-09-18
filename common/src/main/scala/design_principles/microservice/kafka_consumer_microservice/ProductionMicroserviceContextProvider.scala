@@ -1,14 +1,14 @@
 package design_principles.microservice.kafka_consumer_microservice
 
-import akka.actor.ActorSystem
-import akka.actor.typed.ActorRef
+import akka.actor.{ActorSystem, Props}
+import akka.actor.ActorRef
 import akka.actor.typed.scaladsl.ActorContext
 import akka.actor.typed.scaladsl.adapter._
 import akka.cluster.ClusterEvent.MemberUp
-import akka.entity.ShardedEntity.ShardedEntityRequirements
 import akka.http.scaladsl.server.Route
 import akka.kafka.ConsumerRebalanceEvent
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import cassandra.write.CassandraWriteProduction
 import com.typesafe.config.Config
 import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
 import kafka.{KafkaMessageProcessorRequirements, TopicListener}
@@ -19,18 +19,19 @@ object ProductionMicroserviceContextProvider {
 
     implicit val monitoring: KamonMonitoring = new KamonMonitoring
 
-    val rebalancerListener: ActorRef[ConsumerRebalanceEvent] =
-      ctx.spawn(
-        TopicListener(
-          typeKeyName = "rebalancerListener",
-          monitoring
-        ),
-        name = "rebalancerListener"
+    val rebalancerListener: ActorRef =
+      ctx.actorOf(
+        Props(
+          new TopicListener(
+            typeKeyName = "rebalancerListener",
+            monitoring
+          )
+        )
       )
 
     val kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements =
       KafkaMessageProcessorRequirements.productionSettings(
-        rebalancerListener.toClassic,
+        rebalancerListener,
         monitoring,
         system = ctx,
         executionContext = ctx.dispatcher
@@ -39,23 +40,22 @@ object ProductionMicroserviceContextProvider {
       system = ctx,
       executionContext = ctx.dispatcher
     )
-    val shardedEntityRequirements = ShardedEntityRequirements(
-      system = ctx
-    )
     val actorTransactionRequirements = ActorTransactionRequirements(
       executionContext = ctx.dispatcher,
       config = config
     )
+
+    val cassandraWrite = new CassandraWriteProduction()
 
     visitor(
       KafkaConsumerMicroserviceRequirements(
         monitoring = monitoring,
         ctx = ctx,
         queryStateApiRequirements,
-        shardedEntityRequirements,
         actorTransactionRequirements,
         kafkaMessageProcessorRequirements,
-        config
+        config,
+        cassandraWrite
       )
     )
   }

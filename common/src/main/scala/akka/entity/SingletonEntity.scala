@@ -8,7 +8,6 @@ import akka.cluster.singleton.{
   ClusterSingletonProxy,
   ClusterSingletonProxySettings
 }
-import akka.entity.ShardedEntity.ShardedEntityRequirements
 import akka.util.Timeout
 
 trait SingletonEntity[Requirements] extends ClusterEntity[Requirements] {
@@ -17,12 +16,11 @@ trait SingletonEntity[Requirements] extends ClusterEntity[Requirements] {
 
   def startWithRequirements(requirements: Requirements)(
       implicit
-      shardedEntityRequirements: ShardedEntityRequirements
+      system: ActorSystem
   ): ActorRef = {
 
     import scala.concurrent.duration._
     implicit val timeout: Timeout = Timeout(10 seconds)
-    val system = shardedEntityRequirements.system
     val actorRef = system.actorSelection(s"/user/${typeName}Proxy").resolveOne()
 
     Await.result(

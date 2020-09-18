@@ -6,4 +6,6 @@ class DummyGauge(name: String) extends Gauge {
 
   override def add(num: Int): Unit = ()
   override def subtract(num: Int): Unit = ()
+
+  override def set(num: Int): Unit = ()
 }

@@ -11,19 +11,18 @@ import consumers.registral.calendario.domain.CalendarioEvents.CalendarioUpdatedF
 import consumers.registral.calendario.domain.events.CalendarioUpdatedFromDtoHandler
 import consumers.registral.calendario.domain.{CalendarioEvents, CalendarioState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
+import kafka.MessageProducer
 
-case class CalendarioActor(state: CalendarioState = CalendarioState(), config: Config)(
-    implicit system: ActorSystem[Nothing]
+case class CalendarioActor(state: CalendarioState = CalendarioState())(
+    implicit
+
+    messageProducer: MessageProducer,
+    system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       CalendarioMessage,
       CalendarioEvents,
       CalendarioState
-    ](state, config) {
-
-  override def tags(event: CalendarioEvents): Set[String] = event match {
-    case _: CalendarioUpdatedFromDto => Set("Calendario")
-  }
-
+    ](state) {
   commandBus.subscribe[CalendarioUpdateFromDto](new CalendarioUpdateFromDtoHandler().handle)
   queryBus.subscribe[GetStateCalendario](new GetStateCalendarioHandler().handle)
   eventBus.subscribe[CalendarioUpdatedFromDto](new CalendarioUpdatedFromDtoHandler().handle)

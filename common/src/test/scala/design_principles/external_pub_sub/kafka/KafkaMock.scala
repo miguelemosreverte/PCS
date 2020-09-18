@@ -3,25 +3,33 @@ package design_principles.external_pub_sub.kafka
 import scala.concurrent.{ExecutionContext, Future}
 import akka.Done
 import akka.actor.ActorSystem
-import akka.stream.OverflowStrategy
+import akka.stream.{OverflowStrategy, UniqueKillSwitch}
 import akka.stream.scaladsl.{Sink, Source, SourceQueue}
 import api.actor_transaction.ActorTransaction
-import kafka.{KafkaCommitableMessageProcessor, KafkaTransactionalMessageProcessor, MessageProcessor, MessageProducer}
+import kafka.KafkaMessageProducer.KafkaKeyValue
+import kafka.{KafkaTransactionalMessageProcessor, MessageProcessor, MessageProducer}
 
 import scala.collection.mutable
 
 class KafkaMock() extends MessageProducer with MessageProcessor with MessageProcessorLogging {
 
   object PubSub {
-    case class Message(topic: String, message: String)
+    case class Message(topic: String, message: KafkaKeyValue)
     case class SubscribeMe(topic: String, algorithm: String => Future[Seq[String]])
   }
   import PubSub._
   var subscriptors: Set[SubscribeMe] = Set.empty
 
   def receive(message: Any): Any = message match {
-    case m: Message =>
-      messageHistory = messageHistory :+ ((m.topic, m.message))
+    case m: Message if !(topics contains m.topic) =>
+      println(
+        s"""
+           |${Console.YELLOW} [MessageProducer] ${m.topic} ${Console.RESET}
+           |  Not sending message because the topic has not been created.
+           |""".stripMargin
+      )
+    case m: Message if topics contains m.topic =>
+      messageHistory = messageHistory :+ ((m.topic, m.message.json))
       println(
         s"""
            |${Console.YELLOW} [MessageProducer] ${Console.RESET}
@@ -34,13 +42,13 @@ class KafkaMock() extends MessageProducer with MessageProcessor with MessageProc
            |""".stripMargin
       )
       subscriptors.filter(_.topic == m.topic).foreach {
-        _.algorithm(m.message)
+        _.algorithm(m.message.json)
       }
     case s: SubscribeMe =>
       subscriptors = subscriptors + s
   }
 
-  override def produce(data: Seq[String], topic: String)(handler: Seq[String] => Unit) = {
+  override def produce(data: Seq[KafkaKeyValue], topic: String)(handler: Seq[KafkaKeyValue] => Unit) = {
     data map {
       PubSub.Message(topic, _)
     } foreach { receive }
@@ -48,14 +56,19 @@ class KafkaMock() extends MessageProducer with MessageProcessor with MessageProc
     Future.successful(Done)
   }
 
-  override type KillSwitch = Done
+  override type MessageProcessorKillSwitch = UniqueKillSwitch
 
   override def run(SOURCE_TOPIC: String, SINK_TOPIC: String, algorithm: String => Future[Seq[String]]) =
-    (Done, {
+    (None, {
       receive(PubSub.SubscribeMe(SOURCE_TOPIC, algorithm))
       Future.successful(Done)
     })
 
+  var topics: Set[String] = Set.empty
+  override def createTopic(topic: String): Future[Done] = {
+    topics = topics + topic
+    Future.successful(Done)
+  }
 }
 
 object KafkaMock {
@@ -65,10 +78,6 @@ object KafkaMock {
         implicit ec: ExecutionContext
     ): (_, Future[Done]) =
       messageConsumer match {
-        case processor: KafkaCommitableMessageProcessor =>
-          processor.run(SOURCE_TOPIC,
-                        SOURCE_TOPIC + "_done",
-                        message => actorTransaction.transaction(message).map(_ => Seq("Done")))
 
         case processor: KafkaTransactionalMessageProcessor =>
           processor.run(SOURCE_TOPIC,

@@ -11,7 +11,7 @@ import design_principles.actor_model.{Response, TypedActorSpec}
 
 class DeclaracionJuradaSpec extends TypedActorSpec {
 
-  val actor = DeclaracionJuradaActor(DeclaracionJuradaState(), MockConfig.config)
+  val actor = DeclaracionJuradaActor(DeclaracionJuradaState())
 
   "Typed cluster sharding with persistent actor" should
   "support ask with thenReply" in {

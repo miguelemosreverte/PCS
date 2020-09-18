@@ -13,6 +13,8 @@ class ObjetoUpdateFromObligacionHandler(actor: ObjetoActor)
   override def handle(
       command: ObjetoCommands.ObjetoUpdateFromObligacion
   ): Try[Response.SuccessProcessing] = {
+    val sender = actor.context.sender()
+
     val event = ObjetoUpdatedFromObligacion(
       command.deliveryId,
       command.sujetoId,
@@ -28,6 +30,6 @@ class ObjetoUpdateFromObligacionHandler(actor: ObjetoActor)
       actor.informParent(command, actor.state)
       actor.persistSnapshot(event, actor.state)(() => ())
     }
-    Success(Response.SuccessProcessing(command.deliveryId))
+    Success(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
   }
 }

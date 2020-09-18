@@ -3,8 +3,7 @@ package consumers.no_registral.sujeto.infrastructure.dependency_injection
 import akka.ActorRefMap
 import akka.actor.{ActorRef, Props}
 import akka.entity.ShardedEntity
-import akka.entity.ShardedEntity.MonitoringAndConfig
-import com.typesafe.config.Config
+import akka.entity.ShardedEntity.MonitoringAndMessageProducer
 import consumers.no_registral.objeto.application.entities.ObjetoMessage
 import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMessageRoots
 import consumers.no_registral.objeto.infrastructure.dependency_injection.ObjetoActor
@@ -20,19 +19,21 @@ import consumers.no_registral.sujeto.application.entity.SujetoMessage.SujetoMess
 import consumers.no_registral.sujeto.application.entity.{SujetoCommands, SujetoQueries}
 import consumers.no_registral.sujeto.domain.SujetoEvents.SujetoSnapshotPersisted
 import consumers.no_registral.sujeto.domain.{SujetoEvents, SujetoState}
-import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor.{SujetoActorRefMap, SujetoTags}
+import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor.SujetoActorRefMap
 import cqrs.base_actor.untyped.PersistentBaseActor
+import kafka.KafkaMessageProducer.KafkaKeyValue
+import kafka.MessageProducer
 import monitoring.Monitoring
 
-class SujetoActor(monitoring: Monitoring, objetoActorPropsOption: Option[Props] = None, config: Config)
-    extends PersistentBaseActor[SujetoEvents, SujetoState](monitoring, config) {
+class SujetoActor(requirements: MonitoringAndMessageProducer, objetoActorPropsOption: Option[Props] = None)
+    extends PersistentBaseActor[SujetoEvents, SujetoState](requirements.monitoring) {
 
   var state = SujetoState()
 
   val objetos: SujetoActorRefMap = {
     val objetoActorProps = objetoActorPropsOption match {
       case Some(props) => props
-      case None => ObjetoActor.props(monitoring, config)
+      case None => ObjetoActor.props(requirements)
     }
     new SujetoActorRefMap(
       {
@@ -68,21 +69,24 @@ class SujetoActor(monitoring: Monitoring, objetoActorPropsOption: Option[Props] 
       objetos((evt.sujetoId, evt.objetoId, evt.tipoObjeto))
   }
 
-  def persistSnapshot()(handler: () => Unit): Unit = {
+  import consumers.no_registral.sujeto.infrastructure.json._
+  def persistSnapshot()(handler: Seq[KafkaKeyValue] => Unit): Unit = {
     val sujetoId = SujetoMessageRoots.extractor(persistenceId).sujetoId
     val event = SujetoSnapshotPersisted(state.registro.map(_.EV_ID).getOrElse(0), sujetoId, state.registro, state.saldo)
-    persistEvent(event, SujetoTags.SujetoReadside)(handler)
+
+    requirements.messageProducer.produce(
+      data = Seq(KafkaKeyValue(persistenceId, serialization.encode(event))),
+      topic = "SujetoSnapshotPersisted"
+    )(handler)
   }
 
 }
 
-object SujetoActor extends ShardedEntity[MonitoringAndConfig] {
-  def props(sujetoActorRequirements: MonitoringAndConfig): Props =
-    Props(new SujetoActor(sujetoActorRequirements.monitoring, None, sujetoActorRequirements.config))
-
-  object SujetoTags {
-    val SujetoReadside: Set[String] = Set("Sujeto")
-  }
+object SujetoActor extends ShardedEntity[MonitoringAndMessageProducer] {
+  def props(sujetoActorRequirements: MonitoringAndMessageProducer): Props =
+    Props(
+      new SujetoActor(sujetoActorRequirements, None)
+    )
 
   type ObjetoAggregateRoot = (String, String, String)
   class SujetoActorRefMap(newActor: ObjetoAggregateRoot => ActorRef) extends ActorRefMap[ObjetoAggregateRoot](newActor)

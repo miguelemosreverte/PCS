@@ -1,15 +1,25 @@
 package akka.dispatchers
 
+import akka.actor.Actor
+import akka.persistence.PersistentActor
 import com.typesafe.config.Config
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
 import cqrs.base_actor.untyped.PersistentBaseActor
 
 class ActorsDispatchers(config: Config) {
 
-  private val typedActors = utils.Inference.getSubtypesNames[BasePersistentShardedTypedActorWithCQRS[_, _, _]]
-  private val untypedActors = utils.Inference.getSubtypesNames[PersistentBaseActor[_, _]]
+  private val BasePersistentShardedTypedActorWithCQRSs =
+    utils.Inference.getSubtypesNames[BasePersistentShardedTypedActorWithCQRS[_, _, _]]
+  private val PersistentBaseActors = utils.Inference.getSubtypesNames[PersistentBaseActor[_, _]]
+  private val PersistentActors = utils.Inference.getSubtypesNames[PersistentActor]
+  private val Actors = utils.Inference.getSubtypesNames[Actor]
 
-  private val actors = typedActors ++ untypedActors
+  private val actors: Seq[String] = Seq(
+    BasePersistentShardedTypedActorWithCQRSs,
+    PersistentBaseActors,
+    PersistentActors,
+    Actors
+  ).flatten
 
   private val strongScalingDispatcher: StrongScaling =
     StrongScaling.apply(config)

@@ -1,5 +1,7 @@
 package cqrs.base_actor.typed
 
+import akka.actor.Props
+
 import scala.reflect.ClassTag
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior, DispatcherSelector}
@@ -8,19 +10,18 @@ import akka.cluster.sharding.typed.scaladsl.{ClusterSharding, Entity, EntityRef,
 import akka.cluster.sharding.typed.{ClusterShardingSettings, HashCodeNoEnvelopeMessageExtractor}
 import akka.persistence.typed.PersistenceId
 import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.{Config, ConfigFactory, ConfigRenderOptions}
 import design_principles.actor_model.mechanism.AbstractOverReplyTo.MessageWithAutomaticReplyTo
 import design_principles.actor_model.mechanism.local_processing.LocalizedProcessingMessageExtractor
 
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 abstract class BasePersistentShardedTypedActor[
     ActorMessages <: design_principles.actor_model.ShardedMessage: ClassTag,
     ActorEvents,
     State <: BasePersistentShardedTypedActorAbstractState[ActorMessages, ActorEvents, State]
 ](
-    state: State,
-    config: Config
+    state: State
 )(implicit system: ActorSystem[_]) {
 
   val sharding: ClusterSharding = ClusterSharding(system)
@@ -34,14 +35,22 @@ abstract class BasePersistentShardedTypedActor[
     }.withAllocationStrategy(new ExternalShardAllocationStrategy(system, TypeKey.name))
       .withMessageExtractor(new LocalizedProcessingMessageExtractor[ActorMessages](30))
       .withSettings(ClusterShardingSettings(system))
-      .withEntityProps(DispatcherSelector.fromConfig(utils.Inference.getSimpleName(this.getClass.getName)))
+      .withEntityProps {
+        val dispatcherName = utils.Inference.getSimpleName(this.getClass.getName)
+        val dispatcher = Try {
+          // when running the tests, the typed actors had troubles finding the config
+          DispatcherSelector.default()
+          //DispatcherSelector.fromConfig(dispatcherName)
+        } match {
+          case Failure(configurationException) => DispatcherSelector.default()
+          case Success(dispatcher) => dispatcher
+        }
+        dispatcher
+      }
   )
 
   def commandHandler(state: State, command: ActorMessages): Effect[ActorEvents, State]
   def eventHandler(state: State, event: ActorEvents): State
-
-  def tags(event: ActorEvents): Set[String] = Set.empty
-  // maybe remove this to a Singleton?
 
   def persistentEntity(entityId: String, shardedId: ActorRef[ClusterSharding.ShardCommand]): Behavior[ActorMessages] =
     Behaviors.setup { _ =>
@@ -54,20 +63,7 @@ abstract class BasePersistentShardedTypedActor[
         emptyState = state,
         commandHandler = (state, message) => commandHandler(state, message),
         eventHandler = (state, evt) => eventHandler(state, evt)
-      ).withTagger({ event =>
-        val tagsWithShardId = tags(event) map { tag =>
-          val parallelism = Try {
-            config
-              .getString(
-                s"projectionist.$tag.paralellism"
-              )
-              .toInt
-          }.getOrElse(1)
-          val shardId = PersistenceId(TypeKey.name, entityId).hashCode.abs % parallelism
-          s"$tag-$shardId"
-        }
-        tagsWithShardId
-      })
+      )
     }
 
   def getEntityRef(entityId: String): EntityRef[ActorMessages] =

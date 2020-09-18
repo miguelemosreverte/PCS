@@ -1,17 +1,15 @@
 package consumers.no_registral.cotitularidad.infrastructure.main
 
-import akka.actor.{ActorRef, ActorSystem}
-import akka.entity.ShardedEntity.ShardedEntityRequirements
+import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.entity.ShardedEntity.ProductionMonitoringAndMessageProducer
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction
 import consumers.no_registral.cotitularidad.infrastructure.dependency_injection.CotitularidadActor
 import consumers.no_registral.cotitularidad.infrastructure.http.CotitularidadStateAPI
-import consumers.no_registral.cotitularidad.infrastructure.kafka.{
-  AddCotitularTransaction,
-  CotitularPublishSnapshotTransaction
-}
+import consumers.no_registral.cotitularidad.infrastructure.kafka.ObjetoSnapshotPersistedHandler
 import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
+import design_principles.actor_model.mechanism.tell_supervision.TellSupervisor
 import design_principles.microservice.kafka_consumer_microservice.{
   KafkaConsumerMicroservice,
   KafkaConsumerMicroserviceRequirements
@@ -21,25 +19,18 @@ import kafka.KafkaMessageProcessorRequirements
 
 import scala.concurrent.ExecutionContext
 
-object CotitularidadMicroservice extends KafkaConsumerMicroservice {
+class CotitularidadMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
 
-  def route(m: KafkaConsumerMicroserviceRequirements): Route = {
-    val monitoring = m.monitoring
+  val actor: ActorRef =
+    CotitularidadActor.startWithRequirements(monitoringAndMessageProducer)
 
-    implicit val shardedEntityR: ShardedEntityRequirements = m.shardedEntityRequirements
-    implicit val queryStateApiR: QueryStateApiRequirements = m.queryStateApiRequirements
-    implicit val kafkaMessageProcessorR: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
-    implicit val actorTransactionR: ActorTransaction.ActorTransactionRequirements = m.actorTransactionRequirements
+  val tellSupervisor: ActorRef = TellSupervisor.start(actor)
 
-    val ctx = m.ctx
-    import akka.actor.typed.scaladsl.adapter._
-    implicit val system: ActorSystem = ctx
-    implicit val actor: ActorRef =
-      CotitularidadActor.startWithRequirements(kafkaMessageProcessorR)
-    Seq(
-      CotitularidadStateAPI(actor, monitoring).route,
-      AddCotitularTransaction(actor, monitoring).route,
-      CotitularPublishSnapshotTransaction(actor, monitoring).route
-    ) reduce (_ ~ _)
-  }
+  override def actorTransactions: Set[ActorTransaction[_]] =
+    Set(
+      ObjetoSnapshotPersistedHandler(tellSupervisor, monitoring)
+    )
+
+  override def route: Route =
+    (Seq(CotitularidadStateAPI(actor, monitoring).route) ++ actorTransactions.map(_.route)) reduce (_ ~ _)
 }

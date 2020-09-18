@@ -11,18 +11,18 @@ import consumers.registral.domicilio_sujeto.domain.DomicilioSujetoEvents.Domicil
 import consumers.registral.domicilio_sujeto.domain.events.DomicilioSujetoUpdatedFromDtoHandler
 import consumers.registral.domicilio_sujeto.domain.{DomicilioSujetoEvents, DomicilioSujetoState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
+import kafka.MessageProducer
 
-case class DomicilioSujetoActor(state: DomicilioSujetoState = DomicilioSujetoState(), config: Config)(
-    implicit system: ActorSystem[Nothing]
+case class DomicilioSujetoActor(state: DomicilioSujetoState = DomicilioSujetoState())(
+    implicit
+
+    messageProducer: MessageProducer,
+    system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       DomicilioSujetoMessage,
       DomicilioSujetoEvents,
       DomicilioSujetoState
-    ](state, config) {
-
-  override def tags(event: DomicilioSujetoEvents): Set[String] = event match {
-    case _: DomicilioSujetoUpdatedFromDto => Set("DomicilioSujeto")
-  }
+    ](state) {
 
   commandBus.subscribe[DomicilioSujetoUpdateFromDto](new DomicilioSujetoUpdateFromDtoHandler().handle)
   queryBus.subscribe[GetStateDomicilioSujeto](new GetStateDomicilioSujetoHandler().handle)

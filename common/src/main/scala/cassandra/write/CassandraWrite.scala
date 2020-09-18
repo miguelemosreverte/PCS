@@ -9,9 +9,12 @@ import design_principles.actor_model.Event
 
 trait CassandraWrite {
   def writeState[E <: Event](state: ReadSideProjection[E])(
-      implicit system: ActorSystem,
+      implicit
       ec: ExecutionContext
   ): Future[Done]
 
-  def cql(cql: String): Future[Done]
+  def cql(cql: String)(
+      implicit
+      ec: ExecutionContext
+  ): Future[Done]
 }

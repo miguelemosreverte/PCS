@@ -1,6 +1,7 @@
 package consumers.registral.etapas_procesales.infrastructure.kafka
 
 import akka.Done
+import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import com.typesafe.config.Config
@@ -20,7 +21,7 @@ import serialization.{decodeF, maybeDecode}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-case class EtapasProcesalesNoTributarioTransaction(actor: EtapasProcesalesActor, monitoring: Monitoring)(
+case class EtapasProcesalesNoTributarioTransaction(actor: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[EtapasProcesalesAnt](monitoring) {
@@ -32,7 +33,7 @@ case class EtapasProcesalesNoTributarioTransaction(actor: EtapasProcesalesActor,
   def processInput(input: String): Either[Throwable, EtapasProcesalesAnt] =
     maybeDecode[EtapasProcesalesAnt](input)
 
-  override def processCommand(registro: EtapasProcesalesAnt): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: EtapasProcesalesAnt): Future[Response.SuccessProcessing] = {
     val command = EtapasProcesalesCommands.EtapasProcesalesUpdateFromDto(
       juicioId = registro.BEP_JUI_ID,
       etapaId = registro.BPE_ETA_ID,

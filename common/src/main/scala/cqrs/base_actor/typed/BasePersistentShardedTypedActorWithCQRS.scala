@@ -16,10 +16,10 @@ abstract class BasePersistentShardedTypedActorWithCQRS[
     ActorMessages <: design_principles.actor_model.ShardedMessage: ClassTag,
     ActorEvents,
     State <: AbstractStateWithCQRS[ActorMessages, ActorEvents, State]
-](s: State, config: Config)(implicit system: ActorSystem[_])
+](s: State)(implicit system: ActorSystem[_])
     extends BasePersistentShardedTypedActor[MessageWithAutomaticReplyTo[ActorMessages, ActorMessages#ReturnType],
                                             ActorEvents,
-                                            State](s, config) {
+                                            State](s) {
 
   val logger: Logger = LoggerFactory.getLogger(getClass)
   val commandBus = new SyncEffectCommandBus[ActorEvents, State](logger)

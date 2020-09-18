@@ -13,21 +13,22 @@ import scala.util.{Success, Try}
 
 class SujetoUpdateFromTriHandler(actor: SujetoActor) extends SyncCommandHandler[SujetoUpdateFromTri] {
   override def handle(command: SujetoUpdateFromTri): Try[Response.SuccessProcessing] = {
+    val sender = actor.context.sender()
 
     val event = SujetoUpdatedFromTri(command.deliveryId, command.sujetoId, command.registro)
 
     if (validateCommand(event, command, actor.state.lastDeliveryIdByEvents)) {
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
-      actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
+      sender ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
     } else {
 
       actor.persistEvent(event) { () =>
         actor.state += event
-        actor.persistSnapshot() { () =>
-          actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
+        actor.persistSnapshot() { _ =>
+          sender ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
         }
       }
     }
-    Success(Response.SuccessProcessing(command.deliveryId))
+    Success(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
   }
 }

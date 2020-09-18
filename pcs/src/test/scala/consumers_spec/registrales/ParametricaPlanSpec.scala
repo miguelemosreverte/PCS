@@ -12,7 +12,7 @@ import design_principles.actor_model.{Response, TypedActorSpec}
 
 class ParametricaPlanSpec extends TypedActorSpec {
 
-  val actor: ParametricaPlanActor = ParametricaPlanActor(ParametricaPlanState(), MockConfig.config)
+  val actor: ParametricaPlanActor = ParametricaPlanActor(ParametricaPlanState())
 
   "Typed cluster sharding with persistent actor" should
   "support ask with thenReply" in {

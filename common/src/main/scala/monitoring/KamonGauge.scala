@@ -13,4 +13,6 @@ class KamonGauge(name: String) extends Gauge {
 
   override def add(num: Int): Unit = gauge.increment(num)
   override def subtract(num: Int): Unit = gauge.decrement(num)
+
+  override def set(num: Int): Unit = gauge.update(num)
 }

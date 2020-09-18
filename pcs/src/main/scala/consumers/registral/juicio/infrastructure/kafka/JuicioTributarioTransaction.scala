@@ -1,6 +1,7 @@
 package consumers.registral.juicio.infrastructure.kafka
 
 import akka.Done
+import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import com.typesafe.config.Config
@@ -17,7 +18,7 @@ import serialization.{decodeF, maybeDecode}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-case class JuicioTributarioTransaction(actor: JuicioActor, monitoring: Monitoring)(
+case class JuicioTributarioTransaction(actor: ActorRef, monitoring: Monitoring)(
     implicit
     actorTransactionRequirements: ActorTransactionRequirements
 ) extends ActorTransaction[JuicioTri](monitoring) {
@@ -29,7 +30,7 @@ case class JuicioTributarioTransaction(actor: JuicioActor, monitoring: Monitorin
   def processInput(input: String): Either[Throwable, JuicioTri] =
     maybeDecode[JuicioTri](input)
 
-  override def processCommand(registro: JuicioTri): Future[Response.SuccessProcessing] = {
+  override def processMessage(registro: JuicioTri): Future[Response.SuccessProcessing] = {
 
     implicit val b: Reads[Seq[DetallesJuicio]] = Reads.seq(DetallesJuicioF.reads)
 

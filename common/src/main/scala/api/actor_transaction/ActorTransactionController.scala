@@ -3,6 +3,7 @@ package api.actor_transaction
 import scala.concurrent.ExecutionContextExecutor
 import akka.actor.ActorSystem
 import akka.http.Controller
+import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives.{complete, path, pathPrefix, post, _}
 import akka.http.scaladsl.server.Route
 import akka.stream.UniqueKillSwitch
@@ -11,9 +12,9 @@ import kafka.{KafkaMessageProcessorRequirements, KafkaPlainConsumerMessageProces
 class ActorTransactionController(
     actorTransaction: ActorTransaction[_],
     requirements: KafkaMessageProcessorRequirements
-)(implicit system: ActorSystem)
-    extends Controller(requirements.monitoring) {
+) extends Controller(requirements.monitoring) {
 
+  implicit val system = requirements.system
   implicit private val ec: ExecutionContextExecutor = system.dispatcher
 
   var currentTransaction: Option[UniqueKillSwitch] = None
@@ -33,7 +34,7 @@ class ActorTransactionController(
     }
   }
 
-  def startTransaction(): Unit = {
+  def startTransaction(): Option[UniqueKillSwitch] = {
     def topic = actorTransaction.topic
     val transaction = actorTransaction.transaction _
     log.debug(s"Starting ${actorTransaction.topic} transaction")
@@ -52,40 +53,11 @@ class ActorTransactionController(
       }
     }
     log.debug("Setting currentTransaction to Some(killswitch)")
-    currentTransaction = Some(killSwitch)
+    currentTransaction = killSwitch
+    killSwitch
   }
-
-  def start_kafka: Route = {
-    post {
-      pathPrefix("start") {
-        path(actorTransaction.topic) {
-          handleErrors(exceptionHandler) {
-            shouldBeRunning = true
-            startTransaction()
-            requests.increment()
-            complete(s"Starting ${actorTransaction.topic} transaction \n ")
-          }
-        }
-      }
-    }
-  }
-
-  def stop_kafka: Route =
-    post {
-      pathPrefix("stop") {
-        path(actorTransaction.topic) {
-          handleErrors(exceptionHandler) {
-            shouldBeRunning = false
-            stopTransaction()
-            requests.increment()
-            complete(s"Stopping ${actorTransaction.topic} transaction \n ")
-          }
-        }
-      }
-    }
-
   def route: Route =
-    pathPrefix("kafka") {
-      start_kafka ~ stop_kafka
+    path("api" / "system" / "health" / "topic" / actorTransaction.topic) {
+      complete(StatusCodes.OK)
     }
 }

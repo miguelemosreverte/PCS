@@ -10,8 +10,8 @@ import kafka.MessageProducer
 
 trait NoRegistralesImplicitConversions {
 
-  implicit def avoidImportOfMessageProducerNoRegistrales: MessageProducer => MessageProducerNoRegistrales =
-    messageProducer => new MessageProducerNoRegistrales(messageProducer)
+  //implicit def avoidImportOfMessageProducerNoRegistrales: MessageProducer => MessageProducerNoRegistrales =
+  // messageProducer => new MessageProducerNoRegistrales(messageProducer)
 
   implicit def avoidImportOfObligacionesTriRootExtractor: ObligacionesTri => ObligacionesTriRootExtractor =
     obligacionTri => new ObligacionesTriRootExtractor(obligacionTri)

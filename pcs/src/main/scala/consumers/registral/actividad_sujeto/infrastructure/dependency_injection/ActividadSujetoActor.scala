@@ -11,19 +11,17 @@ import consumers.registral.actividad_sujeto.domain.ActividadSujetoEvents.Activid
 import consumers.registral.actividad_sujeto.domain.events.ActividadSujetoUpdatedFromDtoHandler
 import consumers.registral.actividad_sujeto.domain.{ActividadSujetoEvents, ActividadSujetoState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
+import kafka.MessageProducer
 
-case class ActividadSujetoActor(state: ActividadSujetoState = ActividadSujetoState(), config: Config)(
-    implicit system: ActorSystem[Nothing]
+case class ActividadSujetoActor(state: ActividadSujetoState = ActividadSujetoState())(
+    implicit
+    messageProducer: MessageProducer,
+    system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       ActividadSujetoMessage,
       ActividadSujetoEvents,
       ActividadSujetoState
-    ](state, config) {
-
-  override def tags(event: ActividadSujetoEvents): Set[String] = event match {
-    case _: ActividadSujetoUpdatedFromDto => Set("ActividadSujeto")
-  }
-
+    ](state) {
   commandBus.subscribe[ActividadSujetoUpdateFromDto](new ActividadSujetoUpdateFromDtoHandler().handle)
   queryBus.subscribe[GetStateActividadSujeto](new GetStateActividadSujetoHandler().handle)
   eventBus.subscribe[ActividadSujetoUpdatedFromDto](new ActividadSujetoUpdatedFromDtoHandler().handle)

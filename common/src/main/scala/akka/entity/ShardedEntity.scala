@@ -2,9 +2,12 @@ package akka.entity
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
+import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import cassandra.write.{CassandraWrite, CassandraWriteProduction}
 import com.typesafe.config.Config
 import design_principles.actor_model.mechanism.local_processing.LocalizedProcessingMessageExtractor
-import monitoring.Monitoring
+import kafka.{KafkaMessageProducer, MessageProducer}
+import monitoring.{KamonMonitoring, Monitoring}
 
 import scala.concurrent.ExecutionContext
 
@@ -14,21 +17,57 @@ trait ShardedEntity[Requirements] extends ClusterEntity[Requirements] {
 
   def props(requirements: Requirements): Props
 
+  val extractEntityId: ShardRegion.ExtractEntityId = {
+    case s: Sharded => (s.entityId, s)
+  }
+
+  val numberOfShards = 3
+  def extractShardId: ShardRegion.ExtractShardId = {
+    case s: Sharded =>
+      new LocalizedProcessingMessageExtractor(numberOfShards * 10).shardId(s.shardedId)
+  }
+
+  def clusterShardingSettings(
+      implicit
+      system: ActorSystem
+  ) = ClusterShardingSettings(system)
+
   def startWithRequirements(requirements: Requirements)(
       implicit
-      shardedEntityRequirements: ShardedEntityRequirements
-  ): ActorRef = ClusterSharding(shardedEntityRequirements.system).start(
+      system: ActorSystem
+  ): ActorRef = ClusterSharding(system).start(
     typeName = typeName,
     entityProps = props(requirements).withDispatcher(utils.Inference.getSimpleName(this.getClass.getName)),
-    settings = ClusterShardingSettings(shardedEntityRequirements.system),
+    settings = clusterShardingSettings,
     extractEntityId = extractEntityId,
-    extractShardId = extractShardId(3)
+    extractShardId = extractShardId
   )
 }
 
 object ShardedEntity {
 
-  case class MonitoringAndConfig(monitoring: Monitoring, config: Config)
+  trait MonitoringAndCassandraWrite {
+    val monitoring: Monitoring
+    val cassandraWrite: CassandraWrite
+    val actorTransactionRequirements: ActorTransactionRequirements
+
+    def ec = actorTransactionRequirements.executionContext
+  }
+
+  case class ProductionMonitoringAndCassandraWrite(
+      monitoring: KamonMonitoring,
+      cassandraWrite: CassandraWriteProduction,
+      actorTransactionRequirements: ActorTransactionRequirements
+  ) extends MonitoringAndCassandraWrite
+
+  trait MonitoringAndMessageProducer {
+    val monitoring: Monitoring
+    val messageProducer: MessageProducer
+  }
+  case class ProductionMonitoringAndMessageProducer(
+      monitoring: KamonMonitoring,
+      messageProducer: KafkaMessageProducer
+  ) extends MonitoringAndMessageProducer
 
   case class ShardedEntityRequirements(
       system: ActorSystem
@@ -38,17 +77,8 @@ object ShardedEntity {
 
     def start(
         implicit
-        shardedEntityRequirements: ShardedEntityRequirements
+        system: ActorSystem
     ): ActorRef = this.startWithRequirements(NoRequirements())
-  }
-
-  val extractEntityId: ShardRegion.ExtractEntityId = {
-    case s: Sharded => (s.entityId, s)
-  }
-
-  def extractShardId(numberOfShards: Int): ShardRegion.ExtractShardId = {
-    case s: Sharded =>
-      new LocalizedProcessingMessageExtractor(30).shardId(s.shardedId)
   }
 
   case class NoRequirements()

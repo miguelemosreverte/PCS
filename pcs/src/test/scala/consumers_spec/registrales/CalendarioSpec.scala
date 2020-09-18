@@ -11,7 +11,7 @@ import design_principles.actor_model.{Response, TypedActorSpec}
 
 class CalendarioSpec extends TypedActorSpec {
 
-  val actor: CalendarioActor = CalendarioActor(CalendarioState(), MockConfig.config)
+  val actor: CalendarioActor = CalendarioActor(CalendarioState())
 
   "Typed cluster sharding with persistent actor" should
   "support ask with thenReply" in {

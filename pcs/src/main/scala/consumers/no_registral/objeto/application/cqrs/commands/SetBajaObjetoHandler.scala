@@ -14,6 +14,7 @@ class SetBajaObjetoHandler(actor: ObjetoActor) extends SyncCommandHandler[Objeto
   override def handle(
       command: ObjetoCommands.SetBajaObjeto
   ): Try[Response.SuccessProcessing] = {
+    val sender = actor.context.sender()
 
     val event = ObjetoEvents.ObjetoBajaSet(
       command.deliveryId,
@@ -26,16 +27,16 @@ class SetBajaObjetoHandler(actor: ObjetoActor) extends SyncCommandHandler[Objeto
     )
     if (validateCommand(event, command, actor.state.lastDeliveryIdByEvents)) {
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
-      actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
+      sender ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
     } else {
       actor.persistEvent(event) { () =>
         actor.state += event
         actor.informBajaToParent(command)
         actor.persistSnapshot(event, actor.state) { () =>
-          actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
+          sender ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
         }
       }
     }
-    Success(Response.SuccessProcessing(command.deliveryId))
+    Success(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
   }
 }

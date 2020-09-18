@@ -33,7 +33,7 @@ class ActividadSujetoUpdatedFromDtoHandler(
     projection.updateReadside()
     for {
       done <- cassandra writeState projection
-    } yield SuccessProcessing(registro.deliveryId)
+    } yield SuccessProcessing(registro.aggregateRoot, registro.deliveryId)
   }
 
 }

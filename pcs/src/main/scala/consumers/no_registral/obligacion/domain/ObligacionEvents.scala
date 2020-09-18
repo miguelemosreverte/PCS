@@ -1,11 +1,11 @@
 package consumers.no_registral.obligacion.domain
 
 import consumers.no_registral.objeto.application.entities.ObjetoExternalDto.Exencion
-import consumers.no_registral.obligacion.application.entities.ObligacionExternalDto
+import consumers.no_registral.obligacion.application.entities.{ObligacionExternalDto, ObligacionMessage}
 import consumers.no_registral.obligacion.application.entities.ObligacionExternalDto.DetallesObligacion
 import design_principles.actor_model.Event
 
-sealed trait ObligacionEvents extends Event {
+sealed trait ObligacionEvents extends Event with ObligacionMessage {
   def sujetoId: String
   def objetoId: String
   def tipoObjeto: String

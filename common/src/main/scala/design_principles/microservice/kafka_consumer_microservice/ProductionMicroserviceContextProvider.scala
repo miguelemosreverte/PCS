@@ -8,6 +8,7 @@ import akka.cluster.ClusterEvent.MemberUp
 import akka.http.scaladsl.server.Route
 import akka.kafka.ConsumerRebalanceEvent
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import cassandra.write.CassandraWriteProduction
 import com.typesafe.config.Config
 import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
 import kafka.{KafkaMessageProcessorRequirements, TopicListener}
@@ -43,6 +44,8 @@ object ProductionMicroserviceContextProvider {
       config = config
     )
 
+    val cassandraWrite = new CassandraWriteProduction()
+
     visitor(
       KafkaConsumerMicroserviceRequirements(
         monitoring = monitoring,
@@ -50,7 +53,8 @@ object ProductionMicroserviceContextProvider {
         queryStateApiRequirements,
         actorTransactionRequirements,
         kafkaMessageProcessorRequirements,
-        config
+        config,
+        cassandraWrite
       )
     )
   }

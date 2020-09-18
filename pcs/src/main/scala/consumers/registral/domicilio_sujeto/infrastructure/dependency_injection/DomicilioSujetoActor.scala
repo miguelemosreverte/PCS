@@ -11,9 +11,13 @@ import consumers.registral.domicilio_sujeto.domain.DomicilioSujetoEvents.Domicil
 import consumers.registral.domicilio_sujeto.domain.events.DomicilioSujetoUpdatedFromDtoHandler
 import consumers.registral.domicilio_sujeto.domain.{DomicilioSujetoEvents, DomicilioSujetoState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
+import kafka.MessageProducer
 
 case class DomicilioSujetoActor(state: DomicilioSujetoState = DomicilioSujetoState())(
-    implicit system: ActorSystem[Nothing]
+    implicit
+
+    messageProducer: MessageProducer,
+    system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       DomicilioSujetoMessage,
       DomicilioSujetoEvents,

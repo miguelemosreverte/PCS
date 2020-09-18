@@ -7,16 +7,9 @@ import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import com.typesafe.config.ConfigFactory
-import consumers.no_registral.cotitularidad.infrastructure.kafka.{
-  AddSujetoCotitularTransaction,
-  CotitularPublishSnapshotTransaction
-}
+import consumers.no_registral.cotitularidad.infrastructure.kafka.ObjetoSnapshotPersistedHandler
 import consumers.no_registral.objeto.application.entities.ObjetoExternalDto
 import consumers.no_registral.objeto.infrastructure.consumer.{ObjetoTributarioTransaction, _}
-import consumers.no_registral.objeto.infrastructure.event_processor.{
-  ObjetoReceiveSnapshotHandler,
-  ObjetoUpdatedFromTriHandler
-}
 import consumers.no_registral.obligacion.application.entities.ObligacionExternalDto
 import consumers.no_registral.obligacion.infrastructure.consumer.{
   ObligacionNoTributariaTransaction,
@@ -44,8 +37,7 @@ class MessageTestkitUtils(sujeto: ActorRef, cotitularidadActor: ActorRef) {
 
       (if (topics.isEmpty)
          Set(
-           AddSujetoCotitularTransaction(cotitularidadActor, monitoring),
-           CotitularPublishSnapshotTransaction(cotitularidadActor, monitoring),
+           ObjetoSnapshotPersistedHandler(cotitularidadActor, monitoring),
            ObjetoUpdateCotitularesTransaction(sujeto, monitoring),
            ObjetoTributarioTransaction(sujeto, monitoring),
            ObjetoExencionTransaction(sujeto, monitoring),

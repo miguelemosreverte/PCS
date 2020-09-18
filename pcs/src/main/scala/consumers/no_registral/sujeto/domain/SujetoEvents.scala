@@ -1,11 +1,11 @@
 package consumers.no_registral.sujeto.domain
 
-import consumers.no_registral.sujeto.application.entity.SujetoExternalDto
+import consumers.no_registral.sujeto.application.entity.{SujetoExternalDto, SujetoMessage}
 import consumers.no_registral.sujeto.application.entity.SujetoExternalDto.{SujetoAnt, SujetoTri}
 import ddd.Deliverable
 import design_principles.actor_model.Event
 
-sealed trait SujetoEvents extends Event with Deliverable {
+sealed trait SujetoEvents extends Event with Deliverable with SujetoMessage {
   def sujetoId: String
 }
 

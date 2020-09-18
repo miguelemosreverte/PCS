@@ -3,15 +3,15 @@ package readside.proyectionists.registrales.juicio.infrastructure.main
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction
-import design_principles.microservice.cassandra_projectionist_microservice.{
-  CassandraProjectionistMicroservice,
-  CassandraProjectionistMicroserviceRequirements
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
 }
 import readside.proyectionists.registrales.juicio.JuicioUpdatedFromDtoHandler
 
 class JuicioProjectionistMicroservice(
-    implicit m: CassandraProjectionistMicroserviceRequirements
-) extends CassandraProjectionistMicroservice {
+    implicit m: KafkaConsumerMicroserviceRequirements
+) extends KafkaConsumerMicroservice {
 
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(

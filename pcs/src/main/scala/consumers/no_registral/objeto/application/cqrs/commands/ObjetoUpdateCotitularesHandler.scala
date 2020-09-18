@@ -13,6 +13,8 @@ class ObjetoUpdateCotitularesHandler(actor: ObjetoActor)
   override def handle(
       command: ObjetoCommands.ObjetoUpdateCotitulares
   ): Try[Response.SuccessProcessing] = {
+    val sender = actor.context.sender()
+
     val event = ObjetoUpdatedCotitulares(
       command.deliveryId,
       command.sujetoId,
@@ -24,9 +26,9 @@ class ObjetoUpdateCotitularesHandler(actor: ObjetoActor)
       actor.state += event
       actor.informParent(command, actor.state)
       actor.persistSnapshot(event, actor.state) { () =>
-        actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
+        sender ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
       }
     }
-    Success(Response.SuccessProcessing(command.deliveryId))
+    Success(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
   }
 }

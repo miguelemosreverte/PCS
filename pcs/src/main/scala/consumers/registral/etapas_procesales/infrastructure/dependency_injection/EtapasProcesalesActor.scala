@@ -11,9 +11,13 @@ import consumers.registral.etapas_procesales.domain.EtapasProcesalesEvents.Etapa
 import consumers.registral.etapas_procesales.domain.events.EtapasProcesalesUpdatedFromDtoHandler
 import consumers.registral.etapas_procesales.domain.{EtapasProcesalesEvents, EtapasProcesalesState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
+import kafka.MessageProducer
 
 case class EtapasProcesalesActor(state: EtapasProcesalesState = EtapasProcesalesState())(
-    implicit system: ActorSystem[Nothing]
+    implicit
+
+    messageProducer: MessageProducer,
+    system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       EtapasProcesalesMessage,
       EtapasProcesalesEvents,

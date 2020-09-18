@@ -8,6 +8,6 @@ trait DomicilioSujetoProjection extends UpdateReadSideProjection[DomicilioSujeto
 
   val keys: List[(String, Object)] = List(
     "bds_suj_identificador" -> event.sujetoId,
-    "bds_dom_id" -> event.domicilioSujetoId
+    "bds_dom_id" -> event.domicilioId
   )
 }

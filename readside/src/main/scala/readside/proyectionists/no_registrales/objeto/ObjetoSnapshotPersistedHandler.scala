@@ -13,10 +13,11 @@ class ObjetoSnapshotPersistedHandler(
     r: MonitoringAndCassandraWrite
 ) extends ActorTransaction[ObjetoSnapshotPersisted](r.monitoring)(r.actorTransactionRequirements) {
 
-  override def topic: String = "SujetoSnapshot"
+  override def topic: String = "ObjetoSnapshotPersistedReadside"
 
   override def processInput(input: String): Either[Throwable, ObjetoSnapshotPersisted] = {
     import consumers.no_registral.objeto.infrastructure.json._
+    print("RECEIVED OBJETO SNAPSHOT AT READSIDE")
     serialization
       .maybeDecode[ObjetoSnapshotPersisted](input)
   }
@@ -25,7 +26,7 @@ class ObjetoSnapshotPersistedHandler(
     val projection = ObjetoSnapshotPersistedProjection(registro)
     for {
       done <- r.cassandraWrite writeState projection
-    } yield SuccessProcessing(registro.deliveryId)
+    } yield SuccessProcessing(registro.aggregateRoot, registro.deliveryId)
   }
 
 }

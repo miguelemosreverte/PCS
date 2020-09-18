@@ -11,9 +11,13 @@ import consumers.registral.calendario.domain.CalendarioEvents.CalendarioUpdatedF
 import consumers.registral.calendario.domain.events.CalendarioUpdatedFromDtoHandler
 import consumers.registral.calendario.domain.{CalendarioEvents, CalendarioState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
+import kafka.MessageProducer
 
 case class CalendarioActor(state: CalendarioState = CalendarioState())(
-    implicit system: ActorSystem[Nothing]
+    implicit
+
+    messageProducer: MessageProducer,
+    system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       CalendarioMessage,
       CalendarioEvents,

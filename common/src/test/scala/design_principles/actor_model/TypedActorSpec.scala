@@ -8,6 +8,8 @@ import com.typesafe.config.{Config, ConfigFactory}
 import cqrs.base_actor.typed.{AbstractStateWithCQRS, BasePersistentShardedTypedActorWithCQRS}
 import design_principles.actor_model.mechanism.TypedAsk
 import design_principles.actor_model.mechanism.TypedAsk.AkkaTypedTypedAsk
+import design_principles.external_pub_sub.kafka.KafkaMock
+import kafka.{KafkaMessageProducer, MessageProducer}
 import org.scalatest.flatspec.AnyFlatSpecLike
 
 abstract class TypedActorSpec extends ScalaTestWithActorTestKit(TypedActorSpec.config) with AnyFlatSpecLike {
@@ -23,7 +25,7 @@ abstract class TypedActorSpec extends ScalaTestWithActorTestKit(TypedActorSpec.c
   ): TypedAsk.AkkaTypedTypedAsk[ActorMessages, ActorEvents, State] = new AkkaTypedTypedAsk(actor)
 
   implicit val ec: ExecutionContextExecutor = system.classicSystem.dispatcher
-
+  implicit val messageProducer: MessageProducer = new KafkaMock()
   Cluster(system).manager ! Join(Cluster(system).selfMember.address)
 }
 

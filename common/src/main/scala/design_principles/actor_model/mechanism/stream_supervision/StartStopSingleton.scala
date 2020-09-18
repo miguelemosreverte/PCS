@@ -4,12 +4,15 @@ import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
 import akka.entity.ShardedEntity.NoRequirements
 import akka.entity.SingletonEntity
 
+import scala.collection.mutable
 import scala.concurrent.duration.DurationInt
 
 object StartStopSingleton extends SingletonEntity[NoRequirements] {
-  case class SubscribeMe(actorRef: ActorRef)
+  case class SubscribeMe(topic: String, actorRef: ActorRef)
   case class Start()
   case class Stop()
+  case class StartByTopic(topic: String)
+  case class StopByTopic(topic: String)
   case class Ping()
   case class Pong()
 
@@ -21,25 +24,32 @@ class StartStopSingleton() extends Actor with ActorLogging {
 
   import StartStopSingleton._
 
-  var phonebook: Seq[ActorRef] = Seq.empty
+  val phonebook: mutable.Map[String, ActorRef] = mutable.Map.empty
 
   override def receive: Receive = {
 
-    case SubscribeMe(actorRef: ActorRef) =>
-      phonebook = phonebook :+ actorRef
-      log.info(s"StartStopSingleton added ${actorRef.path.name} to the list to be stopped/started")
+    case SubscribeMe(topic: String, actorRef: ActorRef) =>
+      phonebook(topic) = actorRef
+      log.info(s"StartStopSingleton added ${topic} to the list to be stopped/started")
+
+    case message @ StartByTopic(topic) =>
+      phonebook(topic) ! message
+
+    case message @ StopByTopic(topic) =>
+      phonebook(topic) ! message
 
     case Start() =>
-      phonebook foreach { _ ! Start() }
+      phonebook.values foreach { _ ! Start() }
     case Stop() =>
-      phonebook foreach { _ ! Stop() }
+      phonebook.values foreach { _ ! Stop() }
 
-    case Pong() =>
+    case Pong() => ()
+
   }
 
   object Call extends Runnable {
     def run(): Unit = {
-      phonebook foreach { _ ! Ping() }
+      phonebook.values foreach { _ ! Ping() }
     }
   }
 

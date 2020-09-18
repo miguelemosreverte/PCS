@@ -23,7 +23,7 @@ object ObjetoCommands {
       saldo: BigDecimal,
       cotitulares: Set[String],
       tags: Set[String],
-      sujetoResponsable: String,
+      sujetoResponsable: Option[String],
       obligacionesSaldo: Map[String, BigDecimal] = Map.empty
   ) extends ObjetoCommands
 

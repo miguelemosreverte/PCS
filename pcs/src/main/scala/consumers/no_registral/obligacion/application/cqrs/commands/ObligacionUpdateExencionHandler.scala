@@ -14,6 +14,7 @@ class ObligacionUpdateExencionHandler(actor: ObligacionActor)
   override def handle(
       command: ObligacionCommands.ObligacionUpdateExencion
   ): Try[Response.SuccessProcessing] = {
+    val sender = actor.context.sender()
 
     val receivesExencion = (for {
       fechaInicio <- command.exencion.BEX_FECHA_INICIO
@@ -38,11 +39,11 @@ class ObligacionUpdateExencionHandler(actor: ObligacionActor)
       actor.persistEvent(event) { () =>
         actor.state += event
         actor.persistSnapshot() { () =>
-          actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
+          sender ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
         }
       }
     }
-    Success(Response.SuccessProcessing(command.deliveryId))
+    Success(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
 
   }
 }

@@ -13,7 +13,7 @@ object DomicilioObjetoEvents {
     sujetoId = domicilioObjetoTriStub.BDO_SUJ_IDENTIFICADOR,
     objetoId = domicilioObjetoTriStub.BDO_SOJ_IDENTIFICADOR,
     tipoObjeto = domicilioObjetoTriStub.BDO_SOJ_TIPO_OBJETO,
-    domicilioObjetoId = domicilioObjetoTriStub.BDO_DOM_ID,
+    domicilioId = domicilioObjetoTriStub.BDO_DOM_ID,
     registro = domicilioObjetoTriStub
   )
   def domicilioObjetoUpdatedFromDtoAntStub = DomicilioObjetoUpdatedFromDto(
@@ -21,7 +21,7 @@ object DomicilioObjetoEvents {
     sujetoId = domicilioObjetoAntStub.BDO_SUJ_IDENTIFICADOR,
     objetoId = domicilioObjetoAntStub.BDO_SOJ_IDENTIFICADOR,
     tipoObjeto = domicilioObjetoAntStub.BDO_SOJ_TIPO_OBJETO,
-    domicilioObjetoId = domicilioObjetoTriStub.BDO_DOM_ID,
+    domicilioId = domicilioObjetoTriStub.BDO_DOM_ID,
     registro = domicilioObjetoAntStub
   )
 }

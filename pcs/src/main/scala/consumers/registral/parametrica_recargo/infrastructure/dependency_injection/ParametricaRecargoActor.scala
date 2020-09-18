@@ -11,9 +11,13 @@ import consumers.registral.parametrica_recargo.domain.ParametricaRecargoEvents.P
 import consumers.registral.parametrica_recargo.domain.events.ParametricaRecargoUpdatedFromDtoHandler
 import consumers.registral.parametrica_recargo.domain.{ParametricaRecargoEvents, ParametricaRecargoState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
+import kafka.MessageProducer
 
 case class ParametricaRecargoActor(state: ParametricaRecargoState = ParametricaRecargoState())(
-    implicit system: ActorSystem[Nothing]
+    implicit
+
+    messageProducer: MessageProducer,
+    system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       ParametricaRecargoMessage,
       ParametricaRecargoEvents,

@@ -48,27 +48,6 @@ services:
       kafka_copernico_net:
         ipv4_address: 172.22.1.3
 
-  node1:
-    container_name: node1
-    image: pcs/pcs:1.0
-    ports:
-      - '2552:2551'
-      - '8559:8558'
-      - '8082:8081'
-      - '5002:9095'
-    environment:
-      SEED_NODES: 'akka://PersonClassificationService@172.22.1.3:2551'
-      KAFKA_BROKERS_LIST: '172.22.0.5:29092'
-      CASSANDRA_CONTACT_POINTS: '172.22.0.6:9042'
-
-      LOGSTASH: '172.22.5.3:5000'
-      CLUSTER_IP: 172.22.1.4
-      CLUSTER_PORT: 2551
-      HTTP_PORT: 8081
-      PROMETHEUS_PORT: 9095
-    networks:
-      kafka_copernico_net:
-        ipv4_address: 172.22.1.4
 
 networks:
   kafka_copernico_net:

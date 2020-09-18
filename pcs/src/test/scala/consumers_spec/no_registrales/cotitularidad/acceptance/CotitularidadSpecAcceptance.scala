@@ -5,10 +5,7 @@ import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
 import com.typesafe.config.ConfigFactory
 import consumers.no_registral.cotitularidad.infrastructure.dependency_injection.CotitularidadActor
 import consumers.no_registral.cotitularidad.infrastructure.dependency_injection.CotitularidadActor
-import consumers.no_registral.cotitularidad.infrastructure.kafka.{
-  AddSujetoCotitularTransaction,
-  CotitularPublishSnapshotTransaction
-}
+import consumers.no_registral.cotitularidad.infrastructure.kafka.ObjetoSnapshotPersistedHandler
 import consumers.no_registral.objeto.infrastructure.consumer.{
   ObjetoTributarioTransaction,
   ObjetoUpdateCotitularesTransaction
@@ -43,8 +40,7 @@ object CotitularidadSpecAcceptance {
           )
           val monitoring = MonitoringAndMessageProducerMock.production(system).monitoring
           Set(
-            AddSujetoCotitularTransaction(cotitularidadActor, monitoring),
-            CotitularPublishSnapshotTransaction(cotitularidadActor, monitoring),
+            ObjetoSnapshotPersistedHandler(cotitularidadActor, monitoring),
             ObjetoUpdateCotitularesTransaction(sujetoActor, monitoring),
             ObjetoTributarioTransaction(sujetoActor, monitoring)
           )

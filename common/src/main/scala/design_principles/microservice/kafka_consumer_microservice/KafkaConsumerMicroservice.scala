@@ -6,7 +6,7 @@ import design_principles.microservice.Microservice
 import kafka.{KafkaMessageProcessorRequirements, KafkaMessageProducer}
 import monitoring.{KamonMonitoring, Monitoring}
 import akka.actor.typed.scaladsl.adapter._
-import akka.entity.ShardedEntity.ProductionMonitoringAndMessageProducer
+import akka.entity.ShardedEntity.{ProductionMonitoringAndCassandraWrite, ProductionMonitoringAndMessageProducer}
 
 abstract class KafkaConsumerMicroservice(implicit m: KafkaConsumerMicroserviceRequirements)
     extends Microservice[KafkaConsumerMicroserviceRequirements] {
@@ -18,13 +18,24 @@ abstract class KafkaConsumerMicroservice(implicit m: KafkaConsumerMicroserviceRe
   implicit final val queryStateApiR: QueryStateApiRequirements = m.queryStateApiRequirements
   implicit final val kafkaMessageProcessorR: KafkaMessageProcessorRequirements = m.kafkaMessageProcessorRequirements
   implicit final val actorTransactionR: ActorTransaction.ActorTransactionRequirements = m.actorTransactionRequirements
+  implicit val messageProducer: KafkaMessageProducer =
+    KafkaMessageProducer(monitoring, m.kafkaMessageProcessorRequirements.rebalancerListener)
   implicit final val monitoringAndMessageProducer: ProductionMonitoringAndMessageProducer =
     ProductionMonitoringAndMessageProducer(
       monitoring,
-      KafkaMessageProducer(monitoring, m.kafkaMessageProcessorRequirements.rebalancerListener)
+      messageProducer
     )
+  implicit final val monitoringAndCassandraWrite: ProductionMonitoringAndCassandraWrite =
+    ProductionMonitoringAndCassandraWrite(
+      monitoring,
+      m.cassandraWrite,
+      actorTransactionR
+    )
+
   def actorTransactions: Set[ActorTransaction[_]]
 
-  final def actorTransactionControllers: Set[ActorTransactionController] =
-    actorTransactions.map(_.controller)
+  final def actorTransactionControllers: Set[(String, ActorTransactionController)] =
+    actorTransactions.map { actorTransaction =>
+      (actorTransaction.topic, actorTransaction.controller)
+    }
 }

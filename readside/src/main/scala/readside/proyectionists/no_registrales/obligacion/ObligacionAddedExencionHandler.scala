@@ -43,7 +43,7 @@ class ObligacionAddedExencionHandler(
           log.error(ex.getMessage)
           ex
         }
-    } yield SuccessProcessing(registro.deliveryId)
+    } yield SuccessProcessing(registro.aggregateRoot, registro.deliveryId)
   }
 
 }

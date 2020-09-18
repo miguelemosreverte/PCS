@@ -29,7 +29,7 @@ class DomicilioSujetoUpdatedFromDtoHandler(
     val projection = DomicilioSujetoUpdatedFromDtoProjection(registro)
     for {
       done <- cassandra writeState projection
-    } yield SuccessProcessing(registro.deliveryId)
+    } yield SuccessProcessing(registro.aggregateRoot, registro.deliveryId)
   }
 
 }

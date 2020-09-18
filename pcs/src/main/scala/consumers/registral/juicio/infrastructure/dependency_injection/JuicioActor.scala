@@ -11,9 +11,13 @@ import consumers.registral.juicio.domain.JuicioEvents.JuicioUpdatedFromDto
 import consumers.registral.juicio.domain.events.JuicioUpdatedFromDtoHandler
 import consumers.registral.juicio.domain.{JuicioEvents, JuicioState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
+import kafka.MessageProducer
 
 case class JuicioActor(state: JuicioState = JuicioState())(
-    implicit system: ActorSystem[Nothing]
+    implicit
+
+    messageProducer: MessageProducer,
+    system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       JuicioMessage,
       JuicioEvents,

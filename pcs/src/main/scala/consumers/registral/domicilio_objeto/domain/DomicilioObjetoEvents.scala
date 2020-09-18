@@ -1,14 +1,9 @@
 package consumers.registral.domicilio_objeto.domain
 
-import consumers.registral.domicilio_objeto.application.entities.DomicilioObjetoExternalDto
+import consumers.registral.domicilio_objeto.application.entities.{DomicilioObjetoExternalDto, DomicilioObjetoMessage}
 import design_principles.actor_model.Event
 
-sealed trait DomicilioObjetoEvents extends Event {
-  def sujetoId: String
-  def objetoId: String
-  def tipoObjeto: String
-  def domicilioObjetoId: String
-}
+sealed trait DomicilioObjetoEvents extends Event with DomicilioObjetoMessage
 
 object DomicilioObjetoEvents {
   case class DomicilioObjetoUpdatedFromDto(
@@ -16,7 +11,7 @@ object DomicilioObjetoEvents {
       sujetoId: String,
       objetoId: String,
       tipoObjeto: String,
-      domicilioObjetoId: String,
+      domicilioId: String,
       registro: DomicilioObjetoExternalDto
   ) extends DomicilioObjetoEvents
 

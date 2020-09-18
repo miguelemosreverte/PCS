@@ -11,9 +11,13 @@ import consumers.registral.declaracion_jurada.domain.DeclaracionJuradaEvents.Dec
 import consumers.registral.declaracion_jurada.domain.events.DeclaracionJuradaUpdatedFromDtoHandler
 import consumers.registral.declaracion_jurada.domain.{DeclaracionJuradaEvents, DeclaracionJuradaState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
+import kafka.MessageProducer
 
 case class DeclaracionJuradaActor(state: DeclaracionJuradaState = DeclaracionJuradaState())(
-    implicit system: ActorSystem[Nothing]
+    implicit
+
+    messageProducer: MessageProducer,
+    system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       DeclaracionJuradaMessage,
       DeclaracionJuradaEvents,

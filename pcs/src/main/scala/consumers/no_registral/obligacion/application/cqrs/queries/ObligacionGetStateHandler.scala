@@ -12,6 +12,7 @@ class ObligacionGetStateHandler(actor: ObligacionActor) extends SyncQueryHandler
   override def handle(
       query: ObligacionQueries.GetStateObligacion
   ): Try[ObligacionResponses.GetObligacionResponse] = {
+    val sender = actor.context.sender()
 
     val response = GetObligacionResponse(
       actor.state.saldo,
@@ -23,7 +24,7 @@ class ObligacionGetStateHandler(actor: ObligacionActor) extends SyncQueryHandler
       actor.state.juicioId
     )
     log.info(s"[${actor.persistenceId}] GetState | $response")
-    actor.context.sender() ! response
+    sender ! response
     Success(response)
   }
 }

@@ -2,10 +2,13 @@ package consumers.registral.parametrica_plan.domain
 
 import java.time.LocalDateTime
 
-import consumers.registral.parametrica_plan.application.entities.ParametricaPlanExternalDto
+import consumers.registral.parametrica_plan.application.entities.{ParametricaPlanExternalDto, ParametricaPlanMessage}
 import design_principles.actor_model.Event
 
-sealed trait ParametricaPlanEvents extends Event {
+sealed trait ParametricaPlanEvents extends Event with ParametricaPlanMessage {
+
+  override val parametricaPlanId: String = bppFpmId
+
   def bppRdlId: String
   def bppFpmId: String
   def bppCantMaxCuotas: BigInt

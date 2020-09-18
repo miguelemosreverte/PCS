@@ -1,17 +1,15 @@
 package consumers.no_registral.cotitularidad.infrastructure.main
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.entity.ShardedEntity.ProductionMonitoringAndMessageProducer
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import api.actor_transaction.ActorTransaction
 import consumers.no_registral.cotitularidad.infrastructure.dependency_injection.CotitularidadActor
 import consumers.no_registral.cotitularidad.infrastructure.http.CotitularidadStateAPI
-import consumers.no_registral.cotitularidad.infrastructure.kafka.{
-  AddSujetoCotitularTransaction,
-  CotitularPublishSnapshotTransaction
-}
+import consumers.no_registral.cotitularidad.infrastructure.kafka.ObjetoSnapshotPersistedHandler
 import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
+import design_principles.actor_model.mechanism.tell_supervision.TellSupervisor
 import design_principles.microservice.kafka_consumer_microservice.{
   KafkaConsumerMicroservice,
   KafkaConsumerMicroserviceRequirements
@@ -23,13 +21,14 @@ import scala.concurrent.ExecutionContext
 
 class CotitularidadMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
 
-  implicit val actor: ActorRef =
+  val actor: ActorRef =
     CotitularidadActor.startWithRequirements(monitoringAndMessageProducer)
+
+  val tellSupervisor: ActorRef = TellSupervisor.start(actor)
 
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(
-      AddSujetoCotitularTransaction(actor, monitoring),
-      CotitularPublishSnapshotTransaction(actor, monitoring)
+      ObjetoSnapshotPersistedHandler(tellSupervisor, monitoring)
     )
 
   override def route: Route =

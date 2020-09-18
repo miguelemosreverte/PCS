@@ -7,8 +7,10 @@ import consumers.registral.actividad_sujeto.application.entities.ActividadSujeto
 import consumers.registral.actividad_sujeto.domain.ActividadSujetoEvents.ActividadSujetoUpdatedFromDto
 import consumers.registral.actividad_sujeto.domain.ActividadSujetoState
 import design_principles.actor_model.Response
-
-class ActividadSujetoUpdateFromDtoHandler() {
+import kafka.KafkaMessageProducer.KafkaKeyValue
+import kafka.MessageProducer
+import consumers.registral.actividad_sujeto.infrastructure.json._
+class ActividadSujetoUpdateFromDtoHandler(implicit messageProducer: MessageProducer) {
 
   def handle(command: ActividadSujetoUpdateFromDto)(replyTo: ActorRef[Success]) = {
     Effect
@@ -23,7 +25,25 @@ class ActividadSujetoUpdateFromDtoHandler() {
           command.registro
         )
       )
-      .thenReply(replyTo)(state => Success(Response.SuccessProcessing(command.deliveryId)))
+      .thenReply(replyTo) { state =>
+        messageProducer.produce(
+          Seq(
+            KafkaKeyValue(
+              command.aggregateRoot,
+              serialization.encode(
+                ActividadSujetoUpdatedFromDto(
+                  command.deliveryId,
+                  command.sujetoId,
+                  command.actividadSujetoId,
+                  command.registro
+                )
+              )
+            )
+          ),
+          "ActividadSujetoUpdatedFromDto"
+        )(_ => ())
+        Success(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
+      }
   }
 
 }

@@ -14,6 +14,7 @@ import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoA
 import consumers.no_registral.sujeto.infrastructure.http.SujetoStateAPI
 import ddd.ExternalDto
 import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
+import design_principles.actor_model.mechanism.tell_supervision.TellSupervisor
 import design_principles.microservice.kafka_consumer_microservice.{
   KafkaConsumerMicroservice,
   KafkaConsumerMicroserviceRequirements
@@ -23,10 +24,12 @@ import kafka.KafkaMessageProcessorRequirements
 class SujetoMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
   implicit val actor: ActorRef = SujetoActor.startWithRequirements(monitoringAndMessageProducer)
 
+  val tellSupervisor: ActorRef = TellSupervisor.start(actor)
+
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(
-      SujetoTributarioTransaction(actor, monitoring),
-      SujetoNoTributarioTransaction(actor, monitoring)
+      SujetoTributarioTransaction(tellSupervisor, monitoring),
+      SujetoNoTributarioTransaction(tellSupervisor, monitoring)
     )
 
   override def route: Route =

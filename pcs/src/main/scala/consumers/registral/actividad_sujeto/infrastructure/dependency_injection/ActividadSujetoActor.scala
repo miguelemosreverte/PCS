@@ -11,9 +11,12 @@ import consumers.registral.actividad_sujeto.domain.ActividadSujetoEvents.Activid
 import consumers.registral.actividad_sujeto.domain.events.ActividadSujetoUpdatedFromDtoHandler
 import consumers.registral.actividad_sujeto.domain.{ActividadSujetoEvents, ActividadSujetoState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
+import kafka.MessageProducer
 
 case class ActividadSujetoActor(state: ActividadSujetoState = ActividadSujetoState())(
-    implicit system: ActorSystem[Nothing]
+    implicit
+    messageProducer: MessageProducer,
+    system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       ActividadSujetoMessage,
       ActividadSujetoEvents,

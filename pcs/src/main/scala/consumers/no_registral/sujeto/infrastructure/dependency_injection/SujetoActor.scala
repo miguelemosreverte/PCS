@@ -59,7 +59,6 @@ class SujetoActor(requirements: MonitoringAndMessageProducer, objetoActorPropsOp
     case childMessage: ObligacionMessage =>
       objetos((childMessage.sujetoId, childMessage.objetoId, childMessage.tipoObjeto)) forward childMessage
     case childMessage: ObjetoMessage =>
-      println(s"childMessage -- ${childMessage}")
       objetos((childMessage.sujetoId, childMessage.objetoId, childMessage.tipoObjeto)) forward childMessage
   }
 

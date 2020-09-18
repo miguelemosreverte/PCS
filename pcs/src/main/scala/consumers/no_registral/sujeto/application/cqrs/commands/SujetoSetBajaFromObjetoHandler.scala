@@ -11,6 +11,7 @@ import scala.util.{Success, Try}
 
 class SujetoSetBajaFromObjetoHandler(actor: SujetoActor) extends SyncCommandHandler[SujetoSetBajaFromObjeto] {
   override def handle(command: SujetoSetBajaFromObjeto): Try[Response.SuccessProcessing] = {
+    val sender = actor.context.sender()
     val event = SujetoEvents.SujetoBajaFromObjetoSet(
       command.deliveryId,
       command.sujetoId,
@@ -22,6 +23,6 @@ class SujetoSetBajaFromObjetoHandler(actor: SujetoActor) extends SyncCommandHand
       actor.state += event
       actor.persistSnapshot()(_ => ())
     }
-    Success(Response.SuccessProcessing(command.deliveryId))
+    Success(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
   }
 }

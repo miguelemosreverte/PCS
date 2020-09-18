@@ -1,14 +1,9 @@
 package consumers.registral.plan_pago.domain
 
-import consumers.registral.plan_pago.application.entities.PlanPagoExternalDto
+import consumers.registral.plan_pago.application.entities.{PlanPagoExternalDto, PlanPagoMessage}
 import design_principles.actor_model.Event
 
-sealed trait PlanPagoEvents extends Event {
-  def sujetoId: String
-  def objetoId: String
-  def tipoObjeto: String
-  def planPagoId: String
-}
+sealed trait PlanPagoEvents extends Event with PlanPagoMessage
 
 object PlanPagoEvents {
   case class PlanPagoUpdatedFromDto(

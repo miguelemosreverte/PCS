@@ -4,7 +4,6 @@ import akka.ActorRefMap
 import akka.actor.{ActorRef, Props}
 import akka.entity.ShardedEntity.MonitoringAndMessageProducer
 import com.typesafe.config.Config
-import consumers.no_registral.cotitularidad.application.entities.CotitularidadCommands.CotitularidadAddSujetoCotitular
 import consumers.no_registral.objeto.application.cqrs.commands._
 import consumers.no_registral.objeto.application.cqrs.queries.{GetStateExencionHandler, GetStateObjetoHandler}
 import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMessageRoots
@@ -26,6 +25,7 @@ class ObjetoActor(requirements: MonitoringAndMessageProducer, obligacionActorPro
   import ObjetoActor._
 
   var state = ObjetoState()
+  implicit val messageProducer: MessageProducer = requirements.messageProducer
 
   override def setupHandlers(): Unit = {
     commandBus.subscribe[ObjetoCommands.ObjetoSnapshot](new ObjetoSnapshotHandler(this).handle)
@@ -107,40 +107,8 @@ class ObjetoActor(requirements: MonitoringAndMessageProducer, obligacionActorPro
       }
   }
 
-  def shouldInformCotitulares(consolidatedState: ObjetoState): Boolean =
-    consolidatedState.isResponsable && consolidatedState.sujetos.size > 1
-
   import consumers.no_registral.objeto.infrastructure.json._
 
-  def AddSujetoCotitularTransaction(snapshot: ObjetoEvents.ObjetoUpdatedFromTri) = {
-    println("""
-              |
-              |
-              |PUBLISHING NOTIFICATION TO THE TOPIC 
-              |   AddSujetoCotitularTransaction
-              |   
-              |   
-              |   
-              |""".stripMargin)
-    val notification = CotitularidadAddSujetoCotitular(
-      snapshot.deliveryId,
-      snapshot.sujetoId,
-      snapshot.objetoId,
-      snapshot.tipoObjeto,
-      snapshot.sujetoResponsable.map(_ == snapshot.sujetoId),
-      snapshot.sujetoResponsable
-    )
-    import consumers.no_registral.cotitularidad.infrastructure.json._
-    requirements.messageProducer.produce(
-      data = Seq(
-        KafkaKeyValue(
-          notification.aggregateRoot,
-          serialization.encode(notification)
-        )
-      ),
-      "AddSujetoCotitularTransaction"
-    )(_ => ())
-  }
   def persistSnapshot(evt: ObjetoEvents, consolidatedState: ObjetoState)(handler: () => Unit): Unit = {
     val snapshot =
       ObjetoSnapshotPersisted(
@@ -151,7 +119,7 @@ class ObjetoActor(requirements: MonitoringAndMessageProducer, obligacionActorPro
         consolidatedState.saldo,
         consolidatedState.sujetos,
         consolidatedState.tags,
-        consolidatedState.sujetoResponsable.getOrElse(evt.sujetoId),
+        consolidatedState.sujetoResponsable,
         consolidatedState.porcentajeResponsabilidad,
         consolidatedState.registro,
         consolidatedState.obligacionesSaldo
@@ -167,9 +135,7 @@ class ObjetoActor(requirements: MonitoringAndMessageProducer, obligacionActorPro
         )
       ),
       "ObjetoSnapshotPersisted"
-    )(_ => ())
-
-    if (shouldInformCotitulares(this.state)) {
+    ) { _ =>
       requirements.messageProducer.produce(
         data = Seq(
           KafkaKeyValue(
@@ -177,11 +143,9 @@ class ObjetoActor(requirements: MonitoringAndMessageProducer, obligacionActorPro
             serialization.encode(snapshot)
           )
         ),
-        "CotitularidadPublishSnapshot"
-      )(_ => ())
-
+        "ObjetoSnapshotPersistedReadside"
+      )(_ => handler())
     }
-    handler()
 
   }
 

@@ -13,6 +13,8 @@ class ObjetoUpdateFromSetBajaObligacionHandler(actor: ObjetoActor)
   override def handle(
       command: ObjetoCommands.ObjetoUpdateFromSetBajaObligacion
   ): Try[Response.SuccessProcessing] = {
+    val sender = actor.context.sender()
+
     val event = ObjetoUpdatedFromObligacionBajaSet(
       command.deliveryId,
       command.sujetoId,
@@ -24,6 +26,6 @@ class ObjetoUpdateFromSetBajaObligacionHandler(actor: ObjetoActor)
       actor.state += event
       actor.persistSnapshot(event, actor.state)(() => ())
     }
-    Success(Response.SuccessProcessing(command.deliveryId))
+    Success(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
   }
 }

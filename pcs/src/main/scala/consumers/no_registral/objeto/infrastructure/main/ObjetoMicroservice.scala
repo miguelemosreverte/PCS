@@ -12,11 +12,10 @@ import consumers.no_registral.objeto.infrastructure.consumer.{
   ObjetoTributarioTransaction,
   ObjetoUpdateNovedadTransaction
 }
-import consumers.no_registral.objeto.infrastructure.event_processor.ObjetoReceiveSnapshotHandler
-import consumers.no_registral.objeto.infrastructure.event_processor.ObjetoUpdatedFromTriHandler
 import consumers.no_registral.objeto.infrastructure.http._
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor
 import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
+import design_principles.actor_model.mechanism.tell_supervision.TellSupervisor
 import design_principles.microservice.kafka_consumer_microservice.{
   KafkaConsumerMicroservice,
   KafkaConsumerMicroserviceRequirements
@@ -26,14 +25,14 @@ class ObjetoMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) exte
   implicit val actor: ActorRef =
     SujetoActor.startWithRequirements(monitoringAndMessageProducer)
 
+  val tellSupervisor: ActorRef = TellSupervisor.start(actor)
+
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(
-      new ObjetoReceiveSnapshotHandler(),
-      new ObjetoUpdatedFromTriHandler(),
-      ObjetoExencionTransaction(actor, monitoring),
-      ObjetoNoTributarioTransaction(actor, monitoring),
-      ObjetoTributarioTransaction(actor, monitoring),
-      ObjetoUpdateNovedadTransaction(actor, monitoring)
+      ObjetoExencionTransaction(tellSupervisor, monitoring),
+      ObjetoNoTributarioTransaction(tellSupervisor, monitoring),
+      ObjetoTributarioTransaction(tellSupervisor, monitoring),
+      ObjetoUpdateNovedadTransaction(tellSupervisor, monitoring)
     )
   def route: Route =
     (

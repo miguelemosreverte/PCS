@@ -11,9 +11,12 @@ import consumers.registral.tramite.domain.TramiteEvents.TramiteUpdatedFromDto
 import consumers.registral.tramite.domain.events.TramiteUpdatedFromDtoHandler
 import consumers.registral.tramite.domain.{TramiteEvents, TramiteState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
+import kafka.MessageProducer
 
 case class TramiteActor(state: TramiteState = TramiteState())(
-    implicit system: ActorSystem[Nothing]
+    implicit
+    messageProducer: MessageProducer,
+    system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       TramiteMessage,
       TramiteEvents,

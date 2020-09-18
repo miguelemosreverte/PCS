@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import akka.actor.typed.scaladsl.ActorContext
 import akka.cluster.ClusterEvent.MemberUp
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import cassandra.write.{CassandraWrite, CassandraWriteProduction}
 import com.typesafe.config.Config
 import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
 import design_principles.microservice.MicroserviceRequirements
@@ -18,5 +19,6 @@ case class KafkaConsumerMicroserviceRequirements(
     queryStateApiRequirements: QueryStateApiRequirements,
     actorTransactionRequirements: ActorTransactionRequirements,
     kafkaMessageProcessorRequirements: KafkaMessageProcessorRequirements,
-    config: Config
+    config: Config,
+    cassandraWrite: CassandraWriteProduction
 ) extends MicroserviceRequirements

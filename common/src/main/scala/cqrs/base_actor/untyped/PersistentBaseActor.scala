@@ -1,5 +1,7 @@
 package cqrs.base_actor.untyped
 
+import akka.actor.ActorLogging
+
 import scala.reflect.ClassTag
 import scala.util.Try
 import akka.persistence.journal.Tagged
@@ -15,7 +17,8 @@ import scala.concurrent.ExecutionContext
 
 abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[E]: ClassTag](monitoring: Monitoring)
     extends BaseActor[E, State](monitoring)
-    with PersistentActor {
+    with PersistentActor
+    with ActorLogging {
 
   val persistedCounter: Counter = monitoring.counter(s"$name-persisted")
 

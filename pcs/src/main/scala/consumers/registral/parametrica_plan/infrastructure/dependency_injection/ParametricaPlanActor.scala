@@ -11,9 +11,13 @@ import consumers.registral.parametrica_plan.domain.ParametricaPlanEvents.Paramet
 import consumers.registral.parametrica_plan.domain.events.ParametricaPlanUpdatedFromDtoHandler
 import consumers.registral.parametrica_plan.domain.{ParametricaPlanEvents, ParametricaPlanState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
+import kafka.MessageProducer
 
 case class ParametricaPlanActor(state: ParametricaPlanState = ParametricaPlanState())(
-    implicit system: ActorSystem[Nothing]
+    implicit
+
+    messageProducer: MessageProducer,
+    system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       ParametricaPlanMessage,
       ParametricaPlanEvents,

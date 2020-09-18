@@ -1,5 +1,7 @@
 package consumers.no_registral.cotitularidad.application.entities
 
+import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoSnapshotPersisted
+
 sealed trait CotitularidadCommands extends design_principles.actor_model.Command {
   def objetoId: String
   def tipoObjeto: String
@@ -8,13 +10,11 @@ sealed trait CotitularidadCommands extends design_principles.actor_model.Command
 
 object CotitularidadCommands {
 
-  case class CotitularidadAddSujetoCotitular(
+  case class ObjetoSnapshotPersistedReaction(
       deliveryId: BigInt,
-      sujetoId: String,
       objetoId: String,
       tipoObjeto: String,
-      isResponsable: Option[Boolean],
-      sujetoResponsable: Option[String]
+      event: ObjetoSnapshotPersisted
   ) extends CotitularidadCommands
 
   case class CotitularidadPublishSnapshot(

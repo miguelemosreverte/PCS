@@ -11,9 +11,12 @@ import consumers.registral.subasta.domain.SubastaEvents.SubastaUpdatedFromDto
 import consumers.registral.subasta.domain.events.SubastaUpdatedFromDtoHandler
 import consumers.registral.subasta.domain.{SubastaEvents, SubastaState}
 import cqrs.base_actor.typed.BasePersistentShardedTypedActorWithCQRS
+import kafka.MessageProducer
 
 case class SubastaActor(state: SubastaState = SubastaState())(
-    implicit system: ActorSystem[Nothing]
+    implicit
+    messageProducer: MessageProducer,
+    system: ActorSystem[Nothing]
 ) extends BasePersistentShardedTypedActorWithCQRS[
       SubastaMessage,
       SubastaEvents,

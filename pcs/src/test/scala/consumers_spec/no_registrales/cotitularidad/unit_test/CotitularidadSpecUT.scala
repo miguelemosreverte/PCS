@@ -7,16 +7,12 @@ import com.typesafe.config.ConfigFactory
 import consumers.no_registral.cotitularidad.application.entities.CotitularidadCommands.CotitularidadPublishSnapshot
 import consumers.no_registral.cotitularidad.infrastructure.dependency_injection.CotitularidadActor
 import consumers.no_registral.cotitularidad.infrastructure.dependency_injection.CotitularidadActor
-import consumers.no_registral.cotitularidad.infrastructure.kafka.{
-  AddSujetoCotitularTransaction,
-  CotitularPublishSnapshotTransaction
-}
+import consumers.no_registral.cotitularidad.infrastructure.kafka.ObjetoSnapshotPersistedHandler
 import consumers.no_registral.objeto.infrastructure.consumer.{
   ObjetoTributarioTransaction,
   ObjetoUpdateCotitularesTransaction,
   ObjetoUpdateNovedadTransaction
 }
-import consumers.no_registral.objeto.infrastructure.event_processor.ObjetoReceiveSnapshotHandler
 import consumers.no_registral.obligacion.infrastructure.consumer.ObligacionTributariaTransaction
 import consumers.no_registral.sujeto.infrastructure.dependency_injection.SujetoActor
 import consumers_spec.no_registrales.cotitularidad.CotitularidadSpec
@@ -51,17 +47,11 @@ object CotitularidadSpecUT {
           )
           val monitoring = MonitoringAndMessageProducerMock.dummy.monitoring
           Set(
-            AddSujetoCotitularTransaction(cotitularidadActor, monitoring),
-            CotitularPublishSnapshotTransaction(cotitularidadActor, monitoring),
+            ObjetoSnapshotPersistedHandler(cotitularidadActor, monitoring),
             ObjetoUpdateCotitularesTransaction(sujetoActor, monitoring),
             ObjetoTributarioTransaction(sujetoActor, monitoring),
             ObligacionTributariaTransaction(sujetoActor, monitoring),
             ObjetoUpdateNovedadTransaction(sujetoActor, monitoring)
-            /*new ObjetoReceiveSnapshotHandler(
-              MonitoringAndMessageProducerMock.dummy.copy(
-                messageProducer = CotitularidadSpecMessageBroker
-              )
-            )*/
           )
         }
       new NoRegistralesQueryWithActorRef(

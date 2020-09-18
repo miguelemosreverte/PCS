@@ -12,6 +12,7 @@ import scala.util.{Success, Try}
 
 class ObligacionUpdateFromDtoHandler(actor: ObligacionActor) extends SyncCommandHandler[ObligacionUpdateFromDto] {
   override def handle(command: ObligacionUpdateFromDto): Try[Response.SuccessProcessing] = {
+    val sender = actor.context.sender()
     val event = ObligacionUpdatedFromDto(
       command.deliveryId,
       command.sujetoId,
@@ -23,17 +24,17 @@ class ObligacionUpdateFromDtoHandler(actor: ObligacionActor) extends SyncCommand
     )
     if (validateCommand(event, command, actor.state.lastDeliveryIdByEvents)) {
       log.warn(s"[${actor.persistenceId}] respond idempotent because of old delivery id | $command")
-      actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
-      Success(Response.SuccessProcessing(command.deliveryId))
+      sender ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
+      Success(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
     } else {
       actor.persistEvent(event) { () =>
         actor.state += event
         actor.informParent(command)
         actor.persistSnapshot() { () =>
-          actor.context.sender() ! Response.SuccessProcessing(command.deliveryId)
+          sender ! Response.SuccessProcessing(command.aggregateRoot, command.deliveryId)
         }
       }
     }
-    Success(Response.SuccessProcessing(command.deliveryId))
+    Success(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
   }
 }

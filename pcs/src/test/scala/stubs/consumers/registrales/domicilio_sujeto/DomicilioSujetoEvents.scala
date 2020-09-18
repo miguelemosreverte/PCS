@@ -12,13 +12,13 @@ object DomicilioSujetoEvents {
   def domicilioSujetoUpdatedFromDtoAntStub: DomicilioSujetoUpdatedFromDto = DomicilioSujetoUpdatedFromDto(
     deliveryId = domicilioSujetoAntStub.EV_ID.toInt,
     sujetoId = domicilioSujetoAntStub.BDS_SUJ_IDENTIFICADOR,
-    domicilioSujetoId = domicilioSujetoAntStub.BDS_DOM_ID,
+    domicilioId = domicilioSujetoAntStub.BDS_DOM_ID,
     registro = domicilioSujetoAntStub
   )
   def domicilioSujetoUpdatedFromDtoTriStub: DomicilioSujetoUpdatedFromDto = DomicilioSujetoUpdatedFromDto(
     deliveryId = domicilioSujetoTriStub.EV_ID.toInt,
     sujetoId = domicilioSujetoTriStub.BDS_SUJ_IDENTIFICADOR,
-    domicilioSujetoId = domicilioSujetoTriStub.BDS_DOM_ID,
+    domicilioId = domicilioSujetoTriStub.BDS_DOM_ID,
     registro = domicilioSujetoTriStub
   )
 }

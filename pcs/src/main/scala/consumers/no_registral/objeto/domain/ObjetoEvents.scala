@@ -30,7 +30,7 @@ object ObjetoEvents {
       saldo: BigDecimal,
       cotitulares: Set[String],
       tags: Set[String],
-      sujetoResponsable: String,
+      sujetoResponsable: Option[String],
       porcentajeResponsabilidad: BigDecimal,
       registro: Option[ObjetoExternalDto],
       obligacionesSaldo: Map[String, BigDecimal] = Map.empty

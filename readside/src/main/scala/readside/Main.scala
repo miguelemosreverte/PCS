@@ -1,11 +1,11 @@
 package readside
 
 import com.typesafe.config.{Config, ConfigFactory}
-import design_principles.microservice.cassandra_projectionist_microservice.{
-  CassandraProjectionistMicroservice,
-  CassandraProjectionistMicroserviceRequirements
+import design_principles.microservice.kafka_consumer_microservice.{
+  KafkaConsumerMicroservice,
+  KafkaConsumerMicroserviceRequirements
 }
-import design_principles.microservice.cassandra_projectionist_microservice.MainApplication.startMicroservices
+import design_principles.microservice.kafka_consumer_microservice.MainApplication.startMicroservices
 import design_principles.microservice.kafka_consumer_microservice.KafkaConsumerMicroserviceRequirements
 import monitoring.KamonMonitoring
 
@@ -19,10 +19,10 @@ object Main extends App {
   startMicroservices(microservices, ip, port, actorSystemName)
 
   def microservices(
-      microserviceProvisioning: CassandraProjectionistMicroserviceRequirements
-  ): Seq[CassandraProjectionistMicroservice] = {
+      microserviceProvisioning: KafkaConsumerMicroserviceRequirements
+  ): Seq[KafkaConsumerMicroservice] = {
     // localImplicit @deprecated | in Scala 3 we will be able to send first order functions with implicit parameters
-    implicit val localImplicit: CassandraProjectionistMicroserviceRequirements = microserviceProvisioning
+    implicit val localImplicit: KafkaConsumerMicroserviceRequirements = microserviceProvisioning
     Seq(
       new readside.proyectionists.no_registrales.obligacion.infrastructure.main.ObligacionProjectionistMicroservice,
       new readside.proyectionists.no_registrales.objeto.infrastructure.main.ObjetoProjectionistMicroservice,

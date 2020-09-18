@@ -10,6 +10,6 @@ trait DomicilioObjetoProjection extends UpdateReadSideProjection[DomicilioObjeto
     "bdo_suj_identificador" -> event.sujetoId,
     "bdo_soj_identificador" -> event.objetoId,
     "bdo_soj_tipo_objeto" -> event.tipoObjeto,
-    "bdo_dom_id" -> event.domicilioObjetoId
+    "bdo_dom_id" -> event.domicilioId
   )
 }

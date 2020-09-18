@@ -29,7 +29,7 @@ class ObligacionPersistedSnapshotHandler(
     val projection = ObligacionSnapshotProjection(registro)
     for {
       done <- r.cassandraWrite writeState projection
-    } yield SuccessProcessing(registro.deliveryId)
+    } yield SuccessProcessing(registro.aggregateRoot, registro.deliveryId)
   }
 
 }

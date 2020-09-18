@@ -1,15 +1,10 @@
 package consumers.registral.juicio.domain
 
-import consumers.registral.juicio.application.entities.JuicioExternalDto
+import consumers.registral.juicio.application.entities.{JuicioExternalDto, JuicioMessage}
 import consumers.registral.juicio.application.entities.JuicioExternalDto.DetallesJuicio
 import design_principles.actor_model.Event
 
-sealed trait JuicioEvents extends Event {
-  def sujetoId: String
-  def objetoId: String
-  def tipoObjeto: String
-  def juicioId: String
-}
+sealed trait JuicioEvents extends Event with JuicioMessage
 
 object JuicioEvents {
   case class JuicioUpdatedFromDto(

@@ -63,6 +63,10 @@ spec:
           imagePullPolicy: Always
           name: pcs-cluster
           env:
+            - name: CASSANDRA_CONSISTENCY
+              value: "ONE"
+            - name: CASSANDRA_CONSISTENCY_SNAPSHOT
+              value: "ONE"
             - name: PARALELLISM
               value: "$PARALLELISM"
             - name: REQUIRED_CONTACT_POINTS

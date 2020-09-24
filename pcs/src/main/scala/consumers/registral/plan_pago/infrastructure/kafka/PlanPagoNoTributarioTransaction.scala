@@ -40,7 +40,8 @@ case class PlanPagoNoTributarioTransaction(actor: ActorRef, monitoring: Monitori
       registro = registro
     )
 
-    actor ask command
+    actor ! command
+    Future.successful(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
   }
 
 }

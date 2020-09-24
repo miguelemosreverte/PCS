@@ -39,7 +39,9 @@ case class ParametricaPlanTributarioTransaction(actor: ActorRef, monitoring: Mon
       deliveryId = BigInt(registro.EV_ID),
       registro = registro
     )
-    actor ask command
+
+    actor ! command
+    Future.successful(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
   }
 
 }

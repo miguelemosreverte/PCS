@@ -60,6 +60,8 @@ case class ObligacionNoTributariaTransaction(actorRef: ActorRef, monitoring: Mon
           registro = registro,
           detallesObligacion = detalles.getOrElse(Seq.empty)
         )
-    actorRef.ask[Response.SuccessProcessing](command)
+
+    actorRef ! command
+    Future.successful(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
   }
 }

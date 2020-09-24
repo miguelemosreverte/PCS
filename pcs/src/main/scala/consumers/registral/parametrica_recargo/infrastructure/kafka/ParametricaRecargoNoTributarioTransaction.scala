@@ -40,7 +40,9 @@ case class ParametricaRecargoNoTributarioTransaction(actor: ActorRef, monitoring
       deliveryId = BigInt(registro.EV_ID),
       registro = registro
     )
-    actor ask command
+
+    actor ! command
+    Future.successful(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
   }
 
 }

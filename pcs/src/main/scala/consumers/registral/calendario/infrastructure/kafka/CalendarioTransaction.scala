@@ -39,7 +39,9 @@ case class CalendarioTransaction(actor: ActorRef, monitoring: Monitoring)(
           registro = registro
         )
     }
-    actor ask command
+
+    actor ! command
+    Future.successful(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
   }
 
 }

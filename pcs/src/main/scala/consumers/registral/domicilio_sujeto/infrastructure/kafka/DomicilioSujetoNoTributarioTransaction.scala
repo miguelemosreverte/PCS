@@ -38,7 +38,9 @@ case class DomicilioSujetoNoTributarioTransaction(actor: ActorRef, monitoring: M
       deliveryId = BigInt(registro.EV_ID),
       registro = registro
     )
-    actor ask command
+
+    actor ! command
+    Future.successful(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
   }
 
 }

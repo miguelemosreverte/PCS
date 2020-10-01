@@ -21,8 +21,10 @@ class ParametricaPlanMicroservice(implicit m: KafkaConsumerMicroserviceRequireme
   val tellSupervisor: ActorRef = TellSupervisor.start(actor.shardActor.toClassic)
 
   override def actorTransactions: Set[ActorTransaction[_]] =
-    Set(ParametricaPlanNoTributarioTransaction(tellSupervisor, monitoring),
-        ParametricaPlanTributarioTransaction(tellSupervisor, monitoring))
+    Set(
+      ParametricaPlanNoTributarioTransaction(actor.shardActor.toClassic, monitoring),
+      ParametricaPlanTributarioTransaction(actor.shardActor.toClassic, monitoring)
+    )
 
   override def route: Route =
     (Seq(

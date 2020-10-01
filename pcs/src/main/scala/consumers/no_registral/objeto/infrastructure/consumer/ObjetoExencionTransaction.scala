@@ -36,7 +36,6 @@ case class ObjetoExencionTransaction(actorRef: ActorRef, monitoring: Monitoring)
       exencion = exencion
     )
 
-    actorRef ! command
-    Future.successful(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
+    actorRef.ask[Response.SuccessProcessing](command)
   }
 }

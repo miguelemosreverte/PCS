@@ -20,7 +20,7 @@ class SubastaMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) ext
   val tellSupervisor: ActorRef = TellSupervisor.start(actor.shardActor.toClassic)
 
   override def actorTransactions: Set[ActorTransaction[_]] =
-    Set(SubastaTransaction(tellSupervisor, monitoring))
+    Set(SubastaTransaction(actor.shardActor.toClassic, monitoring))
 
   override def route: Route =
     (Seq(

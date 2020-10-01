@@ -21,9 +21,7 @@ case class ObjetoUpdateNovedadTransaction(actorRef: ActorRef, monitoring: Monito
   def processInput(input: String): Either[Throwable, ObjetoSnapshot] =
     maybeDecode[ObjetoSnapshot](input)
 
-  def processMessage(cmd: ObjetoSnapshot): Future[Response.SuccessProcessing] = {
-    actorRef ! cmd
-    Future.successful(Response.SuccessProcessing(cmd.aggregateRoot, cmd.deliveryId))
-  }
+  def processMessage(cmd: ObjetoSnapshot): Future[Response.SuccessProcessing] =
+    actorRef.ask[Response.SuccessProcessing](cmd)
 
 }

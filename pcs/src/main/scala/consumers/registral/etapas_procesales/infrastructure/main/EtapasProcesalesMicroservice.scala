@@ -22,8 +22,10 @@ class EtapasProcesalesMicroservice(implicit m: KafkaConsumerMicroserviceRequirem
   val tellSupervisor: ActorRef = TellSupervisor.start(actor.shardActor.toClassic)
 
   override def actorTransactions: Set[ActorTransaction[_]] =
-    Set(EtapasProcesalesNoTributarioTransaction(tellSupervisor, monitoring),
-        EtapasProcesalesTributarioTransaction(tellSupervisor, monitoring))
+    Set(
+      EtapasProcesalesNoTributarioTransaction(actor.shardActor.toClassic, monitoring),
+      EtapasProcesalesTributarioTransaction(actor.shardActor.toClassic, monitoring)
+    )
 
   override def route: Route =
     (Seq(

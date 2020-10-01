@@ -27,8 +27,8 @@ class ObligacionMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) 
 
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(
-      ObligacionTributariaTransaction(tellSupervisor, monitoring),
-      ObligacionNoTributariaTransaction(tellSupervisor, monitoring)
+      ObligacionTributariaTransaction(actor, monitoring),
+      ObligacionNoTributariaTransaction(actor, monitoring)
     )
 
   def route: Route = {

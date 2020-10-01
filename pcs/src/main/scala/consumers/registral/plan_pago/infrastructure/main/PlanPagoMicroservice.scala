@@ -22,8 +22,8 @@ class PlanPagoMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) ex
 
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(
-      PlanPagoNoTributarioTransaction(tellSupervisor, monitoring),
-      PlanPagoTributarioTransaction(tellSupervisor, monitoring)
+      PlanPagoNoTributarioTransaction(actor.shardActor.toClassic, monitoring),
+      PlanPagoTributarioTransaction(actor.shardActor.toClassic, monitoring)
     )
 
   override def route: Route =

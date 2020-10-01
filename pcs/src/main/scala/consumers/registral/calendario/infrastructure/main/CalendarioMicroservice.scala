@@ -20,7 +20,7 @@ class CalendarioMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) 
   val tellSupervisor: ActorRef = TellSupervisor.start(actor.shardActor.toClassic)
 
   override def actorTransactions: Set[ActorTransaction[_]] =
-    Set(CalendarioTransaction(tellSupervisor, monitoring))
+    Set(CalendarioTransaction(actor.shardActor.toClassic, monitoring))
 
   override def route: Route =
     (Seq(

@@ -28,8 +28,8 @@ class SujetoMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) exte
 
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(
-      SujetoTributarioTransaction(tellSupervisor, monitoring),
-      SujetoNoTributarioTransaction(tellSupervisor, monitoring)
+      SujetoTributarioTransaction(actor, monitoring),
+      SujetoNoTributarioTransaction(actor, monitoring)
     )
 
   override def route: Route =

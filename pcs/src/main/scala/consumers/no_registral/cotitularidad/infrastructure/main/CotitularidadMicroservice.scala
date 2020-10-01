@@ -28,7 +28,7 @@ class CotitularidadMicroservice(implicit m: KafkaConsumerMicroserviceRequirement
 
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(
-      ObjetoSnapshotPersistedHandler(tellSupervisor, monitoring)
+      ObjetoSnapshotPersistedHandler(actor, monitoring)
     )
 
   override def route: Route =

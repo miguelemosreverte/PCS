@@ -21,7 +21,7 @@ class DeclaracionJuradaMicroservice(implicit m: KafkaConsumerMicroserviceRequire
   val tellSupervisor: ActorRef = TellSupervisor.start(actor.shardActor.toClassic)
 
   override def actorTransactions: Set[ActorTransaction[_]] =
-    Set(DeclaracionJuradaTransaction(tellSupervisor, monitoring))
+    Set(DeclaracionJuradaTransaction(actor.shardActor.toClassic, monitoring))
 
   override def route: Route =
     (Seq(

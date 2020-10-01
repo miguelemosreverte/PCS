@@ -41,7 +41,6 @@ case class DomicilioSujetoTributarioTransaction(actor: ActorRef, monitoring: Mon
       registro = registro
     )
 
-    actor ! command
-    Future.successful(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
+    actor ask command
   }
 }

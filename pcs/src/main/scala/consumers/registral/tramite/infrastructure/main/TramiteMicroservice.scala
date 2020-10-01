@@ -19,7 +19,7 @@ class TramiteMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) ext
   val tellSupervisor: ActorRef = TellSupervisor.start(actor.shardActor.toClassic)
 
   override def actorTransactions: Set[ActorTransaction[_]] =
-    Set(TramiteTransaction(tellSupervisor, monitoring))
+    Set(TramiteTransaction(actor.shardActor.toClassic, monitoring))
 
   override def route: Route =
     (Seq(

@@ -17,8 +17,6 @@ import akka.actor.typed.scaladsl.adapter._
 
 class SubastaMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
   implicit val actor: SubastaActor = SubastaActor(SubastaState())
-  val tellSupervisor: ActorRef = TellSupervisor.start(actor.shardActor.toClassic)
-
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(SubastaTransaction(actor.shardActor.toClassic, monitoring))
 

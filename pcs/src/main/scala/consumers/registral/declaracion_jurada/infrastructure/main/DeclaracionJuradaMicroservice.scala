@@ -18,8 +18,6 @@ import akka.actor.typed.scaladsl.adapter._
 class DeclaracionJuradaMicroservice(implicit m: KafkaConsumerMicroserviceRequirements)
     extends KafkaConsumerMicroservice {
   implicit val actor: DeclaracionJuradaActor = DeclaracionJuradaActor(DeclaracionJuradaState())
-  val tellSupervisor: ActorRef = TellSupervisor.start(actor.shardActor.toClassic)
-
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(DeclaracionJuradaTransaction(actor.shardActor.toClassic, monitoring))
 

@@ -24,8 +24,6 @@ import kafka.KafkaMessageProcessorRequirements
 class SujetoMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
   implicit val actor: ActorRef = SujetoActor.startWithRequirements(monitoringAndMessageProducer)
 
-  val tellSupervisor: ActorRef = TellSupervisor.start(actor)
-
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(
       SujetoTributarioTransaction(actor, monitoring),

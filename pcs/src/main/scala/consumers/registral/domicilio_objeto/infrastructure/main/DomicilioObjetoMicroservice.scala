@@ -18,8 +18,6 @@ import akka.actor.typed.scaladsl.adapter._
 
 class DomicilioObjetoMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
   implicit val actor: DomicilioObjetoActor = DomicilioObjetoActor(DomicilioObjetoState())
-  val tellSupervisor: ActorRef = TellSupervisor.start(actor.shardActor.toClassic)
-
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(
       DomicilioObjetoNoTributarioTransaction(actor.shardActor.toClassic, monitoring),

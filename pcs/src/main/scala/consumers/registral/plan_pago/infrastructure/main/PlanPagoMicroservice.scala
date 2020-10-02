@@ -18,8 +18,6 @@ import akka.actor.typed.scaladsl.adapter._
 
 class PlanPagoMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
   implicit val actor: PlanPagoActor = PlanPagoActor(PlanPagoState())
-  val tellSupervisor: ActorRef = TellSupervisor.start(actor.shardActor.toClassic)
-
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(
       PlanPagoNoTributarioTransaction(actor.shardActor.toClassic, monitoring),

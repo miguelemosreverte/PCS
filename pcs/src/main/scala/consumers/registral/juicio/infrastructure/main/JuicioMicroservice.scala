@@ -18,8 +18,6 @@ import akka.actor.typed.scaladsl.adapter._
 
 class JuicioMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
   implicit val actor: JuicioActor = JuicioActor(JuicioState())
-  val tellSupervisor: ActorRef = TellSupervisor.start(actor.shardActor.toClassic)
-
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(
       JuicioNoTributarioTransaction(actor.shardActor.toClassic, monitoring),

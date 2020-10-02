@@ -18,7 +18,7 @@ spec:
       serviceAccountName: cluster-admin
       containers:
         - name: ubuntu
-          image: miguelemos/akka-kubernetes-administrator
+          image: ftestagrossa/akka-kubernetes-administrator
           volumeMounts:
             - mountPath: /var/run/docker.sock
               name: docker-socket-volume

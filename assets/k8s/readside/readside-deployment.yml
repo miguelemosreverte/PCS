@@ -86,6 +86,10 @@ spec:
               value: "copernico"
             - name: SERVICE_NAME
               value: "application-dns-internal"
+            - name: CASSANDRA_CONSISTENCY
+              value: "ONE"
+            - name: CASSANDRA_CONSISTENCY_SNAPSHOT
+              value: "ONE"
           ports:
             - name: remoting
               containerPort: 2554

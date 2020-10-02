@@ -19,11 +19,11 @@ import akka.actor.typed.scaladsl.adapter._
 class EtapasProcesalesMicroservice(implicit m: KafkaConsumerMicroserviceRequirements)
     extends KafkaConsumerMicroservice {
   implicit val actor: EtapasProcesalesActor = EtapasProcesalesActor(EtapasProcesalesState())
-  val tellSupervisor: ActorRef = TellSupervisor.start(actor.shardActor.toClassic)
-
   override def actorTransactions: Set[ActorTransaction[_]] =
-    Set(EtapasProcesalesNoTributarioTransaction(tellSupervisor, monitoring),
-        EtapasProcesalesTributarioTransaction(tellSupervisor, monitoring))
+    Set(
+      EtapasProcesalesNoTributarioTransaction(actor.shardActor.toClassic, monitoring),
+      EtapasProcesalesTributarioTransaction(actor.shardActor.toClassic, monitoring)
+    )
 
   override def route: Route =
     (Seq(

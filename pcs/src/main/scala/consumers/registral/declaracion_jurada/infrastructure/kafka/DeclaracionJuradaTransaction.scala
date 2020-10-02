@@ -41,8 +41,7 @@ case class DeclaracionJuradaTransaction(actor: ActorRef, monitoring: Monitoring)
       registro = registro
     )
 
-    actor ! command
-    Future.successful(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
+    actor ask command
   }
 
 }

@@ -17,10 +17,8 @@ import akka.actor.typed.scaladsl.adapter._
 
 class ActividadSujetoMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
   implicit val actor: ActividadSujetoActor = ActividadSujetoActor(ActividadSujetoState())
-  val tellSupervisor: ActorRef = TellSupervisor.start(actor.shardActor.toClassic)
-
   override def actorTransactions: Set[ActorTransaction[_]] =
-    Set(ActividadSujetoTransaction(tellSupervisor, monitoring))
+    Set(ActividadSujetoTransaction(actor.shardActor.toClassic, monitoring))
 
   override def route: Route =
     (Seq(

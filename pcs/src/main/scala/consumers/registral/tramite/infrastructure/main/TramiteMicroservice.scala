@@ -16,10 +16,8 @@ import design_principles.microservice.kafka_consumer_microservice.{
 import akka.actor.typed.scaladsl.adapter._
 class TramiteMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
   implicit val actor: TramiteActor = TramiteActor(TramiteState())
-  val tellSupervisor: ActorRef = TellSupervisor.start(actor.shardActor.toClassic)
-
   override def actorTransactions: Set[ActorTransaction[_]] =
-    Set(TramiteTransaction(tellSupervisor, monitoring))
+    Set(TramiteTransaction(actor.shardActor.toClassic, monitoring))
 
   override def route: Route =
     (Seq(

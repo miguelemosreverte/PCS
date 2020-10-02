@@ -23,12 +23,10 @@ class ObligacionMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) 
 
   implicit val actor: ActorRef = SujetoActor.startWithRequirements(monitoringAndMessageProducer)
 
-  val tellSupervisor: ActorRef = TellSupervisor.start(actor)
-
   override def actorTransactions: Set[ActorTransaction[_]] =
     Set(
-      ObligacionTributariaTransaction(tellSupervisor, monitoring),
-      ObligacionNoTributariaTransaction(tellSupervisor, monitoring)
+      ObligacionTributariaTransaction(actor, monitoring),
+      ObligacionNoTributariaTransaction(actor, monitoring)
     )
 
   def route: Route = {

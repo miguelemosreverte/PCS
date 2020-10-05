@@ -18,11 +18,11 @@ import akka.actor.typed.scaladsl.adapter._
 
 class ParametricaPlanMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
   implicit val actor: ParametricaPlanActor = ParametricaPlanActor(ParametricaPlanState())
-  val tellSupervisor: ActorRef = TellSupervisor.start(actor.shardActor.toClassic)
-
   override def actorTransactions: Set[ActorTransaction[_]] =
-    Set(ParametricaPlanNoTributarioTransaction(tellSupervisor, monitoring),
-        ParametricaPlanTributarioTransaction(tellSupervisor, monitoring))
+    Set(
+      ParametricaPlanNoTributarioTransaction(actor.shardActor.toClassic, monitoring),
+      ParametricaPlanTributarioTransaction(actor.shardActor.toClassic, monitoring)
+    )
 
   override def route: Route =
     (Seq(

@@ -17,10 +17,8 @@ import akka.actor.typed.scaladsl.adapter._
 
 class CalendarioMicroservice(implicit m: KafkaConsumerMicroserviceRequirements) extends KafkaConsumerMicroservice {
   implicit val actor: CalendarioActor = CalendarioActor(CalendarioState())
-  val tellSupervisor: ActorRef = TellSupervisor.start(actor.shardActor.toClassic)
-
   override def actorTransactions: Set[ActorTransaction[_]] =
-    Set(CalendarioTransaction(tellSupervisor, monitoring))
+    Set(CalendarioTransaction(actor.shardActor.toClassic, monitoring))
 
   override def route: Route =
     (Seq(

@@ -48,7 +48,6 @@ case class ObjetoNoTributarioTransaction(actorRef: ActorRef, monitoring: Monitor
           registro = registro
         )
 
-    actorRef ! command
-    Future.successful(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
+    actorRef.ask[Response.SuccessProcessing](command)
   }
 }

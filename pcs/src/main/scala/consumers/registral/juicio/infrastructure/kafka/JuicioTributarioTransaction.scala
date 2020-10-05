@@ -50,8 +50,7 @@ case class JuicioTributarioTransaction(actor: ActorRef, monitoring: Monitoring)(
         detalles.getOrElse(Seq.empty)
       )
 
-    actor ! command
-    Future.successful(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
+    actor ask command
   }
 
 }

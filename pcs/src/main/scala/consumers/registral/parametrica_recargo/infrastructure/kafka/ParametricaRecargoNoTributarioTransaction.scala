@@ -41,8 +41,7 @@ case class ParametricaRecargoNoTributarioTransaction(actor: ActorRef, monitoring
       registro = registro
     )
 
-    actor ! command
-    Future.successful(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
+    actor ask command
   }
 
 }

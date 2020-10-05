@@ -40,8 +40,7 @@ case class CalendarioTransaction(actor: ActorRef, monitoring: Monitoring)(
         )
     }
 
-    actor ! command
-    Future.successful(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
+    actor ask command
   }
 
 }

@@ -74,8 +74,6 @@ case class ObjetoTributarioTransaction(actorRef: ActorRef, monitoring: Monitorin
           sujetoResponsable = sujetoResponsable
         )
 
-    actorRef ! command
-    Future.successful(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))
-
+    actorRef.ask[Response.SuccessProcessing](command)
   }
 }

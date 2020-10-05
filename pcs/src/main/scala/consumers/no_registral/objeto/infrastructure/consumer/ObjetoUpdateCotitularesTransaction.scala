@@ -21,8 +21,6 @@ case class ObjetoUpdateCotitularesTransaction(actorRef: ActorRef, monitoring: Mo
     maybeDecode[ObjetoUpdateCotitulares](input)
 
   def processMessage(cmd: ObjetoUpdateCotitulares): Future[Response.SuccessProcessing] = {
-    actorRef ! cmd
-    Future.successful(Response.SuccessProcessing(cmd.aggregateRoot, cmd.deliveryId))
+    actorRef.ask[Response.SuccessProcessing](cmd)
   }
-
 }

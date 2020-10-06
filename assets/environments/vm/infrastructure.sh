@@ -20,8 +20,8 @@ docker-compose -f assets/docker-compose/docker-compose-kafka.yml down -v
 docker-compose -f assets/docker-compose/docker-compose-kafka.yml up -d
 echo "== kafka started =="
 
-# docker-compose -f assets/docker-compose/docker-compose-monitoring.yml build grafana
-# docker-compose -f assets/docker-compose/docker-compose-monitoring.yml --env-file=assets/docker-compose/.env up -d
+docker-compose -f assets/docker-compose/docker-compose-monitoring.yml build grafana
+docker-compose -f assets/docker-compose/docker-compose-monitoring.yml --env-file=assets/docker-compose/.env up -d
 
 checkCassandra() {
   docker exec cassandra cqlsh -e 'describe tables' > /dev/null 2>&1

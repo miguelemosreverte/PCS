@@ -7,12 +7,10 @@ import consumers.no_registral.objeto.application.entities.ObjetoCommands.{
   ObjetoSnapshot,
   ObjetoTagAdd,
   ObjetoTagRemove,
-  ObjetoUpdateCotitulares,
   ObjetoUpdateFromAnt,
   ObjetoUpdateFromObligacion,
   ObjetoUpdateFromSetBajaObligacion,
   ObjetoUpdateFromTri,
-  SelfUpdateCotitulares,
   SetBajaObjeto
 }
 import consumers.no_registral.objeto.application.entities.ObjetoExternalDto.{
@@ -47,16 +45,12 @@ package object json {
     Json.format[consumers.no_registral.objeto.application.entities.ObjetoResponses.GetObjetoResponse]
 
   implicit val ObjetoSnapshotF = Json.format[ObjetoSnapshot]
-  implicit val ObjetoUpdateCotitularesF = Json.format[ObjetoUpdateCotitulares]
-  implicit val ObjetoUpdatedCotitularesF = Json.format[ObjetoUpdatedCotitulares]
-  class ObjetoUpdatedCotitularesFS extends EventSerializer[ObjetoUpdatedCotitulares]
   implicit val ObjetoUpdateFromTriF = Json.format[ObjetoUpdateFromTri]
   implicit val ObjetoUpdateFromAntF = Json.format[ObjetoUpdateFromAnt]
   implicit val ObjetoUpdateFromObligacionF = Json.format[ObjetoUpdateFromObligacion]
   implicit val ObjetoTagAddF = Json.format[ObjetoTagAdd]
   implicit val SetBajaObjetoF = Json.format[SetBajaObjeto]
   implicit val ObjetoTagRemoveF = Json.format[ObjetoTagRemove]
-  implicit val SelfUpdateCotitularesF = Json.format[SelfUpdateCotitulares]
   implicit val ObjetoUpdateFromSetBajaObligacionF = Json.format[ObjetoUpdateFromSetBajaObligacion]
 
   implicit val ObjetoSnapshotPersistedF = Json.format[ObjetoSnapshotPersisted]

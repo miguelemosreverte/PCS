@@ -10,7 +10,6 @@ import consumers.no_registral.cotitularidad.infrastructure.dependency_injection.
 import consumers.no_registral.cotitularidad.infrastructure.kafka.ObjetoSnapshotPersistedHandler
 import consumers.no_registral.objeto.infrastructure.consumer.{
   ObjetoTributarioTransaction,
-  ObjetoUpdateCotitularesTransaction,
   ObjetoUpdateNovedadTransaction
 }
 import consumers.no_registral.obligacion.infrastructure.consumer.ObligacionTributariaTransaction
@@ -48,14 +47,14 @@ object CotitularidadSpecUT {
           val monitoring = MonitoringAndMessageProducerMock.dummy.monitoring
           Set(
             ObjetoSnapshotPersistedHandler(cotitularidadActor, monitoring),
-            ObjetoUpdateCotitularesTransaction(sujetoActor, monitoring),
             ObjetoTributarioTransaction(sujetoActor, monitoring),
             ObligacionTributariaTransaction(sujetoActor, monitoring),
             ObjetoUpdateNovedadTransaction(sujetoActor, monitoring)
           )
         }
       new NoRegistralesQueryWithActorRef(
-        sujetoActor
+        sujetoActor,
+        cotitularidadActor
       )
     }
     CotitularidadSpec TestContext (

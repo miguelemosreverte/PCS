@@ -2,6 +2,7 @@ package stubs.consumers.no_registrales
 
 import java.time.LocalDateTime
 
+import consumers.no_registral.cotitularidad.application.entities.CotitularidadResponses.GetCotitularesResponse
 import consumers.no_registral.objeto.application.entities.ObjetoResponses.GetObjetoResponse
 import consumers.no_registral.obligacion.application.entities.ObligacionCommands.ObligacionUpdateFromDto
 import consumers.no_registral.obligacion.application.entities.ObligacionExternalDto.{ObligacionesAnt, ObligacionesTri}
@@ -12,6 +13,10 @@ import utils.generators.Model.deliveryId
 
 package object common {
 
+  import consumers.no_registral.cotitularidad.infrastructure.json.GetCotitularesResponseF
+  implicit class GetCotitularesResponsePrettyPrint(response: GetCotitularesResponse) {
+    def prettyPrint: String = serialization.encode(response)(GetCotitularesResponseF)
+  }
   import consumers.no_registral.sujeto.infrastructure.json.GetSujetoResponseF
   implicit class GetSujetoResponsePrettyPrint(response: GetSujetoResponse) {
     def prettyPrint: String = serialization.encode(response)(GetSujetoResponseF)

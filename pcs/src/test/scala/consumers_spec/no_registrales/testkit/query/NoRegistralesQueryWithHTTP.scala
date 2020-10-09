@@ -1,6 +1,9 @@
 package consumers_spec.no_registrales.testkit.query
 
 import akka.actor.ActorSystem
+import consumers.no_registral.cotitularidad.application.entities.CotitularidadMessage.CotitularidadMessageRoots
+import consumers.no_registral.cotitularidad.application.entities.CotitularidadQueries.GetCotitulares
+import consumers.no_registral.cotitularidad.application.entities.CotitularidadResponses.GetCotitularesResponse
 import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMessageRoots
 import consumers.no_registral.objeto.application.entities.ObjetoResponses.GetObjetoResponse
 import consumers.no_registral.obligacion.application.entities.ObligacionMessage.ObligacionMessageRoots
@@ -20,6 +23,7 @@ class NoRegistralesQueryWithHTTP()(implicit system: ActorSystem)
   import consumers.no_registral.objeto.infrastructure.json._
   import consumers.no_registral.obligacion.infrastructure.json._
   import consumers.no_registral.sujeto.infrastructure.json._
+  import consumers.no_registral.cotitularidad.infrastructure.json._
   implicit val ec: ExecutionContextExecutor = system.dispatcher
   def getStateObligacion(obligacionExample: ObligacionMessageRoots): GetObligacionResponse = {
     val sujetoId = obligacionExample.sujetoId
@@ -29,6 +33,16 @@ class NoRegistralesQueryWithHTTP()(implicit system: ActorSystem)
     http
       .GET[GetObligacionResponse](
         s"0.0.0.0:8081/state/sujeto/$sujetoId/objeto/$objetoId/tipo/$tipoObjeto/obligacion/$obligacionId"
+      )
+      .futureValue
+  }
+
+  def getStateCotitularidad(objetoExample: CotitularidadMessageRoots): GetCotitularesResponse = {
+    val objetoId = objetoExample.objetoId
+    val tipoObjeto = objetoExample.tipoObjeto
+    http
+      .GET[GetCotitularesResponse](
+        s"0.0.0.0:8081/state/objeto/$objetoId/tipo/$tipoObjeto"
       )
       .futureValue
   }

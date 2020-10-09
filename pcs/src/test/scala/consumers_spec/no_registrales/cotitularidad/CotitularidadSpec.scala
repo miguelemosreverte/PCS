@@ -1,6 +1,8 @@
 package consumers_spec.no_registrales.cotitularidad
 
 import akka.actor.ActorSystem
+import consumers.no_registral.cotitularidad.application.entities.CotitularidadMessage.CotitularidadMessageRoots
+import consumers.no_registral.cotitularidad.application.entities.CotitularidadResponses.GetCotitularesResponse
 import consumers.no_registral.objeto.application.entities.ObjetoExternalDto.ObjetosTri
 import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMessageRoots
 import consumers.no_registral.objeto.application.entities.ObjetoResponses.GetObjetoResponse
@@ -68,10 +70,12 @@ abstract class CotitularidadSpec(
     )(_ => ())
 
     eventually {
-      messageProcessor.messageHistory.last match {
-        case (topic, a) if topic == "AddSujetoCotitularTransaction" =>
-          true
-      }
+      val response: GetCotitularesResponse = Query getStateCotitularidad CotitularidadMessageRoots(
+          examples.objetoId2._1,
+          examples.objetoId2._2
+        )
+      response.sujetoResponsable should be(examples.sujetoId1)
+      log.info(response.prettyPrint)
     }
 
     messageProducer.produce(
@@ -85,18 +89,11 @@ abstract class CotitularidadSpec(
     )(_ => ())
 
     eventually {
-      val response: GetObjetoResponse = Query getStateObjeto ObjetoMessageRoots(examples.sujetoId1,
-                                                                                examples.objetoId2._1,
-                                                                                examples.objetoId2._2)
-      response.sujetos should be(Set(examples.sujetoId1, examples.sujetoId2))
-      log.info(response.prettyPrint)
-    }
-
-    eventually {
-      val response: GetObjetoResponse = Query getStateObjeto ObjetoMessageRoots(examples.sujetoId2,
-                                                                                examples.objetoId2._1,
-                                                                                examples.objetoId2._2)
-      response.sujetos should be(Set(examples.sujetoId1, examples.sujetoId2))
+      val response: GetCotitularesResponse = Query getStateCotitularidad CotitularidadMessageRoots(
+          examples.objetoId2._1,
+          examples.objetoId2._2
+        )
+      response.sujetosCotitulares + response.sujetoResponsable should be(Set(examples.sujetoId1, examples.sujetoId2))
       log.info(response.prettyPrint)
     }
 
@@ -111,17 +108,21 @@ abstract class CotitularidadSpec(
     )(_ => ())
 
     eventually {
-      val response: GetObjetoResponse = Query getStateObjeto ObjetoMessageRoots(examples.sujetoId1,
-                                                                                examples.objetoId2._1,
-                                                                                examples.objetoId2._2)
+      val response: GetObjetoResponse = Query getStateObjeto ObjetoMessageRoots(
+          examples.sujetoId1,
+          examples.objetoId2._1,
+          examples.objetoId2._2
+        )
       response.saldo should be(examples.obligacionWithSaldo50.BOB_SALDO)
       log.info(response.prettyPrint)
     }
 
     eventually {
-      val response: GetObjetoResponse = Query getStateObjeto ObjetoMessageRoots(examples.sujetoId2,
-                                                                                examples.objetoId2._1,
-                                                                                examples.objetoId2._2)
+      val response: GetObjetoResponse = Query getStateObjeto ObjetoMessageRoots(
+          examples.sujetoId2,
+          examples.objetoId2._1,
+          examples.objetoId2._2
+        )
 
       response.saldo should be(examples.obligacionWithSaldo50.BOB_SALDO)
       log.info(response.prettyPrint)
@@ -139,26 +140,27 @@ abstract class CotitularidadSpec(
       log.info(response.prettyPrint)
     }
 
-    messageProcessor.messageHistory(0)._1 should be("DGR-COP-OBJETOS-TRI")
-    messageProcessor.messageHistory(1)._1 should be("AddSujetoCotitularTransaction")
-    messageProcessor.messageHistory(2)._1 should be("DGR-COP-OBJETOS-TRI")
-    messageProcessor.messageHistory(3)._1 should be("AddSujetoCotitularTransaction")
-    messageProcessor
-      .messageHistory(4)
-      ._1 should be("ObjetoUpdatedCotitulares") // contains two messages one for each objeto which informs about the cotitulares Set(1,2) // TODO should only send a AddCotitular to objeto 1
-    messageProcessor
-      .messageHistory(5)
-      ._1 should be("ObjetoUpdatedCotitulares") // contains two messages one for each objeto which informs about the cotitulares Set(1,2) // TODO should only send a AddCotitular to objeto 1
-    messageProcessor.messageHistory(6)._1 should be("CotitularidadPublishSnapshot")
-    messageProcessor
-      .messageHistory(7)
-      ._1 should be("ObjetoReceiveSnapshot") // TODO separar mensajes informOfCurrentState
-    messageProcessor.messageHistory(8)._1 should be("DGR-COP-OBLIGACIONES-TRI")
-    messageProcessor.messageHistory(9)._1 should be("CotitularidadPublishSnapshot")
-    messageProcessor
-      .messageHistory(10)
-      ._1 should be("ObjetoReceiveSnapshot") // contains two messages one for each objeto which informs about the cotitulares Set(1,2)
-    messageProcessor.messageHistory.size should be(11)
+    messageProcessor.messageHistory.foreach { m =>
+      println(m._1)
+    }
+
+    messageProcessor.messageHistory.map { m =>
+      m._1
+    } should be(
+      Seq(
+        "DGR-COP-OBJETOS-TRI", // message A for objeto A, yes responsible
+        "ObjetoSnapshotPersisted", // thanks to message A
+        "DGR-COP-OBJETOS-TRI", // message B for objeto B, not responsible
+        "ObjetoSnapshotPersisted", // thanks to message B
+        "DGR-COP-OBLIGACIONES-TRI", // message C
+        "ObjetoSnapshotPersisted", // thanks to message C
+        "ObjetoReceiveSnapshot", // message D -- generated by CotitularidadActor
+        // CotitularidadActor informs objeto B
+        // of the message C
+        // which arrived at objeto A
+        "ObjetoSnapshotPersisted" // thanks to message D
+      )
+    )
 
   }
 

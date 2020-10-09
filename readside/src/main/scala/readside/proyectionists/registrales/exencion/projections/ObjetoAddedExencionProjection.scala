@@ -14,7 +14,7 @@ case class ObjetoAddedExencionProjection(
     "bex_fecha_fin" -> registro.BEX_FECHA_FIN,
     "bex_fecha_inicio" -> registro.BEX_FECHA_INICIO,
     "bex_periodo" -> registro.BEX_PERIODO,
-    "bex_porcentaje " -> registro.BEX_PORCENTAJE,
+    "bex_porcentaje" -> registro.BEX_PORCENTAJE,
     "bex_tipo" -> registro.BEX_TIPO
   )
 }

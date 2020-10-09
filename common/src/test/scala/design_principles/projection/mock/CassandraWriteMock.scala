@@ -2,20 +2,27 @@ package design_principles.projection.mock
 
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
-
 import akka.{actor, Done}
+import cassandra.ReadSideProjection
 import cassandra.write.CassandraWrite
+import cassandra.ReadSideProjection
 import design_principles.actor_model.Event
 
-class CassandraWriteMock(rowsAsMap: mutable.Map[String, Map[String, String]],
-                         proyectionistReaction: Any => (String, String))
-    extends CassandraWrite {
+class CassandraWriteMock(rowsAsMap: mutable.Map[String, Map[String, String]]) extends CassandraWrite {
+
+  val proyectionistReaction: ReadSideProjection[_ <: Event] => (String, Map[String, String]) = {
+    case e: ReadSideProjection[_] =>
+      (e.event.aggregateRoot,
+       (
+         e.keys ++ e.bindings
+       ).map(t => (t._1, t._2.toString)).toMap)
+
+  }
 
   override def writeState[E <: Event](
-      state: ddd.ReadSideProjection[E]
+      state: ReadSideProjection[E]
   )(implicit ec: ExecutionContext): Future[Done] = {
-    val (key, value) = proyectionistReaction(state.event)
-    rowsAsMap.addOne((key, Map("event" -> value)))
+    rowsAsMap.addOne(proyectionistReaction(state))
     Future.successful(Done)
   }
 

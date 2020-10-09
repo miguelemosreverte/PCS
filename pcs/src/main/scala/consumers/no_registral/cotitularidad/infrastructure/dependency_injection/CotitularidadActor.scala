@@ -6,16 +6,9 @@ import akka.entity.ShardedEntity
 import akka.entity.ShardedEntity.MonitoringAndMessageProducer
 import akka.persistence.{PersistentActor, RecoveryCompleted, SnapshotOffer}
 import consumers.no_registral.cotitularidad.application.entities.CotitularidadCommands.ObjetoSnapshotPersistedReaction
-import consumers.no_registral.cotitularidad.application.entities.{
-  CotitularidadCommands,
-  CotitularidadQueries,
-  CotitularidadResponses
-}
+import consumers.no_registral.cotitularidad.application.entities.{CotitularidadQueries, CotitularidadResponses}
 import consumers.no_registral.cotitularidad.domain.CotitularidadEvents.CotitularidadAddedSujetoCotitular
 import consumers.no_registral.cotitularidad.domain.{CotitularidadEvents, CotitularidadState}
-import consumers.no_registral.objeto.application.entities.ObjetoCommands.{ObjetoSnapshot, ObjetoUpdateCotitulares}
-import consumers.no_registral.objeto.domain.ObjetoEvents.ObjetoSnapshotPersisted
-import consumers.no_registral.objeto.infrastructure.consumer.ObjetoUpdateCotitularesTransaction
 import consumers.no_registral.objeto.infrastructure.json._
 import design_principles.actor_model.Response
 import kafka.KafkaMessageProducer.KafkaKeyValue
@@ -69,7 +62,11 @@ class CotitularidadActor(requirements: MonitoringAndMessageProducer)
             sujetosNoResponsables.map { sujetoNoResponsable =>
               val event = command.event
               val redirection = event.copy(
-                sujetoId = sujetoNoResponsable
+                sujetoId = sujetoNoResponsable,
+                cotitulares = state.sujetoResponsable match {
+                  case Some(sujetoResponsable) => state.sujetosCotitulares + sujetoResponsable
+                  case None => state.sujetosCotitulares
+                }
               )
               KafkaKeyValue(redirection.aggregateRoot, serialization.encode(redirection))
             }.toSeq,

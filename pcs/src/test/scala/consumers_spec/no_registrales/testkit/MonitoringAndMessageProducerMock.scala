@@ -32,7 +32,12 @@ object MonitoringAndMessageProducerMock {
           name = "rebalancerListener"
         )
         .toClassic
-    ProductionMonitoringAndMessageProducer.apply(monitoring, KafkaMessageProducer(monitoring, rebalancerListener)(s))
+    ProductionMonitoringAndMessageProducer.apply(
+      monitoring,
+      KafkaMessageProducer(monitoring, rebalancerListener)(s),
+      rebalancerListener,
+      s
+    )
   }
 
 }

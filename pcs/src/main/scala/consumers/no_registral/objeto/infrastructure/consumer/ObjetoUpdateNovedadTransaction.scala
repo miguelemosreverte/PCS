@@ -5,7 +5,7 @@ import akka.Done
 import akka.actor.ActorRef
 import api.actor_transaction.ActorTransaction
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
-import consumers.no_registral.objeto.application.entities.ObjetoCommands.{ObjetoSnapshot, ObjetoUpdateCotitulares}
+import consumers.no_registral.objeto.application.entities.ObjetoCommands.ObjetoSnapshot
 import consumers.no_registral.objeto.infrastructure.json._
 import design_principles.actor_model.Response
 import monitoring.Monitoring

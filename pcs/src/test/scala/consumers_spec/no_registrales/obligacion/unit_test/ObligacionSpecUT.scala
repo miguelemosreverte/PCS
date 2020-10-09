@@ -27,7 +27,8 @@ object ObligacionSpecUT {
         .StartMessageProcessor(ObligacionSpecMessageBroker)
         .startProcessing()
       new NoRegistralesQueryWithActorRef(
-        sujetoActor
+        sujetoActor,
+        cotitularidadActor
       )
     }
     ObligacionSpec TestContext (

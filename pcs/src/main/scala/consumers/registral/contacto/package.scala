@@ -5,8 +5,7 @@ import java.util.Date
 
 import cassandra.CassandraTypesAdapter._
 import consumers.registral.contacto.domain.{ContactoEvents, ContactoExternalDto}
-import ddd.ReadSideProjection
-
+import cassandra.ReadSideProjection
 package object contacto {
 
   final case class Contacto(

@@ -24,7 +24,9 @@ abstract class KafkaConsumerMicroservice(implicit m: KafkaConsumerMicroserviceRe
   implicit final val monitoringAndMessageProducer: ProductionMonitoringAndMessageProducer =
     ProductionMonitoringAndMessageProducer(
       monitoring,
-      messageProducer
+      messageProducer,
+      m.kafkaMessageProcessorRequirements.rebalancerListener,
+      m.ctx
     )
   implicit final val monitoringAndCassandraWrite: ProductionMonitoringAndCassandraWrite =
     ProductionMonitoringAndCassandraWrite(

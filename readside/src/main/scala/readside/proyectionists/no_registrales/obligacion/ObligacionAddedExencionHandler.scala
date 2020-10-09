@@ -24,11 +24,10 @@ class ObligacionAddedExencionHandler(
     serialization
       .maybeDecode[ObligacionAddedExencion](input)
 
-  val cassandra = new CassandraWriteProduction()
   private val log = LoggerFactory.getLogger(this.getClass)
   override def processMessage(registro: ObligacionAddedExencion): Future[Response.SuccessProcessing] = {
     for {
-      done <- cassandra
+      done <- r.cassandraWrite
         .cql(
           s"""
           DELETE FROM read_side.buc_obligaciones """ +

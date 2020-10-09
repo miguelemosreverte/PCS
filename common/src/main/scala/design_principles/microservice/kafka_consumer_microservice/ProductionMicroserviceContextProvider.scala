@@ -8,7 +8,9 @@ import akka.cluster.ClusterEvent.MemberUp
 import akka.http.scaladsl.server.Route
 import akka.kafka.ConsumerRebalanceEvent
 import api.actor_transaction.ActorTransaction.ActorTransactionRequirements
+import cassandra.CqlSessionSingleton
 import cassandra.write.CassandraWriteProduction
+import com.datastax.oss.driver.api.core.CqlSession
 import com.typesafe.config.Config
 import design_principles.actor_model.mechanism.QueryStateAPI.QueryStateApiRequirements
 import kafka.{KafkaMessageProcessorRequirements, TopicListener}
@@ -44,6 +46,7 @@ object ProductionMicroserviceContextProvider {
       executionContext = ctx.dispatcher,
       config = config
     )
+    implicit val session: CqlSession = CqlSessionSingleton.session
 
     val cassandraWrite = new CassandraWriteProduction()
 

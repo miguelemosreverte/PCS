@@ -1,9 +1,8 @@
 package readside.proyectionists.no_registrales.obligacion.projectionists
 
 import consumers.no_registral.obligacion.domain.ObligacionEvents
-import cassandra.mechanism.UpdateReadSideProjection
-
-trait ObligacionProjection extends UpdateReadSideProjection[ObligacionEvents] {
+import cassandra.ReadSideProjection
+trait ObligacionProjection extends ReadSideProjection[ObligacionEvents] {
   def collectionName: String = "read_side.buc_obligaciones"
   val keys: List[(String, Object)] = List(
     "bob_suj_identificador" -> event.sujetoId,

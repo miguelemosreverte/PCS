@@ -7,14 +7,6 @@ sealed trait ObjetoCommands extends Command with ObjetoMessage
 
 object ObjetoCommands {
 
-  case class ObjetoUpdateCotitulares(
-      deliveryId: BigInt,
-      sujetoId: String,
-      objetoId: String,
-      tipoObjeto: String,
-      cotitulares: Set[String]
-  ) extends ObjetoCommands
-
   case class ObjetoSnapshot(
       deliveryId: BigInt,
       sujetoId: String,
@@ -78,13 +70,6 @@ object ObjetoCommands {
       objetoId: String,
       tipoObjeto: String,
       tag: String
-  ) extends ObjetoCommands
-
-  case class SelfUpdateCotitulares(
-      deliveryId: BigInt,
-      sujetoId: String,
-      objetoId: String,
-      tipoObjeto: String
   ) extends ObjetoCommands
 
   case class ObjetoAddExencion(

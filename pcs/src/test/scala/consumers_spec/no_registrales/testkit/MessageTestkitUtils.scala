@@ -38,7 +38,6 @@ class MessageTestkitUtils(sujeto: ActorRef, cotitularidadActor: ActorRef) {
       (if (topics.isEmpty)
          Set(
            ObjetoSnapshotPersistedHandler(cotitularidadActor, monitoring),
-           ObjetoUpdateCotitularesTransaction(sujeto, monitoring),
            ObjetoTributarioTransaction(sujeto, monitoring),
            ObjetoExencionTransaction(sujeto, monitoring),
            ObjetoNoTributarioTransaction(sujeto, monitoring),

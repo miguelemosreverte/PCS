@@ -31,7 +31,8 @@ object SujetoSpecUT {
         .StartMessageProcessor(SujetoSpecMessageBroker)
         .startProcessing()
       new NoRegistralesQueryWithActorRef(
-        sujetoActor
+        sujetoActor,
+        cotitularidadActor
       )
     }
     SujetoSpec TestContext (

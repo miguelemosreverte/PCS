@@ -27,7 +27,7 @@ case class ObjetoSnapshotPersistedHandler(actorRef: ActorRef, monitoring: Monito
   def processInput(input: String): Either[Throwable, ObjetoSnapshotPersisted] =
     maybeDecode[ObjetoSnapshotPersisted](input)
 
-  def processMessage(evt: ObjetoSnapshotPersisted): Future[Response.SuccessProcessing] = {
+  def processMessage(evt: ObjetoSnapshotPersisted): Future[Response.SuccessProcessing] =
     actorRef.ask[Response.SuccessProcessing](
       ObjetoSnapshotPersistedReaction(
         evt.deliveryId,
@@ -36,5 +36,4 @@ case class ObjetoSnapshotPersistedHandler(actorRef: ActorRef, monitoring: Monito
         evt
       )
     )
-  }
 }

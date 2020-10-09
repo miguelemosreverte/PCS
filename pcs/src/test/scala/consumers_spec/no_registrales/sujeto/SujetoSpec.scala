@@ -20,7 +20,6 @@ abstract class SujetoSpec(
     getContext: ActorSystem => SujetoSpec.TestContext
 ) extends ActorSpec
     with NoRegistralesImplicitConversions {
-  val examples = new Examples("SujetoSpec")
 
   "un sujeto" should
   "pisar una obligacion con otra nueva que llegue desde Kafka para el mismo ID" in parallelActorSystemRunner {
@@ -28,6 +27,7 @@ abstract class SujetoSpec(
       val context = getContext(s)
       val messageProducer = context.messageProducer
       val Query = context.Query
+      val examples = new Examples("SujetoSpecTest1")
       messageProducer produceObligacion examples.obligacionWithSaldo200
       eventually {
         val response = Query getStateSujeto examples.obligacionWithSaldo200
@@ -47,6 +47,7 @@ abstract class SujetoSpec(
     val context = getContext(s)
     val messageProducer = context.messageProducer
     val Query = context.Query
+    val examples = new Examples("SujetoSpecTest2")
     val anotherOne = examples.obligacionWithSaldo50.copy(
       BOB_SOJ_IDENTIFICADOR = "anotherObject",
       BOB_OBN_ID = "anotherObligation",
@@ -66,6 +67,7 @@ abstract class SujetoSpec(
     val context = getContext(s)
     val messageProducer = context.messageProducer
     val Query = context.Query
+    val examples = new Examples("SujetoSpecTest3")
     val anotherOne = examples.obligacionWithSaldo50.copy(
       BOB_SOJ_IDENTIFICADOR = "anotherObject",
       BOB_OBN_ID = "anotherObligation",

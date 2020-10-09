@@ -1,25 +1,3 @@
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: pcs-api
-  namespace: copernico
-  labels:
-    app: pcs-cluster
-spec:
-  type: LoadBalancer
-  selector:
-    app: pcs-cluster
-  ports:
-    - protocol: TCP
-      port: 8081
-      targetPort: 8081
-      name: api
-    - protocol: TCP
-      port: 9095
-      targetPort: 9095
-      name: monitoring
 
 
 ---
@@ -30,7 +8,7 @@ metadata:
   name: pcs
   namespace: copernico
 spec:
-  replicas: $REPLICAS
+  replicas: 2
   selector:
     matchLabels:
       app: pcs-cluster
@@ -44,33 +22,22 @@ spec:
       labels:
         app: pcs-cluster
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: index
-                    operator: In
-                    values:
-                      - "1"
-                      - "2"
-                      - "3"
       terminationGracePeriodSeconds: 30
       restartPolicy: Always
       serviceAccountName: pcs-cluster
       containers:
-        - image: $IMAGE
-          imagePullPolicy: Always
+        - image: pcs/pcs:1.0
+          imagePullPolicy: Never
           name: pcs-cluster
           env:
-            - name: PARALELLISM
-              value: "$PARALLELISM"
             - name: REQUIRED_CONTACT_POINTS
-              value: "$REPLICAS"
+              value: "2"
             - name: KAFKA_BROKERS_LIST
               value: "kafka-internal:29092"
             - name: CASSANDRA_CONTACT_POINTS
-              value: "cassandra:9042"
+              value: "cassandra:9043"
+            - name: CASSANDRA_REPLICAS
+              value: "1"
             - name: DISCOVERY_METHOD
               value: "kubernetes-api"
             - name: CLUSTER_IP
@@ -86,10 +53,6 @@ spec:
               value: "copernico"
             - name: SERVICE_NAME
               value: "application-dns-internal"
-            - name: CASSANDRA_CONSISTENCY
-              value: "ONE"
-            - name: CASSANDRA_CONSISTENCY_SNAPSHOT
-              value: "ONE"
           ports:
             - name: remoting
               containerPort: 2551

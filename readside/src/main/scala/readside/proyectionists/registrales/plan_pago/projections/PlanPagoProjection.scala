@@ -1,9 +1,8 @@
 package readside.proyectionists.registrales.plan_pago.projections
 import cassandra.CassandraTypesAdapter.int
 import consumers.registral.plan_pago.domain.PlanPagoEvents
-import cassandra.mechanism.UpdateReadSideProjection
-
-trait PlanPagoProjection extends UpdateReadSideProjection[PlanPagoEvents] {
+import cassandra.ReadSideProjection
+trait PlanPagoProjection extends ReadSideProjection[PlanPagoEvents] {
   def collectionName: String = "read_side.buc_planes_pago"
   val keys: List[(String, Object)] = List(
     "bpl_suj_identificador" -> event.sujetoId,

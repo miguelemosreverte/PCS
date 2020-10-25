@@ -1,6 +1,9 @@
 package consumers_spec.no_registrales.testkit.query
 
 import akka.actor.ActorRef
+import consumers.no_registral.cotitularidad.application.entities.CotitularidadMessage.CotitularidadMessageRoots
+import consumers.no_registral.cotitularidad.application.entities.CotitularidadQueries.GetCotitulares
+import consumers.no_registral.cotitularidad.application.entities.CotitularidadResponses.GetCotitularesResponse
 import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMessageRoots
 import consumers.no_registral.objeto.application.entities.ObjetoQueries.GetStateObjeto
 import consumers.no_registral.objeto.application.entities.ObjetoResponses.GetObjetoResponse
@@ -13,7 +16,7 @@ import consumers.no_registral.sujeto.application.entity.SujetoResponses.GetSujet
 import design_principles.actor_model.testkit.QueryTestkit.AgainstActors
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 
-class NoRegistralesQueryWithActorRef(sujeto: ActorRef)
+class NoRegistralesQueryWithActorRef(sujeto: ActorRef, cotitularActor: ActorRef)
     extends NoRegistralesQueryTestKit
     with AgainstActors
     with ScalaFutures
@@ -32,6 +35,17 @@ class NoRegistralesQueryWithActorRef(sujeto: ActorRef)
         )
       )
       .futureValue
+
+  def getStateCotitularidad(objetoExample: CotitularidadMessageRoots): GetCotitularesResponse =
+    cotitularActor
+      .ask[GetCotitularesResponse](
+        GetCotitulares(
+          objetoExample.objetoId,
+          objetoExample.tipoObjeto
+        )
+      )
+      .futureValue
+
   def getStateObjeto(objetoExample: ObjetoMessageRoots): GetObjetoResponse =
     sujeto
       .ask[GetObjetoResponse](

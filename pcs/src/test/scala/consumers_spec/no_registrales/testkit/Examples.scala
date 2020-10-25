@@ -11,7 +11,7 @@ class Examples(testName: String) {
   val sujetoId1 = s"${testName}Sujeto1"
   val sujetoId2 = s"${testName}Sujeto2"
 
-  val objetoId2: (String, String) = ("2", "I")
+  val objetoId2: (String, String) = (s"${testName}Objeto2", "I")
   val objeto2: ObjetosTri = objetoTriStub.copy(
     EV_ID = deliveryId,
     SOJ_SUJ_IDENTIFICADOR = sujetoId1,
@@ -20,7 +20,7 @@ class Examples(testName: String) {
   )
 
   val fechaVencimientoObligacion5: LocalDateTime = LocalDateTime.now.plusMinutes(5)
-  val obligacionId = "1"
+  val obligacionId = s"${testName}Obligacion1"
   private def obligacionExample: ObligacionExternalDto.ObligacionesTri =
     stubs.consumers.no_registrales.obligacion.ObligacionExternalDtoStub.obligacionesTri.copy(
       EV_ID = deliveryId,

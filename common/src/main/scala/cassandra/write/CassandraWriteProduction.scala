@@ -4,14 +4,17 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 import akka.Done
 import cassandra.CqlSessionSingleton
-import ddd.ReadSideProjection
+import com.datastax.oss.driver.api.core.CqlSession
+import cassandra.ReadSideProjection
 import design_principles.actor_model.Event
 import org.slf4j.LoggerFactory
+
 import scala.jdk.FutureConverters.CompletionStageOps
 
-class CassandraWriteProduction extends CassandraWrite {
+class CassandraWriteProduction() extends CassandraWrite {
   private val logger = LoggerFactory.getLogger(this.getClass)
-  private val session = CqlSessionSingleton.session
+
+  val session: CqlSession = CqlSessionSingleton.session
 
   def writeState[E <: Event](
       state: ReadSideProjection[E]

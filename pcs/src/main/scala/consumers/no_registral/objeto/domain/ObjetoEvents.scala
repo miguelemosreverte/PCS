@@ -14,14 +14,6 @@ sealed trait ObjetoEvents extends Event {
 
 object ObjetoEvents {
 
-  case class ObjetoUpdatedCotitulares(
-      deliveryId: BigInt,
-      sujetoId: String,
-      objetoId: String,
-      tipoObjeto: String,
-      cotitulares: Set[String]
-  ) extends ObjetoEvents
-
   case class ObjetoSnapshotPersisted(
       deliveryId: BigInt,
       sujetoId: String,

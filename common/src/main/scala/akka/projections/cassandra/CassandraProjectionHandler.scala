@@ -1,7 +1,6 @@
 package akka.projections.cassandra
 
 import scala.util.{Failure, Success, Try}
-
 import akka.actor.typed.ActorSystem
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
@@ -10,14 +9,15 @@ import akka.projections.cassandra.CassandraProjectionist.CassandraProjectionistR
 import akka.projections.{ProjectionHandler, ProjectionSettings}
 import akka.stream.alpakka.cassandra.CassandraSessionSettings
 import akka.stream.alpakka.cassandra.scaladsl.{CassandraSession, CassandraSessionRegistry}
+import cassandra.CqlSessionSingleton
 import cassandra.write.{CassandraWrite, CassandraWriteProduction}
+import com.datastax.oss.driver.api.core.CqlSession
 import org.slf4j.LoggerFactory
 
 abstract class CassandraProjectionHandler[T](settings: ProjectionSettings, system: ActorSystem[_])
     extends ProjectionHandler[T](settings, system) {
 
-  private val sessionSettings = CassandraSessionSettings.create()
-  private implicit val session: CassandraSession = CassandraSessionRegistry.get(system).sessionFor(sessionSettings)
+  private implicit val session: CqlSession = CqlSessionSingleton.session
 
   val cassandra: CassandraWrite = new CassandraWriteProduction()
 

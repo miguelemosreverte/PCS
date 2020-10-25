@@ -31,10 +31,6 @@ case class ObjetoState(
 
   private def changeState(event: ObjetoEvents): ObjetoState =
     event match {
-      case cmd: ObjetoEvents.ObjetoUpdatedCotitulares =>
-        copy(
-          sujetos = cmd.cotitulares
-        )
       case ObjetoEvents.ObjetoAddedExencion(deliveryId, sujetoId, objetoId, tipoObjeto, exencion) =>
         copy(
           exenciones = exenciones + exencion

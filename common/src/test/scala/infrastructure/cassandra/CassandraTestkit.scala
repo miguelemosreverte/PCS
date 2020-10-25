@@ -20,7 +20,9 @@ object CassandraTestkit extends AnyFlatSpec {
         .replace("Map()", "{}")
         .replace("--", "null")
         .replace("\"", "")
-        .replace(".", "")
+        .replace("t00:00", "")
+        .replace("T00:00", "")
+        .replace("{}", "null")
 
     val secondPass = firstPass match {
       case s"Some($v)" => v
@@ -73,9 +75,9 @@ object CassandraTestkit extends AnyFlatSpec {
     case Some(v: Map[_, _]) if v.nonEmpty && v.values.head.isInstanceOf[String] && v.keys.head.isInstanceOf[String] =>
       v.toString
 
-    case v: String => v.toString
+    case v: String => v
 
-    case Some(v: String) => v.toString
+    case Some(v: String) => v
 
     case v: LocalDateTime => v.toString
 
@@ -110,10 +112,13 @@ object CassandraTestkit extends AnyFlatSpec {
         val detailedOneByOneComparison: Seq[String] = compareToPrepared.toSeq map {
             case (key, value) =>
               val valueAsString = value
-              val valueInCassandra = rowAsMapPrepared.getOrElse(key, "--")
-              " " * 60 + s"row(${Console.CYAN + key + Console.RESET}) == value" + " | " + s"${Console.GREEN + standarize(
-                valueInCassandra
-              ) + Console.RESET} == ${standarize(valueAsString)}"
+              val valueInCassandra = rowAsMapPrepared.getOrElse(key.trim, "--")
+              val a = " " * 60 + s"row(${Console.CYAN + key + Console.RESET}) == value" + " | " + s"${Console.GREEN + standarize(
+                  valueInCassandra
+                ) + Console.RESET} == ${standarize(valueAsString)}"
+              println(a)
+              assert(safeCompare(valueInCassandra, valueAsString))
+              a
           }
         val fullPresentation: String = (Seq(twoColumnComparison) ++ detailedOneByOneComparison) mkString "\n"
         val twoEmptyLines = "\n" * 2
@@ -124,7 +129,6 @@ object CassandraTestkit extends AnyFlatSpec {
           case (key, value) =>
             val valueAsString = value
             val valueInCassandra = rowAsMapPrepared.getOrElse(key, "--")
-            assert(safeCompare(valueInCassandra, valueAsString))
             safeCompare(valueInCassandra, valueAsString)
 
         }

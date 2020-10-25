@@ -33,6 +33,17 @@ class ObligacionActor(requirements: MonitoringAndMessageProducer)
   }
 
   def informParent(cmd: ObligacionCommands): Unit = {
+    println(s"HERE 2: ${cmd.aggregateRoot} ${ObjetoCommands.ObjetoUpdateFromObligacion(
+      cmd.deliveryId,
+      cmd.sujetoId,
+      cmd.objetoId,
+      cmd.tipoObjeto,
+      cmd.obligacionId,
+      state.saldo,
+      state.exenta,
+      state.porcentajeExencion
+    )}")
+
     context.parent ! ObjetoCommands.ObjetoUpdateFromObligacion(
       cmd.deliveryId,
       cmd.sujetoId,

@@ -1,9 +1,8 @@
 package readside.proyectionists.registrales.domicilio_sujeto.projections
 
 import consumers.registral.domicilio_sujeto.domain.DomicilioSujetoEvents
-import cassandra.mechanism.UpdateReadSideProjection
-
-trait DomicilioSujetoProjection extends UpdateReadSideProjection[DomicilioSujetoEvents] {
+import cassandra.ReadSideProjection
+trait DomicilioSujetoProjection extends ReadSideProjection[DomicilioSujetoEvents] {
   def collectionName: String = "read_side.buc_domicilios_sujeto"
 
   val keys: List[(String, Object)] = List(

@@ -35,7 +35,6 @@ class ObjetoActor(requirements: MonitoringAndMessageProducer, obligacionActorPro
     commandBus.subscribe[ObjetoCommands.ObjetoUpdateFromTri](new ObjetoUpdateFromTriHandler(this).handle)
     commandBus.subscribe[ObjetoCommands.SetBajaObjeto](new SetBajaObjetoHandler(this).handle)
     commandBus.subscribe[ObjetoCommands.ObjetoUpdateFromObligacion](new ObjetoUpdateFromObligacionHandler(this).handle)
-    commandBus.subscribe[ObjetoCommands.ObjetoUpdateCotitulares](new ObjetoUpdateCotitularesHandler(this).handle)
     commandBus.subscribe[ObjetoCommands.ObjetoAddExencion](new ObjetoAddExencionHandler(this).handle)
     commandBus.subscribe[ObjetoCommands.ObjetoUpdateFromSetBajaObligacion](
       new ObjetoUpdateFromSetBajaObligacionHandler(this).handle
@@ -164,6 +163,26 @@ class ObjetoActor(requirements: MonitoringAndMessageProducer, obligacionActorPro
     sujetos.size > 1
 
   def informParent(cmd: ObjetoCommands, state: ObjetoState): Unit = {
+    println(
+      s"objeto informParent HERE 3: ${cmd.aggregateRoot} ${SujetoCommands.SujetoUpdateFromObjeto(
+        cmd.deliveryId,
+        cmd.sujetoId,
+        cmd.objetoId,
+        cmd.tipoObjeto,
+        state.saldo,
+        state.obligacionesSaldo.values.sum
+      )}" +
+      s"${SujetoCommands
+        .SujetoUpdateFromObjeto(
+          cmd.deliveryId,
+          cmd.sujetoId,
+          cmd.objetoId,
+          cmd.tipoObjeto,
+          state.saldo,
+          state.obligacionesSaldo.values.sum
+        )
+        .saldoObjeto}"
+    )
     context.parent ! SujetoCommands.SujetoUpdateFromObjeto(
       cmd.deliveryId,
       cmd.sujetoId,

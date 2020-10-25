@@ -23,6 +23,10 @@ class SujetoUpdateFromObjetoHandler(actor: SujetoActor) extends SyncCommandHandl
 
     actor.persistEvent(event) { () =>
       actor.state += event
+      println(s"HERE 4: sujeto received update: ${command.aggregateRoot} ${command.saldoObjeto}")
+      println(s"HERE 5: sujeto received update: ${actor.state.saldo}")
+      log.info(s"[${actor.persistenceId}] GetState | ${actor.state}")
+
       actor.persistSnapshot()(_ => ())
     }
     Success(Response.SuccessProcessing(command.aggregateRoot, command.deliveryId))

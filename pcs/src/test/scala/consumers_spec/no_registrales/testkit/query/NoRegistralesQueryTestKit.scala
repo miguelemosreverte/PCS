@@ -1,5 +1,7 @@
 package consumers_spec.no_registrales.testkit.query
 
+import consumers.no_registral.cotitularidad.application.entities.CotitularidadMessage.CotitularidadMessageRoots
+import consumers.no_registral.cotitularidad.application.entities.CotitularidadResponses.GetCotitularesResponse
 import consumers.no_registral.objeto.application.entities.ObjetoMessage.ObjetoMessageRoots
 import consumers.no_registral.objeto.application.entities.ObjetoResponses.GetObjetoResponse
 import consumers.no_registral.obligacion.application.entities.ObligacionExternalDto.ObligacionesTri
@@ -12,6 +14,7 @@ import design_principles.actor_model.testkit.QueryTestkit
 trait NoRegistralesQueryTestKit extends QueryTestkit {
 
   def getStateObligacion(obligacionExample: ObligacionMessageRoots): GetObligacionResponse
+  def getStateCotitularidad(objetoExample: CotitularidadMessageRoots): GetCotitularesResponse
   def getStateObjeto(objetoExample: ObjetoMessageRoots): GetObjetoResponse
   def getStateSujeto(sujetoExample: SujetoMessageRoots): GetSujetoResponse
 

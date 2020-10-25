@@ -61,6 +61,8 @@ case class ObligacionTributariaTransaction(actorRef: ActorRef, monitoring: Monit
           registro = registro,
           detallesObligacion = detalles.getOrElse(Seq.empty)
         )
+    println(s"HERE: ${command.aggregateRoot} ${registro.BOB_SALDO}")
+
     actorRef.ask[Response.SuccessProcessing](command)
 
   }

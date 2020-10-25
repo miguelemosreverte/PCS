@@ -2,9 +2,8 @@ package readside.proyectionists.registrales.juicio.projections
 
 import cassandra.CassandraTypesAdapter.int
 import consumers.registral.juicio.domain.JuicioEvents
-import cassandra.mechanism.UpdateReadSideProjection
-
-trait JuicioProjection extends UpdateReadSideProjection[JuicioEvents] {
+import cassandra.ReadSideProjection
+trait JuicioProjection extends ReadSideProjection[JuicioEvents] {
   def collectionName: String = "read_side.buc_juicios"
 
   val keys: List[(String, Object)] = List(

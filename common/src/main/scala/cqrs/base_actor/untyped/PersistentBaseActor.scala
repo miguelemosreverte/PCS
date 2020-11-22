@@ -20,6 +20,7 @@ abstract class PersistentBaseActor[E <: Event: ClassTag, State <: AbstractState[
     with PersistentActor
     with ActorLogging {
 
+
   val persistedCounter: Counter = monitoring.counter(s"$name-persisted")
 
   val eventBus: EventBus[Try] = new SyncEventBus(logger)

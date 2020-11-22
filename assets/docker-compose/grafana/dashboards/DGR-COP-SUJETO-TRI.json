@@ -15,11 +15,9 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": null,
   "links": [],
   "panels": [
     {
-      "content": "\n# WRITESIDE\n\n\n\n\n",
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -34,12 +32,11 @@
         "y": 0
       },
       "id": 14,
-      "mode": "markdown",
       "options": {
         "content": "# writeside\n\n",
         "mode": "markdown"
       },
-      "pluginVersion": "7.1.0",
+      "pluginVersion": "7.3.3",
       "timeFrom": null,
       "timeShift": null,
       "title": "",
@@ -47,7 +44,6 @@
       "type": "text"
     },
     {
-      "content": "\n# READSIDE\n\n\n\n\n",
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -62,12 +58,11 @@
         "y": 0
       },
       "id": 15,
-      "mode": "markdown",
       "options": {
         "content": "# readside\n\n",
         "mode": "markdown"
       },
-      "pluginVersion": "7.1.0",
+      "pluginVersion": "7.3.3",
       "timeFrom": null,
       "timeShift": null,
       "title": "",
@@ -75,6 +70,10 @@
       "type": "text"
     },
     {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
       "datasource": null,
       "fieldConfig": {
         "defaults": {
@@ -92,45 +91,94 @@
                 "value": 80
               }
             ]
-          },
-          "unit": "ms"
+          }
         },
         "overrides": []
       },
+      "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 5,
-        "w": 5,
+        "w": 8,
         "x": 5,
         "y": 2
       },
-      "id": 8,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
+      "hiddenSeries": false,
+      "id": 10,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
       },
-      "pluginVersion": "7.0.3",
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.3",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
       "targets": [
         {
-          "expr": "\nhistogram_quantile(0.9, \n  rate(copernico_histograms_bucket{entity=\"actor-transaction-sujeto_tributario_transaction-latency\"}[5m])\n)\n",
+          "expr": "\nsum(\nincrease(copernico_counters_total{entity=\"actor-transaction-sujeto_tributario_transaction-request\"}[1m])\n)\n",
           "interval": "",
-          "legendFormat": "actor-transaction-_obligacion_tributaria_transaction-latency",
+          "legendFormat": "",
           "refId": "A"
         }
       ],
+      "thresholds": [],
       "timeFrom": null,
+      "timeRegions": [],
       "timeShift": null,
-      "title": "latencia akka",
-      "type": "stat"
+      "title": "Kafka consumptions per minute (RPM)",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:378",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:379",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "aliasColors": {},
@@ -181,10 +229,10 @@
       "linewidth": 1,
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.1.1",
+      "pluginVersion": "7.3.3",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -194,7 +242,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "\n\nsum(\nincrease(copernico_counters_total{entity=\"projection-handler-sujeto_projection_handler-request\"}[1m])\n)\n",
+          "expr": "\n\nsum(\nincrease(copernico_counters_total{entity=\"SujetoActor-persisted\"}[1m])\n)\n",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -220,6 +268,7 @@
       },
       "yaxes": [
         {
+          "$$hashKey": "object:449",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -228,6 +277,7 @@
           "show": true
         },
         {
+          "$$hashKey": "object:450",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -253,48 +303,50 @@
               {
                 "color": "green",
                 "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
               }
             ]
-          }
+          },
+          "unit": "ms"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 2,
+        "h": 5,
         "w": 5,
-        "x": 5,
+        "x": 8,
         "y": 7
       },
-      "id": 19,
-      "links": [],
+      "id": 8,
       "options": {
         "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "center",
+        "graphMode": "area",
+        "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
-            "max"
+            "mean"
           ],
           "fields": "",
           "values": false
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "7.3.3",
       "targets": [
         {
-          "expr": "sum(copernico_counters_total{entity=\"actor-transaction-sujeto_tributario_transaction-request\"} )\n",
-          "format": "time_series",
+          "expr": "\nhistogram_quantile(0.9, \n  rate(copernico_histograms_bucket{entity=\"actor-transaction-sujeto_tributario_transaction-latency\"}[5m])\n)\n",
           "interval": "",
-          "intervalFactor": 1,
-          "legendFormat": "",
+          "legendFormat": "actor-transaction-_obligacion_tributaria_transaction-latency",
           "refId": "A"
         }
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "TOTAL TRANSACTIONS ",
+      "title": "latencia akka",
       "type": "stat"
     },
     {
@@ -341,10 +393,10 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "7.3.3",
       "targets": [
         {
-          "expr": "copernico_histograms_bucket{le=\"3000.0\",entity=\"projection-handler-sujeto_projection_handler-latency\"}",
+          "expr": "copernico_histograms_bucket{le=\"3000.0\",entity=\"actor-transaction-sujeto_snapshot_persisted_handler-latency\"}",
           "interval": "",
           "legendFormat": "actor-transaction-_obligacion_tributaria_transaction-latency",
           "refId": "A"
@@ -374,12 +426,12 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 2,
-        "w": 5,
-        "x": 5,
-        "y": 9
+        "h": 3,
+        "w": 12,
+        "x": 0,
+        "y": 12
       },
-      "id": 23,
+      "id": 19,
       "links": [],
       "options": {
         "colorMode": "value",
@@ -395,10 +447,10 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "7.3.3",
       "targets": [
         {
-          "expr": "sum(copernico_counters_total{entity=\"SujetoActor-persisted-SujetoUpdatedFromTri\"} )\n",
+          "expr": "sum(copernico_counters_total{entity=\"actor-transaction-sujeto_tributario_transaction-request\"} )\n",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -408,117 +460,8 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "TOTAL EVENTS PERSISTED ",
+      "title": "TOTAL TRANSACTIONS ",
       "type": "stat"
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "custom": {},
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 5,
-        "w": 12,
-        "x": 0,
-        "y": 11
-      },
-      "hiddenSeries": false,
-      "id": 10,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": false,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "dataLinks": []
-      },
-      "percentage": false,
-      "pluginVersion": "7.1.1",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "\nsum(\nincrease(copernico_counters_total{entity=\"actor-transaction-sujeto_tributario_transaction-request\"}[1m])\n)\n",
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Kafka consumptions per minute (RPM)",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
     },
     {
       "datasource": null,
@@ -560,10 +503,10 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "7.3.3",
       "targets": [
         {
-          "expr": "sum(copernico_counters_total{entity=\"projection-handler-sujeto_projection_handler-request\"} )",
+          "expr": "sum(copernico_counters_total{entity=\"SujetoActor-persisted\"} )",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -593,200 +536,8 @@
       "gridPos": {
         "h": 9,
         "w": 12,
-        "x": 12,
+        "x": 0,
         "y": 15
-      },
-      "hiddenSeries": false,
-      "id": 16,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "options": {
-        "dataLinks": []
-      },
-      "percentage": false,
-      "pluginVersion": "7.1.1",
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "copernico_counters_total{entity=\"projection-handler-sujeto_projection_handler-request\"} ",
-          "format": "time_series",
-          "interval": "",
-          "intervalFactor": 1,
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "TOTAL PROJECTIONS PER NODE",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": true,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 5,
-        "w": 12,
-        "x": 0,
-        "y": 16
-      },
-      "hiddenSeries": false,
-      "id": 22,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": true,
-        "total": false,
-        "values": false
-      },
-      "lines": false,
-      "linewidth": 1,
-      "nullPointMode": "null",
-      "options": {
-        "dataLinks": []
-      },
-      "percentage": false,
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "\nsum(\nincrease(copernico_counters_total{entity=\"SujetoActor-persisted-SujetoUpdatedFromTri\"}[1m])\n)\n",
-          "interval": "",
-          "legendFormat": "",
-          "refId": "A"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Persistencias per minute (RPM)",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": null,
-      "fieldConfig": {
-        "defaults": {
-          "custom": {}
-        },
-        "overrides": []
-      },
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 9,
-        "w": 12,
-        "x": 0,
-        "y": 21
       },
       "hiddenSeries": false,
       "id": 2,
@@ -804,10 +555,10 @@
       "links": [],
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.1.1",
+      "pluginVersion": "7.3.3",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -845,6 +596,7 @@
       },
       "yaxes": [
         {
+          "$$hashKey": "object:742",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -853,6 +605,7 @@
           "show": true
         },
         {
+          "$$hashKey": "object:743",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -883,8 +636,134 @@
       "gridPos": {
         "h": 9,
         "w": 12,
+        "x": 12,
+        "y": 15
+      },
+      "hiddenSeries": false,
+      "id": 16,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true
+      },
+      "percentage": false,
+      "pluginVersion": "7.3.3",
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "copernico_counters_total{entity=\"SujetoActor-persisted\"} ",
+          "format": "time_series",
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "TOTAL PROJECTIONS PER NODE",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "$$hashKey": "object:596",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "$$hashKey": "object:597",
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 7,
+        "x": 9,
+        "y": 24
+      },
+      "id": 18,
+      "options": {
+        "content": "# published events\n\n\n",
+        "mode": "markdown"
+      },
+      "pluginVersion": "7.3.3",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 9,
+        "w": 12,
         "x": 0,
-        "y": 30
+        "y": 26
       },
       "hiddenSeries": false,
       "id": 4,
@@ -904,10 +783,10 @@
       "links": [],
       "nullPointMode": "null",
       "options": {
-        "dataLinks": []
+        "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.1.1",
+      "pluginVersion": "7.3.3",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -917,7 +796,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "copernico_counters_total{entity=\"SujetoActor-persisted-SujetoUpdatedFromTri\"} ",
+          "expr": "copernico_counters_total{entity=\"SujetoActor-persisted-SujetoSnapshotPersisted\"} ",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -945,6 +824,7 @@
       },
       "yaxes": [
         {
+          "$$hashKey": "object:80",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -953,6 +833,7 @@
           "show": true
         },
         {
+          "$$hashKey": "object:81",
           "format": "short",
           "label": null,
           "logBase": 1,
@@ -967,15 +848,15 @@
       }
     }
   ],
-  "refresh": "10s",
-  "schemaVersion": 25,
+  "refresh": "",
+  "schemaVersion": 26,
   "style": "dark",
   "tags": [],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {
@@ -1005,5 +886,5 @@
   "timezone": "",
   "title": "DGR-COP-SUJETO_TRI",
   "uid": "DGR-COP-SUJETO_TRI",
-  "version": 1
+  "version": 8
 }

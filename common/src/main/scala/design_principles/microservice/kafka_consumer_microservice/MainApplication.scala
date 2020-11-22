@@ -2,7 +2,8 @@ package design_principles.microservice.kafka_consumer_microservice
 
 import akka.actor.ActorSystem
 import akka.cluster.ClusterEvent
-import akka.dispatchers.ActorsDispatchers
+import config.StaticConfig
+//import akka.dispatchers.ActorsDispatchers
 import akka.http.AkkaHttpServer
 import akka.http.scaladsl.server.Directives._
 import api.actor_transaction.{ActorTransaction, ActorTransactionController}
@@ -33,8 +34,9 @@ object MainApplication {
       mainConfig,
       ConfigFactory parseString EventSerializer.eventAdapterConf,
       ConfigFactory parseString EventSerializer.serializationConf,
-      ConfigFactory parseString new ActorsDispatchers(mainConfig).actorsDispatchers,
-      extraConfigurations
+      //ConfigFactory parseString new ActorsDispatchers(mainConfig).actorsDispatchers,
+      extraConfigurations,
+      StaticConfig.config
     ).reduce(_ withFallback _)
 
     implicit val system: ActorSystem = Guardian.getContext(GuardianRequirements(actorSystemName, config))
